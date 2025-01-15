@@ -26,10 +26,16 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/request-location/{latitude}/{longitude}', [ApiLocationController::class, 'getRecentRequestLocation'])
         ->name('api.request-location.get');
 
-    Route::post('/{post}/like', [LikeController::class, 'store'])
-        ->name('posts.like');
-    Route::delete('/{post}/like', [LikeController::class, 'destroy'])
-        ->name('posts.unlike');
+    Route::prefix('posts')->group(function () {
+        Route::prefix('{post}')->group(function () {
+            Route::get('/', [PostController::class, 'show'])
+                ->name('api.posts.show');
+            Route::post('/like', [LikeController::class, 'store'])
+                ->name('posts.like');
+            Route::delete('/like', [LikeController::class, 'destroy'])
+                ->name('posts.unlike');
+        });
+    });
 
     Route::prefix('map')->group(function () {
         Route::get('/linestring/{from}/{to}', [MapController::class, 'getLineStringBetween'])

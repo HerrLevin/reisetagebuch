@@ -4,30 +4,47 @@ import { getBaseText, prettyDates } from '@/Services/PostTextService';
 import { getDepartureDelay } from '@/Services/TripTimeService';
 import { TransportPost } from '@/types/PostTypes';
 import { Head, router } from '@inertiajs/vue3';
+import axios from 'axios';
 import { CircleX, PlaneLanding, PlaneTakeoff } from 'lucide-vue-next';
 import { DateTime } from 'luxon';
-import { PropType, ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
 
 const props = defineProps({
-    post: {
-        type: Object as PropType<TransportPost>,
+    postId: {
+        type: String,
         required: true,
     },
 });
 
-const manualDeparture = ref<DateTime | null>(
-    props.post?.manualDepartureTime
-        ? DateTime.fromISO(props.post.manualDepartureTime)
-        : null,
-);
-const manualArrival = ref<DateTime | null>(
-    props.post?.manualArrivalTime
-        ? DateTime.fromISO(props.post.manualArrivalTime)
-        : null,
-);
+const post = ref<TransportPost | null>(null);
+
+const manualDeparture = ref<DateTime | null>(null);
+const manualArrival = ref<DateTime | null>(null);
+const subtitle = ref('');
+const title = t('edit_transport_times.title');
+const fullTitle = ref('');
+
+function fetchPost() {
+    axios
+        .get('/api/posts/' + props.postId)
+        .then((response) => {
+            post.value = response.data;
+            manualDeparture.value = post.value?.manualDepartureTime
+                ? DateTime.fromISO(post.value.manualDepartureTime)
+                : null;
+            manualArrival.value = post.value?.manualArrivalTime
+                ? DateTime.fromISO(post.value.manualArrivalTime)
+                : null;
+
+            getTitles();
+        })
+        .catch((error) => {
+            console.error('Error fetching post:', error);
+        });
+}
 
 function submit() {
     if (
@@ -38,7 +55,7 @@ function submit() {
         alert(t('edit_transport_times.arrival_before_departure_error'));
         return;
     }
-    router.put(route('posts.update.transport-times', props.post?.id), {
+    router.put(route('posts.update.transport-times', post.value?.id), {
         manualDepartureTime: manualDeparture.value
             ? manualDeparture.value.toISO()
             : null,
@@ -48,22 +65,28 @@ function submit() {
     });
 }
 
-const subtitle = `${getBaseText(props.post)} (${prettyDates(props.post)})`;
-const title = t('edit_transport_times.title');
-const fullTitle = `${title} · ${subtitle}`;
+function getTitles() {
+    if (!post.value) {
+        return;
+    }
+    subtitle.value = `${getBaseText(post.value)} (${prettyDates(post.value)})`;
+    fullTitle.value = `${title} · ${subtitle.value}`;
+}
 
 function goBack() {
     window.history.back();
 }
 
 function departNow() {
+    if (!post.value) {
+        return;
+    }
     manualDeparture.value = DateTime.now().set({ second: 0, millisecond: 0 });
-    const post = props.post;
-    post.manualDepartureTime = manualDeparture.value.toISO();
-    const delay = getDepartureDelay(props.post);
-    if (delay && delay > 1 && post?.destinationStop?.arrivalTime) {
+    post.value.manualDepartureTime = manualDeparture.value.toISO();
+    const delay = getDepartureDelay(post.value);
+    if (delay && delay > 1 && post.value?.destinationStop?.arrivalTime) {
         manualArrival.value = DateTime.fromISO(
-            post.destinationStop.arrivalTime,
+            post.value.destinationStop.arrivalTime,
         ).plus({ minutes: delay });
     }
 }
@@ -127,6 +150,8 @@ function selectArrivalTime(event: Event) {
         manualArrival.value = DateTime.fromISO(target.value);
     }
 }
+
+watch(() => props.postId, fetchPost, { immediate: true });
 </script>
 
 <template>

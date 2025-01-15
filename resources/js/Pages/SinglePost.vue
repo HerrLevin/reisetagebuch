@@ -22,14 +22,15 @@ import axios from 'axios';
 import { GeometryCollection } from 'geojson';
 import { ArrowLeft } from 'lucide-vue-next';
 import { LngLat } from 'maplibre-gl';
-import { computed, onMounted, onUnmounted, PropType, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import Loading from '@/Components/Loading.vue';
 
 const { t } = useI18n();
 
 const props = defineProps({
-    post: {
-        type: Object as PropType<BasePost | TransportPost | LocationPost>,
+    postId: {
+        type: String,
         required: true,
     },
 });
@@ -41,69 +42,98 @@ const startPoint = ref(null as LngLat | null);
 const endPoint = ref(null as LngLat | null);
 const lineString = ref(null as GeometryCollection | null);
 const stopovers = ref(null as GeometryCollection | null);
+const heading = ref('');
+const pageTitle = ref('');
+const loading = ref(false);
 
-if (isLocationPost(props.post)) {
-    startPoint.value = new LngLat(
-        (props.post as LocationPost).location?.longitude ?? 9,
-        (props.post as LocationPost).location?.latitude ?? 49,
-    );
-} else if (isTransportPost(props.post)) {
-    startPoint.value = new LngLat(
-        (props.post as TransportPost).originStop.location.longitude ?? 9,
-        (props.post as TransportPost).originStop.location.latitude ?? 49,
-    );
-    endPoint.value = new LngLat(
-        (props.post as TransportPost).destinationStop.location.longitude ?? 9,
-        (props.post as TransportPost).destinationStop.location.latitude ?? 49,
-    );
+const post = ref<BasePost | TransportPost | LocationPost | null>(null);
 
+function fetchPost() {
+    loading.value = true;
     axios
-        .get(
-            '/api/map/linestring/' +
-                props.post.originStop.id +
-                '/' +
-                props.post.destinationStop.id,
-        )
+        .get('/api/posts/' + props.postId)
         .then((response) => {
-            lineString.value = response.data;
+            post.value = response.data;
+            heading.value = t('posts.name_post', {
+                name: post.value?.user.name,
+            });
+            getPageTitle();
+            mapPostDetails();
+            loading.value = false;
         })
         .catch(() => {
-            lineString.value = null;
+            post.value = null;
         });
+}
 
-    axios
-        .get(
-            '/api/map/stopovers/' +
-                props.post.originStop.id +
-                '/' +
-                props.post.destinationStop.id,
-        )
-        .then((response) => {
-            stopovers.value = response.data;
-        })
-        .catch(() => {
-            stopovers.value = null;
+function mapPostDetails() {
+    if (isLocationPost(post.value)) {
+        startPoint.value = new LngLat(
+            (post.value as LocationPost).location?.longitude ?? 9,
+            (post.value as LocationPost).location?.latitude ?? 49,
+        );
+    } else if (isTransportPost(post.value)) {
+        startPoint.value = new LngLat(
+            (post.value as TransportPost).originStop.location.longitude ?? 9,
+            (post.value as TransportPost).originStop.location.latitude ?? 49,
+        );
+        endPoint.value = new LngLat(
+            (post.value as TransportPost).destinationStop.location.longitude ??
+                9,
+            (post.value as TransportPost).destinationStop.location.latitude ??
+                49,
+        );
+
+        axios
+            .get(
+                '/api/map/linestring/' +
+                    post.value.originStop.id +
+                    '/' +
+                    post.value.destinationStop.id,
+            )
+            .then((response) => {
+                lineString.value = response.data;
+            })
+            .catch(() => {
+                lineString.value = null;
+            });
+
+        axios
+            .get(
+                '/api/map/stopovers/' +
+                    post.value.originStop.id +
+                    '/' +
+                    post.value.destinationStop.id,
+            )
+            .then((response) => {
+                stopovers.value = response.data;
+            })
+            .catch(() => {
+                stopovers.value = null;
+            });
+    } else {
+        startPoint.value = null;
+        endPoint.value = null;
+    }
+}
+
+function getPageTitle() {
+    pageTitle.value = heading.value;
+    if (isLocationPost(post.value)) {
+        pageTitle.value = t('posts.name_location_post', {
+            name: post.value.user.name,
+            location: post.value.location.name,
         });
-} else {
-    startPoint.value = null;
-    endPoint.value = null;
-}
-const heading = t('posts.name_post', { name: props.post.user.name });
-let head = heading;
-if (isLocationPost(props.post)) {
-    head = t('posts.name_location_post', {
-        name: props.post.user.name,
-        location: props.post.location.name,
-    });
-} else if (isTransportPost(props.post)) {
-    head = t('posts.name_transport_post', {
-        name: props.post.user.name,
-        from: props.post.originStop.location.name,
-        to: props.post.destinationStop.location.name,
-    });
-}
-if (props.post.body) {
-    head += `: ${props.post.body}`;
+    } else if (isTransportPost(post.value)) {
+        pageTitle.value = t('posts.name_transport_post', {
+            name: post.value.user.name,
+            from: post.value.originStop.location.name,
+            to: post.value.destinationStop.location.name,
+        });
+    }
+    if (post.value?.body) {
+        pageTitle.value += `: ${post.value.body}`;
+    }
 }
 
 const currentTime = ref(Date.now());
@@ -121,10 +151,12 @@ onUnmounted(() => {
     }
 });
 
-const progress = computed(() => {
-    if (!isTransportPost(props.post)) return 0;
+watch(() => props.postId, fetchPost, { immediate: true });
 
-    const transportPost = props.post as TransportPost;
+const progress = computed(() => {
+    if (!isTransportPost(post.value)) return 0;
+
+    const transportPost = post.value as TransportPost;
     const departureDelay = getDepartureDelay(transportPost) || 0;
     const departureTime = getDepartureTime(transportPost.originStop)
         ?.plus({ minutes: departureDelay })
@@ -151,7 +183,7 @@ const progress = computed(() => {
 </script>
 
 <template>
-    <Head :title="head" />
+    <Head :title="pageTitle" />
 
     <AuthenticatedLayout>
         <template #header>
@@ -171,7 +203,7 @@ const progress = computed(() => {
                 </button>
             </div>
             <Map
-                v-if="startPoint"
+                v-if="post && startPoint"
                 :start-point="startPoint"
                 :end-point="endPoint"
                 :line-string="lineString"
@@ -187,12 +219,13 @@ const progress = computed(() => {
             <div class="p-4">
                 <ul class="list">
                     <li class="list-row">
-                        <Post :post />
+                        <Loading v-if="loading" class="my-4 mx-auto" />
+                        <Post v-if="post" :post />
                     </li>
                 </ul>
             </div>
         </div>
 
-        <PostMetaInfo :meta-infos="post.metaInfos" class="mt-4" />
+        <PostMetaInfo v-if="post" :meta-infos="post.metaInfos" class="mt-4" />
     </AuthenticatedLayout>
 </template>

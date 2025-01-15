@@ -3,7 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Dto\PostPaginationDto;
+use App\Http\Resources\PostTypes\BasePost;
+use App\Http\Resources\PostTypes\LocationPost;
+use App\Http\Resources\PostTypes\TransportPost;
 use Illuminate\Http\Request;
+use Symfony\Component\Mailer\Transport;
 
 class PostController extends Controller
 {
@@ -23,5 +27,10 @@ class PostController extends Controller
     public function postsForUsername(string $username, Request $request): PostPaginationDto
     {
         return $this->postController->postsForUser($username, $this->auth->user());
+    }
+
+    public function show(string $postId): BasePost|TransportPost|LocationPost
+    {
+        return $this->postController->show($postId);
     }
 }

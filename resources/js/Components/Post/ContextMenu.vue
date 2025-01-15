@@ -128,7 +128,18 @@ function blur() {
                     </Link>
                 </li>
                 <li v-if="isTransportPost(post)">
-                    <Link :href="route('posts.edit.transport-post', post.id)">
+                    <Link
+                        :href="
+                            route('posts.edit.transport-post', {
+                                postId: post.id,
+                                tripId: post.trip.foreignId,
+                                startId: post.originStop.id,
+                                startTime:
+                                    post.originStop.arrivalTime ||
+                                    post.originStop.departureTime,
+                            })
+                        "
+                    >
                         <Route class="size-4" />
                         {{ t('posts.edit.change_exit') }}
                     </Link>

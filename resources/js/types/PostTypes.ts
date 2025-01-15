@@ -13,6 +13,7 @@ export type BasePost = {
     likesCount: number;
     likedByUser: boolean;
     metaInfos: Record<string, string | string[]>;
+    travelReason: TravelReason | null;
 };
 
 export type LocationPost = BasePost & {
@@ -53,10 +54,10 @@ export type Trip = {
     routeTextColor: string | null;
 };
 
-export const isLocationPost = (post: BasePost): post is LocationPost => {
-    return (post as LocationPost).location !== undefined;
+export const isLocationPost = (post: BasePost | null): post is LocationPost => {
+    return post !== null && (post as LocationPost).location !== undefined;
 };
 
-export const isTransportPost = (post: BasePost): post is TransportPost => {
-    return (post as TransportPost).originStop !== undefined;
+export const isTransportPost = (post: BasePost | null): post is TransportPost => {
+    return post !== null && (post as TransportPost).originStop !== undefined;
 };
