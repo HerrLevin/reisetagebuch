@@ -66,7 +66,7 @@ const props = defineProps({
         default: null,
     },
     metaTripId: {
-        type: String || null,
+        type: String as () => string | null,
         default: null,
     },
 });

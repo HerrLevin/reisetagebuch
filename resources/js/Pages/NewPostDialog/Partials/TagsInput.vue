@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { X } from 'lucide-vue-next';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -58,6 +58,14 @@ function deleteRecentTag() {
         highlighted.value = true;
     }
 }
+
+watch(
+    () => props.tags,
+    (newTags) => {
+        tagsModel.value = newTags;
+    },
+    { immediate: true },
+);
 </script>
 <template>
     <label

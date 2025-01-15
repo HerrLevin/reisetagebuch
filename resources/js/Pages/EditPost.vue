@@ -2,7 +2,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PostCreationForm from '@/Pages/NewPostDialog/Partials/PostCreationForm.vue';
 import { getBaseText, prettyDates } from '@/Services/PostTextService';
-import { TravelReason, Visibility } from '@/types/enums';
+import { TravelReason, TravelRole, Visibility } from '@/types/enums';
 import {
     BasePost,
     isLocationPost,
@@ -11,20 +11,41 @@ import {
     TransportPost,
 } from '@/types/PostTypes';
 import { Head, router } from '@inertiajs/vue3';
-import { PropType, reactive } from 'vue';
+import { reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import axios from 'axios';
 
 const { t } = useI18n();
 
 const props = defineProps({
-    post: {
-        type: Object as PropType<BasePost | TransportPost | LocationPost>,
+    postId: {
+        type: String,
         required: true,
     },
 });
 
+const post = ref<BasePost | TransportPost | LocationPost | null>(null);
+const title = ref<string>(t('edit_post.title'));
+const subtitle = ref<string>('');
+const fullTitle = ref<string>(t('edit_post.title'));
+
 function goBack() {
     window.history.back();
+}
+
+function fetchPost() {
+    axios
+        .get(`/api/posts/${props.postId}`)
+        .then((response) => {
+            post.value = response.data as
+                | BasePost
+                | TransportPost
+                | LocationPost;
+            prefillForm();
+        })
+        .catch(() => {
+            post.value = null;
+        });
 }
 
 const form = reactive({
@@ -35,48 +56,58 @@ const form = reactive({
     travelReason: TravelReason.LEISURE,
     vehicleIds: [] as string[],
     metaTripId: null as string | null,
-    travelRole: null as string | null,
+    travelRole: null as TravelRole | null,
 });
 
 function submitForm() {
+    if (!post.value) {
+        return;
+    }
     if (!form.body?.trim()) {
         form.body = undefined;
     }
-    router.patch(route('posts.update', props.post.id), form);
+    router.patch(route('posts.update', post.value.id), form);
 }
 
-form.id = props.post.id;
-form.body = props.post.body || '';
-form.visibility = props.post.visibility;
-form.tags = props.post.hashTags || [];
-form.travelReason = props.post.travelReason || TravelReason.LEISURE;
+function prefillForm() {
+    if (!post.value) {
+        return;
+    }
 
-const vehicleIds = props.post.metaInfos['rtb:vehicle_id'];
-if (Array.isArray(vehicleIds)) {
-    form.vehicleIds = vehicleIds;
-} else if (typeof vehicleIds === 'string') {
-    form.vehicleIds = [vehicleIds];
-} else {
-    form.vehicleIds = [];
+    form.id = post.value.id;
+    form.body = post.value.body || '';
+    form.visibility = post.value.visibility;
+    form.tags = post.value.hashTags || [];
+    form.travelReason = post.value.travelReason || TravelReason.LEISURE;
+
+    const vehicleIds = post.value.metaInfos['rtb:vehicle_id'];
+    if (Array.isArray(vehicleIds)) {
+        form.vehicleIds = vehicleIds;
+    } else if (typeof vehicleIds === 'string') {
+        form.vehicleIds = [vehicleIds];
+    } else {
+        form.vehicleIds = [];
+    }
+
+    const metaTripId = post.value.metaInfos['rtb:trip_id'];
+    if (typeof metaTripId === 'string') {
+        form.metaTripId = metaTripId;
+    } else {
+        form.metaTripId = null;
+    }
+
+    const travelRole = post.value.metaInfos['rtb:travel_role'];
+    if (typeof travelRole === 'string') {
+        form.travelRole = travelRole as TravelRole;
+    } else {
+        form.travelRole = null;
+    }
+
+    subtitle.value = `${getBaseText(post.value)} (${prettyDates(post.value)})`;
+    fullTitle.value = `${fullTitle.value} · ${subtitle.value}`;
 }
 
-const metaTripId = props.post.metaInfos['rtb:trip_id'];
-if (typeof metaTripId === 'string') {
-    form.metaTripId = metaTripId;
-} else {
-    form.metaTripId = null;
-}
-
-const travelRole = props.post.metaInfos['rtb:travel_role'];
-if (typeof travelRole === 'string') {
-    form.travelRole = travelRole;
-} else {
-    form.travelRole = null;
-}
-
-const subtitle = `${getBaseText(props.post)} (${prettyDates(props.post)})`;
-const title = t('edit_post.title');
-const fullTitle = `${title} · ${subtitle}`;
+fetchPost();
 </script>
 
 <template>

@@ -5,10 +5,13 @@ namespace App\Http\Resources\PostTypes;
 use App\Enums\Visibility;
 use App\Http\Resources\UserDto;
 use App\Models\Post;
+use App\Traits\JsonResponseObject;
 use Carbon\Carbon;
 
 class BasePost
 {
+    use JsonResponseObject;
+
     public string $id;
 
     public UserDto $user;

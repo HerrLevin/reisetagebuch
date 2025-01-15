@@ -35,9 +35,7 @@ class PostController extends Controller
      */
     public function show(string $postId): Response|ResponseFactory
     {
-        return Inertia::render('SinglePost', [
-            'post' => $this->postController->show($postId),
-        ]);
+        return Inertia::render('SinglePost', ['postId' => $postId]);
     }
 
     public function createTransport(): Response|ResponseFactory
@@ -98,10 +96,8 @@ class PostController extends Controller
      */
     public function edit(string $postId): Response|ResponseFactory
     {
-        $post = $this->postController->edit($postId);
-
         return Inertia::render('EditPost', [
-            'post' => $post,
+            'postId' => $postId,
         ]);
     }
 
@@ -120,15 +116,9 @@ class PostController extends Controller
     /**
      * @throws AuthorizationException
      */
-    public function editTransport(string $postId): Response|ResponseFactory
+    public function editTransport(): Response|ResponseFactory
     {
-        $trip = $this->postController->editTransport($postId);
-
-        return inertia('NewPostDialog/ListStopovers', [
-            'trip' => $trip,
-            'startTime' => $trip->startTime,
-            'postId' => $postId,
-        ]);
+        return inertia('NewPostDialog/ListStopovers');
     }
 
     /**
@@ -136,10 +126,8 @@ class PostController extends Controller
      */
     public function editTimesTransport(string $postId): Response|ResponseFactory
     {
-        $post = $this->postController->editTimesTransport($postId);
-
         return inertia('NewPostDialog/EditTransportTimes', [
-            'post' => $post,
+            'postId' => $postId,
         ]);
     }
 

@@ -52,7 +52,7 @@ Route::middleware('auth')->group(callback: function () {
             Route::get('/stopovers', [LocationController::class, 'stopovers'])->name('posts.create.stopovers');
             Route::get('/create', [PostController::class, 'createTransport'])->name('posts.create.transport-post');
             Route::post('/create', [PostController::class, 'storeTransport'])->name('posts.create.transport-post.store');
-            Route::get('/{postId}/edit', [PostController::class, 'editTransport'])->name('posts.edit.transport-post');
+            Route::get('/exit/edit', [PostController::class, 'editTransport'])->name('posts.edit.transport-post');
             Route::get('/{postId}/times/edit', [PostController::class, 'editTimesTransport'])->name('posts.edit.transport-times');
             Route::put('/{postId}/times', [PostController::class, 'updateTimesTransport'])->name('posts.update.transport-times');
             Route::put('/{postId}', [PostController::class, 'updateTransport'])->name('posts.update.transport-post');

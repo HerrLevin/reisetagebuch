@@ -150,16 +150,6 @@ class PostController extends Controller
         return $post;
     }
 
-    /**
-     * @throws AuthorizationException
-     */
-    public function edit(string $postId): BasePost|LocationPost|TransportPost
-    {
-        $post = $this->postRepository->getById($postId, Auth::user());
-        $this->authorize('update', $post);
-
-        return $post;
-    }
 
     /**
      * @throws AuthorizationException
@@ -206,55 +196,6 @@ class PostController extends Controller
         }
 
         $this->postRepository->delete($post);
-    }
-
-    /**
-     * @throws AuthorizationException
-     */
-    public function editTransport(string $postId): TripDto
-    {
-        $post = $this->postRepository->getById($postId, Auth::user());
-        $this->authorize('update', $post);
-
-        if (! $post instanceof TransportPost) {
-            abort(422, 'Not a transport post');
-        }
-
-        $trip = $this->transportTripRepository->getTripById(
-            $post->trip->id,
-            ['stops', 'stops.location.identifiers']
-        );
-
-        // remove everything before $post->originStop
-        $filteredStops = collect();
-        $foundOrigin = false;
-        foreach ($trip->stops as $stop) {
-            if ($stop->id === $post->originStop->id) {
-                $foundOrigin = true;
-            }
-            if ($foundOrigin) {
-                $filteredStops->push($stop);
-            }
-        }
-
-        $hydrator = new DbTripHydrator;
-
-        return $hydrator->hydrateTrip($trip, $filteredStops);
-    }
-
-    /**
-     * @throws AuthorizationException
-     */
-    public function editTimesTransport(string $postId): TransportPost
-    {
-        $post = $this->postRepository->getById($postId, Auth::user());
-        $this->authorize('update', $post);
-
-        if (! $post instanceof TransportPost) {
-            abort(422, 'Not a transport post');
-        }
-
-        return $post;
     }
 
     /**
