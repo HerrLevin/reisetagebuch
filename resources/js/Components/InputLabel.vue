@@ -2,11 +2,13 @@
 defineProps<{
     value?: string;
 }>();
+
+const classes = 'label-text text-base-content';
 </script>
 
 <template>
-    <label class="block text-sm font-medium text-gray-700">
-        <span v-if="value">{{ value }}</span>
-        <span v-else><slot /></span>
+    <label class="label">
+        <span v-if="value" :class="classes">{{ value }}</span>
+        <span v-else :class="classes"><slot /></span>
     </label>
 </template>
