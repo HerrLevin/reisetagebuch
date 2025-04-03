@@ -18,7 +18,7 @@ const props = defineProps({
 </script>
 
 <template>
-    <li class="list-row cursor-pointer hover:bg-neutral-200">
+    <li class="list-row hover:bg-base-200 cursor-pointer">
         <div class="text-3xl">{{ emoji }}</div>
         <div>
             <div>{{ name }}</div>
