@@ -50,41 +50,27 @@ import { Link } from '@inertiajs/vue3';
             <span class="dock-label">Home</span>
         </Link>
 
-        <button>
+        <Link
+            :href="route('posts.create')"
+            as="button"
+            :class="{ 'dock-active': route().current('posts.create') }"
+        >
             <svg
-                class="size-[1.2em]"
                 xmlns="http://www.w3.org/2000/svg"
+                fill="none"
                 viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6"
             >
-                <g
-                    fill="currentColor"
-                    stroke-linejoin="miter"
-                    stroke-linecap="butt"
-                >
-                    <polyline
-                        points="3 14 9 14 9 17 15 17 15 14 21 14"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-miterlimit="10"
-                        stroke-width="2"
-                    ></polyline>
-                    <rect
-                        x="3"
-                        y="3"
-                        width="18"
-                        height="18"
-                        rx="2"
-                        ry="2"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-linecap="square"
-                        stroke-miterlimit="10"
-                        stroke-width="2"
-                    ></rect>
-                </g>
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                />
             </svg>
-            <span class="dock-label">Inbox</span>
-        </button>
+            <span class="dock-label">New Post</span>
+        </Link>
 
         <Link
             :href="route('profile.edit')"
