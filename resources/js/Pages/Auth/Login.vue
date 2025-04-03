@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import Checkbox from '@/Components/Checkbox.vue';
-import GuestLayout from '@/Layouts/GuestLayout.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
+import AuthLayout from '@/Layouts/AuthLayout.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 
 defineProps<{
@@ -28,15 +26,16 @@ const submit = () => {
 </script>
 
 <template>
-    <GuestLayout>
+    <AuthLayout>
         <Head title="Log in" />
 
-        <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
+        <h2 class="mb-2 text-center text-2xl font-semibold">Login</h2>
+        <div v-if="status" class="text-success mb-4 text-sm font-medium">
             {{ status }}
         </div>
 
         <form @submit.prevent="submit">
-            <div>
+            <div class="form-control w-full">
                 <InputLabel for="email" value="Email" />
 
                 <TextInput
@@ -44,6 +43,7 @@ const submit = () => {
                     type="email"
                     class="mt-1 block w-full"
                     v-model="form.email"
+                    :error="form.errors.email"
                     required
                     autofocus
                     autocomplete="username"
@@ -52,7 +52,7 @@ const submit = () => {
                 <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
-            <div class="mt-4">
+            <div class="form-control mt-4 w-full">
                 <InputLabel for="password" value="Password" />
 
                 <TextInput
@@ -60,6 +60,7 @@ const submit = () => {
                     type="password"
                     class="mt-1 block w-full"
                     v-model="form.password"
+                    :error="form.errors.password"
                     required
                     autocomplete="current-password"
                 />
@@ -67,32 +68,38 @@ const submit = () => {
                 <InputError class="mt-2" :message="form.errors.password" />
             </div>
 
-            <div class="mt-4 block">
-                <label class="flex items-center">
-                    <Checkbox name="remember" v-model:checked="form.remember" />
-                    <span class="ms-2 text-sm text-gray-600"
-                        >Remember me</span
-                    >
-                </label>
-            </div>
+            <div class="mt-4 flex items-center justify-between">
+                <fieldset class="form-control">
+                    <label class="fieldset-label">
+                        <input
+                            type="checkbox"
+                            :checked="form.remember"
+                            class="checkbox"
+                        />
+                        Remember me
+                    </label>
+                </fieldset>
 
-            <div class="mt-4 flex items-center justify-end">
                 <Link
                     v-if="canResetPassword"
                     :href="route('password.request')"
-                    class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    class="link"
                 >
                     Forgot your password?
                 </Link>
-
-                <PrimaryButton
-                    class="ms-4"
-                    :class="{ 'opacity-25': form.processing }"
-                    :disabled="form.processing"
-                >
-                    Log in
-                </PrimaryButton>
             </div>
+
+            <button
+                class="btn btn-primary mt-12 w-full"
+                :class="{ 'opacity-25': form.processing }"
+                :disabled="form.processing"
+            >
+                Log in
+            </button>
         </form>
-    </GuestLayout>
+        <div class="mt-4 text-center">
+            Don't have an account yet?
+            <Link :href="route('register')" class="link"> Register </Link>
+        </div>
+    </AuthLayout>
 </template>
