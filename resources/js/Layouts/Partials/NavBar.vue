@@ -43,7 +43,7 @@ import { Link } from '@inertiajs/vue3';
             </div>
         </div>
         <div class="navbar-center">
-            <a class="btn btn-ghost text-xl">Reisetagebuch</a>
+            <slot></slot>
         </div>
         <div class="navbar-end">
             <ThemeSelector />

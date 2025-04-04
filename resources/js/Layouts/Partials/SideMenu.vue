@@ -29,8 +29,12 @@ import { Link } from '@inertiajs/vue3';
         </li>
         <li>
             <Link
-                :href="route('posts.create')"
-                :class="{ 'menu-active': route().current('posts.create') }"
+                :href="route('posts.create.start')"
+                :class="{
+                    'menu-active': route()
+                        .current()
+                        ?.startsWith('posts.create'),
+                }"
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"

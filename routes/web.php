@@ -24,9 +24,18 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // click dummy
-    Route::get('/new', function () {
-        return Inertia::render('NewPostDialog/New');
-    })->name('posts.create');
+
+    Route::get('/posts/create', function () {
+        return Inertia::render('NewPostDialog/CreatePost');
+    })->name('posts.create.post');
+
+    Route::get('/posts/new', function () {
+        return Inertia::render('NewPostDialog/ListLocations');
+    })->name('posts.create.start');
+
+    Route::get('/posts/route', function () {
+        return Inertia::render('NewPostDialog/ListLocations');
+    })->name('posts.create.route');
 });
 
 require __DIR__.'/auth.php';

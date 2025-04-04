@@ -15,3 +15,9 @@ export type PageProps<
     };
     ziggy: Config & { location: string };
 };
+
+export type LocationEntry = {
+    emoji: string;
+    name: string;
+    type: string;
+};

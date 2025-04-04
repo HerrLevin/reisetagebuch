@@ -2,8 +2,10 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
 import LocationListEntry from '@/Pages/NewPostDialog/Partials/LocationListEntry.vue';
+import { LocationEntry } from '@/types';
+import { ref } from 'vue';
 
-const demoLocations = [
+const demoLocations = ref([
     {
         emoji: '🏘️',
         name: 'Oststadt',
@@ -44,13 +46,24 @@ const demoLocations = [
         name: 'Karlsruhe',
         type: 'City',
     },
-];
+] as LocationEntry[]);
+
+const showStartButton = ref(false);
+showStartButton.value = route().current('posts.create.start');
+
+if (!showStartButton.value) {
+    // sort random
+    demoLocations.value = demoLocations.value.sort(() => Math.random() - 0.5);
+}
 </script>
 
 <template>
     <Head title="Dashboard" />
 
     <AuthenticatedLayout>
+        <template #header>
+            <h2 class="text-xl leading-tight font-semibold">New Post</h2>
+        </template>
         <div class="card bg-base-100 min-w-full shadow-md">
             <!-- Search Bar -->
             <div class="w-full p-8">
@@ -83,11 +96,13 @@ const demoLocations = [
                     Locations nearby
                 </li>
 
+                <!-- todo: use id as key -->
                 <LocationListEntry
+                    :data="{ location: location }"
                     v-for="location in demoLocations"
-                    :emoji="location.emoji"
-                    :name="location.name"
-                    :type="location.type"
+                    :location
+                    :showStartButton
+                    :key="location.name"
                 />
             </ul>
         </div>
