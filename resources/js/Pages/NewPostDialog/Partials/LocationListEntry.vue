@@ -1,32 +1,45 @@
 <script setup lang="ts">
 import { defineProps } from 'vue';
+import { Link } from '@inertiajs/vue3';
+import { LocationEntry } from '@/types';
 
-const props = defineProps({
-    emoji: {
-        type: String,
-        default: '🏘️',
+defineProps({
+    location: {
+        type: Object,
+        default: () => ({}) as LocationEntry,
     },
-    name: {
-        type: String,
-        default: 'Oststadt',
+    showStartButton: {
+        type: Boolean,
+        default: true,
     },
-    type: {
-        type: String,
-        default: 'Neighborhood',
+    data: {
+        type: Object,
+        default: () => ({}),
     },
 });
 </script>
 
 <template>
-    <li class="list-row hover:bg-base-200 cursor-pointer">
-        <div class="text-3xl">{{ emoji }}</div>
+    <Link
+        :href="route('posts.create.post')"
+        :data
+        as="li"
+        class="list-row hover:bg-base-200 cursor-pointer"
+    >
+        <div class="text-3xl">{{ location.emoji }}</div>
         <div>
-            <div>{{ name }}</div>
+            <div>{{ location.name }}</div>
             <div class="text-xs uppercase opacity-60">
-                {{ type }}
+                {{ location.type }}
             </div>
         </div>
-        <button class="btn btn-square btn-ghost">
+        <Link
+            v-if="showStartButton"
+            :href="route('posts.create.route')"
+            :data
+            class="btn btn-square btn-ghost"
+            as="button"
+        >
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -41,7 +54,7 @@ const props = defineProps({
                     d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"
                 />
             </svg>
-        </button>
+        </Link>
         <button class="btn btn-square btn-ghost">
             <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -58,7 +71,7 @@ const props = defineProps({
                 />
             </svg>
         </button>
-    </li>
+    </Link>
 </template>
 
 <style scoped></style>

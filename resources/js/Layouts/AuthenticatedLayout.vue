@@ -12,7 +12,12 @@ const showingNavigationDropdown = ref(false);
         <div
             class="container mx-auto mb-2 max-w-screen-xl grow px-0 pt-0 sm:px-5 md:pt-8"
         >
-            <NavBar />
+            <NavBar>
+                <a v-if="!$slots.header" class="btn btn-ghost text-xl">
+                    <span class="blur">Reisetagebuch</span>
+                </a>
+                <slot name="header" />
+            </NavBar>
             <div class="grid grid-cols-12 gap-4 md:mt-12">
                 <div class="col-span-12 lg:col-span-3 lg:col-start-2">
                     <SideMenu class="hidden md:flex" />
