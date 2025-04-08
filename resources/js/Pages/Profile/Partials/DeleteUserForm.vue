@@ -3,7 +3,7 @@ import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { useForm } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { ref, useTemplateRef } from 'vue';
 
 const passwordInput = ref<HTMLInputElement | null>(null);
 
@@ -11,10 +11,12 @@ const form = useForm({
     password: '',
 });
 
+const deleteModal = useTemplateRef('deleteModal');
+
 const deleteUser = () => {
     form.delete(route('profile.destroy'), {
         preserveScroll: true,
-        onSuccess: () => deleteModal.close(),
+        onSuccess: () => deleteModal.value?.close(),
         onError: () => passwordInput.value?.focus(),
         onFinish: () => {
             form.reset();
@@ -38,7 +40,7 @@ const deleteUser = () => {
         <button class="btn btn-error" onclick="deleteModal.showModal()">
             Delete Account
         </button>
-        <dialog id="deleteModal" class="modal">
+        <dialog ref="deleteModal" class="modal">
             <div class="modal-box">
                 <h3 class="text-lg font-bold">
                     Are you sure you want to delete your account?
