@@ -13,6 +13,17 @@ const demoData = [
         picture: 'https://loremfaces.net/96/id/1.jpg',
     },
     {
+        username: 'Julia',
+        stars: 5,
+        likes: 1,
+        location: 'Karlsruhe, Deutschland',
+        venue: '',
+        createdAt: '2025-04-08T18:00:00Z',
+        body: '',
+        picture: 'https://loremfaces.net/96/id/1.jpg',
+        showRoute: true,
+    },
+    {
         username: 'Marc',
         stars: 5,
         likes: 1,
@@ -60,6 +71,7 @@ const demoData = [
             :createdAt="demo.createdAt"
             :body="demo.body"
             :picture="demo.picture"
+            :showRoute="demo.showRoute"
         />
     </ul>
 </template>
