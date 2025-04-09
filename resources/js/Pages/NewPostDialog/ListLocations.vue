@@ -47,6 +47,13 @@ const demoLocations = ref([
         type: 'City',
     },
 ] as LocationEntry[]);
+const props = defineProps({
+    venues: {
+        type: Array,
+        default: () => [],
+        required: false,
+    },
+});
 
 const showStartButton = ref(false);
 showStartButton.value = route().current('posts.create.start');
@@ -55,6 +62,7 @@ if (!showStartButton.value) {
     // sort random
     demoLocations.value = demoLocations.value.sort(() => Math.random() - 0.5);
 }
+console.log(props.venues);
 </script>
 
 <template>

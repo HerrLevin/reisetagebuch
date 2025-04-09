@@ -3,6 +3,7 @@ import TimelineEntry from '@/Components/TimelineEntry/TimelineEntry.vue';
 
 const demoData = [
     {
+        id: 1,
         username: 'Julia',
         stars: 10,
         likes: 3,
@@ -13,6 +14,7 @@ const demoData = [
         picture: 'https://loremfaces.net/96/id/1.jpg',
     },
     {
+        id: 2,
         username: 'Julia',
         stars: 5,
         likes: 1,
@@ -24,6 +26,7 @@ const demoData = [
         showRoute: true,
     },
     {
+        id: 3,
         username: 'Marc',
         stars: 5,
         likes: 1,
@@ -34,6 +37,7 @@ const demoData = [
         picture: 'https://loremfaces.net/96/id/2.jpg',
     },
     {
+        id: 4,
         username: 'Julia',
         stars: 3,
         likes: 0,
@@ -44,6 +48,7 @@ const demoData = [
         picture: 'https://loremfaces.net/96/id/1.jpg',
     },
     {
+        id: 5,
         username: 'Felix',
         stars: 8,
         likes: 2,
@@ -62,7 +67,7 @@ const demoData = [
         </li>
         <TimelineEntry
             v-for="demo in demoData"
-            :key="demo"
+            :key="demo.id"
             :username="demo.username"
             :stars="demo.stars"
             :likes="demo.likes"
