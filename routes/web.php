@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Inertia\VenueController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -29,9 +30,7 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('NewPostDialog/CreatePost');
     })->name('posts.create.post');
 
-    Route::get('/posts/new', function () {
-        return Inertia::render('NewPostDialog/ListLocations');
-    })->name('posts.create.start');
+    Route::get('/posts/new', [VenueController::class, 'nearby'])->name('posts.create.start');
 
     Route::get('/posts/route', function () {
         return Inertia::render('NewPostDialog/ListLocations');

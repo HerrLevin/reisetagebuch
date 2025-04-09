@@ -1,5 +1,17 @@
 <script setup lang="ts">
+import { LocationService } from '@/Services/LocationService';
 import { Link } from '@inertiajs/vue3';
+import { onMounted, ref } from 'vue';
+
+const latitude = ref(0);
+const longitude = ref(0);
+
+onMounted(() => {
+    LocationService.getPosition().then((position) => {
+        latitude.value = position.coords.latitude;
+        longitude.value = position.coords.longitude;
+    });
+});
 </script>
 
 <template>
@@ -29,7 +41,12 @@ import { Link } from '@inertiajs/vue3';
         </li>
         <li>
             <Link
-                :href="route('posts.create.start')"
+                :href="
+                    route('posts.create.start', {
+                        latitude: latitude,
+                        longitude: longitude,
+                    })
+                "
                 :class="{
                     'menu-active': route()
                         .current()
