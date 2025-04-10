@@ -2,6 +2,7 @@
  * Methods to be called statically: getPosition()
  * Store position in localStorage and refresh if it has been more than 5 minutes
  */
+import axios from 'axios';
 
 export class LocationService {
     private static readonly REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes
@@ -14,6 +15,7 @@ export class LocationService {
 
         const position = await this.getCurrentPosition();
         this.saveToLocalStorage(position);
+        this.prefetchLocationData(position);
         return position;
     }
 
@@ -48,5 +50,21 @@ export class LocationService {
                 (error) => reject(error),
             );
         });
+    }
+
+    public static prefetchLocationData(position: GeolocationPosition): void {
+        axios
+            .get(
+                route('posts.create.prefetch', {
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                }),
+            )
+            .then(() => {
+                console.log('Location data prefetched successfully.');
+            })
+            .catch((error) => {
+                console.error('Error prefetching location data:', error);
+            });
     }
 }

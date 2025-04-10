@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Backend\LocationController as BLocationController;
 use App\Http\Controllers\Inertia\LocationController;
 use App\Http\Controllers\Inertia\PostController;
 use App\Http\Controllers\ProfileController;
@@ -16,19 +17,21 @@ Route::get('/', function () {
     ]);
 });
 
-Route::middleware('auth')->group(function () {
+Route::middleware('auth')->group(callback: function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // click dummy
 
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create.post');
     Route::post('/posts/create', [PostController::class, 'store'])->name('posts.create.post.store');
     Route::get('/dashboard', [PostController::class, 'dashboard'])->name('dashboard');
-
     Route::get('/posts/new', [LocationController::class, 'nearby'])->name('posts.create.start');
 
+    // this belongs in an api
+    Route::get('/posts/new/prefetch/{latitude}/{longitude}', [BLocationController::class, 'nearby'])->name('posts.create.prefetch');
+
+    // click dummy
     Route::get('/posts/route', function () {
         return Inertia::render('NewPostDialog/ListLocations');
     })->name('posts.create.route');
