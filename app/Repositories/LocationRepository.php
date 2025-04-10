@@ -78,17 +78,16 @@ class LocationRepository
 
     public function getNearbyLocations(float $latitude, float $longitude): Collection|SupportCollection
     {
-        if (!$this->recentNearbyRequests($latitude, $longitude)) {
-            $this->createRequestLocation($latitude, $longitude);
-            $this->fetchNearbyLocations($latitude, $longitude);
-        }
-
         return LocationHelper::nearbyQueryFilter(
             Location::class,
             $latitude,
             $longitude,
             100,
-        )->where([['name', '!=', '']])->with('tags')->orderByDesc('distance')->get();
+        )
+            ->where([['name', '!=', '']])
+            ->with('tags')
+            ->orderByDesc('distance')
+            ->get();
     }
 
     public function getLocationById(string $id, bool $withRelations = true): ?Location
