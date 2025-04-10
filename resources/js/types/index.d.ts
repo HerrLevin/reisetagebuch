@@ -17,7 +17,15 @@ export type PageProps<
 };
 
 export type LocationEntry = {
-    emoji: string;
+    id: string;
     name: string;
-    type: string;
+    latitude: number;
+    longitude: number;
+    distance: ?number;
+    tags: LocationTag[];
+};
+
+export type LocationTag = {
+    key: string;
+    value: string;
 };

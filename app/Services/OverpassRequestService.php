@@ -2,12 +2,12 @@
 
 namespace App\Services;
 
-use App\Dto\OverpassVenue;
+use App\Dto\OverpassLocation;
 use Generator;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 
-class OverpassService
+class OverpassRequestService
 {
     private float $latitude;
     private float $longitude;
@@ -111,15 +111,15 @@ class OverpassService
     }
 
     /**
-     * @return Generator<OverpassVenue>
+     * @return Generator<OverpassLocation>
      */
-    public function getVenues(): Generator
+    public function getLocations(): Generator
     {
         $response = $this->getElements();
 
         foreach ($response['elements'] as $element) {
             if (in_array($element['type'], ['node', 'way', 'relation']) && isset($element['tags']['name'])) {
-                yield new OverpassVenue(
+                yield new OverpassLocation(
                     osmId: $element['id'],
                     name: $element['tags']['name'] ?? '',
                     latitude: $element['lat'] ?? $element['center']['lat'] ?? 0,
