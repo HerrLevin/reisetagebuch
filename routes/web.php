@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Inertia\LocationController;
+use App\Http\Controllers\Inertia\PostController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -15,10 +16,6 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -26,9 +23,9 @@ Route::middleware('auth')->group(function () {
 
     // click dummy
 
-    Route::get('/posts/create', function () {
-        return Inertia::render('NewPostDialog/CreatePost');
-    })->name('posts.create.post');
+    Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create.post');
+    Route::post('/posts/create', [PostController::class, 'store'])->name('posts.create.post.store');
+    Route::get('/dashboard', [PostController::class, 'dashboard'])->name('dashboard');
 
     Route::get('/posts/new', [LocationController::class, 'nearby'])->name('posts.create.start');
 

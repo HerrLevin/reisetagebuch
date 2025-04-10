@@ -1,57 +1,22 @@
 <script setup lang="ts">
-import LikeButton from '@/Components/TimelineEntry/LikeButton.vue';
-import RouteDisplay from '@/Components/TimelineEntry/RouteDisplay.vue';
 import LocationDisplay from '@/Components/TimelineEntry/LocationDisplay.vue';
-import { DateTime } from 'luxon';
+import RouteDisplay from '@/Components/TimelineEntry/RouteDisplay.vue';
+import { Post } from '@/types';
 
-const props = defineProps({
-    username: {
-        type: String,
-        default: 'Max Mustermann',
-    },
-    stars: {
-        type: Number,
-        default: 0,
-    },
-    likes: {
-        type: Number,
-        default: 0,
-    },
-    region: {
-        type: String,
-        default: 'Karlsruhe, Deutschland',
-    },
-    location: {
-        type: String,
-        default: 'Karlsruhe Hbf',
-    },
-    createdAt: {
-        type: String,
-        default: '2023-10-01T12:00:00Z',
-    },
-    body: {
-        type: String,
-        default: '',
-        required: false,
+defineProps({
+    post: {
+        type: Object as () => Post,
+        required: true,
     },
     picture: {
         type: String,
-        default: 'https://loremfaces.net/96/id/1.jpg',
+        default: '/assets/pexels-brenoanp-442535-1136575.jpg',
     },
     showRoute: {
         type: Boolean,
         default: false,
     },
 });
-
-function relativeCreatedAt(): string {
-    const date = DateTime.fromISO(props.createdAt);
-
-    if (date.diffNow('days').days < -1) {
-        return date.toLocaleString();
-    }
-    return date.toRelative() || '';
-}
 </script>
 
 <template>
@@ -60,23 +25,15 @@ function relativeCreatedAt(): string {
             <img
                 class="rounded-box size-10"
                 :src="picture"
-                :alt="`Profile picture of ${username}`"
+                :alt="`Profile picture of ${post.user.name}`"
             />
         </div>
-        <LocationDisplay
-            v-if="!showRoute"
-            :stars
-            :likes
-            :region
-            :location
-            :body
-            :relativeCreatedAt="relativeCreatedAt()"
-        />
+        <LocationDisplay v-if="!showRoute" :post />
         <RouteDisplay v-else />
-        <p v-if="body" class="list-col-wrap text-xs">
-            {{ body }}
+        <p v-if="post.body" class="list-col-wrap text-xs">
+            {{ post.body }}
         </p>
-        <LikeButton />
+        <!--        <LikeButton />-->
     </li>
 </template>
 

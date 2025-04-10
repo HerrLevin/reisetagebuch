@@ -1,7 +1,15 @@
 <script setup lang="ts">
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head } from '@inertiajs/vue3';
 import Timeline from '@/Pages/Dashboard/Timeline.vue';
+import { Post } from '@/types';
+import { Head } from '@inertiajs/vue3';
+
+defineProps({
+    posts: {
+        type: Array,
+        default: () => [] as Post[],
+    },
+});
 </script>
 
 <template>
@@ -13,7 +21,7 @@ import Timeline from '@/Pages/Dashboard/Timeline.vue';
         </template>
 
         <div class="card bg-base-100 min-w-full p-0 shadow-md">
-            <Timeline />
+            <Timeline :posts />
         </div>
     </AuthenticatedLayout>
 </template>

@@ -90,4 +90,13 @@ class LocationRepository
             100,
         )->where([['name', '!=', '']])->with('tags')->orderByDesc('distance')->get();
     }
+
+    public function getLocationById(string $id, bool $withRelations = true): ?Location
+    {
+        if ($withRelations) {
+            return Location::with(['tags', 'identifiers'])->find($id);
+        }
+
+        return Location::find($id);
+    }
 }
