@@ -16,4 +16,9 @@ class LocationPost extends Model
     {
         return $this->belongsTo(Post::class);
     }
+
+    public function location(): BelongsTo
+    {
+        return $this->belongsTo(Location::class);
+    }
 }

@@ -29,3 +29,17 @@ export type LocationTag = {
     key: string;
     value: string;
 };
+
+export type PublicUser = {
+    id: string;
+    name: string;
+};
+
+export type Post = {
+    id: string;
+    body: string;
+    user: PublicUser;
+    location: LocationEntry | null;
+    created_at: string;
+    updated_at: string;
+};

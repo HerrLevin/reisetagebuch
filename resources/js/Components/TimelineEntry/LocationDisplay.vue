@@ -1,50 +1,51 @@
 <script setup lang="ts">
-import LikesIndicator from '@/Components/TimelineEntry/LikesIndicator.vue';
-import StarsIndicator from '@/Components/TimelineEntry/StarsIndicator.vue';
+import LocationListEntryInfo from '@/Pages/NewPostDialog/Partials/LocationListEntryInfo.vue';
+import { Post } from '@/types';
+import { DateTime } from 'luxon';
+import { getEmojiFromTags } from '../../Services/LocationTypeService';
 
-defineProps({
-    username: {
-        type: String,
-        default: 'Max Mustermann',
-    },
-    stars: {
-        type: Number,
-        default: 0,
-    },
-    likes: {
-        type: Number,
-        default: 0,
-    },
-    region: {
-        type: String,
-        default: 'Karlsruhe, Deutschland',
-    },
-    location: {
-        type: String,
-        default: 'Karlsruhe Hbf',
-    },
-    relativeCreatedAt: {
-        type: String,
-        default: '2023-10-01T12:00:00Z',
+const props = defineProps({
+    post: {
+        type: Object as () => Post,
+        required: true,
     },
 });
+
+function relativeCreatedAt(): string {
+    const date = DateTime.fromISO(props.post?.created_at);
+
+    if (date.diffNow('days').days < -1) {
+        return date.toLocaleString();
+    }
+    return date.toRelative() || '';
+}
 </script>
 
 <template>
     <div>
         <div>
-            <div class="text-xs opacity-60">{{ username }}</div>
-            <div class="font-semibold">{{ location }}</div>
+            <div class="text-xs opacity-60">
+                {{ post.user.name }}
+                ·
+                {{ relativeCreatedAt() }}
+            </div>
+            <div class="font-semibold">
+                <LocationListEntryInfo :location="post.location">
+                    <template v-slot:activator="{ onClick }">
+                        <a href="#" @click.prevent="onClick">
+                            {{ getEmojiFromTags(post.location.tags) }}
+                            {{ post.location.name }}
+                        </a>
+                    </template>
+                </LocationListEntryInfo>
+            </div>
         </div>
 
         <div class="mt-1">
             <div class="flex items-center gap-2 text-xs">
-                <span class="opacity-50">{{ region }}</span>
-                <StarsIndicator :stars />
-                <LikesIndicator :likes />
-            </div>
-            <div class="flex items-center text-xs opacity-60">
-                {{ relativeCreatedAt }}
+                <!--                <span class="opacity-50">{{ region }}</span>-->
+                <!--                <StarsIndicator :stars />-->
+                <!--                <LikesIndicator :likes />-->
             </div>
         </div>
     </div>

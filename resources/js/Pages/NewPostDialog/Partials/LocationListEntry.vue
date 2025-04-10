@@ -1,14 +1,14 @@
 <script setup lang="ts">
+import LocationListEntryInfo from '@/Pages/NewPostDialog/Partials/LocationListEntryInfo.vue';
 import { LocationEntry } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import { defineProps } from 'vue';
+import { defineProps, ref } from 'vue';
 import {
     getEmojiFromTags,
     getName,
 } from '../../../Services/LocationTypeService';
-import LocationListEntryInfo from '@/Pages/NewPostDialog/Partials/LocationListEntryInfo.vue';
 
-defineProps({
+const props = defineProps({
     location: {
         type: Object,
         default: () => ({}) as LocationEntry,
@@ -22,18 +22,32 @@ defineProps({
         default: () => ({}),
     },
 });
+
+const name = ref('');
+const emoji = ref('');
+
+emoji.value = getEmojiFromTags(props.location.tags);
+name.value = getName(props.location as LocationEntry);
+
+const linkData = ref({
+    location: {
+        emoji: emoji.value,
+        name: name.value,
+        id: props.location.id,
+    },
+});
 </script>
 
 <template>
     <Link
         :href="route('posts.create.post')"
-        :data
+        :data="linkData"
         as="li"
         class="list-row hover:bg-base-200 cursor-pointer"
     >
-        <div class="text-3xl">{{ getEmojiFromTags(location.tags) }}</div>
+        <div class="text-3xl">{{ emoji }}</div>
         <div>
-            <div>{{ getName(location as LocationEntry) }}</div>
+            <div>{{ name }}</div>
             <div class="text-xs uppercase opacity-60"></div>
         </div>
         <!--
@@ -61,7 +75,29 @@ defineProps({
             </svg>
         </Link>
         -->
-        <LocationListEntryInfo :location />
+        <LocationListEntryInfo :location>
+            <template v-slot:activator="{ onClick }">
+                <button
+                    class="btn btn-square btn-ghost"
+                    @click.prevent="onClick"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="size-[1.2em]"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
+                        />
+                    </svg>
+                </button>
+            </template>
+        </LocationListEntryInfo>
     </Link>
 </template>
 
