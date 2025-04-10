@@ -46,7 +46,6 @@ class LocationRepository
                     'value' => $value,
                 ]);
             }
-            $data->load('tags');
 
             $data->push($dbLocation);
         }
