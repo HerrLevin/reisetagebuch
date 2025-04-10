@@ -2,7 +2,10 @@
 import { LocationEntry } from '@/types';
 import { Link } from '@inertiajs/vue3';
 import { defineProps } from 'vue';
-import { getEmojiFromTags } from '../../../Services/LocationTypeService';
+import {
+    getEmojiFromTags,
+    getName,
+} from '../../../Services/LocationTypeService';
 import LocationListEntryInfo from '@/Pages/NewPostDialog/Partials/LocationListEntryInfo.vue';
 
 defineProps({
@@ -30,9 +33,11 @@ defineProps({
     >
         <div class="text-3xl">{{ getEmojiFromTags(location.tags) }}</div>
         <div>
-            <div>{{ location.name }}</div>
+            <div>{{ getName(location as LocationEntry) }}</div>
             <div class="text-xs uppercase opacity-60"></div>
         </div>
+        <!--
+        for now, we don't need this button
         <Link
             v-if="showStartButton"
             :href="route('posts.create.route')"
@@ -55,6 +60,7 @@ defineProps({
                 />
             </svg>
         </Link>
+        -->
         <LocationListEntryInfo :location />
     </Link>
 </template>

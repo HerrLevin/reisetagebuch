@@ -17,8 +17,8 @@ defineProps({
     },
 });
 
-const tagModal = ref(null);
-const modalBox = ref(null);
+const tagModal = ref<HTMLDialogElement | null>(null);
+const modalBox = ref<HTMLElement | null>(null);
 
 function closeModal() {
     tagModal.value?.close();
@@ -56,7 +56,7 @@ function openModal() {
     >
         <div class="modal-box p-0" ref="modalBox">
             <ul class="list">
-                <li class="p-4 pb-2 text-xs tracking-wide opacity-60">
+                <li class="text p-4 pb-2 tracking-wide opacity-60">
                     {{ location.name }}
                 </li>
 
@@ -76,5 +76,13 @@ function openModal() {
                 <button class="btn" @click.prevent="closeModal()">Close</button>
             </div>
         </div>
+
+        <form
+            method="dialog"
+            class="modal-backdrop"
+            @click.prevent="closeModal()"
+        >
+            <button>close</button>
+        </form>
     </dialog>
 </template>

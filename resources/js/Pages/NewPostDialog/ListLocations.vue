@@ -13,10 +13,22 @@ const props = defineProps({
     },
 });
 
-console.log('locations', props.locations);
-
 const showStartButton = ref(false);
 showStartButton.value = route().current('posts.create.start');
+
+const filteredLocations = ref<LocationEntry[]>([]);
+const search = ref<string>('');
+
+function filterLocations() {
+    if (search.value.length <= 0) {
+        filteredLocations.value = props.locations;
+    } else {
+        filteredLocations.value = props.locations.filter((location) =>
+            location.name.toLowerCase().includes(search.value.toLowerCase()),
+        );
+    }
+}
+filterLocations();
 </script>
 
 <template>
@@ -46,9 +58,16 @@ showStartButton.value = route().current('posts.create.start');
                             <path d="m21 21-4.3-4.3"></path>
                         </g>
                     </svg>
-                    <input type="search" class="grow" placeholder="Search" />
-                    <kbd class="kbd kbd-sm">⌘</kbd>
-                    <kbd class="kbd kbd-sm">K</kbd>
+                    <input
+                        type="search"
+                        class="grow"
+                        placeholder="Search"
+                        @keyup="filterLocations"
+                        v-model="search"
+                        autofocus
+                    />
+                    <!--                    <kbd class="kbd kbd-sm">⌘</kbd>-->
+                    <!--                    <kbd class="kbd kbd-sm">K</kbd>-->
                 </label>
             </div>
 
@@ -58,13 +77,12 @@ showStartButton.value = route().current('posts.create.start');
                     Locations nearby
                 </li>
 
-                <!-- todo: use id as key -->
                 <LocationListEntry
                     :data="{ location: location }"
-                    v-for="location in locations"
+                    v-for="location in filteredLocations"
                     :location
                     :showStartButton
-                    :key="location.name"
+                    :key="location.id"
                 />
             </ul>
         </div>
