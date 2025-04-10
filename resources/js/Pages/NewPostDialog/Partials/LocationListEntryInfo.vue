@@ -1,0 +1,80 @@
+<script setup lang="ts">
+import { defineProps, ref } from 'vue';
+import { LocationEntry } from '@/types';
+
+defineProps({
+    location: {
+        type: Object,
+        default: () => ({}) as LocationEntry,
+    },
+    showStartButton: {
+        type: Boolean,
+        default: true,
+    },
+    data: {
+        type: Object,
+        default: () => ({}),
+    },
+});
+
+const tagModal = ref(null);
+const modalBox = ref(null);
+
+function closeModal() {
+    tagModal.value?.close();
+}
+
+function openModal() {
+    tagModal.value?.showModal();
+    if (modalBox.value) {
+        modalBox.value.scrollTop = 0;
+    }
+}
+</script>
+
+<template>
+    <button class="btn btn-square btn-ghost" @click.prevent="openModal()">
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="size-[1.2em]"
+        >
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
+            />
+        </svg>
+    </button>
+    <dialog
+        ref="tagModal"
+        class="modal modal-bottom sm:modal-middle"
+        @click.prevent=""
+    >
+        <div class="modal-box p-0" ref="modalBox">
+            <ul class="list">
+                <li class="p-4 pb-2 text-xs tracking-wide opacity-60">
+                    {{ location.name }}
+                </li>
+
+                <li
+                    class="list-row py-3"
+                    v-for="tag in location.tags"
+                    :key="tag.key"
+                >
+                    <div>
+                        <div class="text-xs opacity-60">{{ tag.key }}</div>
+                        <div class="font-semibold">{{ tag.value }}</div>
+                    </div>
+                </li>
+            </ul>
+
+            <div class="modal-action m-4">
+                <button class="btn" @click.prevent="closeModal()">Close</button>
+            </div>
+        </div>
+    </dialog>
+</template>
