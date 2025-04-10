@@ -1,4 +1,4 @@
-import { LocationTag } from '@/types';
+import { LocationEntry, LocationTag } from '@/types';
 
 const osmCategoryToEmoji: Record<string, Record<string, string>> = {
     amenity: {
@@ -140,7 +140,7 @@ const fallbackEmojis: Record<string, string> = {
     building: '🏬',
     historic: '🗽',
     public_transport: '🚏',
-    office: '🏬',
+    office: '🧑‍💻',
 };
 
 export function osmCategoryToEmojiMapper(
@@ -174,4 +174,18 @@ export function getEmojiFromTags(tags: LocationTag[]): string {
         }
     }
     return '📍';
+}
+
+export function getName(location: LocationEntry): string {
+    // show platform name if available in tags
+    if (location.tags) {
+        const platformName = location.tags.find(
+            (tag) => tag.key === 'railway:track_ref',
+        );
+        if (platformName) {
+            return `Platform ${platformName.value} (${location.name})`;
+        }
+    }
+
+    return location.name;
 }
