@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { defineProps } from 'vue';
-import { Link } from '@inertiajs/vue3';
 import { LocationEntry } from '@/types';
+import { Link } from '@inertiajs/vue3';
+import { defineProps } from 'vue';
 
 defineProps({
     location: {
@@ -26,12 +26,10 @@ defineProps({
         as="li"
         class="list-row hover:bg-base-200 cursor-pointer"
     >
-        <div class="text-3xl">{{ location.emoji }}</div>
+        <div class="text-3xl">🥳</div>
         <div>
             <div>{{ location.name }}</div>
-            <div class="text-xs uppercase opacity-60">
-                {{ location.type }}
-            </div>
+            <div class="text-xs uppercase opacity-60"></div>
         </div>
         <Link
             v-if="showStartButton"

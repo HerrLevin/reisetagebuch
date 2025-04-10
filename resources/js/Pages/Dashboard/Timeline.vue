@@ -7,8 +7,8 @@ const demoData = [
         username: 'Julia',
         stars: 10,
         likes: 3,
-        location: 'Heidelberg, Deutschland',
-        venue: "Yorma's",
+        region: 'Heidelberg, Deutschland',
+        location: "Yorma's",
         createdAt: '2025-04-08T19:00:00Z',
         body: 'Bester Kaffee!',
         picture: 'https://loremfaces.net/96/id/1.jpg',
@@ -18,8 +18,8 @@ const demoData = [
         username: 'Julia',
         stars: 5,
         likes: 1,
-        location: 'Karlsruhe, Deutschland',
-        venue: '',
+        region: 'Karlsruhe, Deutschland',
+        location: '',
         createdAt: '2025-04-08T18:00:00Z',
         body: '',
         picture: 'https://loremfaces.net/96/id/1.jpg',
@@ -30,8 +30,8 @@ const demoData = [
         username: 'Marc',
         stars: 5,
         likes: 1,
-        location: 'Stockholm, Schweden',
-        venue: 'Bageri',
+        region: 'Stockholm, Schweden',
+        location: 'Bageri',
         createdAt: '2025-04-08T18:00:00Z',
         body: 'Das Brot ist sehr lecker!',
         picture: 'https://loremfaces.net/96/id/2.jpg',
@@ -41,8 +41,8 @@ const demoData = [
         username: 'Julia',
         stars: 3,
         likes: 0,
-        location: 'Karlsruhe, Deutschland',
-        venue: 'Karlsruhe Hbf',
+        region: 'Karlsruhe, Deutschland',
+        location: 'Karlsruhe Hbf',
         createdAt: '2025-04-08T17:00:00Z',
         body: '',
         picture: 'https://loremfaces.net/96/id/1.jpg',
@@ -52,8 +52,8 @@ const demoData = [
         username: 'Felix',
         stars: 8,
         likes: 2,
-        location: 'Berlin, Deutschland',
-        venue: 'Berghain',
+        region: 'Berlin, Deutschland',
+        location: 'Berghain',
         createdAt: '2025-04-08T16:00:00Z',
         picture: 'https://loremfaces.net/96/id/3.jpg',
     },
@@ -71,8 +71,8 @@ const demoData = [
             :username="demo.username"
             :stars="demo.stars"
             :likes="demo.likes"
+            :region="demo.region"
             :location="demo.location"
-            :venue="demo.venue"
             :createdAt="demo.createdAt"
             :body="demo.body"
             :picture="demo.picture"

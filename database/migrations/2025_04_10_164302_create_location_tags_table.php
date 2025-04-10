@@ -1,7 +1,6 @@
 <?php
 
-use App\Models\Post;
-use App\Models\Venue;
+use App\Models\Location;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -10,16 +9,17 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('venue_posts', function (Blueprint $table) {
+        Schema::create('location_tags', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignIdFor(Post::class);
-            $table->foreignIdFor(Venue::class);
+            $table->foreignIdFor(Location::class)->constrained()->cascadeOnDelete();
+            $table->string('key');
+            $table->string('value')->nullable();
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('venue_posts');
+        Schema::dropIfExists('location_tags');
     }
 };

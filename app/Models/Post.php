@@ -22,8 +22,8 @@ class Post extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function venuePost(): HasOne
+    public function locationPost(): HasOne
     {
-        return $this->hasOne(VenuePost::class);
+        return $this->hasOne(LocationPost::class);
     }
 }

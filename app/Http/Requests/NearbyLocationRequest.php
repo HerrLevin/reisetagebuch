@@ -9,7 +9,7 @@ use Illuminate\Foundation\Http\FormRequest;
  * @property float $latitude
  * @property float $longitude
  */
-class NearbyVenueRequest extends FormRequest
+class NearbyLocationRequest extends FormRequest
 {
 
     /**

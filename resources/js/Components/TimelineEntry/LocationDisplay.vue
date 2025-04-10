@@ -15,11 +15,11 @@ defineProps({
         type: Number,
         default: 0,
     },
-    location: {
+    region: {
         type: String,
         default: 'Karlsruhe, Deutschland',
     },
-    venue: {
+    location: {
         type: String,
         default: 'Karlsruhe Hbf',
     },
@@ -34,12 +34,12 @@ defineProps({
     <div>
         <div>
             <div class="text-xs opacity-60">{{ username }}</div>
-            <div class="font-semibold">{{ venue }}</div>
+            <div class="font-semibold">{{ location }}</div>
         </div>
 
         <div class="mt-1">
             <div class="flex items-center gap-2 text-xs">
-                <span class="opacity-50">{{ location }}</span>
+                <span class="opacity-50">{{ region }}</span>
                 <StarsIndicator :stars />
                 <LikesIndicator :likes />
             </div>

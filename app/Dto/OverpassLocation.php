@@ -2,7 +2,7 @@
 
 namespace App\Dto;
 
-readonly class OverpassVenue
+readonly class OverpassLocation
 {
     public string $osmId;
     public ?string $name;

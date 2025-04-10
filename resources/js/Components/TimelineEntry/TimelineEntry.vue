@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import LikeButton from '@/Components/TimelineEntry/LikeButton.vue';
 import RouteDisplay from '@/Components/TimelineEntry/RouteDisplay.vue';
-import VenueDisplay from '@/Components/TimelineEntry/VenueDisplay.vue';
+import LocationDisplay from '@/Components/TimelineEntry/LocationDisplay.vue';
 import { DateTime } from 'luxon';
 
 const props = defineProps({
@@ -17,11 +17,11 @@ const props = defineProps({
         type: Number,
         default: 0,
     },
-    location: {
+    region: {
         type: String,
         default: 'Karlsruhe, Deutschland',
     },
-    venue: {
+    location: {
         type: String,
         default: 'Karlsruhe Hbf',
     },
@@ -63,10 +63,11 @@ function relativeCreatedAt(): string {
                 :alt="`Profile picture of ${username}`"
             />
         </div>
-        <VenueDisplay
+        <LocationDisplay
             v-if="!showRoute"
             :stars
             :likes
+            :region
             :location
             :body
             :relativeCreatedAt="relativeCreatedAt()"

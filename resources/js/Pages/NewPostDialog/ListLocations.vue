@@ -5,64 +5,18 @@ import LocationListEntry from '@/Pages/NewPostDialog/Partials/LocationListEntry.
 import { LocationEntry } from '@/types';
 import { ref } from 'vue';
 
-const demoLocations = ref([
-    {
-        emoji: '🏘️',
-        name: 'Oststadt',
-        type: 'Neighborhood',
-    },
-    {
-        emoji: '🥨',
-        name: 'Visel',
-        type: 'Bakery',
-    },
-    {
-        emoji: '🚉',
-        name: 'Gottesauer Platz / BGV',
-        type: 'Tram Stop',
-    },
-    {
-        name: 'Edeka',
-        type: 'Supermarket',
-        emoji: '🛒',
-    },
-    {
-        name: 'Disco',
-        type: 'Club',
-        emoji: '💃',
-    },
-    {
-        name: 'Tulla Brunnen',
-        type: 'Park',
-        emoji: '🌳',
-    },
-    {
-        name: 'EnBW',
-        type: 'Office Building',
-        emoji: '🏢',
-    },
-    {
-        emoji: '🏙️',
-        name: 'Karlsruhe',
-        type: 'City',
-    },
-] as LocationEntry[]);
 const props = defineProps({
-    venues: {
-        type: Array,
-        default: () => [],
+    locations: {
+        type: Array<LocationEntry>,
+        default: () => [] as LocationEntry[],
         required: false,
     },
 });
 
+console.log('locations', props.locations);
+
 const showStartButton = ref(false);
 showStartButton.value = route().current('posts.create.start');
-
-if (!showStartButton.value) {
-    // sort random
-    demoLocations.value = demoLocations.value.sort(() => Math.random() - 0.5);
-}
-console.log(props.venues);
 </script>
 
 <template>
@@ -107,7 +61,7 @@ console.log(props.venues);
                 <!-- todo: use id as key -->
                 <LocationListEntry
                     :data="{ location: location }"
-                    v-for="location in demoLocations"
+                    v-for="location in locations"
                     :location
                     :showStartButton
                     :key="location.name"
