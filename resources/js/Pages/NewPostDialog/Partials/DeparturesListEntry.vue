@@ -67,14 +67,19 @@ function formatTime(date: DateTime | null): string {
 
 <template>
     <Link
-        :href="route('posts.create.post')"
-        :data="linkData"
+        :href="route('posts.create.stopovers')"
+        :data="{
+            tripId: props.stopTime.tripId,
+            startId: props.stopTime.place.stopId,
+            startTime: _scheduledTime,
+        }"
         as="li"
-        class="list-row hover:bg-base-200 cursor-pointer"
+        class="list-row hover:bg-base-200 cursor-pointer grid-cols-11"
     >
-        <div class="flex min-w-[5rem] items-center justify-between text-3xl">
+        <div class="col text-center text-3xl">
             {{ emoji }}
-
+        </div>
+        <div class="col col-span-2 text-center">
             <div
                 class="badge min-w-[3em]"
                 :style="`background-color: ${getColor(stopTime.mode)}`"
@@ -82,7 +87,7 @@ function formatTime(date: DateTime | null): string {
                 {{ stopTime.routeShortName }}
             </div>
         </div>
-        <div>
+        <div class="col col-span-6">
             <div>
                 {{ stopTime.headSign }}
             </div>
@@ -93,7 +98,7 @@ function formatTime(date: DateTime | null): string {
                 {{ stopTime.place.name }}
             </div>
         </div>
-        <div>
+        <div class="col col-span-2 text-right">
             <div
                 :class="{
                     'text-warning': delay < 4 && delay >= 2,
@@ -110,4 +115,8 @@ function formatTime(date: DateTime | null): string {
     </Link>
 </template>
 
-<style scoped></style>
+<style scoped>
+.badge {
+    height: auto;
+}
+</style>

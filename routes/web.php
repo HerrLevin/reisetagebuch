@@ -28,6 +28,7 @@ Route::middleware('auth')->group(callback: function () {
     Route::get('/dashboard', [PostController::class, 'dashboard'])->name('dashboard');
     Route::get('/posts/locations', [LocationController::class, 'nearby'])->name('posts.create.start');
     Route::get('/posts/departures', [LocationController::class, 'departures'])->name('posts.create.departures');
+    Route::get('/posts/stopovers', [LocationController::class, 'stopovers'])->name('posts.create.stopovers');
     Route::get('/posts/new', [PostController::class, 'dashboard'])->name('posts.create.text');
 
     // this belongs in an api
