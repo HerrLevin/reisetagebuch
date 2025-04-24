@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Dto\Coordinate;
 use App\Dto\MotisApi\StopDto;
 use App\Dto\MotisApi\StopTimeDto;
+use App\Dto\MotisApi\TripDto;
 use App\Hydrators\MotisHydrator;
 use Carbon\Carbon;
 use Illuminate\Http\Client\ConnectionException;
@@ -96,5 +97,20 @@ class TransitousRequestService
         });
 
         return $stops->sortBy('distance')->values();
+    }
+
+    public function getStopTimes(string $tripId): ?TripDto
+    {
+        $response = Http::withUserAgent($this->versionService->getUserAgent())->get(self::API_URL . '/trip/?tripId=' . $tripId);
+
+        if (!$response->ok()) {
+            Log::error('Unknown response (getStopTimes)', [
+                'status' => $response->status(),
+                'body'   => $response->body()
+            ]);
+            return null;
+        }
+
+        return $this->hydrator->hydrateTrip($response->json());
     }
 }

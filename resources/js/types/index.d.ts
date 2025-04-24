@@ -17,6 +17,33 @@ export type PageProps<
     ziggy: Config & { location: string };
 };
 
+export type TripDto = {
+    duration: number;
+    startTime: string;
+    endTime: string;
+    transfers: number;
+    legs: LegDto[];
+};
+
+export type LegDto = {
+    mode: TransportMode;
+    from: StopPlace;
+    to: StopPlace;
+    duration: number;
+    startTime: string | null;
+    endTime: string | null;
+    scheduledStartTime: string | null;
+    scheduledEndTime: string | null;
+    realTime: boolean;
+    headSign: string;
+    agencyName: string | null;
+    agencyId: string | null;
+    tripId: string;
+    routeShortName: string;
+    source: string;
+    intermediateStops: StopPlace[];
+};
+
 export type DeparturesDto = {
     stop: StopDto;
     departures: DepartureDto[];

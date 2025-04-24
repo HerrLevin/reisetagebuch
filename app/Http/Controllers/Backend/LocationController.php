@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend;
 
 use App\Dto\DeparturesDto;
 use App\Dto\MotisApi\StopDto;
+use App\Dto\MotisApi\TripDto;
 use App\Http\Controllers\Controller;
 use App\Repositories\LocationRepository;
 use App\Services\TransitousRequestService;
@@ -50,5 +51,11 @@ class LocationController extends Controller
             stop: $firstStop,
             departures: $this->transitousRequestService->getDepartures($firstStop->stopId, now())
         );
+    }
+
+    public function stopovers(string $tripId, string $startId, string $startTime): ?TripDto
+    {
+        //todo: make more than one request
+        return $this->transitousRequestService->getStopTimes($tripId);
     }
 }

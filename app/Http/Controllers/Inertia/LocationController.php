@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Inertia;
 use App\Http\Controllers\Backend\LocationController as BackendLocationController;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\NearbyLocationRequest;
+use App\Http\Requests\StopoverRequest;
 use App\Http\Resources\LocationResource;
 use Inertia\Response;
 use Inertia\ResponseFactory;
@@ -35,6 +36,21 @@ class LocationController extends Controller
 
         return inertia('NewPostDialog/ListDepartures', [
             'departures' => $departures,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
+        ]);
+    }
+
+    public function stopovers(StopoverRequest $request): Response|ResponseFactory
+    {
+        $trip = $this->locationController->stopovers(
+            tripId: $request->tripId,
+            startId: $request->startId,
+            startTime: $request->startTime
+        );
+
+        return inertia('NewPostDialog/ListStopovers', [
+            'trip' => $trip,
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
         ]);
