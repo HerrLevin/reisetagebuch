@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Backend;
 
+use App\Dto\DeparturesDto;
 use App\Dto\MotisApi\StopDto;
 use App\Http\Controllers\Controller;
 use App\Repositories\LocationRepository;
@@ -32,20 +33,22 @@ class LocationController extends Controller
     }
 
     /**
-     * @returns Collection|StopDto[]
      * @throws ConnectionException
      */
-    public function departures(float $latitude, float $longitude): Collection
+    public function departures(float $latitude, float $longitude): ?DeparturesDto
     {
         $stops = $this->transitousRequestService->getNearby($latitude, $longitude);
         if ($stops->isEmpty()) {
-            return collect();
+            return null;
         }
 
         /**
          * @var StopDto $firstStop
          */
         $firstStop = $stops->first();
-        return $this->transitousRequestService->getDepartures($firstStop->stopId, now());
+        return new DeparturesDto(
+            stop: $firstStop,
+            departures: $this->transitousRequestService->getDepartures($firstStop->stopId, now())
+        );
     }
 }
