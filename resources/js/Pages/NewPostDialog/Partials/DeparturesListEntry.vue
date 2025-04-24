@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { getColor, getEmoji } from '@/Services/DepartureTypeService';
-import { StopTime } from '@/types';
+import { StopDto, StopTime } from '@/types';
 import { Link } from '@inertiajs/vue3';
 import { DateTime } from 'luxon';
 import { defineProps, PropType, ref } from 'vue';
@@ -16,6 +16,10 @@ const props = defineProps({
     },
     data: {
         type: Object,
+        default: () => ({}),
+    },
+    stop: {
+        type: Object as PropType<StopDto>,
         default: () => ({}),
     },
 });
@@ -82,7 +86,10 @@ function formatTime(date: DateTime | null): string {
             <div>
                 {{ stopTime.headSign }}
             </div>
-            <div class="overflow-x-hidden text-xs uppercase opacity-60">
+            <div
+                v-if="stopTime.place.name !== stop.name"
+                class="overflow-x-hidden text-xs uppercase opacity-60"
+            >
                 {{ stopTime.place.name }}
             </div>
         </div>

@@ -17,6 +17,19 @@ export type PageProps<
     ziggy: Config & { location: string };
 };
 
+export type DeparturesDto = {
+    stop: StopDto;
+    departures: DepartureDto[];
+};
+
+export type StopDto = {
+    stopId: string;
+    name: string;
+    latitude: number;
+    longitude: number;
+    distance: number | null;
+};
+
 export type StopTime = {
     place: StopPlace;
     mode: TransportMode;

@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import DeparturesListEntry from '@/Pages/NewPostDialog/Partials/DeparturesListEntry.vue';
-import { StopTime } from '@/types';
+import { DeparturesDto } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import { PropType, ref } from 'vue';
 
 const props = defineProps({
     departures: {
-        type: Array as () => PropType<Array<StopTime>>,
-        default: () => [],
+        type: Object as PropType<DeparturesDto> | null,
         required: false,
     },
 });
@@ -28,13 +27,14 @@ showStartButton.value = route().current('posts.create.start');
             <!-- Results -->
             <ul class="list">
                 <li class="p-4 pb-2 text-xs tracking-wide opacity-60">
-                    Departures nearby
+                    Departures at {{ departures?.stop.name }}
                 </li>
                 <DeparturesListEntry
-                    v-for="(departure, index) in departures"
+                    v-for="(departure, index) in departures?.departures"
                     :key="index"
                     :stopTime="departure"
                     :showStartButton="showStartButton"
+                    :stop="departures!.stop"
                 />
             </ul>
         </div>
