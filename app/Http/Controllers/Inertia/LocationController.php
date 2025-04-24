@@ -28,4 +28,15 @@ class LocationController extends Controller
             'longitude' => $request->longitude,
         ]);
     }
+
+    public function departures(NearbyLocationRequest $request): Response|ResponseFactory
+    {
+        $departures = $this->locationController->departures($request->latitude, $request->longitude);
+
+        return inertia('NewPostDialog/ListDepartures', [
+            'departures' => $departures,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
+        ]);
+    }
 }

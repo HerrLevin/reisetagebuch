@@ -1,4 +1,5 @@
 import { Config } from 'ziggy-js';
+import { TransportMode } from '@/types/enums';
 
 export interface User {
     id: number;
@@ -14,6 +15,29 @@ export type PageProps<
         user: User;
     };
     ziggy: Config & { location: string };
+};
+
+export type StopTime = {
+    place: StopPlace;
+    mode: TransportMode;
+    realTime: boolean;
+    headSign: string;
+    agencyName: string | null;
+    agencyId: string | null;
+    tripId: string;
+    routeShortName: string;
+    source: string;
+};
+
+export type StopPlace = {
+    name: string;
+    stopId: string;
+    latitude: number;
+    longitude: number;
+    arrival: string | null;
+    departure: string | null;
+    scheduledArrival: string | null;
+    scheduledDeparture: string | null;
 };
 
 export type LocationEntry = {
