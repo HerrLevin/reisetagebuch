@@ -3,11 +3,12 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import Timeline from '@/Pages/Dashboard/Timeline.vue';
 import { Post } from '@/types';
 import { Head } from '@inertiajs/vue3';
+import type { PropType } from 'vue';
 
 defineProps({
     posts: {
-        type: Array,
-        default: () => [] as Post[],
+        type: Array as PropType<Post[]>,
+        default: () => [],
     },
 });
 </script>

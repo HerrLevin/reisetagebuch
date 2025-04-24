@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import TimelineEntry from '@/Components/TimelineEntry/TimelineEntry.vue';
 import { Post } from '@/types';
+import type { PropType } from 'vue';
 
 defineProps({
     posts: {
-        type: Array as () => Post[],
+        type: Array as PropType<Post[]>,
         default: () => [],
     },
 });
@@ -19,7 +20,7 @@ defineProps({
             v-for="post in posts"
             :key="post.id"
             :post="post"
-            :showRoute="post.showRoute"
+            :showRoute="false"
         />
     </ul>
 </template>

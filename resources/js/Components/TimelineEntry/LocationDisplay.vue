@@ -3,10 +3,11 @@ import LocationListEntryInfo from '@/Pages/NewPostDialog/Partials/LocationListEn
 import { Post } from '@/types';
 import { DateTime } from 'luxon';
 import { getEmojiFromTags } from '../../Services/LocationTypeService';
+import type { PropType } from 'vue';
 
 const props = defineProps({
     post: {
-        type: Object as () => Post,
+        type: Object as PropType<Post>,
         required: true,
     },
 });
@@ -30,7 +31,10 @@ function relativeCreatedAt(): string {
                 {{ relativeCreatedAt() }}
             </div>
             <div class="font-semibold">
-                <LocationListEntryInfo :location="post.location">
+                <LocationListEntryInfo
+                    v-if="post.location"
+                    :location="post.location"
+                >
                     <template v-slot:activator="{ onClick }">
                         <a href="#" @click.prevent="onClick">
                             {{ getEmojiFromTags(post.location.tags) }}
