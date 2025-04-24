@@ -27,7 +27,7 @@ Route::middleware('auth')->group(callback: function () {
     Route::post('/posts/create', [PostController::class, 'store'])->name('posts.create.post.store');
     Route::get('/dashboard', [PostController::class, 'dashboard'])->name('dashboard');
     Route::get('/posts/locations', [LocationController::class, 'nearby'])->name('posts.create.start');
-    Route::get('/posts/departures', [LocationController::class, 'nearby'])->name('posts.create.departures');
+    Route::get('/posts/departures', [LocationController::class, 'departures'])->name('posts.create.departures');
     Route::get('/posts/new', [PostController::class, 'dashboard'])->name('posts.create.text');
 
     // this belongs in an api

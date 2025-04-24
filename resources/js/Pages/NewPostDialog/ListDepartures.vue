@@ -1,0 +1,42 @@
+<script setup lang="ts">
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import DeparturesListEntry from '@/Pages/NewPostDialog/Partials/DeparturesListEntry.vue';
+import { StopTime } from '@/types';
+import { Head } from '@inertiajs/vue3';
+import { PropType, ref } from 'vue';
+
+const props = defineProps({
+    departures: {
+        type: Array as () => PropType<Array<StopTime>>,
+        default: () => [],
+        required: false,
+    },
+});
+
+const showStartButton = ref(false);
+showStartButton.value = route().current('posts.create.start');
+</script>
+
+<template>
+    <Head title="Dashboard" />
+
+    <AuthenticatedLayout>
+        <template #header>
+            <h2 class="text-xl leading-tight font-semibold">New Post</h2>
+        </template>
+        <div class="card bg-base-100 min-w-full shadow-md">
+            <!-- Results -->
+            <ul class="list">
+                <li class="p-4 pb-2 text-xs tracking-wide opacity-60">
+                    Departures nearby
+                </li>
+                <DeparturesListEntry
+                    v-for="(departure, index) in departures"
+                    :key="index"
+                    :stopTime="departure"
+                    :showStartButton="showStartButton"
+                />
+            </ul>
+        </div>
+    </AuthenticatedLayout>
+</template>
