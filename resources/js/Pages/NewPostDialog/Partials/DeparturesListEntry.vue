@@ -2,8 +2,9 @@
 import { getColor, getEmoji } from '@/Services/DepartureTypeService';
 import { StopDto, StopTime } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import { DateTime } from 'luxon';
 import { defineProps, PropType, ref } from 'vue';
+import MotisTimeService from '@/Services/MotisTimeService';
+import TimeDisplay from '@/Pages/NewPostDialog/Partials/TimeDisplay.vue';
 
 const props = defineProps({
     stopTime: {
@@ -25,54 +26,25 @@ const props = defineProps({
 });
 
 const emoji = ref('');
-const time = ref('');
-const plannedTime = ref('');
-const delay = ref(-1);
+
+const timeService = new MotisTimeService(props.stopTime.place);
+const plannedTime = ref(timeService.plannedTimeString);
+const time = ref(timeService.timeString);
+const delay = ref(timeService.delay);
 
 emoji.value = getEmoji(props.stopTime.mode);
 
 const linkData = ref({
-    location: {
-        emoji: emoji.value,
-        name: props.stopTime.headSign,
-        id: props.stopTime.tripId,
-    },
+    tripId: props.stopTime.tripId,
+    startId: props.stopTime.place.stopId,
+    startTime: timeService.plannedTime?.toISODate(),
 });
-
-const _scheduledTime =
-    props.stopTime.place.scheduledDeparture ??
-    props.stopTime.place.scheduledArrival;
-const luxonSchedule = _scheduledTime ? DateTime.fromISO(_scheduledTime) : null;
-const _time = props.stopTime.place.departure ?? props.stopTime.place.arrival;
-const luxonTime = _time ? DateTime.fromISO(_time) : null;
-const realTime = props.stopTime.realTime;
-
-delay.value =
-    realTime && luxonTime && luxonSchedule
-        ? luxonTime.diff(luxonSchedule, 'minutes').minutes
-        : -1;
-
-time.value = realTime
-    ? formatTime(luxonTime ?? luxonSchedule)
-    : formatTime(luxonSchedule);
-plannedTime.value = realTime ? formatTime(luxonSchedule) : '';
-
-function formatTime(date: DateTime | null): string {
-    if (!date) {
-        return '';
-    }
-    return date.toFormat('HH:mm');
-}
 </script>
 
 <template>
     <Link
         :href="route('posts.create.stopovers')"
-        :data="{
-            tripId: props.stopTime.tripId,
-            startId: props.stopTime.place.stopId,
-            startTime: _scheduledTime,
-        }"
+        :data="linkData"
         as="li"
         class="list-row hover:bg-base-200 cursor-pointer grid-cols-11"
     >
@@ -81,7 +53,7 @@ function formatTime(date: DateTime | null): string {
         </div>
         <div class="col col-span-2 text-center">
             <div
-                class="badge min-w-[3em]"
+                class="badge min-w-[3em] text-white"
                 :style="`background-color: ${getColor(stopTime.mode)}`"
             >
                 {{ stopTime.routeShortName }}
@@ -99,18 +71,12 @@ function formatTime(date: DateTime | null): string {
             </div>
         </div>
         <div class="col col-span-2 text-right">
-            <div
-                :class="{
-                    'text-warning': delay < 4 && delay >= 2,
-                    'text-success': delay < 2 && delay >= 0,
-                    'text-error': delay >= 4,
-                }"
-            >
-                {{ time }}
-            </div>
-            <div v-if="delay" class="line-through opacity-60">
-                {{ plannedTime }}
-            </div>
+            <TimeDisplay
+                :planned="plannedTime"
+                :time="time"
+                :delay="delay"
+                :realTime="props.stopTime.realTime"
+            />
         </div>
     </Link>
 </template>

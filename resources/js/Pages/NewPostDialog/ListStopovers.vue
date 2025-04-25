@@ -4,6 +4,7 @@ import { StopPlace, TripDto } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import { PropType, ref } from 'vue';
 import StopoversListEntry from '@/Pages/NewPostDialog/Partials/StopoversListEntry.vue';
+import { getEmoji } from '../../Services/DepartureTypeService';
 
 const props = defineProps({
     trip: {
@@ -33,6 +34,7 @@ stopovers.value = props.trip?.legs[0]
             <!-- Results -->
             <ul class="list">
                 <li class="p-4 pb-2 text-xs tracking-wide opacity-60">
+                    {{ trip?.legs[0].mode ? getEmoji(trip?.legs[0].mode) : '' }}
                     {{ trip?.legs[0].routeShortName }}
                     |
                     {{ trip?.legs[0].headSign }}
@@ -43,6 +45,7 @@ stopovers.value = props.trip?.legs[0]
                     :stop="stopover"
                     :mode="trip?.legs[0].mode"
                     :shortName="trip?.legs[0].routeShortName"
+                    :realTime="trip?.legs[0].realTime"
                 />
             </ul>
         </div>

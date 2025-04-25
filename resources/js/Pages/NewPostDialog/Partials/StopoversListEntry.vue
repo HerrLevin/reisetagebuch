@@ -3,8 +3,9 @@ import { getEmoji } from '@/Services/DepartureTypeService';
 import { StopPlace } from '@/types';
 import { TransportMode } from '@/types/enums';
 import { Link } from '@inertiajs/vue3';
-import { DateTime } from 'luxon';
 import { defineProps, PropType, ref } from 'vue';
+import TimeDisplay from '@/Pages/NewPostDialog/Partials/TimeDisplay.vue';
+import MotisTimeService from '@/Services/MotisTimeService';
 
 const props = defineProps({
     stop: {
@@ -19,35 +20,19 @@ const props = defineProps({
         type: String,
         default: '',
     },
+    realTime: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const emoji = ref('');
-const time = ref('');
-const plannedTime = ref('');
-const delay = ref(-1);
-
-const _scheduledTime =
-    props.stop.scheduledDeparture ?? props.stop.scheduledArrival;
-const luxonSchedule = _scheduledTime ? DateTime.fromISO(_scheduledTime) : null;
-const _time = props.stop.departure ?? props.stop.arrival;
-const luxonTime = _time ? DateTime.fromISO(_time) : null;
-
-delay.value =
-    luxonTime && luxonSchedule
-        ? luxonTime.diff(luxonSchedule, 'minutes').minutes
-        : -1;
-
-time.value = formatTime(luxonTime ?? luxonSchedule);
-plannedTime.value = formatTime(luxonSchedule);
+const timeService = new MotisTimeService(props.stop);
+const plannedTime = ref(timeService.plannedTimeString);
+const time = ref(timeService.timeString);
+const delay = ref(timeService.delay);
 
 emoji.value = props.mode ? getEmoji(props.mode as TransportMode) : '';
-
-function formatTime(date: DateTime | null): string {
-    if (!date) {
-        return '';
-    }
-    return date.toFormat('HH:mm');
-}
 
 const linkData = ref({
     location: {
@@ -69,18 +54,12 @@ const linkData = ref({
             {{ stop.name }}
         </div>
         <div class="col col-span-2 text-right">
-            <div
-                :class="{
-                    'text-warning': delay < 4 && delay >= 2,
-                    'text-success': delay < 2 && delay >= 0,
-                    'text-error': delay >= 4,
-                }"
-            >
-                {{ time }}
-            </div>
-            <div v-if="delay" class="line-through opacity-60">
-                {{ plannedTime }}
-            </div>
+            <TimeDisplay
+                :planned="plannedTime"
+                :time="time"
+                :delay="delay"
+                :realTime="realTime"
+            />
         </div>
     </Link>
 </template>
