@@ -51,6 +51,7 @@ class LocationController extends Controller
 
         return inertia('NewPostDialog/ListStopovers', [
             'trip' => $trip,
+            'startTime' => $request->startTime,
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
         ]);

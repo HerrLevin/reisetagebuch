@@ -37,7 +37,7 @@ emoji.value = getEmoji(props.stopTime.mode);
 const linkData = ref({
     tripId: props.stopTime.tripId,
     startId: props.stopTime.place.stopId,
-    startTime: timeService.plannedTime?.toISODate(),
+    startTime: timeService.plannedTime?.toISO(),
 });
 </script>
 
