@@ -1,14 +1,11 @@
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
 
 <template>
     <div>
         <div class="grid grid-cols-3 gap-0 pb-0">
             <div class="text-left">
-                <div class="mb-2 leading-none font-semibold">
-                    Karlsruhe Hbf
-                </div>
-                <div class="opacity-50 text-xs">Karlsruhe</div>
+                <div class="mb-2 leading-none font-semibold">Karlsruhe Hbf</div>
+                <div class="text-xs opacity-50">Karlsruhe</div>
                 <p class="text-muted-foreground text-sm font-medium">10:05</p>
             </div>
             <div class="self-end text-center">
@@ -18,7 +15,7 @@
                 <div class="mb-2 leading-none font-semibold">
                     Heidelberg Hbf
                 </div>
-                <div class="opacity-50 text-xs">Heidelberg</div>
+                <div class="text-xs opacity-50">Heidelberg</div>
                 <p class="text-muted-foreground text-sm font-medium">10:35</p>
             </div>
         </div>
@@ -30,15 +27,15 @@
 
 <style scoped>
 .divider-dashed {
-    &::before, &::after {
-        background:
-            repeating-linear-gradient(
-                90deg,
-                transparent,
-                transparent 5px,
-                color-mix(in oklab, var(--color-base-content) 10%, transparent) 5px,
-                color-mix(in oklab, var(--color-base-content) 10%, transparent) 10px
-            );
+    &::before,
+    &::after {
+        background: repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 5px,
+            color-mix(in oklab, var(--color-base-content) 10%, transparent) 5px,
+            color-mix(in oklab, var(--color-base-content) 10%, transparent) 10px
+        );
     }
 }
 </style>

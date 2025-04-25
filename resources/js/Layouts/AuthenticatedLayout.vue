@@ -1,10 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import NavBar from '@/Layouts/Partials/NavBar.vue';
 import SideMenu from '@/Layouts/Partials/SideMenu.vue';
 import Dock from '@/Pages/Profile/Partials/Dock.vue';
-import NavBar from '@/Layouts/Partials/NavBar.vue';
-
-const showingNavigationDropdown = ref(false);
 </script>
 
 <template>

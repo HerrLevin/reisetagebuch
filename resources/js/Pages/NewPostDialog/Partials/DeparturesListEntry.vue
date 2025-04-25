@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import TimeDisplay from '@/Pages/NewPostDialog/Partials/TimeDisplay.vue';
 import { getColor, getEmoji } from '@/Services/DepartureTypeService';
+import MotisTimeService from '@/Services/MotisTimeService';
 import { StopDto, StopTime } from '@/types';
 import { Link } from '@inertiajs/vue3';
 import { defineProps, PropType, ref } from 'vue';
-import MotisTimeService from '@/Services/MotisTimeService';
-import TimeDisplay from '@/Pages/NewPostDialog/Partials/TimeDisplay.vue';
 
 const props = defineProps({
     stopTime: {

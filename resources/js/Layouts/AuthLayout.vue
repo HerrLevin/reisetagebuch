@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ApplicationLogo from "@/Components/ApplicationLogo.vue";
+import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 </script>
 
 <template>
@@ -9,15 +9,23 @@ import ApplicationLogo from "@/Components/ApplicationLogo.vue";
                 <div class="">
                     <div
                         class="hero bg-base-200 min-h-full rounded-l-xl"
-                        style="background-image: url('/assets/login/pexels-nurseryart-346885.jpg'); background-size: cover; background-position: center;"
+                        style="
+                            background-image: url('/assets/login/pexels-nurseryart-346885.jpg');
+                            background-size: cover;
+                            background-position: center;
+                        "
                     >
                         <div class="hero-content py-12">
                             <div class="max-w-md">
-                                <h1 class="text-center text-3xl font-bold mix-blend-difference text-white">
-                                    <ApplicationLogo class="inline-block h-12 w-12 fill-current" />
+                                <h1
+                                    class="text-center text-3xl font-bold text-white mix-blend-difference"
+                                >
+                                    <ApplicationLogo
+                                        class="inline-block h-12 w-12 fill-current"
+                                    />
                                     &nbsp; Reisetagebuch
                                 </h1>
-                           </div>
+                            </div>
                         </div>
                     </div>
                 </div>

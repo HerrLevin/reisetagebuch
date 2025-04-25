@@ -22,10 +22,10 @@ defineProps({
 <template>
     <div
         :class="{
-                    'text-warning': delay < 4 && delay >= 2,
-                    'text-success': delay < 2 && delay >= 0 && realTime,
-                    'text-error': delay >= 4,
-                }"
+            'text-warning': delay < 4 && delay >= 2,
+            'text-success': delay < 2 && delay >= 0 && realTime,
+            'text-error': delay >= 4,
+        }"
     >
         {{ time }}
     </div>
@@ -34,6 +34,4 @@ defineProps({
     </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

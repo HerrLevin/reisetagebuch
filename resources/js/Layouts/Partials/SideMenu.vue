@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import Cog from '@/Icons/Cog.vue';
 import House from '@/Icons/House.vue';
+import List from '@/Icons/List.vue';
+import PencilSquare from '@/Icons/PencilSquare.vue';
 import Pin from '@/Icons/Pin.vue';
 import PlusCircle from '@/Icons/PlusCircle.vue';
 import { LocationService } from '@/Services/LocationService';
 import { Link } from '@inertiajs/vue3';
 import { onMounted, ref } from 'vue';
-import List from '@/Icons/List.vue';
-import PencilSquare from '@/Icons/PencilSquare.vue';
 
 const latitude = ref(0);
 const longitude = ref(0);

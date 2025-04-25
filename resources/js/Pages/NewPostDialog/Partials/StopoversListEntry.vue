@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import TimeDisplay from '@/Pages/NewPostDialog/Partials/TimeDisplay.vue';
 import { getEmoji } from '@/Services/DepartureTypeService';
+import MotisTimeService from '@/Services/MotisTimeService';
 import { StopPlace } from '@/types';
 import { TransportMode } from '@/types/enums';
 import { Link } from '@inertiajs/vue3';
 import { defineProps, PropType, ref } from 'vue';
-import TimeDisplay from '@/Pages/NewPostDialog/Partials/TimeDisplay.vue';
-import MotisTimeService from '@/Services/MotisTimeService';
 
 const props = defineProps({
     stop: {

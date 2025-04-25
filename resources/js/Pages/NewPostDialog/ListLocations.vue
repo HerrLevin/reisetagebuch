@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head } from '@inertiajs/vue3';
 import LocationListEntry from '@/Pages/NewPostDialog/Partials/LocationListEntry.vue';
 import { LocationEntry } from '@/types';
+import { Head } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
 const props = defineProps({
