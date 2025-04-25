@@ -59,10 +59,6 @@ const linkData = ref({
                 :time="time"
                 :delay="delay"
                 :realTime="realTime"
-            />
-        </div>
-    </Link>
-</template>
 
 <style scoped>
 .badge {

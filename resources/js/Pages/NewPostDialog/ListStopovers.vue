@@ -4,23 +4,34 @@ import StopoversListEntry from '@/Pages/NewPostDialog/Partials/StopoversListEntr
 import { StopPlace, TripDto } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import { PropType, ref } from 'vue';
-import { getEmoji } from '../../Services/DepartureTypeService';
+import { DateTime } from 'luxon';
+import { getEmoji } from '@/Services/DepartureTypeService';
 
 const props = defineProps({
     trip: {
         type: Object as PropType<TripDto> | null,
         required: false,
     },
+    startTime: {
+        type: String,
+        default: '',
+    },
 });
 const stopovers = ref([] as StopPlace[]);
+const filterTime = props.startTime ? DateTime.fromISO(props.startTime) : null;
 
 stopovers.value = props.trip?.legs[0]
-    ? [
-          props.trip!.legs[0].from,
-          ...props.trip!.legs[0].intermediateStops,
-          props.trip!.legs[0].to,
-      ]
+    ? [...props.trip!.legs[0].intermediateStops, props.trip!.legs[0].to]
     : [];
+
+stopovers.value = stopovers.value.filter((stopover) => {
+    const time = stopover.scheduledDeparture || stopover.scheduledArrival;
+    const luxonTime = time ? DateTime.fromISO(time) : null;
+
+    if (filterTime && luxonTime) {
+        return luxonTime >= filterTime;
+    }
+});
 </script>
 
 <template>
