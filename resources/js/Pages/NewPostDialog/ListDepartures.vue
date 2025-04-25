@@ -5,7 +5,7 @@ import { DeparturesDto } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import { PropType, ref } from 'vue';
 
-const props = defineProps({
+defineProps({
     departures: {
         type: Object as PropType<DeparturesDto> | null,
         required: false,

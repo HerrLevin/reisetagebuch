@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import StopoversListEntry from '@/Pages/NewPostDialog/Partials/StopoversListEntry.vue';
 import { StopPlace, TripDto } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import { PropType, ref } from 'vue';
-import StopoversListEntry from '@/Pages/NewPostDialog/Partials/StopoversListEntry.vue';
 import { getEmoji } from '../../Services/DepartureTypeService';
 
 const props = defineProps({

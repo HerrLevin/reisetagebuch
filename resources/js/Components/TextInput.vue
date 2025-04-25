@@ -22,7 +22,7 @@ defineExpose({ focus: () => input.value?.focus() });
     <input
         class="input input-bordered w-full"
         :class="{
-           'input-error': props.error,
+            'input-error': props.error,
         }"
         v-model="model"
         ref="input"

@@ -1,5 +1,5 @@
-import { Config } from 'ziggy-js';
 import { TransportMode } from '@/types/enums';
+import { Config } from 'ziggy-js';
 
 export interface User {
     id: number;
