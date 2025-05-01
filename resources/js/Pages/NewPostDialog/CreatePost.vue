@@ -38,6 +38,7 @@ function submitForm() {
                 <PostCreationForm
                     :name="name"
                     :emoji="emoji"
+                    v-model="form.body"
                     @cancel="goBack"
                 />
             </form>
