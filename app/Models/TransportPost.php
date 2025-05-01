@@ -13,11 +13,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $destination_id
  * @property Carbon $departure
  * @property Carbon $arrival
- * @property int $departure_delay
- * @property int $arrival_delay
+ * @property int|null $departure_delay
+ * @property int|null $arrival_delay
+ * @property string $mode
+ * @property string|null $line
  * @property Carbon $created_at
  * @property Carbon $updated_at
  *
+ * @property-read string $post_id
  * @property-read Location $origin
  * @property-read Location $destination
  */
@@ -27,12 +30,22 @@ class TransportPost extends Model
 
     protected $fillable = [
         'id',
+        'post_id',
         'origin_id',
         'destination_id',
         'departure',
         'arrival',
+        'mode',
+        'line',
         'departure_delay',
         'arrival_delay'
+    ];
+
+    protected $casts = [
+        'departure' => 'datetime',
+        'arrival' => 'datetime',
+        'departure_delay' => 'integer',
+        'arrival_delay' => 'integer',
     ];
 
     public function origin(): BelongsTo

@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import TimeDisplay from '@/Pages/NewPostDialog/Partials/TimeDisplay.vue';
-import { getEmoji } from '@/Services/DepartureTypeService';
 import MotisTimeService from '@/Services/MotisTimeService';
 import { StopPlace } from '@/types';
-import { TransportMode } from '@/types/enums';
-import { Link } from '@inertiajs/vue3';
 import { defineProps, PropType, ref } from 'vue';
 
 const props = defineProps({
@@ -26,30 +23,14 @@ const props = defineProps({
     },
 });
 
-const emoji = ref('');
 const timeService = new MotisTimeService(props.stop);
 const plannedTime = ref(timeService.plannedTimeString);
 const time = ref(timeService.timeString);
 const delay = ref(timeService.delay);
-
-emoji.value = props.mode ? getEmoji(props.mode as TransportMode) : '';
-
-const linkData = ref({
-    location: {
-        emoji: emoji.value,
-        name: props.shortName + ' ➜ ' + props.stop.name,
-        id: '',
-    },
-});
 </script>
 
 <template>
-    <Link
-        :href="route('posts.create.post')"
-        :data="linkData"
-        as="li"
-        class="list-row hover:bg-base-200 cursor-pointer grid-cols-8"
-    >
+    <li class="list-row hover:bg-base-200 cursor-pointer grid-cols-8">
         <div class="col col-span-6">
             {{ stop.name }}
         </div>
@@ -59,6 +40,10 @@ const linkData = ref({
                 :time="time"
                 :delay="delay"
                 :realTime="realTime"
+            />
+        </div>
+    </li>
+</template>
 
 <style scoped>
 .badge {

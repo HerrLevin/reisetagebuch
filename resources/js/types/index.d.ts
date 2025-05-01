@@ -104,6 +104,12 @@ export type Post = {
     body: string;
     user: PublicUser;
     location: LocationEntry | null;
+    start: LocationEntry | null;
+    stop: LocationEntry | null;
+    start_time: string | null;
+    stop_time: string | null;
+    line: string | null;
+    mode: TransportMode | null;
     created_at: string;
     updated_at: string;
 };

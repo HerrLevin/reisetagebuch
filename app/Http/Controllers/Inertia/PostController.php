@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Inertia;
 
 use App\Http\Requests\PostCreateRequest;
+use App\Http\Requests\TransportPostCreateRequest;
 use App\Http\Resources\PostResource;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -22,6 +23,18 @@ class PostController
     public function create(): Response|ResponseFactory
     {
         return Inertia::render('NewPostDialog/CreatePost');
+    }
+
+    public function createTransport(): Response|ResponseFactory
+    {
+        return Inertia::render('NewPostDialog/CreateTransportPost');
+    }
+
+    public function storeTransport(TransportPostCreateRequest $request): RedirectResponse
+    {
+        $this->postController->storeTransport($request);
+
+        return to_route('dashboard');
     }
 
     public function store(PostCreateRequest $request): RedirectResponse
