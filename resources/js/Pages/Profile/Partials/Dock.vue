@@ -40,8 +40,8 @@ const isTextRoute = () => {
 </script>
 
 <template>
-    <div class="md:hidden">
-        <div class="over-dock" :class="{ hidden: !isPostsCreateRoute() }">
+    <div class="md:invisible">
+        <div class="over-dock" :class="{ invisible: !isPostsCreateRoute() }">
             <div class="join">
                 <Link
                     :href="
