@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import StopoversListEntry from '@/Pages/NewPostDialog/Partials/StopoversListEntry.vue';
+import { getEmoji } from '@/Services/DepartureTypeService';
 import { StopPlace, TripDto } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import { PropType, ref } from 'vue';
 import { DateTime } from 'luxon';
-import { getEmoji } from '@/Services/DepartureTypeService';
+import { PropType, ref } from 'vue';
 
 const props = defineProps({
     trip: {
@@ -13,6 +13,14 @@ const props = defineProps({
         required: false,
     },
     startTime: {
+        type: String,
+        default: '',
+    },
+    tripId: {
+        type: String,
+        default: '',
+    },
+    startId: {
         type: String,
         default: '',
     },
@@ -32,6 +40,20 @@ stopovers.value = stopovers.value.filter((stopover) => {
         return luxonTime >= filterTime;
     }
 });
+
+function redirectCreatePost(stopover: StopPlace) {
+    const params = {
+        tripId: props.tripId,
+        startId: props.startId,
+        startTime: props.startTime,
+        stopId: stopover.stopId,
+        stopTime: stopover.scheduledDeparture || stopover.scheduledArrival,
+        stopName: stopover.name,
+        stopMode: props.trip?.legs[0].mode,
+        lineName: props.trip?.legs[0].routeShortName,
+    };
+    window.location.href = route('posts.create.transport-post', params);
+}
 </script>
 
 <template>
@@ -57,6 +79,7 @@ stopovers.value = stopovers.value.filter((stopover) => {
                     :mode="trip?.legs[0].mode"
                     :shortName="trip?.legs[0].routeShortName"
                     :realTime="trip?.legs[0].realTime"
+                    @click="redirectCreatePost(stopover)"
                 />
             </ul>
         </div>

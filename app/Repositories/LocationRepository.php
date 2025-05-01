@@ -26,18 +26,14 @@ class LocationRepository
             $dbLocation = $identifier->location ?? null;
 
             if ($dbLocation === null) {
-                $dbLocation = Location::create([
-                    'name' => $location->name,
-                    'latitude' => $location->latitude,
-                    'longitude' => $location->longitude,
-                ]);
-                $dbLocation->identifiers()->create([
-                    'identifier' => $location->osmId,
-                    'type' => $location->osmType,
-                    'origin' => 'osm',
-                    'name' => $location->name,
-                ]);
-                $dbLocation->save();
+                $dbLocation = $this->createLocation(
+                    $location->name,
+                    $location->latitude,
+                    $location->longitude,
+                    $location->osmId,
+                    $location->osmType,
+                    'osm'
+                );
             }
 
             foreach ($location->tags as $key => $value) {
@@ -97,5 +93,41 @@ class LocationRepository
         }
 
         return Location::find($id);
+    }
+
+    public function getLocationByIdentifier(string $identifier, string $type, ?string $origin = null): ?Location
+    {
+        return Location::whereHas('identifiers', function ($query) use ($identifier, $type, $origin) {
+            $query->where('identifier', $identifier)
+                ->where('type', $type);
+            if ($origin) {
+                $query->where('origin', $origin);
+            }
+        })->first();
+    }
+
+    public function createLocation(
+        string $name,
+        float $latitude,
+        float $longitude,
+        string $identifier,
+        string $identifierType,
+        string $origin
+    ): Location {
+        $location = Location::create([
+            'name' => $name,
+            'latitude' => $latitude,
+            'longitude' => $longitude,
+        ]);
+
+        $location->identifiers()->create([
+            'identifier' => $identifier,
+            'type' => $identifierType,
+            'origin' => $origin,
+            'name' => $name,
+        ]);
+        $location->save();
+
+        return $location;
     }
 }

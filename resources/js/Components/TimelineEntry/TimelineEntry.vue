@@ -28,8 +28,8 @@ defineProps({
                 :alt="`Profile picture of ${post.user.name}`"
             />
         </div>
-        <LocationDisplay v-if="!showRoute" :post />
-        <RouteDisplay v-else />
+        <LocationDisplay v-if="post.location" :post />
+        <RouteDisplay v-else-if="post.start" :post />
         <p v-if="post.body" class="list-col-wrap text-xs">
             {{ post.body }}
         </p>

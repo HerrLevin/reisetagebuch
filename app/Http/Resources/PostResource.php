@@ -17,6 +17,12 @@ class PostResource extends JsonResource
             'user' => new UserResource($this->user),
             'body' => $this->body,
             'location' => $this->locationPost ? new LocationResource($this->locationPost->location) : null,
+            'start' => $this->transportPost ? new LocationResource($this->transportPost->origin) : null,
+            'stop' => $this->transportPost ? new LocationResource($this->transportPost->destination) : null,
+            'start_time' => $this->transportPost ? $this->transportPost->departure : null,
+            'stop_time' => $this->transportPost ? $this->transportPost->arrival : null,
+            'mode' => $this->transportPost ? $this->transportPost->mode : null,
+            'line' => $this->transportPost ? $this->transportPost->line : null,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
