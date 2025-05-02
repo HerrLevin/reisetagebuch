@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { Post } from '@/types';
 import type { PropType } from 'vue';
 import { getEmoji } from '../../Services/DepartureTypeService';
+import { TransportPost } from '@/types/PostTypes';
 
-const props = defineProps({
+defineProps({
     post: {
-        type: Object as PropType<Post>,
+        type: Object as PropType<TransportPost>,
         required: true,
     },
 });

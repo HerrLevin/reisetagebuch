@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import LocationListEntryInfo from '@/Pages/NewPostDialog/Partials/LocationListEntryInfo.vue';
-import { Post } from '@/types';
 import { DateTime } from 'luxon';
 import type { PropType } from 'vue';
 import { getEmojiFromTags } from '../../Services/LocationTypeService';
+import { LocationPost } from '@/types/PostTypes';
 
 const props = defineProps({
     post: {
-        type: Object as PropType<Post>,
+        type: Object as PropType<LocationPost>,
         required: true,
     },
 });

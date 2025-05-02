@@ -6,7 +6,7 @@ use App\Http\Controllers\Backend\LocationController as BackendLocationController
 use App\Http\Controllers\Controller;
 use App\Http\Requests\NearbyLocationRequest;
 use App\Http\Requests\StopoverRequest;
-use App\Http\Resources\LocationResource;
+use App\Http\Resources\LocationDto;
 use Inertia\Response;
 use Inertia\ResponseFactory;
 
@@ -24,7 +24,7 @@ class LocationController extends Controller
         $locations = $this->locationController->nearby($request->latitude, $request->longitude);
 
         return inertia('NewPostDialog/ListLocations', [
-            'locations' => LocationResource::collection($locations),
+            'locations' => $locations->map(fn($location) => new LocationDto($location)),
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
         ]);

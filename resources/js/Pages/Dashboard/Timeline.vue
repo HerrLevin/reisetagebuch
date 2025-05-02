@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import TimelineEntry from '@/Components/TimelineEntry/TimelineEntry.vue';
-import { Post } from '@/types';
 import type { PropType } from 'vue';
+import { BasePost, LocationPost, TransportPost } from '@/types/PostTypes';
 
 defineProps({
     posts: {
-        type: Array as PropType<Post[]>,
+        type: Array as PropType<Array<BasePost | TransportPost | LocationPost>>,
         default: () => [],
     },
 });
