@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Inertia;
 
 use App\Http\Requests\PostCreateRequest;
 use App\Http\Requests\TransportPostCreateRequest;
-use App\Http\Resources\PostResource;
+use App\Http\Resources\PostTypes\BasePost;
+use App\Http\Resources\PostTypes\LocationPost;
+use App\Http\Resources\PostTypes\TransportPost;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -49,7 +51,16 @@ class PostController
         $posts = $this->postController->dashboard(Auth::user());
 
         return Inertia::render('Dashboard', [
-            'posts' => PostResource::collection($posts),
+            'posts' => $posts->map(function ($post) {
+                if ($post->locationPost) {
+                    return new LocationPost($post);
+                }
+                if ($post->transportPost) {
+                    return new TransportPost($post);
+                }
+                // Fallback to the base post resource if no specific type is found
+                return new BasePost($post);
+            }),
         ]);
     }
 }
