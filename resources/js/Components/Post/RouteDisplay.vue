@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { PropType } from 'vue';
-import { getEmoji } from '../../Services/DepartureTypeService';
+import { getEmoji } from '@/Services/DepartureTypeService';
 import { TransportPost } from '@/types/PostTypes';
+import type { PropType } from 'vue';
 
 defineProps({
     post: {
@@ -11,7 +11,6 @@ defineProps({
 });
 
 function getTime(date: string): string {
-    console.log(date);
     const dateTime = new Date(date);
     return dateTime.toLocaleTimeString([], {
         hour: '2-digit',

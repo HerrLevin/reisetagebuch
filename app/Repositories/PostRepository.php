@@ -88,4 +88,13 @@ class PostRepository
             ->where('id', $postId)
             ->firstOrFail();
     }
+
+    public function delete(Post $post): void
+    {
+        DB::beginTransaction();
+        $post->delete();
+        $post->locationPost()->delete();
+        $post->transportPost()->delete();
+        DB::commit();
+    }
 }

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Interactions from '@/Components/Post/Interactions.vue';
 import LocationDisplay from '@/Components/Post/LocationDisplay.vue';
 import RouteDisplay from '@/Components/Post/RouteDisplay.vue';
 import {
@@ -8,9 +9,10 @@ import {
     LocationPost,
     TransportPost,
 } from '@/types/PostTypes';
+import { DateTime } from 'luxon';
 import { PropType } from 'vue';
 
-defineProps({
+const props = defineProps({
     post: {
         type: Object as PropType<BasePost | TransportPost | LocationPost>,
         required: true,
@@ -20,6 +22,15 @@ defineProps({
         default: '/assets/pexels-brenoanp-442535-1136575.jpg',
     },
 });
+
+let relativeCreatedAt = '';
+const date = DateTime.fromISO(props.post?.created_at);
+
+if (date.diffNow('days').days < -1) {
+    relativeCreatedAt = date.toLocaleString();
+} else {
+    relativeCreatedAt = date.toRelative() || '';
+}
 </script>
 
 <template>
@@ -30,14 +41,27 @@ defineProps({
             :alt="`Profile picture of ${post.user.name}`"
         />
     </div>
-    <LocationDisplay v-if="isLocationPost(post)" :post="post as LocationPost" />
-    <RouteDisplay
-        v-else-if="isTransportPost(post)"
-        :post="post as TransportPost"
-    />
-    <p v-if="post.body" class="list-col-wrap text-xs">
-        {{ post.body }}
-    </p>
+    <div>
+        <div class="mb-1 text-xs opacity-60">
+            {{ post.user.name }}
+            ·
+            <span class="text-xs opacity-60">
+                {{ relativeCreatedAt }}
+            </span>
+        </div>
+        <p v-if="post.body" class="list-col-wrap my-2 ps-3 text-xs">
+            {{ post.body }}
+        </p>
+        <LocationDisplay
+            v-if="isLocationPost(post)"
+            :post="post as LocationPost"
+        />
+        <RouteDisplay
+            v-else-if="isTransportPost(post)"
+            :post="post as TransportPost"
+        />
+        <Interactions :post />
+    </div>
 </template>
 
 <style scoped></style>

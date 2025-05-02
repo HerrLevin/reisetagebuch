@@ -33,6 +33,7 @@ Route::middleware('auth')->group(callback: function () {
     Route::get('/posts/stopovers', [LocationController::class, 'stopovers'])->name('posts.create.stopovers');
     Route::get('/posts/new', [PostController::class, 'dashboard'])->name('posts.create.text');
     Route::get('/posts/{postId}', [PostController::class, 'show'])->name('posts.show');
+    Route::delete('/posts/{postId}', [PostController::class, 'destroy'])->name('posts.destroy');
 
     // this belongs in an api
     Route::get('/posts/new/prefetch/{latitude}/{longitude}', [BLocationController::class, 'nearby'])->name('posts.create.prefetch');
