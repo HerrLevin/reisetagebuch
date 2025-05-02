@@ -32,7 +32,7 @@ class PostController
 
     public function storeTransport(TransportPostCreateRequest $request): RedirectResponse
     {
-        $this->postController->storeTransport($request);
+        $this->postController->storeMotisTransport($request);
 
         return to_route('dashboard');
     }

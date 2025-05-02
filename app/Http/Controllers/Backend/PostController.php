@@ -29,7 +29,8 @@ class PostController extends Controller
         $this->transitousRequestService = $transitousRequestService;
     }
 
-    public function store(PostCreateRequest $request): Post {
+    public function store(PostCreateRequest $request): Post
+    {
         $location = $this->locationRepository->getLocationById($request->input('location'));
 
         return $this->postRepository->store(
@@ -39,7 +40,8 @@ class PostController extends Controller
         );
     }
 
-    public function storeTransport(TransportPostCreateRequest $request): Post {
+    public function storeMotisTransport(TransportPostCreateRequest $request): Post
+    {
         $trip = $this->transitousRequestService->getStopTimes($request->tripId);
 
         $stopovers = [$trip->legs[0]->from, ...$trip->legs[0]->intermediateStops, $trip->legs[0]->to];
@@ -60,31 +62,23 @@ class PostController extends Controller
             abort(422, 'Invalid stopover');
         }
 
-        $startLocation = $this->locationRepository->getLocationByIdentifier($start->stopId, 'stop', 'motis');
-        $stopLocation = $this->locationRepository->getLocationByIdentifier($stop->stopId, 'stop', 'motis');
+        $startLocation = $this->locationRepository->getOrCreateLocationByIdentifier(
+            $start->name,
+            $start->latitude,
+            $start->longitude,
+            $start->stopId,
+            'stop',
+            'motis'
+        );
 
-        if (empty($startLocation)) {
-            $startLocation = $this->locationRepository->createLocation(
-                $start->name,
-                $start->latitude,
-                $start->longitude,
-                $start->stopId,
-                'stop',
-                'motis'
-            );
-        }
-
-        if (empty($stopLocation)) {
-            $stopLocation = $this->locationRepository->createLocation(
-                $stop->name,
-                $stop->latitude,
-                $stop->longitude,
-                $stop->stopId,
-                'stop',
-                'motis'
-            );
-        }
-
+        $stopLocation = $this->locationRepository->getOrCreateLocationByIdentifier(
+            $stop->name,
+            $stop->latitude,
+            $stop->longitude,
+            $stop->stopId,
+            'stop',
+            'motis'
+        );
 
 
         return $this->postRepository->storeTransport(
