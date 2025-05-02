@@ -7,9 +7,9 @@ import Dock from '@/Pages/Profile/Partials/Dock.vue';
 <template>
     <div>
         <div
-            class="container mx-auto mb-2 max-w-screen-xl grow px-0 pt-0 sm:px-5 md:pt-8"
+            class="container mx-auto mb-2 max-w-screen-xl grow px-0 pt-0 sm:px-5 md:pt-2"
         >
-            <NavBar>
+            <NavBar class="md:hidden">
                 <a v-if="!$slots.header" class="btn btn-ghost text-xl">
                     <span class="blur">Reisetagebuch</span>
                 </a>
