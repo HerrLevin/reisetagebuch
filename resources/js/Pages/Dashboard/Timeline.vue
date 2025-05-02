@@ -34,6 +34,9 @@ defineProps({
     cursor: pointer;
     transition: all 0.2s ease-in-out;
 }
+.hover-list-entry::after {
+    border-color: var(--color-base-300);
+}
 .hover-list-entry:hover {
     background-color: var(--color-base-200);
 }
