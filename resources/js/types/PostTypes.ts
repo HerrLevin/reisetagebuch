@@ -21,3 +21,11 @@ export type TransportPost = BasePost & {
     line: string;
     mode: TransportMode;
 };
+
+export const isLocationPost = (post: BasePost): post is LocationPost => {
+    return (post as LocationPost).location !== undefined;
+};
+
+export const isTransportPost = (post: BasePost): post is TransportPost => {
+    return (post as TransportPost).start !== undefined;
+};

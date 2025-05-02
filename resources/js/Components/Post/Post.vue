@@ -1,10 +1,16 @@
 <script setup lang="ts">
 import LocationDisplay from '@/Components/Post/LocationDisplay.vue';
 import RouteDisplay from '@/Components/Post/RouteDisplay.vue';
-import type { BasePost, LocationPost, TransportPost } from '@/types/PostTypes';
+import {
+    BasePost,
+    isLocationPost,
+    isTransportPost,
+    LocationPost,
+    TransportPost,
+} from '@/types/PostTypes';
 import { PropType } from 'vue';
 
-const props = defineProps({
+defineProps({
     post: {
         type: Object as PropType<BasePost | TransportPost | LocationPost>,
         required: true,
@@ -14,15 +20,6 @@ const props = defineProps({
         default: '/assets/pexels-brenoanp-442535-1136575.jpg',
     },
 });
-
-const isLocationPost = (post: BasePost): post is LocationPost => {
-    return (post as LocationPost).location !== undefined;
-};
-
-const isTransportPost = (post: BasePost): post is TransportPost => {
-    return (post as TransportPost).start !== undefined;
-};
-console.log(typeof props.post);
 </script>
 
 <template>
