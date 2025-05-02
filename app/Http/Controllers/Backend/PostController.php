@@ -97,4 +97,9 @@ class PostController extends Controller
     {
         return $this->postRepository->dashboard($user);
     }
+
+    public function show(string $postId): Post
+    {
+        return $this->postRepository->getById($postId);
+    }
 }
