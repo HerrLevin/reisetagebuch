@@ -81,4 +81,11 @@ class PostRepository
             ->limit(50)
             ->get();
     }
+
+    public function getById(string $postId): Post
+    {
+        return Post::with(['user', 'locationPost.location', 'locationPost.location.tags', 'transportPost', 'transportPost.origin', 'transportPost.destination'])
+            ->where('id', $postId)
+            ->firstOrFail();
+    }
 }

@@ -7,6 +7,7 @@ use App\Http\Requests\TransportPostCreateRequest;
 use App\Http\Resources\PostTypes\BasePost;
 use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
+use App\Models\Post;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -25,6 +26,13 @@ class PostController
     public function create(): Response|ResponseFactory
     {
         return Inertia::render('NewPostDialog/CreatePost');
+    }
+
+    public function show(string $postId): Response|ResponseFactory
+    {
+        return Inertia::render('SinglePost', [
+            'post' => $this->getDto($this->postController->show($postId)),
+        ]);
     }
 
     public function createTransport(): Response|ResponseFactory
@@ -51,16 +59,20 @@ class PostController
         $posts = $this->postController->dashboard(Auth::user());
 
         return Inertia::render('Dashboard', [
-            'posts' => $posts->map(function ($post) {
-                if ($post->locationPost) {
-                    return new LocationPost($post);
-                }
-                if ($post->transportPost) {
-                    return new TransportPost($post);
-                }
-                // Fallback to the base post resource if no specific type is found
-                return new BasePost($post);
+            'posts' => $posts->map(function (Post $post) {
+                return $this->getDto($post);
             }),
         ]);
+    }
+
+    private function getDto(Post $post) {
+        if ($post->locationPost) {
+            return new LocationPost($post);
+        }
+        if ($post->transportPost) {
+            return new TransportPost($post);
+        }
+        // Fallback to the base post resource if no specific type is found
+        return new BasePost($post);
     }
 }
