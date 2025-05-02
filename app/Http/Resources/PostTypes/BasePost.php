@@ -17,7 +17,7 @@ class BasePost
         $this->id = $post->id;
         $this->user = new UserDto($post->user->id, $post->user->name);
         $this->body = $post->body;
-        $this->created_at = $post->created_at;
-        $this->updated_at = $post->updated_at;
+        $this->created_at = $post->created_at->toIso8601String();
+        $this->updated_at = $post->updated_at->toIso8601String();
     }
 }

@@ -14,6 +14,7 @@ use App\Repositories\LocationRepository;
 use App\Repositories\PostRepository;
 use App\Services\TransitousRequestService;
 use Carbon\Carbon;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Collection;
 
 class PostController extends Controller
@@ -101,5 +102,17 @@ class PostController extends Controller
     public function show(string $postId): Post
     {
         return $this->postRepository->getById($postId);
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function destroy(string $postId): void
+    {
+        $post = $this->postRepository->getById($postId);
+
+        $this->authorize('delete', $post);
+
+        $this->postRepository->delete($post);
     }
 }

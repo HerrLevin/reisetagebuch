@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Inertia;
 
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 

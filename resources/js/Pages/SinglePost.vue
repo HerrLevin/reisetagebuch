@@ -58,7 +58,7 @@ if (isLocationPost(props.post)) {
         <div class="card bg-base-100 min-w-full shadow-md">
             <div class="border-base-300 flex items-center gap-2 border-b-1 p-4">
                 <button
-                    class="btn btn-ghost btn-sm text-base-content normal-case"
+                    class="btn btn-ghost btn-sm btn-circle text-base-content normal-case"
                     type="button"
                     @click="goBack"
                 >

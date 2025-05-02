@@ -1,35 +1,20 @@
 <script setup lang="ts">
 import LocationListEntryInfo from '@/Pages/NewPostDialog/Partials/LocationListEntryInfo.vue';
-import { DateTime } from 'luxon';
-import type { PropType } from 'vue';
-import { getEmojiFromTags } from '../../Services/LocationTypeService';
+import { getEmojiFromTags } from '@/Services/LocationTypeService';
 import { LocationPost } from '@/types/PostTypes';
+import type { PropType } from 'vue';
 
-const props = defineProps({
+defineProps({
     post: {
         type: Object as PropType<LocationPost>,
         required: true,
     },
 });
-
-function relativeCreatedAt(): string {
-    const date = DateTime.fromISO(props.post?.created_at);
-
-    if (date.diffNow('days').days < -1) {
-        return date.toLocaleString();
-    }
-    return date.toRelative() || '';
-}
 </script>
 
 <template>
     <div>
         <div>
-            <div class="text-xs opacity-60">
-                {{ post.user.name }}
-                ·
-                {{ relativeCreatedAt() }}
-            </div>
             <div class="font-semibold">
                 <LocationListEntryInfo
                     v-if="post.location"

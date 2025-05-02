@@ -8,13 +8,14 @@ use App\Http\Resources\PostTypes\BasePost;
 use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
 use App\Models\Post;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 use Inertia\ResponseFactory;
 
-class PostController
+class PostController extends Controller
 {
     private \App\Http\Controllers\Backend\PostController $postController;
 
@@ -42,16 +43,21 @@ class PostController
 
     public function storeTransport(TransportPostCreateRequest $request): RedirectResponse
     {
-        $this->postController->storeMotisTransport($request);
+        $post = $this->postController->storeMotisTransport($request);
 
-        return to_route('dashboard');
+        return to_route('posts.show', [
+            'postId' => $post->id,
+        ]);
     }
 
     public function store(PostCreateRequest $request): RedirectResponse
     {
-        $this->postController->store($request);
+        $post = $this->postController->store($request);
 
-        return to_route('dashboard');
+        return to_route('posts.show', [
+            'postId' => $post->id,
+        ]);
+
     }
 
     public function dashboard(): Response|ResponseFactory
@@ -65,7 +71,8 @@ class PostController
         ]);
     }
 
-    private function getDto(Post $post) {
+    private function getDto(Post $post): LocationPost|TransportPost|BasePost
+    {
         if ($post->locationPost) {
             return new LocationPost($post);
         }
@@ -74,5 +81,15 @@ class PostController
         }
         // Fallback to the base post resource if no specific type is found
         return new BasePost($post);
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function destroy(string $postId): RedirectResponse
+    {
+        $this->postController->destroy($postId);
+
+        return to_route('dashboard');
     }
 }
