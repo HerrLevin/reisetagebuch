@@ -117,6 +117,9 @@ const isTextRoute = () => {
                 Settings
             </Link>
         </li>
+        <li class="border-base-300 mt-3 border-t-1">
+            <Link :href="route('logout')" method="post"> Log Out </Link>
+        </li>
     </ul>
 </template>
 
