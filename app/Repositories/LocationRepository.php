@@ -106,6 +106,23 @@ class LocationRepository
         })->first();
     }
 
+    public function getOrCreateLocationByIdentifier(
+        string $name,
+        float $latitude,
+        float $longitude,
+        string $identifier,
+        string $type,
+        string $origin,
+    ): Location {
+        $location = $this->getLocationByIdentifier($identifier, $type, $origin);
+
+        if ($location === null) {
+            $location = $this->createLocation($name, $latitude, $longitude, $identifier, $type, $origin);
+        }
+
+        return $location;
+    }
+
     public function createLocation(
         string $name,
         float $latitude,
