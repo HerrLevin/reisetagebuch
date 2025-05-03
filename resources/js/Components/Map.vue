@@ -40,7 +40,10 @@ const osmAttribution =
 const zoom = 14;
 const bounds = ref(undefined as LngLatBoundsLike | undefined);
 if (props.startPoint && props.endPoint) {
-    bounds.value = new LngLatBounds([props.endPoint, props.startPoint]);
+    const mapBounds = new LngLatBounds();
+    mapBounds.extend(props.startPoint);
+    mapBounds.extend(props.endPoint);
+    bounds.value = mapBounds;
 } else {
     bounds.value = undefined;
 }
