@@ -14,7 +14,7 @@ const form = useForm({
 const deleteModal = useTemplateRef('deleteModal');
 
 const deleteUser = () => {
-    form.delete(route('profile.destroy'), {
+    form.delete(route('account.destroy'), {
         preserveScroll: true,
         onSuccess: () => deleteModal.value?.close(),
         onError: () => passwordInput.value?.focus(),
@@ -37,7 +37,7 @@ const deleteUser = () => {
             </p>
         </header>
 
-        <button class="btn btn-error" onclick="deleteModal.showModal()">
+        <button class="btn btn-error" @click="deleteModal?.showModal()">
             Delete Account
         </button>
         <dialog ref="deleteModal" class="modal">

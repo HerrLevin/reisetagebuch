@@ -1,10 +1,10 @@
 <?php
 
 use App\Http\Controllers\Backend\LocationController as BLocationController;
+use App\Http\Controllers\Inertia\AccountController;
 use App\Http\Controllers\Inertia\LocationController;
 use App\Http\Controllers\Inertia\PostController;
 use App\Http\Controllers\Inertia\UserController;
-use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -19,9 +19,9 @@ Route::get('/', function () {
 });
 
 Route::middleware('auth')->group(callback: function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/account', [AccountController::class, 'edit'])->name('account.edit');
+    Route::patch('/account', [AccountController::class, 'update'])->name('account.update');
+    Route::delete('/account', [AccountController::class, 'destroy'])->name('account.destroy');
 
 
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create.post');

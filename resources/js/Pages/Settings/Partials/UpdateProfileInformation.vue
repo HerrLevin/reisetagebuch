@@ -29,7 +29,7 @@ const form = useForm({
         </header>
 
         <form
-            @submit.prevent="form.patch(route('profile.update'))"
+            @submit.prevent="form.patch(route('account.update'))"
             class="mt-6 space-y-6"
         >
             <div>
