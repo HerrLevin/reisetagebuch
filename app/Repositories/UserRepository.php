@@ -24,7 +24,7 @@ class UserRepository
         return $this->userHydrator->modelToDto($user);
     }
 
-    public function updateUser(User $user, string $name, ?string $bio, ?string $website): UserDto
+    public function updateUser(User $user, string $name, ?string $bio, ?string $website, ?string $avatarPath, ?string $headerPath): UserDto
     {
         $user->update([
             'name' => $name,
@@ -33,6 +33,8 @@ class UserRepository
         $profileData = [
             'bio' => empty($bio) ? null : $bio,
             'website' => empty($website) ? null : $website,
+            'header' => $headerPath,
+            'avatar' => $avatarPath,
         ];
 
         if (!$user->profile) {
@@ -40,7 +42,7 @@ class UserRepository
         } else {
             $user->profile()->update($profileData);
         }
-       
+
         $user->load('profile');
 
         return $this->userHydrator->modelToDto($user);

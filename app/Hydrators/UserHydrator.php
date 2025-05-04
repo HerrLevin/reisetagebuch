@@ -15,7 +15,8 @@ class UserHydrator
         $dto->id = $user->id;
         $dto->name = $user->name;
         $dto->username = $user->username;
-        $dto->avatar = $user->profile?->avatar;
+        $dto->avatar = $user->profile?->avatar ? url('/files/'. $user->profile?->avatar) : null;
+        $dto->header = $user->profile?->header ? url('/files/'. $user->profile?->header) : null;
         $dto->bio = $user->profile?->bio;
         $dto->website = $user->profile?->website;
         $dto->createdAt = $user->created_at->toIso8601String();

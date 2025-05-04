@@ -31,7 +31,7 @@ defineProps({
         <template #header>
             <h2 class="text-xl leading-tight font-semibold">Profile</h2>
         </template>
-        <Banner />
+        <Banner :src="user.header || ''" />
 
         <div class="mb-4 space-y-1 px-5 md:px-0">
             <AvatarMenu :user="user" />

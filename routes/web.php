@@ -7,6 +7,7 @@ use App\Http\Controllers\Inertia\PostController;
 use App\Http\Controllers\Inertia\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -46,8 +47,17 @@ Route::middleware('auth')->group(callback: function () {
 
     Route::prefix('profile')->group(function () {
         Route::get('/{username}', [UserController::class, 'show'])->name('profile.show');
-        Route::put('/{username}', [UserController::class, 'update'])->name('profile.update');
+        Route::post('/{username}', [UserController::class, 'update'])->name('profile.update');
     });
+
+    Route::get('/files/{path}', function ($path) {
+        $disk = Storage::disk('public');
+        if ($disk->exists($path)) {
+            return $disk->response($path);
+        }
+
+        abort(404);
+    })->where('path', '.*')->name('files.show');
 });
 
 require __DIR__.'/auth.php';

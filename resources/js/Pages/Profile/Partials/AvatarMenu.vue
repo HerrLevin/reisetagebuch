@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import EllipsisVertical from '@/Icons/EllipsisVertical.vue';
+import ProfileEditModal from '@/Pages/Profile/Partials/ProfileEditModal.vue';
 import type { UserDto } from '@/types';
 import { PropType } from 'vue';
-import ProfileEditModal from '@/Pages/Profile/Partials/ProfileEditModal.vue';
 
 defineProps({
     user: {
@@ -15,8 +15,14 @@ defineProps({
 <template>
     <div class="flex items-start justify-between">
         <div class="avatar relative -mt-10 ml-0 sm:-mt-16 sm:ml-8">
-            <div class="border-base-200 w-20 rounded-xl border-5 sm:w-32">
-                <img src="/assets/pexels-brenoanp-442535-1136575.jpg" />
+            <div
+                class="border-base-200 bg-primary w-20 rounded-xl border-5 sm:w-32"
+            >
+                <img
+                    v-if="user.avatar?.length"
+                    :src="user.avatar"
+                    alt="Avatar"
+                />
             </div>
         </div>
         <div class="flex items-center gap-2">
