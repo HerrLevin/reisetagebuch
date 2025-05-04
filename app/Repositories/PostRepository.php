@@ -2,17 +2,21 @@
 
 namespace App\Repositories;
 
+use App\Http\Resources\PostTypes\BasePost;
+use App\Http\Resources\PostTypes\LocationPost;
+use App\Http\Resources\PostTypes\TransportPost;
 use App\Models\Location;
 use App\Models\Post;
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
 class PostRepository
 {
-    public function store(User $user, Location $location, ?string $body = null): Post {
+    public function store(User $user, Location $location, ?string $body = null): BasePost|LocationPost|TransportPost
+    {
         try {
             DB::beginTransaction();
             /** @var Post $post */
@@ -32,7 +36,7 @@ class PostRepository
             report($e);
         }
 
-        return $post;
+        return $this->getDto($post);
     }
 
     public function storeTransport(
@@ -44,7 +48,8 @@ class PostRepository
         string $mode,
         string $line,
         ?string $body = null
-    ): Post {
+    ): BasePost|LocationPost|TransportPost
+    {
         try {
             DB::beginTransaction();
             /** @var Post $post */
@@ -70,23 +75,29 @@ class PostRepository
             report($e);
         }
 
-        return $post;
+        return $this->getDto($post);
     }
 
     public function dashboard(User $user): Collection
     {
-        return Post::with(['user', 'locationPost.location', 'locationPost.location.tags', 'transportPost', 'transportPost.origin', 'transportPost.destination'])
+        $posts = Post::with(['user', 'locationPost.location', 'locationPost.location.tags', 'transportPost', 'transportPost.origin', 'transportPost.destination'])
             ->where('user_id', $user->id)
             ->latest()
             ->limit(50)
             ->get();
+
+        return $posts->map(function (Post $post) {
+            return $this->getDto($post);
+        });
     }
 
-    public function getById(string $postId): Post
+    public function getById(string $postId): BasePost|LocationPost|TransportPost
     {
-        return Post::with(['user', 'locationPost.location', 'locationPost.location.tags', 'transportPost', 'transportPost.origin', 'transportPost.destination'])
+        $post = Post::with(['user', 'locationPost.location', 'locationPost.location.tags', 'transportPost', 'transportPost.origin', 'transportPost.destination'])
             ->where('id', $postId)
             ->firstOrFail();
+
+        return $this->getDto($post);
     }
 
     public function delete(Post $post): void
@@ -96,5 +107,19 @@ class PostRepository
         $post->locationPost()->delete();
         $post->transportPost()->delete();
         DB::commit();
+    }
+
+
+
+    private function getDto(Post $post): LocationPost|TransportPost|BasePost
+    {
+        if ($post->locationPost) {
+            return new LocationPost($post);
+        }
+        if ($post->transportPost) {
+            return new TransportPost($post);
+        }
+        // Fallback to the base post resource if no specific type is found
+        return new BasePost($post);
     }
 }
