@@ -48,14 +48,14 @@ class PostRepository
     }
 
     public function storeTransport(
-        User $user,
+        User     $user,
         Location $start,
-        Carbon $startTime,
+        Carbon   $startTime,
         Location $stop,
-        Carbon $stopTime,
-        string $mode,
-        string $line,
-        ?string $body = null
+        Carbon   $stopTime,
+        string   $mode,
+        string   $line,
+        ?string  $body = null
     ): BasePost|LocationPost|TransportPost
     {
         try {
@@ -124,12 +124,12 @@ class PostRepository
         return $this->postHydrator->modelToDto($post);
     }
 
-    public function delete(Post $post): void
+    public function delete(BasePost $post): void
     {
         DB::beginTransaction();
-        $post->delete();
-        $post->locationPost()->delete();
-        $post->transportPost()->delete();
+        Post::with(['locationPost', 'transportPost'])
+            ->where('id', $post->id)
+            ->delete();
         DB::commit();
     }
 }

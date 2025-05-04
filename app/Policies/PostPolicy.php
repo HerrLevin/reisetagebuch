@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Http\Resources\PostTypes\BasePost;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
@@ -30,9 +31,9 @@ class PostPolicy
             : Response::deny('You do not own this post.');
     }
 
-    public function delete(User $user, Post $post): Response
+    public function delete(User $user, BasePost $post): Response
     {
-        return $user->id === $post->user_id
+        return $user->id === $post->user->id
             ? Response::allow()
             : Response::deny('You do not own this post.');
     }

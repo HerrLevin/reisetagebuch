@@ -11,7 +11,7 @@ return new class extends Migration
     {
         Schema::create('location_identifiers', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignIdFor(Location::class);
+            $table->foreignIdFor(Location::class)->constrained()->cascadeOnDelete();
             $table->string('type');
             $table->string('identifier');
             $table->string('origin');

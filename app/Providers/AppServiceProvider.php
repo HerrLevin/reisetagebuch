@@ -2,8 +2,11 @@
 
 namespace App\Providers;
 
+use App\Http\Resources\PostTypes\BasePost;
+use App\Policies\PostPolicy;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
@@ -20,5 +23,8 @@ class AppServiceProvider extends ServiceProvider
         if (App::environment('production')) {
             URL::forceScheme('https');
         }
+
+        // Gates
+        Gate::policy(BasePost::class, PostPolicy::class);
     }
 }
