@@ -18,10 +18,6 @@ const props = defineProps({
         type: Object as PropType<BasePost | TransportPost | LocationPost>,
         required: true,
     },
-    picture: {
-        type: String,
-        default: '/assets/pexels-brenoanp-442535-1136575.jpg',
-    },
 });
 
 let relativeCreatedAt = '';
@@ -35,12 +31,14 @@ if (date.diffNow('days').days < -1) {
 </script>
 
 <template>
-    <div>
-        <img
-            class="rounded-box size-10"
-            :src="picture"
-            :alt="`Profile picture of ${post.user.name}`"
-        />
+    <div class="avatar">
+        <div class="bg-primary size-10 rounded-xl">
+            <img
+                v-if="post.user.avatar"
+                :src="post.user.avatar"
+                :alt="`Profile picture of ${post.user.name}`"
+            />
+        </div>
     </div>
     <div>
         <div class="mb-1 text-xs opacity-60">

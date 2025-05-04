@@ -100,6 +100,7 @@ export type UserDto = {
     name: string;
     username: string;
     avatar: string | null;
+    header: string | null;
     bio: string | null;
     website: string | null;
     createdAt: string;

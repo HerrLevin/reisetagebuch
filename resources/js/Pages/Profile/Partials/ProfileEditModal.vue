@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { PropType, useTemplateRef } from 'vue';
-import { useForm, usePage } from '@inertiajs/vue3';
-import { UserDto } from '@/types';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextArea from '@/Components/TextArea.vue';
 import TextInput from '@/Components/TextInput.vue';
+import { UserDto } from '@/types';
+import { useForm, usePage } from '@inertiajs/vue3';
+import { PropType, ref, useTemplateRef } from 'vue';
 
 const authUser = usePage().props.auth.user;
 
@@ -19,7 +19,8 @@ const props = defineProps({
 const form = useForm({
     bio: '',
     website: '',
-    avatar: '',
+    avatar: null as File | null,
+    header: null as File | null,
     name: '',
 });
 
@@ -28,12 +29,15 @@ form.bio = props.user.bio || '';
 form.website = props.user.website || '';
 
 const editModal = useTemplateRef('editModal');
+const avatarInput = ref('');
+const headerInput = ref('');
 
 const submit = () => {
-    form.put(route('profile.update', authUser.username), {
+    form.post(route('profile.update', authUser.username), {
         preserveScroll: true,
         onSuccess: () => {
             editModal.value?.close();
+            avatarInput.value = '';
         },
         onError: () => {
             // Handle error
@@ -42,6 +46,19 @@ const submit = () => {
             form.reset();
         },
     });
+};
+
+const avatarUpload = (event: Event) => {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+        form.avatar = input.files[0];
+    }
+};
+const headerUpload = (event: Event) => {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+        form.header = input.files[0];
+    }
 };
 </script>
 
@@ -107,6 +124,30 @@ const submit = () => {
                 />
 
                 <InputError :message="form.errors.website" class="mt-2" />
+            </div>
+            <div class="mt-6">
+                <fieldset class="fieldset">
+                    <legend class="fieldset-legend">Profile Picture</legend>
+                    <input
+                        type="file"
+                        class="file-input w-full"
+                        :value="avatarInput"
+                        @input="avatarUpload"
+                    />
+                    <label class="label">Max size 2MB</label>
+                </fieldset>
+            </div>
+            <div class="">
+                <fieldset class="fieldset">
+                    <legend class="fieldset-legend">Header Picture</legend>
+                    <input
+                        type="file"
+                        class="file-input w-full"
+                        :value="headerInput"
+                        @input="headerUpload"
+                    />
+                    <label class="label">Max size 2MB</label>
+                </fieldset>
             </div>
             <div class="modal-action">
                 <form method="dialog">

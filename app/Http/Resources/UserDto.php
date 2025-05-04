@@ -10,6 +10,7 @@ class UserDto
     public string $name;
     public string $username;
     public ?string $avatar = null;
+    public ?string $header = null;
     public ?string $bio = null;
     public ?string $website = null;
     public string $createdAt;
