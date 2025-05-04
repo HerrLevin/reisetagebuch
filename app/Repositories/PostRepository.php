@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Http\Resources\PostTypes\BasePost;
 use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
+use App\Hydrators\PostHydrator;
 use App\Models\Location;
 use App\Models\Post;
 use App\Models\User;
@@ -15,6 +16,13 @@ use Throwable;
 
 class PostRepository
 {
+    private PostHydrator $postHydrator;
+
+    public function __construct(?PostHydrator $postHydrator = null)
+    {
+        $this->postHydrator = $postHydrator ?? new PostHydrator();
+    }
+
     public function store(User $user, Location $location, ?string $body = null): BasePost|LocationPost|TransportPost
     {
         try {
@@ -36,7 +44,7 @@ class PostRepository
             report($e);
         }
 
-        return $this->getDto($post);
+        return $this->postHydrator->modelToDto($post);
     }
 
     public function storeTransport(
@@ -75,19 +83,23 @@ class PostRepository
             report($e);
         }
 
-        return $this->getDto($post);
+        return $this->postHydrator->modelToDto($post);
     }
 
-    public function dashboard(User $user): Collection
+    public function dashboard(User|string $user): Collection
     {
+        if ($user instanceof User) {
+            $user = $user->id;
+        }
+
         $posts = Post::with(['user', 'locationPost.location', 'locationPost.location.tags', 'transportPost', 'transportPost.origin', 'transportPost.destination'])
-            ->where('user_id', $user->id)
+            ->where('user_id', $user)
             ->latest()
             ->limit(50)
             ->get();
 
         return $posts->map(function (Post $post) {
-            return $this->getDto($post);
+            return $this->postHydrator->modelToDto($post);
         });
     }
 
@@ -97,7 +109,7 @@ class PostRepository
             ->where('id', $postId)
             ->firstOrFail();
 
-        return $this->getDto($post);
+        return $this->postHydrator->modelToDto($post);
     }
 
     public function delete(Post $post): void
@@ -107,19 +119,5 @@ class PostRepository
         $post->locationPost()->delete();
         $post->transportPost()->delete();
         DB::commit();
-    }
-
-
-
-    private function getDto(Post $post): LocationPost|TransportPost|BasePost
-    {
-        if ($post->locationPost) {
-            return new LocationPost($post);
-        }
-        if ($post->transportPost) {
-            return new TransportPost($post);
-        }
-        // Fallback to the base post resource if no specific type is found
-        return new BasePost($post);
     }
 }

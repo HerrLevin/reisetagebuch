@@ -36,7 +36,7 @@ Route::middleware('auth')->group(callback: function () {
     Route::get('/posts/{postId}', [PostController::class, 'show'])->name('posts.show');
     Route::delete('/posts/{postId}', [PostController::class, 'destroy'])->name('posts.destroy');
 
-    Route::get('/profile/{userId}', [UserController::class, 'show'])->name('profile.show');
+    Route::get('/profile/{username}', [UserController::class, 'show'])->name('profile.show');
 
     // this belongs in an api
     Route::get('/posts/new/prefetch/{latitude}/{longitude}', [BLocationController::class, 'nearby'])->name('posts.create.prefetch');

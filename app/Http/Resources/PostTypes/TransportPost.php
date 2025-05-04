@@ -3,6 +3,7 @@
 namespace App\Http\Resources\PostTypes;
 
 use App\Http\Resources\LocationDto;
+use App\Http\Resources\UserDto;
 use App\Models\Post;
 
 class TransportPost extends BasePost
@@ -14,8 +15,8 @@ class TransportPost extends BasePost
     public string $mode;
     public string $line;
 
-    public function __construct(Post $post) {
-        parent::__construct($post);
+    public function __construct(Post $post, UserDto $userDto){
+        parent::__construct($post, $userDto);
         $this->start = new LocationDto($post->transportPost->origin);
         $this->stop = new LocationDto($post->transportPost->destination);
         $this->start_time = $post->transportPost->departure;

@@ -9,6 +9,7 @@ import {
     LocationPost,
     TransportPost,
 } from '@/types/PostTypes';
+import { Link } from '@inertiajs/vue3';
 import { DateTime } from 'luxon';
 import { PropType } from 'vue';
 
@@ -43,7 +44,9 @@ if (date.diffNow('days').days < -1) {
     </div>
     <div>
         <div class="mb-1 text-xs opacity-60">
-            {{ post.user.name }}
+            <Link :href="route('profile.show', post.user.username)">
+                {{ post.user.name }}
+            </Link>
             ·
             <span class="text-xs opacity-60">
                 {{ relativeCreatedAt }}

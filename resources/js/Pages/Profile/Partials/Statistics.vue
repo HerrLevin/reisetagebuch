@@ -1,4 +1,14 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import type { UserDto } from '@/types';
+import { PropType } from 'vue';
+
+defineProps({
+    user: {
+        type: Object as PropType<UserDto>,
+        default: () => ({}),
+    },
+});
+</script>
 
 <template>
     <div class="flex flex-wrap gap-x-3">
