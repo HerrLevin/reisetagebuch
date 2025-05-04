@@ -98,5 +98,8 @@ export type UserDto = {
     id: string;
     name: string;
     username: string;
+    avatar: string | null;
+    bio: string | null;
+    website: string | null;
     createdAt: string;
 };

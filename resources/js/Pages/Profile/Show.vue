@@ -22,13 +22,6 @@ defineProps({
         default: () => ({}),
     },
 });
-
-const textTest = `Hi!
-
-Wo?
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-`;
 </script>
 
 <template>

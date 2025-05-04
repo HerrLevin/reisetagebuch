@@ -12,8 +12,11 @@ defineProps({
 
 <template>
     <div>
-        <p class="line-clamp-15 overflow-ellipsis whitespace-pre-wrap">
-            {{ user.name }}
+        <p
+            class="line-clamp-15 overflow-ellipsis whitespace-pre-wrap"
+            v-if="user.bio"
+        >
+            {{ user.bio }}
         </p>
     </div>
 </template>
