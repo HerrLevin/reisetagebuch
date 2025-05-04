@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import NavBar from '@/Layouts/Partials/NavBar.vue';
 import SideMenu from '@/Layouts/Partials/SideMenu.vue';
 import Dock from '@/Pages/Settings/Partials/Dock.vue';
@@ -9,14 +10,22 @@ import Dock from '@/Pages/Settings/Partials/Dock.vue';
         <div
             class="container mx-auto mb-2 max-w-screen-xl grow px-0 pt-0 sm:px-5 md:pt-2"
         >
-            <NavBar class="md:hidden">
-                <a v-if="!$slots.header" class="btn btn-ghost text-xl">
-                    <span class="blur">Reisetagebuch</span>
+            <NavBar>
+                <ApplicationLogo class="hidden h-10 w-10 md:inline-block" />
+                <a
+                    v-if="!$slots.header"
+                    class="btn btn-ghost text-xl md:hidden"
+                >
+                    <span>Reisetagebuch</span>
                 </a>
-                <slot name="header" />
+                <div class="md:hidden">
+                    <slot name="header" class="md-hidden" />
+                </div>
             </NavBar>
+
             <div class="grid grid-cols-12 gap-4 md:mt-12">
                 <div class="col-span-12 lg:col-span-3 lg:col-start-2">
+                    <div class="flex justify-center"></div>
                     <SideMenu class="hidden md:flex" />
                 </div>
                 <div

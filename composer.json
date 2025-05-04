@@ -1,13 +1,15 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "herrlevin/reisetagebuch",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "A self-hosted travel diary application built with Laravel and Inertia.js.",
     "keywords": [
         "laravel",
-        "framework"
+        "inertiajs",
+        "travel",
+        "diary",
+        "self-hosted"
     ],
-    "license": "MIT",
     "require": {
         "php": "^8.4",
         "inertiajs/inertia-laravel": "^2.0",
