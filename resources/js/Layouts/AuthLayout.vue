@@ -5,10 +5,12 @@ import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 <template>
     <div class="bg-base-200 flex min-h-screen items-center">
         <div class="card mx-auto w-full max-w-5xl shadow-xl">
-            <div class="bg-base-100 grid grid-cols-1 rounded-xl md:grid-cols-2">
+            <div
+                class="bg-base-100 grid grid-cols-1 md:grid-cols-2 md:rounded-xl"
+            >
                 <div class="">
                     <div
-                        class="hero bg-base-200 min-h-full rounded-l-xl"
+                        class="hero bg-base-200 min-h-full md:rounded-l-xl"
                         style="
                             background-image: url('/assets/login/pexels-nurseryart-346885.jpg');
                             background-size: cover;
