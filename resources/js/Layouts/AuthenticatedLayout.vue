@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import NavBar from '@/Layouts/Partials/NavBar.vue';
 import SideMenu from '@/Layouts/Partials/SideMenu.vue';
-import Dock from '@/Pages/Profile/Partials/Dock.vue';
+import Dock from '@/Pages/Settings/Partials/Dock.vue';
 </script>
 
 <template>
