@@ -2,8 +2,8 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
 import DeleteUserForm from './Partials/DeleteUserForm.vue';
+import UpdateAccountInformationForm from './Partials/UpdateAccountInformationForm.vue';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm.vue';
-import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm.vue';
 
 defineProps<{
     mustVerifyEmail?: boolean;
@@ -17,7 +17,7 @@ defineProps<{
     <AuthenticatedLayout>
         <div class="min-w-full space-y-6">
             <div class="card bg-base-100 min-w-full p-8 shadow-md">
-                <UpdateProfileInformationForm
+                <UpdateAccountInformationForm
                     :must-verify-email="mustVerifyEmail"
                     :status="status"
                     class="max-w-xl"
