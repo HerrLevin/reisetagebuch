@@ -34,7 +34,7 @@ defineProps({
         <Banner />
 
         <div class="mb-4 space-y-1 px-5 md:px-0">
-            <AvatarMenu />
+            <AvatarMenu :user="user" />
             <div class="-mt-1">
                 <div class="flex items-center">
                     <h3 class="truncate text-2xl font-bold">{{ user.name }}</h3>

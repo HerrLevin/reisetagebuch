@@ -2,7 +2,7 @@ import { TransportMode } from '@/types/enums';
 import { Config } from 'ziggy-js';
 
 export interface User {
-    id: number;
+    id: string;
     name: string;
     username: string;
     email: string;
