@@ -4,6 +4,7 @@ import { Icon } from '@/Icons/icon';
 defineProps(Icon);
 </script>
 <template>
+    <!-- Icon from https://github.com/tailwindlabs/heroicons/, licensed under MIT -->
     <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
