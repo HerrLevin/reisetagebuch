@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Inertia;
 
 use App\Http\Controllers\Backend\PostController;
 use App\Http\Controllers\Backend\UserController as BackendUserController;
+use App\Http\Requests\UpdateProfileRequest;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Response;
 use Inertia\ResponseFactory;
 
@@ -27,6 +29,21 @@ class UserController extends Controller
         return inertia('Profile/Show', [
             'userId' => $user->id,
             'posts' => $posts,
+            'user' => $user,
+        ]);
+    }
+
+    public function update(UpdateProfileRequest $username): RedirectResponse|Response|ResponseFactory
+    {
+        $user = $this->userController->update($username);
+
+        if (route('profile.show', $user->username) !== url()->previous()) {
+            return redirect()->route('profile.show', $user->username);
+        }
+
+        return inertia('Profile/Show', [
+            'userId' => $user->id,
+            'posts' => $this->postController->postsForUser($user->id),
             'user' => $user,
         ]);
     }

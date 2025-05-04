@@ -1,0 +1,132 @@
+<script setup lang="ts">
+import { PropType, useTemplateRef } from 'vue';
+import { useForm, usePage } from '@inertiajs/vue3';
+import { UserDto } from '@/types';
+import InputError from '@/Components/InputError.vue';
+import InputLabel from '@/Components/InputLabel.vue';
+import TextArea from '@/Components/TextArea.vue';
+import TextInput from '@/Components/TextInput.vue';
+
+const authUser = usePage().props.auth.user;
+
+const props = defineProps({
+    user: {
+        type: Object as PropType<UserDto>,
+        default: () => ({}),
+    },
+});
+
+const form = useForm({
+    bio: '',
+    website: '',
+    avatar: '',
+    name: '',
+});
+
+form.name = authUser.name;
+form.bio = props.user.bio || '';
+form.website = props.user.website || '';
+
+const editModal = useTemplateRef('editModal');
+
+const submit = () => {
+    form.put(route('profile.update', authUser.username), {
+        preserveScroll: true,
+        onSuccess: () => {
+            editModal.value?.close();
+        },
+        onError: () => {
+            // Handle error
+        },
+        onFinish: () => {
+            form.reset();
+        },
+    });
+};
+</script>
+
+<template>
+    <button
+        class="btn rounded-full"
+        v-if="user.id === authUser.id"
+        type="button"
+        @click="editModal?.show()"
+    >
+        <div class="flex items-center">Edit Profile</div>
+    </button>
+    <dialog ref="editModal" class="modal">
+        <div class="modal-box">
+            <h3 class="text-lg font-bold">Edit my profile</h3>
+
+            <div class="mt-6">
+                <InputLabel
+                    for="displayname"
+                    value="Displayname"
+                    class="sr-only"
+                />
+
+                <TextInput
+                    id="displayname"
+                    ref="displaynameInput"
+                    v-model="form.name"
+                    :error="form.errors.name"
+                    class="mt-1 block w-3/4"
+                    placeholder="Displayname"
+                    @keydown.enter="submit"
+                />
+
+                <InputError :message="form.errors.name" class="mt-2" />
+            </div>
+
+            <div class="mt-6">
+                <InputLabel for="bio" value="Bio" class="sr-only" />
+
+                <TextArea
+                    id="bio"
+                    ref="bioInput"
+                    v-model="form.bio"
+                    :error="form.errors.bio"
+                    class="mt-1 block w-3/4"
+                    placeholder="Bio"
+                />
+
+                <InputError :message="form.errors.bio" class="mt-2" />
+            </div>
+
+            <div class="mt-6">
+                <InputLabel for="website" value="Website" class="sr-only" />
+
+                <TextInput
+                    id="website"
+                    ref="websiteInput"
+                    v-model="form.website"
+                    :error="form.errors.website"
+                    class="mt-1 block w-3/4"
+                    placeholder="Website"
+                    @keydown.enter="submit"
+                />
+
+                <InputError :message="form.errors.website" class="mt-2" />
+            </div>
+            <div class="modal-action">
+                <form method="dialog">
+                    <button class="btn">Cancel</button>
+                </form>
+
+                <button
+                    class="btn btn-primary"
+                    :class="{ 'opacity-25': form.processing }"
+                    :disabled="form.processing"
+                    @click.prevent="submit"
+                >
+                    Save
+                </button>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+</template>
+
+<style scoped></style>

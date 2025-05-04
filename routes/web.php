@@ -43,7 +43,10 @@ Route::middleware('auth')->group(callback: function () {
 
     Route::get('/dashboard', [PostController::class, 'dashboard'])->name('dashboard');
 
-    Route::get('/profile/{username}', [UserController::class, 'show'])->name('profile.show');
+    Route::prefix('profile')->group(function () {
+        Route::get('/{username}', [UserController::class, 'show'])->name('profile.show');
+        Route::put('/{username}', [UserController::class, 'update'])->name('profile.update');
+    });
 });
 
 require __DIR__.'/auth.php';

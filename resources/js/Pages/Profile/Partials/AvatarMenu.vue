@@ -2,7 +2,7 @@
 import EllipsisVertical from '@/Icons/EllipsisVertical.vue';
 import type { UserDto } from '@/types';
 import { PropType } from 'vue';
-import { usePage } from '@inertiajs/vue3';
+import ProfileEditModal from '@/Pages/Profile/Partials/ProfileEditModal.vue';
 
 defineProps({
     user: {
@@ -10,8 +10,6 @@ defineProps({
         default: () => ({}),
     },
 });
-
-const authUser = usePage().props.auth.user;
 </script>
 
 <template>
@@ -22,13 +20,7 @@ const authUser = usePage().props.auth.user;
             </div>
         </div>
         <div class="flex items-center gap-2">
-            <button
-                class="btn rounded-full"
-                if="user.id === authUser.id"
-                type="button"
-            >
-                <div class="flex items-center">Edit Profile</div>
-            </button>
+            <ProfileEditModal :user="user" />
             <button class="btn btn-circle" type="button">
                 <EllipsisVertical />
             </button>

@@ -12,7 +12,7 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Profile" />
+    <Head title="Settings" />
 
     <AuthenticatedLayout>
         <div class="min-w-full space-y-6">
