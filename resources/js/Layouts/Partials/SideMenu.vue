@@ -5,12 +5,15 @@ import List from '@/Icons/List.vue';
 import PencilSquare from '@/Icons/PencilSquare.vue';
 import Pin from '@/Icons/Pin.vue';
 import PlusCircle from '@/Icons/PlusCircle.vue';
+import UserIcon from '@/Icons/UserIcon.vue';
 import { LocationService } from '@/Services/LocationService';
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 import { onMounted, ref } from 'vue';
 
 const latitude = ref(0);
 const longitude = ref(0);
+
+const user = usePage().props.auth.user;
 
 onMounted(() => {
     LocationService.getPosition().then((position) => {
@@ -35,6 +38,9 @@ const isDeparturesRoute = () => {
 };
 const isTextRoute = () => {
     return route().current('posts.create.text');
+};
+const isProfileRoute = () => {
+    return route().current('profile.show', user.username);
 };
 </script>
 
@@ -110,6 +116,15 @@ const isTextRoute = () => {
         </li>
         <li>
             <Link
+                :href="route('profile.show', user.username)"
+                :class="{ 'menu-active': isProfileRoute() }"
+            >
+                <UserIcon class="h-5 w-5" />
+                Profile
+            </Link>
+        </li>
+        <li>
+            <Link
                 :href="route('account.edit')"
                 :class="{ 'menu-active': isSettingsRoute() }"
             >
@@ -118,7 +133,7 @@ const isTextRoute = () => {
             </Link>
         </li>
         <li class="border-base-300 mt-3 border-t-1">
-            <Link :href="route('logout')" method="post"> Log Out </Link>
+            <Link :href="route('logout')" method="post"> Log Out</Link>
         </li>
     </ul>
 </template>

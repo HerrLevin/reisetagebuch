@@ -6,8 +6,9 @@ import PencilSquare from '@/Icons/PencilSquare.vue';
 import Pin from '@/Icons/Pin.vue';
 import PlusCircle from '@/Icons/PlusCircle.vue';
 import { LocationService } from '@/Services/LocationService';
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 import { onMounted, ref } from 'vue';
+import UserIcon from '@/Icons/UserIcon.vue';
 
 const latitude = ref(0);
 const longitude = ref(0);
@@ -18,6 +19,8 @@ onMounted(() => {
         longitude.value = position.coords.longitude;
     });
 });
+
+const user = usePage().props.auth.user;
 
 const isPostsCreateRoute = () => {
     return route().current()?.startsWith('posts.create');
@@ -36,6 +39,9 @@ const isDeparturesRoute = () => {
 };
 const isTextRoute = () => {
     return route().current('posts.create.text');
+};
+const isProfileRoute = () => {
+    return route().current('profile.show', user.username);
 };
 </script>
 
@@ -101,7 +107,14 @@ const isTextRoute = () => {
                 <PlusCircle class="size-[1.2em]" />
                 <span class="dock-label">New Post</span>
             </Link>
-
+            <Link
+                :href="route('profile.show', user.username)"
+                as="button"
+                :class="{ 'dock-active': isProfileRoute() }"
+            >
+                <UserIcon class="size-[1.2em]" />
+                <span class="dock-label">Profile</span>
+            </Link>
             <Link
                 :href="route('account.edit')"
                 as="button"
