@@ -19,32 +19,31 @@ Route::get('/', function () {
 });
 
 Route::middleware('auth')->group(callback: function () {
-    Route::get('/account', [AccountController::class, 'edit'])->name('account.edit');
-    Route::patch('/account', [AccountController::class, 'update'])->name('account.update');
-    Route::delete('/account', [AccountController::class, 'destroy'])->name('account.destroy');
+    Route::prefix('account')->group(function () {
+        Route::get('/', [AccountController::class, 'edit'])->name('account.edit');
+        Route::patch('/', [AccountController::class, 'update'])->name('account.update');
+        Route::delete('/', [AccountController::class, 'destroy'])->name('account.destroy');
+    });
+
+    Route::prefix('posts')->group(callback: function () {
+        Route::get('/create', [PostController::class, 'create'])->name('posts.create.post');
+        Route::get('/transport/create', [PostController::class, 'createTransport'])->name('posts.create.transport-post');
+        Route::post('/transport/create', [PostController::class, 'storeTransport'])->name('posts.create.transport-post.store');
+        Route::post('/create', [PostController::class, 'store'])->name('posts.create.post.store');
+        Route::get('/locations', [LocationController::class, 'nearby'])->name('posts.create.start');
+        Route::get('/departures', [LocationController::class, 'departures'])->name('posts.create.departures');
+        Route::get('/stopovers', [LocationController::class, 'stopovers'])->name('posts.create.stopovers');
+        Route::get('/new', [PostController::class, 'dashboard'])->name('posts.create.text');
+        Route::get('/{postId}', [PostController::class, 'show'])->name('posts.show');
+        Route::delete('/{postId}', [PostController::class, 'destroy'])->name('posts.destroy');
+        // this belongs in an api
+        Route::get('/new/prefetch/{latitude}/{longitude}', [BLocationController::class, 'nearby'])->name('posts.create.prefetch');
+    });
 
 
-    Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create.post');
-    Route::get('/posts/transport/create', [PostController::class, 'createTransport'])->name('posts.create.transport-post');
-    Route::post('/posts/transport/create', [PostController::class, 'storeTransport'])->name('posts.create.transport-post.store');
-    Route::post('/posts/create', [PostController::class, 'store'])->name('posts.create.post.store');
     Route::get('/dashboard', [PostController::class, 'dashboard'])->name('dashboard');
-    Route::get('/posts/locations', [LocationController::class, 'nearby'])->name('posts.create.start');
-    Route::get('/posts/departures', [LocationController::class, 'departures'])->name('posts.create.departures');
-    Route::get('/posts/stopovers', [LocationController::class, 'stopovers'])->name('posts.create.stopovers');
-    Route::get('/posts/new', [PostController::class, 'dashboard'])->name('posts.create.text');
-    Route::get('/posts/{postId}', [PostController::class, 'show'])->name('posts.show');
-    Route::delete('/posts/{postId}', [PostController::class, 'destroy'])->name('posts.destroy');
 
     Route::get('/profile/{username}', [UserController::class, 'show'])->name('profile.show');
-
-    // this belongs in an api
-    Route::get('/posts/new/prefetch/{latitude}/{longitude}', [BLocationController::class, 'nearby'])->name('posts.create.prefetch');
-
-    // click dummy
-    Route::get('/posts/route', function () {
-        return Inertia::render('NewPostDialog/ListLocations');
-    })->name('posts.create.route');
 });
 
 require __DIR__.'/auth.php';
