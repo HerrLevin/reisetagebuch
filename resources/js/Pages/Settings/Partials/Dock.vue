@@ -26,7 +26,7 @@ const isDashboardRoute = () => {
     return route().current('dashboard');
 };
 const isSettingsRoute = () => {
-    return route().current('profile.edit');
+    return route().current('account.edit');
 };
 const isVenueRoute = () => {
     return route().current('posts.create.start');
@@ -103,7 +103,7 @@ const isTextRoute = () => {
             </Link>
 
             <Link
-                :href="route('profile.edit')"
+                :href="route('account.edit')"
                 as="button"
                 :class="{ 'dock-active': isSettingsRoute() }"
             >

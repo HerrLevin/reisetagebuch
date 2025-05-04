@@ -25,7 +25,7 @@ const isDashboardRoute = () => {
     return route().current('dashboard');
 };
 const isSettingsRoute = () => {
-    return route().current('profile.edit');
+    return route().current('account.edit');
 };
 const isVenueRoute = () => {
     return route().current('posts.create.start');
@@ -110,7 +110,7 @@ const isTextRoute = () => {
         </li>
         <li>
             <Link
-                :href="route('profile.edit')"
+                :href="route('account.edit')"
                 :class="{ 'menu-active': isSettingsRoute() }"
             >
                 <Cog class="h-5 w-5" />
