@@ -50,7 +50,7 @@ Route::middleware('auth')->group(callback: function () {
         Route::post('/{username}', [UserController::class, 'update'])->name('profile.update');
     });
 
-    Route::get('/files/{path}', function ($path) {
+    Route::middleware('cache.headers:public;max_age=2628000;etag')->get('/files/{path}', function ($path) {
         $disk = Storage::disk('public');
         if ($disk->exists($path)) {
             return $disk->response($path);

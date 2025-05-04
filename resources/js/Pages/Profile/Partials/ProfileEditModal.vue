@@ -131,6 +131,7 @@ const headerUpload = (event: Event) => {
                     <input
                         type="file"
                         class="file-input w-full"
+                        accept=".png, .jpg, .jpeg, .webp"
                         :value="avatarInput"
                         @input="avatarUpload"
                     />
@@ -143,6 +144,7 @@ const headerUpload = (event: Event) => {
                     <input
                         type="file"
                         class="file-input w-full"
+                        accept=".png, .jpg, .jpeg, .webp"
                         :value="headerInput"
                         @input="headerUpload"
                     />
