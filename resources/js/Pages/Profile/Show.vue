@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Post from '@/Components/Post/Post.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import AvatarMenu from '@/Pages/Profile/Partials/AvatarMenu.vue';
 import Banner from '@/Pages/Profile/Partials/Banner.vue';
@@ -6,7 +7,16 @@ import BioText from '@/Pages/Profile/Partials/BioText.vue';
 import BottomInfo from '@/Pages/Profile/Partials/BottomInfo.vue';
 import ProfileMenu from '@/Pages/Profile/Partials/ProfileMenu.vue';
 import Statistics from '@/Pages/Profile/Partials/Statistics.vue';
-import { Head } from '@inertiajs/vue3';
+import { BasePost, LocationPost, TransportPost } from '@/types/PostTypes';
+import { Head, Link } from '@inertiajs/vue3';
+import type { PropType } from 'vue';
+
+defineProps({
+    posts: {
+        type: Array as PropType<Array<BasePost | TransportPost | LocationPost>>,
+        default: () => [],
+    },
+});
 
 const textTest = `Hi!
 
@@ -42,7 +52,17 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit.
         </div>
 
         <div class="card bg-base-100 min-w-full shadow-md">
-            Hier kommen dann die posts hin!
+            <ul class="list">
+                <li v-for="post in posts" :key="post.id">
+                    <Link
+                        class="list-row hover-list-entry"
+                        as="div"
+                        :href="route('posts.show', post.id)"
+                    >
+                        <Post :post="post"></Post>
+                    </Link>
+                </li>
+            </ul>
         </div>
     </AuthenticatedLayout>
 </template>

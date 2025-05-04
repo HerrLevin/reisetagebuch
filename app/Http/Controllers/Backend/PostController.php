@@ -8,14 +8,16 @@ use App\Dto\MotisApi\StopDto;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PostCreateRequest;
 use App\Http\Requests\TransportPostCreateRequest;
-use App\Models\Post;
+use App\Http\Resources\PostTypes\BasePost;
+use App\Http\Resources\PostTypes\LocationPost;
+use App\Http\Resources\PostTypes\TransportPost;
 use App\Models\User;
 use App\Repositories\LocationRepository;
 use App\Repositories\PostRepository;
 use App\Services\TransitousRequestService;
 use Carbon\Carbon;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 
 class PostController extends Controller
 {
@@ -30,7 +32,7 @@ class PostController extends Controller
         $this->transitousRequestService = $transitousRequestService;
     }
 
-    public function store(PostCreateRequest $request): Post
+    public function store(PostCreateRequest $request): BasePost|LocationPost|TransportPost
     {
         $location = $this->locationRepository->getLocationById($request->input('location'));
 
@@ -41,7 +43,7 @@ class PostController extends Controller
         );
     }
 
-    public function storeMotisTransport(TransportPostCreateRequest $request): Post
+    public function storeMotisTransport(TransportPostCreateRequest $request): BasePost|LocationPost|TransportPost
     {
         $trip = $this->transitousRequestService->getStopTimes($request->tripId);
 
@@ -99,7 +101,7 @@ class PostController extends Controller
         return $this->postRepository->dashboard($user);
     }
 
-    public function show(string $postId): Post
+    public function show(string $postId): BasePost|LocationPost|TransportPost
     {
         return $this->postRepository->getById($postId);
     }

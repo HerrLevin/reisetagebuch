@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import Post from '@/Components/Post/Post.vue';
 import { BasePost, LocationPost, TransportPost } from '@/types/PostTypes';
 import { Link } from '@inertiajs/vue3';
 import type { PropType } from 'vue';
-import Post from '@/Components/Post/Post.vue';
 
 defineProps({
     posts: {

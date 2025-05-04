@@ -4,10 +4,6 @@ namespace App\Http\Controllers\Inertia;
 
 use App\Http\Requests\PostCreateRequest;
 use App\Http\Requests\TransportPostCreateRequest;
-use App\Http\Resources\PostTypes\BasePost;
-use App\Http\Resources\PostTypes\LocationPost;
-use App\Http\Resources\PostTypes\TransportPost;
-use App\Models\Post;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -32,7 +28,7 @@ class PostController extends Controller
     public function show(string $postId): Response|ResponseFactory
     {
         return Inertia::render('SinglePost', [
-            'post' => $this->getDto($this->postController->show($postId)),
+            'post' => $this->postController->show($postId),
         ]);
     }
 
@@ -65,22 +61,8 @@ class PostController extends Controller
         $posts = $this->postController->dashboard(Auth::user());
 
         return Inertia::render('Dashboard', [
-            'posts' => $posts->map(function (Post $post) {
-                return $this->getDto($post);
-            }),
+            'posts' => $posts,
         ]);
-    }
-
-    private function getDto(Post $post): LocationPost|TransportPost|BasePost
-    {
-        if ($post->locationPost) {
-            return new LocationPost($post);
-        }
-        if ($post->transportPost) {
-            return new TransportPost($post);
-        }
-        // Fallback to the base post resource if no specific type is found
-        return new BasePost($post);
     }
 
     /**
