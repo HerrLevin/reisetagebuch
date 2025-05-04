@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Resources;
 
 class UserDto
@@ -7,29 +9,8 @@ class UserDto
     public string $id;
     public string $name;
     public string $username;
+    public ?string $avatar = null;
+    public ?string $bio = null;
+    public ?string $website = null;
     public string $createdAt;
-
-    public function setId(string $id): UserDto
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    public function setName(string $name): UserDto
-    {
-        $this->name = $name;
-        return $this;
-    }
-
-    public function setUsername(string $username): UserDto
-    {
-        $this->username = $username;
-        return $this;
-    }
-
-    public function setCreatedAt(string $created_at): UserDto
-    {
-        $this->createdAt = $created_at;
-        return $this;
-    }
 }

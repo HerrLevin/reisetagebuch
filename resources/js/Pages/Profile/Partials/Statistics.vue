@@ -11,6 +11,7 @@ defineProps({
 </script>
 
 <template>
+    <!-- todo: add statistics -->
     <div class="flex flex-wrap gap-x-3">
         <a class="link link-hover flex cursor-pointer">
             <b>51</b>&nbsp;<span class="opacity-65">friends</span>
@@ -22,6 +23,7 @@ defineProps({
             <b>12</b>&nbsp;<span class="opacity-65">trips</span>
         </a>
     </div>
+    <!-- todo: add statistics -->
     <div class="flex flex-wrap gap-x-3">
         <span class="flex">
             <b>1.234</b>&nbsp;<span class="opacity-65">posts</span>

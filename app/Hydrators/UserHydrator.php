@@ -15,6 +15,9 @@ class UserHydrator
         $dto->id = $user->id;
         $dto->name = $user->name;
         $dto->username = $user->username;
+        $dto->avatar = $user->profile?->avatar;
+        $dto->bio = $user->profile?->bio;
+        $dto->website = $user->profile?->website;
         $dto->createdAt = $user->created_at->toIso8601String();
 
         return $dto;

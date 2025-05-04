@@ -32,11 +32,18 @@ function getDateString(date: string): string {
                 </span>
             </div>
         </div>
-        <div class="flex flex-wrap gap-x-5 gap-y-2 opacity-65">
+        <div
+            v-if="user.website"
+            class="flex flex-wrap gap-x-5 gap-y-2 opacity-65"
+        >
             <div class="flex items-center gap-1">
                 <Link class="h-4 w-4" />
-                <a class="link link-hover link-primary truncate text-sm">
-                    example.com/todo
+                <a
+                    class="link link-hover link-primary max-w-60 truncate text-sm"
+                >
+                    <a :href="user.website" target="_blank">
+                        {{ user.website }}
+                    </a>
                 </a>
             </div>
         </div>
