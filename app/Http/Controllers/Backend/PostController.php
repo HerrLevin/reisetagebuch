@@ -98,7 +98,7 @@ class PostController extends Controller
 
     public function dashboard(User $user): Collection
     {
-        return $this->postRepository->getPostsForUser($user);
+        return $this->postRepository->getDashboardForUser($user);
     }
 
     public function postsForUser(User|string $user): Collection

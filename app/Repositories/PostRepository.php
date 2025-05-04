@@ -86,6 +86,18 @@ class PostRepository
         return $this->postHydrator->modelToDto($post);
     }
 
+    public function getDashboardForUser(User $user): Collection
+    {
+        $posts = Post::with(['user', 'locationPost.location', 'locationPost.location.tags', 'transportPost', 'transportPost.origin', 'transportPost.destination'])
+            ->latest()
+            ->limit(50)
+            ->get();
+
+        return $posts->map(function (Post $post) {
+            return $this->postHydrator->modelToDto($post);
+        });
+    }
+
     public function getPostsForUser(User|string $user): Collection
     {
         if ($user instanceof User) {

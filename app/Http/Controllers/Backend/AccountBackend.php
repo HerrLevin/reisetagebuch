@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -33,7 +34,10 @@ class AccountBackend extends Controller
 
         Auth::logout();
 
+        /** @var User $user */
         $user->delete();
+        $user->posts()->delete();
+        $user->profile()->delete();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
