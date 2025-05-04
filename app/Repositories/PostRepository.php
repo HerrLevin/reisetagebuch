@@ -86,7 +86,7 @@ class PostRepository
         return $this->postHydrator->modelToDto($post);
     }
 
-    public function dashboard(User|string $user): Collection
+    public function getPostsForUser(User|string $user): Collection
     {
         if ($user instanceof User) {
             $user = $user->id;
