@@ -1,5 +1,17 @@
 <script setup lang="ts">
 import EllipsisVertical from '@/Icons/EllipsisVertical.vue';
+import type { UserDto } from '@/types';
+import { PropType } from 'vue';
+import { usePage } from '@inertiajs/vue3';
+
+defineProps({
+    user: {
+        type: Object as PropType<UserDto>,
+        default: () => ({}),
+    },
+});
+
+const authUser = usePage().props.auth.user;
 </script>
 
 <template>
@@ -10,8 +22,12 @@ import EllipsisVertical from '@/Icons/EllipsisVertical.vue';
             </div>
         </div>
         <div class="flex items-center gap-2">
-            <button class="btn rounded-full">
-                <div class="flex items-center">Follow</div>
+            <button
+                class="btn rounded-full"
+                if="user.id === authUser.id"
+                type="button"
+            >
+                <div class="flex items-center">Edit Profile</div>
             </button>
             <button class="btn btn-circle" type="button">
                 <EllipsisVertical />
