@@ -23,9 +23,7 @@ import Dock from '@/Pages/Profile/Partials/Dock.vue';
                     class="col-span-12 md:flex md:justify-center lg:col-span-7"
                 >
                     <main class="mb-12 w-full pb-12 md:mb-0 md:pb-0">
-                        <main class="md:flex md:justify-center">
-                            <slot />
-                        </main>
+                        <slot />
                     </main>
                 </div>
             </div>

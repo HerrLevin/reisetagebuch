@@ -3,6 +3,7 @@
 use App\Http\Controllers\Backend\LocationController as BLocationController;
 use App\Http\Controllers\Inertia\LocationController;
 use App\Http\Controllers\Inertia\PostController;
+use App\Http\Controllers\Inertia\UserController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -34,6 +35,8 @@ Route::middleware('auth')->group(callback: function () {
     Route::get('/posts/new', [PostController::class, 'dashboard'])->name('posts.create.text');
     Route::get('/posts/{postId}', [PostController::class, 'show'])->name('posts.show');
     Route::delete('/posts/{postId}', [PostController::class, 'destroy'])->name('posts.destroy');
+
+    Route::get('/profile/{userId}', [UserController::class, 'show'])->name('profile.show');
 
     // this belongs in an api
     Route::get('/posts/new/prefetch/{latitude}/{longitude}', [BLocationController::class, 'nearby'])->name('posts.create.prefetch');
