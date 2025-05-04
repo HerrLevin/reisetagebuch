@@ -29,14 +29,6 @@ defineProps({
                 </LocationListEntryInfo>
             </div>
         </div>
-
-        <div class="mt-1">
-            <div class="flex items-center gap-2 text-xs">
-                <!--                <span class="opacity-50">{{ region }}</span>-->
-                <!--                <StarsIndicator :stars />-->
-                <!--                <LikesIndicator :likes />-->
-            </div>
-        </div>
     </div>
 </template>
 

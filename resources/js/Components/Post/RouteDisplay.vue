@@ -21,12 +21,24 @@ function getTime(date: string): string {
 
 <template>
     <div>
-        <div class="grid grid-cols-3 gap-0 pb-0">
+        <div class="grid grid-cols-2 gap-0 pb-0">
             <div class="text-left">
-                <div class="mb-2 leading-none font-semibold">
+                <div
+                    class="mb-2 line-clamp-2 leading-none font-semibold overflow-ellipsis"
+                >
                     {{ post.start!.name }}
                 </div>
-                <div class="text-xs opacity-50"></div>
+            </div>
+            <div class="text-right">
+                <div
+                    class="mb-2 line-clamp-2 leading-none font-semibold overflow-ellipsis"
+                >
+                    {{ post.stop!.name }}
+                </div>
+            </div>
+        </div>
+        <div class="grid grid-cols-3 gap-0 pb-0">
+            <div class="text-left">
                 <p class="text-muted-foreground text-sm font-medium">
                     {{ getTime(post.start_time!) }}
                 </p>
@@ -37,10 +49,6 @@ function getTime(date: string): string {
                 </p>
             </div>
             <div class="text-right">
-                <div class="mb-2 leading-none font-semibold">
-                    {{ post.stop!.name }}
-                </div>
-                <div class="text-xs opacity-50"></div>
                 <p class="text-muted-foreground text-sm font-medium">
                     {{ getTime(post.stop_time!) }}
                 </p>
