@@ -94,7 +94,9 @@ export type LocationTag = {
     value: string;
 };
 
-export type PublicUser = {
+export type UserDto = {
     id: string;
     name: string;
+    username: string;
+    createdAt: string;
 };

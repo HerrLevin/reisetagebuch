@@ -19,7 +19,7 @@ defineProps({
         </li>
         <li v-for="post in posts" :key="post.id">
             <Link
-                class="list-row hover-list-entry"
+                class="list-row hover-list-entry cursor-pointer"
                 as="div"
                 :href="route('posts.show', post.id)"
             >

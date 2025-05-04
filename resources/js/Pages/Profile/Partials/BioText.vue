@@ -1,8 +1,11 @@
 <script setup lang="ts">
+import type { UserDto } from '@/types';
+import { PropType } from 'vue';
+
 defineProps({
-    text: {
-        type: String,
-        default: '',
+    user: {
+        type: Object as PropType<UserDto>,
+        default: () => ({}),
     },
 });
 </script>
@@ -10,7 +13,7 @@ defineProps({
 <template>
     <div>
         <p class="line-clamp-15 overflow-ellipsis whitespace-pre-wrap">
-            {{ text }}
+            {{ user.name }}
         </p>
     </div>
 </template>

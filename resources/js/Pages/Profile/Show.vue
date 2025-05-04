@@ -7,7 +7,8 @@ import BioText from '@/Pages/Profile/Partials/BioText.vue';
 import BottomInfo from '@/Pages/Profile/Partials/BottomInfo.vue';
 import ProfileMenu from '@/Pages/Profile/Partials/ProfileMenu.vue';
 import Statistics from '@/Pages/Profile/Partials/Statistics.vue';
-import { BasePost, LocationPost, TransportPost } from '@/types/PostTypes';
+import type { UserDto } from '@/types';
+import type { BasePost, LocationPost, TransportPost } from '@/types/PostTypes';
 import { Head, Link } from '@inertiajs/vue3';
 import type { PropType } from 'vue';
 
@@ -15,6 +16,10 @@ defineProps({
     posts: {
         type: Array as PropType<Array<BasePost | TransportPost | LocationPost>>,
         default: () => [],
+    },
+    user: {
+        type: Object as PropType<UserDto>,
+        default: () => ({}),
     },
 });
 
@@ -37,17 +42,17 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 
         <div class="mb-4 space-y-1 px-5 md:px-0">
             <AvatarMenu />
-            <div class="-mt-3">
+            <div class="-mt-1">
                 <div class="flex items-center">
-                    <h3 class="truncate text-2xl font-bold">Max Mustermann</h3>
+                    <h3 class="truncate text-2xl font-bold">{{ user.name }}</h3>
                 </div>
                 <div class="flex items-center space-x-3">
-                    <span class="text-sm">@mmustermann</span>
+                    <span class="text-sm">@{{ user.username }}</span>
                 </div>
             </div>
-            <Statistics />
-            <BioText :text="textTest" />
-            <BottomInfo />
+            <Statistics :user="user" />
+            <BioText :user="user" />
+            <BottomInfo :user="user" />
             <ProfileMenu />
         </div>
 
@@ -55,7 +60,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit.
             <ul class="list">
                 <li v-for="post in posts" :key="post.id">
                     <Link
-                        class="list-row hover-list-entry"
+                        class="list-row hover-list-entry cursor-pointer"
                         as="div"
                         :href="route('posts.show', post.id)"
                     >

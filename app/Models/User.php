@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Carbon\Carbon;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -19,6 +20,8 @@ use Illuminate\Notifications\Notifiable;
  * @property string $email_verified_at
  * @property string $password
  * @property string $remember_token
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
  *
  * @property-read Collection<Post> $posts
  */
@@ -37,6 +40,12 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+    ];
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     protected function casts(): array
