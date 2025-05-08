@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import {
+    MglCircleLayer,
     MglGeoJsonSource,
     MglLineLayer,
     MglMap,
-    MglMarker,
     MglRasterLayer,
     MglRasterSource,
 } from '@indoorequal/vue-maplibre-gl';
-import type { GeoJSON } from 'geojson';
+import type { Feature, FeatureCollection } from 'geojson';
 import {
     LngLat,
     LngLatBounds,
@@ -66,7 +66,36 @@ const geoJsonSource = ref({
             },
         },
     ],
-} as GeoJSON);
+} as FeatureCollection);
+const geoJsonA = ref({
+    type: 'FeatureCollection',
+    features: [],
+} as FeatureCollection);
+
+function getPointFeature(
+    lng: number,
+    lat: number,
+    properties: Record<string, unknown> = {},
+): Feature {
+    return {
+        type: 'Feature',
+        properties,
+        geometry: {
+            type: 'Point',
+            coordinates: [lng, lat],
+        },
+    };
+}
+
+geoJsonA.value.features.push(
+    getPointFeature(props.startPoint.lng, props.startPoint.lat),
+);
+
+if (props.endPoint) {
+    geoJsonA.value.features.push(
+        getPointFeature(props.endPoint.lng, props.endPoint.lat),
+    );
+}
 </script>
 
 <template>
@@ -92,7 +121,6 @@ const geoJsonSource = ref({
         >
             <mgl-raster-layer layer-id="raster-layer" />
         </mgl-raster-source>
-
         <mgl-geo-json-source :data="geoJsonSource" source-id="geojson">
             <mgl-line-layer
                 layer-id="line"
@@ -109,9 +137,18 @@ const geoJsonSource = ref({
                 }"
             />
         </mgl-geo-json-source>
-
-        <mgl-marker :coordinates="startPoint"></mgl-marker>
-        <mgl-marker v-if="endPoint" :coordinates="endPoint"></mgl-marker>
+        <mgl-geo-json-source source-id="points" :data="geoJsonA">
+            <mgl-circle-layer
+                layer-id="points"
+                :paint="{
+                    'circle-radius': 6,
+                    'circle-color': '#007cbf',
+                    'circle-stroke-color': '#fff',
+                    'circle-stroke-width': 2,
+                }"
+            >
+            </mgl-circle-layer>
+        </mgl-geo-json-source>
     </mgl-map>
 </template>
 
