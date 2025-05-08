@@ -4,3 +4,8 @@
 @plugin "daisyui" {
     themes: light --default, dark --prefersdark;
 }
+
+/* Input fontsize to prevent zooming on mobile */
+input, textarea, select {
+    font-size: 1rem;
+}
