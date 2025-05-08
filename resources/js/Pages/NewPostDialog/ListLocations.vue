@@ -32,7 +32,7 @@ filterLocations();
 </script>
 
 <template>
-    <Head title="Dashboard" />
+    <Head title="Locations nearby" />
 
     <AuthenticatedLayout>
         <template #header>

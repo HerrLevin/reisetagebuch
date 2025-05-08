@@ -45,10 +45,19 @@ if (isLocationPost(props.post)) {
     startPoint.value = null;
     endPoint.value = null;
 }
+let head = `${props.post.user.name}'s post`;
+if (isLocationPost(props.post)) {
+    head = `${props.post.user.name}'s post at ${props.post.location.name}`;
+} else if (isTransportPost(props.post)) {
+    head = `${props.post.user.name}'s travel from ${props.post.start.name} to ${props.post.stop.name}`;
+}
+if (props.post.body) {
+    head += `: ${props.post.body}`;
+}
 </script>
 
 <template>
-    <Head title="" />
+    <Head :title="head" />
 
     <AuthenticatedLayout>
         <template #header>

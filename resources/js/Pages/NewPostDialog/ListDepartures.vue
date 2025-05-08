@@ -17,7 +17,7 @@ showStartButton.value = route().current('posts.create.start');
 </script>
 
 <template>
-    <Head title="Dashboard" />
+    <Head :title="`${departures?.stop.name}: departures`" />
 
     <AuthenticatedLayout>
         <template #header>

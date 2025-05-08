@@ -54,10 +54,18 @@ function redirectCreatePost(stopover: StopPlace) {
     };
     window.location.href = route('posts.create.transport-post', params);
 }
+
+function getTitle() {
+    let title = props.trip?.legs[0].mode
+        ? getEmoji(props.trip?.legs[0].mode)
+        : '';
+    title = title + ' ' + (props.trip?.legs[0].routeShortName ?? '');
+    return title + ' ➜ ' + props.trip?.legs[0].headSign;
+}
 </script>
 
 <template>
-    <Head title="Dashboard" />
+    <Head :title="getTitle()" />
 
     <AuthenticatedLayout>
         <template #header>
@@ -67,10 +75,7 @@ function redirectCreatePost(stopover: StopPlace) {
             <!-- Results -->
             <ul class="list">
                 <li class="p-4 pb-2 text-xs tracking-wide opacity-60">
-                    {{ trip?.legs[0].mode ? getEmoji(trip?.legs[0].mode) : '' }}
-                    {{ trip?.legs[0].routeShortName }}
-                    |
-                    {{ trip?.legs[0].headSign }}
+                    {{ getTitle() }}
                 </li>
                 <StopoversListEntry
                     v-for="(stopover, index) in stopovers"
