@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Dto\PostPaginationDto;
 use App\Http\Resources\PostTypes\BasePost;
 use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
@@ -10,7 +11,6 @@ use App\Models\Location;
 use App\Models\Post;
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
@@ -86,19 +86,29 @@ class PostRepository
         return $this->postHydrator->modelToDto($post);
     }
 
-    public function getDashboardForUser(User $user): Collection
+    public function getDashboardForUser(User $user): PostPaginationDto
     {
         $posts = Post::with(['user', 'locationPost.location', 'locationPost.location.tags', 'transportPost', 'transportPost.origin', 'transportPost.destination'])
             ->latest()
-            ->limit(50)
-            ->get();
+            ->cursorPaginate(50);
 
-        return $posts->map(function (Post $post) {
+        $mapped = $posts->map(function (Post $post) {
             return $this->postHydrator->modelToDto($post);
         });
+
+        return new PostPaginationDto(
+            perPage: $posts->perPage(),
+            nextCursor: $posts->nextCursor()?->encode(),
+            previousCursor: $posts->previousCursor()?->encode(),
+            items: $mapped,
+        );
     }
 
-    public function getPostsForUser(User|string $user): Collection
+    /**
+     * @param User|string $user
+     * @return PostPaginationDto
+     */
+    public function getPostsForUser(User|string $user): PostPaginationDto
     {
         if ($user instanceof User) {
             $user = $user->id;
@@ -107,12 +117,19 @@ class PostRepository
         $posts = Post::with(['user', 'locationPost.location', 'locationPost.location.tags', 'transportPost', 'transportPost.origin', 'transportPost.destination'])
             ->where('user_id', $user)
             ->latest()
-            ->limit(50)
-            ->get();
+            ->cursorPaginate(50);
 
-        return $posts->map(function (Post $post) {
+
+        $mapped = $posts->map(function (Post $post) {
             return $this->postHydrator->modelToDto($post);
         });
+
+        return new PostPaginationDto(
+            perPage: $posts->perPage(),
+            nextCursor: $posts->nextCursor()?->encode(),
+            previousCursor: $posts->previousCursor()?->encode(),
+            items: $mapped,
+        );
     }
 
     public function getById(string $postId): BasePost|LocationPost|TransportPost

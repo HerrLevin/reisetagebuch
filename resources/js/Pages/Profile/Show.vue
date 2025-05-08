@@ -11,11 +11,22 @@ import type { UserDto } from '@/types';
 import type { BasePost, LocationPost, TransportPost } from '@/types/PostTypes';
 import { Head, Link } from '@inertiajs/vue3';
 import type { PropType } from 'vue';
+import InfiniteScroller from '@/Components/InfiniteScroller.vue';
 
 defineProps({
     posts: {
         type: Array as PropType<Array<BasePost | TransportPost | LocationPost>>,
         default: () => [],
+    },
+    nextCursor: {
+        type: String,
+        nullable: true,
+        default: '',
+    },
+    prevCursor: {
+        type: String,
+        nullable: true,
+        default: '',
     },
     user: {
         type: Object as PropType<UserDto>,
@@ -61,6 +72,7 @@ defineProps({
                     </Link>
                 </li>
             </ul>
+            <InfiniteScroller :only="['posts']" />
         </div>
     </AuthenticatedLayout>
 </template>

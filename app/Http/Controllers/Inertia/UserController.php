@@ -6,6 +6,7 @@ use App\Http\Controllers\Backend\PostController;
 use App\Http\Controllers\Backend\UserController as BackendUserController;
 use App\Http\Requests\UpdateProfileRequest;
 use Illuminate\Http\RedirectResponse;
+use Inertia\Inertia;
 use Inertia\Response;
 use Inertia\ResponseFactory;
 
@@ -28,7 +29,9 @@ class UserController extends Controller
 
         return inertia('Profile/Show', [
             'userId' => $user->id,
-            'posts' => $posts,
+            'posts' => Inertia::merge($posts->items),
+            'nextCursor' => $posts->nextCursor,
+            'previousCursor' => $posts->previousCursor,
             'user' => $user,
         ]);
     }

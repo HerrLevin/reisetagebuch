@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Backend;
 
 use App\Dto\MotisApi\StopDto;
+use App\Dto\PostPaginationDto;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PostCreateRequest;
 use App\Http\Requests\TransportPostCreateRequest;
@@ -17,7 +18,6 @@ use App\Repositories\PostRepository;
 use App\Services\TransitousRequestService;
 use Carbon\Carbon;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Support\Collection;
 
 class PostController extends Controller
 {
@@ -96,12 +96,16 @@ class PostController extends Controller
         );
     }
 
-    public function dashboard(User $user): Collection
+    public function dashboard(User $user): PostPaginationDto
     {
         return $this->postRepository->getDashboardForUser($user);
     }
 
-    public function postsForUser(User|string $user): Collection
+    /**
+     * @param User|string $user
+     * @return PostPaginationDto
+     */
+    public function postsForUser(User|string $user): PostPaginationDto
     {
         return $this->postRepository->getPostsForUser($user);
     }

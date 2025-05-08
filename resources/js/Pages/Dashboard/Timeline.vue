@@ -3,6 +3,7 @@ import Post from '@/Components/Post/Post.vue';
 import { BasePost, LocationPost, TransportPost } from '@/types/PostTypes';
 import { Link } from '@inertiajs/vue3';
 import type { PropType } from 'vue';
+import InfiniteScroller from '@/Components/InfiniteScroller.vue';
 
 defineProps({
     posts: {
@@ -26,6 +27,7 @@ defineProps({
                 <Post :post="post"></Post>
             </Link>
         </li>
+        <InfiniteScroller :only="['posts']" />
     </ul>
 </template>
 

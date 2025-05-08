@@ -61,7 +61,9 @@ class PostController extends Controller
         $posts = $this->postController->dashboard(Auth::user());
 
         return Inertia::render('Dashboard', [
-            'posts' => $posts,
+            'posts' => Inertia::merge($posts->items),
+            'nextCursor' => $posts->nextCursor,
+            'previousCursor' => $posts->previousCursor,
         ]);
     }
 
