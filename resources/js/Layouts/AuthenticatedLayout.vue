@@ -3,6 +3,7 @@ import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import NavBar from '@/Layouts/Partials/NavBar.vue';
 import SideMenu from '@/Layouts/Partials/SideMenu.vue';
 import Dock from '@/Pages/Settings/Partials/Dock.vue';
+import FlashMessages from '@/Components/FlashMessages.vue';
 </script>
 
 <template>
@@ -32,6 +33,7 @@ import Dock from '@/Pages/Settings/Partials/Dock.vue';
                     class="col-span-12 md:flex md:justify-center lg:col-span-7"
                 >
                     <main class="mb-12 w-full pb-12 md:mb-0 md:pb-0">
+                        <FlashMessages />
                         <slot />
                     </main>
                 </div>

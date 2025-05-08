@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
+import FlashMessages from '@/Components/FlashMessages.vue';
 </script>
 
 <template>
@@ -32,6 +33,7 @@ import ApplicationLogo from '@/Components/ApplicationLogo.vue';
                     </div>
                 </div>
                 <div class="px-10 py-24">
+                    <FlashMessages />
                     <slot />
                 </div>
             </div>
