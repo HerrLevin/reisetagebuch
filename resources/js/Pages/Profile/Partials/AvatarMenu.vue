@@ -3,7 +3,9 @@ import EllipsisVertical from '@/Icons/EllipsisVertical.vue';
 import ProfileEditModal from '@/Pages/Profile/Partials/ProfileEditModal.vue';
 import type { UserDto } from '@/types';
 import { PropType } from 'vue';
+import { usePage } from '@inertiajs/vue3';
 
+const authUser = usePage().props.auth.user ?? null;
 defineProps({
     user: {
         type: Object as PropType<UserDto>,
@@ -26,7 +28,7 @@ defineProps({
             </div>
         </div>
         <div class="flex items-center gap-2">
-            <ProfileEditModal :user="user" />
+            <ProfileEditModal v-if="authUser" :user="user" />
             <button class="btn btn-circle" type="button">
                 <EllipsisVertical />
             </button>

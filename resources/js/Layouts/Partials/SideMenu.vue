@@ -13,7 +13,7 @@ import { onMounted, ref } from 'vue';
 const latitude = ref(0);
 const longitude = ref(0);
 
-const user = usePage().props.auth.user;
+const user = usePage().props.auth.user ?? null;
 
 onMounted(() => {
     LocationService.getPosition().then((position) => {
@@ -40,7 +40,7 @@ const isTextRoute = () => {
     return route().current('posts.create.text');
 };
 const isProfileRoute = () => {
-    return route().current('profile.show', user.username);
+    return route().current('profile.show', user?.username ?? '');
 };
 </script>
 
@@ -56,85 +56,87 @@ const isProfileRoute = () => {
                 Dashboard
             </Link>
         </li>
-        <li>
-            <Link
-                :href="
-                    route('posts.create.start', {
-                        latitude: latitude,
-                        longitude: longitude,
-                    })
-                "
-            >
-                <PlusCircle class="h-5 w-5" />
-                <span class="dock-label">New Post</span>
-            </Link>
-            <ul v-if="isPostsCreateRoute()">
-                <li>
-                    <Link
-                        :href="
-                            route('posts.create.start', {
-                                latitude: latitude,
-                                longitude: longitude,
-                            })
-                        "
-                        :class="{ 'menu-active': isVenueRoute() }"
-                    >
-                        <Pin class="h-5 w-5" />
-                        Locations
-                    </Link>
-                </li>
+        <template v-if="user">
+            <li>
+                <Link
+                    :href="
+                        route('posts.create.start', {
+                            latitude: latitude,
+                            longitude: longitude,
+                        })
+                    "
+                >
+                    <PlusCircle class="h-5 w-5" />
+                    <span class="dock-label">New Post</span>
+                </Link>
+                <ul v-if="isPostsCreateRoute()">
+                    <li>
+                        <Link
+                            :href="
+                                route('posts.create.start', {
+                                    latitude: latitude,
+                                    longitude: longitude,
+                                })
+                            "
+                            :class="{ 'menu-active': isVenueRoute() }"
+                        >
+                            <Pin class="h-5 w-5" />
+                            Locations
+                        </Link>
+                    </li>
 
-                <li>
-                    <Link
-                        :href="
-                            route('posts.create.departures', {
-                                latitude: latitude,
-                                longitude: longitude,
-                            })
-                        "
-                        :class="{ 'menu-active': isDeparturesRoute() }"
-                    >
-                        <List class="h-5 w-5" />
-                        Departures
-                    </Link>
-                </li>
-                <li>
-                    <Link
-                        :href="
-                            route('posts.create.text', {
-                                latitude: latitude,
-                                longitude: longitude,
-                            })
-                        "
-                        :class="{ 'menu-active': isTextRoute() }"
-                    >
-                        <PencilSquare class="h-5 w-5" />
-                        Text
-                    </Link>
-                </li>
-            </ul>
-        </li>
-        <li>
-            <Link
-                :href="route('profile.show', user.username)"
-                :class="{ 'menu-active': isProfileRoute() }"
-            >
-                <UserIcon class="h-5 w-5" />
-                Profile
-            </Link>
-        </li>
-        <li>
-            <Link
-                :href="route('account.edit')"
-                :class="{ 'menu-active': isSettingsRoute() }"
-            >
-                <Cog class="h-5 w-5" />
-                Settings
-            </Link>
-        </li>
-        <li class="border-base-300 mt-3 border-t-1">
-            <Link :href="route('logout')" method="post"> Log Out</Link>
-        </li>
+                    <li>
+                        <Link
+                            :href="
+                                route('posts.create.departures', {
+                                    latitude: latitude,
+                                    longitude: longitude,
+                                })
+                            "
+                            :class="{ 'menu-active': isDeparturesRoute() }"
+                        >
+                            <List class="h-5 w-5" />
+                            Departures
+                        </Link>
+                    </li>
+                    <li>
+                        <Link
+                            :href="
+                                route('posts.create.text', {
+                                    latitude: latitude,
+                                    longitude: longitude,
+                                })
+                            "
+                            :class="{ 'menu-active': isTextRoute() }"
+                        >
+                            <PencilSquare class="h-5 w-5" />
+                            Text
+                        </Link>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <Link
+                    :href="route('profile.show', user?.username)"
+                    :class="{ 'menu-active': isProfileRoute() }"
+                >
+                    <UserIcon class="h-5 w-5" />
+                    Profile
+                </Link>
+            </li>
+            <li>
+                <Link
+                    :href="route('account.edit')"
+                    :class="{ 'menu-active': isSettingsRoute() }"
+                >
+                    <Cog class="h-5 w-5" />
+                    Settings
+                </Link>
+            </li>
+            <li class="border-base-300 mt-3 border-t-1">
+                <Link :href="route('logout')" method="post"> Log Out</Link>
+            </li>
+        </template>
     </ul>
 </template>
 

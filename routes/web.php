@@ -36,28 +36,27 @@ Route::middleware('auth')->group(callback: function () {
         Route::get('/departures', [LocationController::class, 'departures'])->name('posts.create.departures');
         Route::get('/stopovers', [LocationController::class, 'stopovers'])->name('posts.create.stopovers');
         Route::get('/new', [PostController::class, 'dashboard'])->name('posts.create.text');
-        Route::get('/{postId}', [PostController::class, 'show'])->name('posts.show');
         Route::delete('/{postId}', [PostController::class, 'destroy'])->name('posts.destroy');
         // this belongs in an api
         Route::get('/new/prefetch/{latitude}/{longitude}', [BLocationController::class, 'nearby'])->name('posts.create.prefetch');
     });
 
-
     Route::get('/dashboard', [PostController::class, 'dashboard'])->name('dashboard');
 
-    Route::prefix('profile')->group(function () {
-        Route::get('/{username}', [UserController::class, 'show'])->name('profile.show');
-        Route::post('/{username}', [UserController::class, 'update'])->name('profile.update');
-    });
+    Route::post('profile/{username}', [UserController::class, 'update'])->name('profile.update');
 
-    Route::middleware('cache.headers:public;max_age=2628000;etag')->get('/files/{path}', function ($path) {
-        $disk = Storage::disk('public');
-        if ($disk->exists($path)) {
-            return $disk->response($path);
-        }
-
-        abort(404);
-    })->where('path', '.*')->name('files.show');
 });
+
+// Public routes
+Route::get('posts/{postId}', [PostController::class, 'show'])->name('posts.show');
+Route::get('profile/{username}', [UserController::class, 'show'])->name('profile.show');
+Route::middleware('cache.headers:public;max_age=2628000;etag')->get('/files/{path}', function ($path) {
+    $disk = Storage::disk('public');
+    if ($disk->exists($path)) {
+        return $disk->response($path);
+    }
+
+    abort(404);
+})->where('path', '.*')->name('files.show');
 
 require __DIR__.'/auth.php';

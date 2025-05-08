@@ -5,10 +5,10 @@ import List from '@/Icons/List.vue';
 import PencilSquare from '@/Icons/PencilSquare.vue';
 import Pin from '@/Icons/Pin.vue';
 import PlusCircle from '@/Icons/PlusCircle.vue';
+import UserIcon from '@/Icons/UserIcon.vue';
 import { LocationService } from '@/Services/LocationService';
 import { Link, usePage } from '@inertiajs/vue3';
 import { onMounted, ref } from 'vue';
-import UserIcon from '@/Icons/UserIcon.vue';
 
 const latitude = ref(0);
 const longitude = ref(0);
@@ -20,7 +20,7 @@ onMounted(() => {
     });
 });
 
-const user = usePage().props.auth.user;
+const user = usePage().props.auth.user ?? null;
 
 const isPostsCreateRoute = () => {
     return route().current()?.startsWith('posts.create');
@@ -41,13 +41,17 @@ const isTextRoute = () => {
     return route().current('posts.create.text');
 };
 const isProfileRoute = () => {
-    return route().current('profile.show', user.username);
+    return route().current('profile.show', user?.username ?? '');
 };
 </script>
 
 <template>
     <div class="md:invisible">
-        <div class="over-dock" :class="{ invisible: !isPostsCreateRoute() }">
+        <div
+            v-if="user"
+            class="over-dock"
+            :class="{ invisible: !isPostsCreateRoute() }"
+        >
             <div class="join">
                 <Link
                     :href="
@@ -93,36 +97,37 @@ const isProfileRoute = () => {
                 <House class="size-[1.2em]" />
                 <span class="dock-label">Home</span>
             </Link>
-
-            <Link
-                :href="
-                    route('posts.create.start', {
-                        latitude: latitude,
-                        longitude: longitude,
-                    })
-                "
-                as="button"
-                :class="{ 'dock-active': isPostsCreateRoute() }"
-            >
-                <PlusCircle class="size-[1.2em]" />
-                <span class="dock-label">New Post</span>
-            </Link>
-            <Link
-                :href="route('profile.show', user.username)"
-                as="button"
-                :class="{ 'dock-active': isProfileRoute() }"
-            >
-                <UserIcon class="size-[1.2em]" />
-                <span class="dock-label">Profile</span>
-            </Link>
-            <Link
-                :href="route('account.edit')"
-                as="button"
-                :class="{ 'dock-active': isSettingsRoute() }"
-            >
-                <Cog class="size-[1.2em]" />
-                <span class="dock-label">Settings</span>
-            </Link>
+            <template v-if="user">
+                <Link
+                    :href="
+                        route('posts.create.start', {
+                            latitude: latitude,
+                            longitude: longitude,
+                        })
+                    "
+                    as="button"
+                    :class="{ 'dock-active': isPostsCreateRoute() }"
+                >
+                    <PlusCircle class="size-[1.2em]" />
+                    <span class="dock-label">New Post</span>
+                </Link>
+                <Link
+                    :href="route('profile.show', user.username)"
+                    as="button"
+                    :class="{ 'dock-active': isProfileRoute() }"
+                >
+                    <UserIcon class="size-[1.2em]" />
+                    <span class="dock-label">Profile</span>
+                </Link>
+                <Link
+                    :href="route('account.edit')"
+                    as="button"
+                    :class="{ 'dock-active': isSettingsRoute() }"
+                >
+                    <Cog class="size-[1.2em]" />
+                    <span class="dock-label">Settings</span>
+                </Link>
+            </template>
         </div>
     </div>
 </template>
