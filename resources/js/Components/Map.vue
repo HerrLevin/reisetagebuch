@@ -1,27 +1,29 @@
 <script setup lang="ts">
 import {
+    MglGeoJsonSource,
+    MglLineLayer,
     MglMap,
     MglMarker,
     MglRasterLayer,
     MglRasterSource,
 } from '@indoorequal/vue-maplibre-gl';
+import type { GeoJSON } from 'geojson';
 import {
     LngLat,
     LngLatBounds,
     LngLatBoundsLike,
-    LngLatLike,
     StyleSpecification,
 } from 'maplibre-gl';
 import { PropType, ref } from 'vue';
 
 const props = defineProps({
     startPoint: {
-        type: Object as PropType<LngLatLike>,
+        type: Object as PropType<LngLat>,
         default: new LngLat(8.403, 49),
         required: false,
     },
     endPoint: {
-        type: Object as PropType<LngLatLike | null>,
+        type: Object as PropType<LngLat | null>,
         default: null,
         required: false,
     },
@@ -47,6 +49,24 @@ if (props.startPoint && props.endPoint) {
 } else {
     bounds.value = undefined;
 }
+const geoJsonSource = ref({
+    type: 'FeatureCollection',
+    features: [
+        {
+            type: 'Feature',
+            properties: {},
+            geometry: {
+                type: 'LineString',
+                coordinates: [
+                    [props.startPoint.lng, props.startPoint.lat],
+                    ...(props.endPoint
+                        ? [[props.endPoint.lng, props.endPoint.lat]]
+                        : []),
+                ],
+            },
+        },
+    ],
+} as GeoJSON);
 </script>
 
 <template>
@@ -72,6 +92,23 @@ if (props.startPoint && props.endPoint) {
         >
             <mgl-raster-layer layer-id="raster-layer" />
         </mgl-raster-source>
+
+        <mgl-geo-json-source :data="geoJsonSource" source-id="geojson">
+            <mgl-line-layer
+                layer-id="line"
+                :source-id="'geojson'"
+                :layout="{
+                    'line-cap': 'round',
+                    'line-join': 'round',
+                    visibility: 'visible',
+                }"
+                :paint="{
+                    'line-color': '#FF0000',
+                    'line-width': 4,
+                    'line-opacity': 0.8,
+                }"
+            />
+        </mgl-geo-json-source>
 
         <mgl-marker :coordinates="startPoint"></mgl-marker>
         <mgl-marker v-if="endPoint" :coordinates="endPoint"></mgl-marker>
