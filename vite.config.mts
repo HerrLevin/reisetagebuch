@@ -30,17 +30,24 @@ export default defineConfig({
                 background_color: '#191e24',
                 display: 'standalone',
                 scope: '/',
-                start_url: '/',
+                start_url: '/home',
                 icons: [
                     {
-                        src: '/pwa-192x192.png',
+                        src: 'assets/pwa-192x192.png',
                         sizes: '192x192',
                         type: 'image/png',
                     },
                     {
-                        src: '/pwa-512x512.png',
+                        src: 'assets/pwa-512x512.png',
                         sizes: '512x512',
                         type: 'image/png',
+                        purpose: 'any',
+                    },
+                    {
+                        src: 'assets/pwa-512x512.png',
+                        sizes: '512x512',
+                        type: 'image/png',
+                        purpose: 'maskable',
                     },
                 ],
             },

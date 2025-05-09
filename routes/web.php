@@ -41,7 +41,7 @@ Route::middleware('auth')->group(callback: function () {
         Route::get('/new/prefetch/{latitude}/{longitude}', [BLocationController::class, 'nearby'])->name('posts.create.prefetch');
     });
 
-    Route::get('/dashboard', [PostController::class, 'dashboard'])->name('dashboard');
+    Route::get('/home', [PostController::class, 'dashboard'])->name('dashboard');
 
     Route::post('profile/{username}', [UserController::class, 'update'])->name('profile.update');
 
