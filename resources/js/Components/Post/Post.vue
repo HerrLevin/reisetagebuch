@@ -20,7 +20,7 @@ const props = defineProps({
     },
 });
 
-let relativeCreatedAt = '';
+let relativeCreatedAt;
 const date = DateTime.fromISO(props.post?.created_at);
 
 if (date.diffNow('days').days < -1) {
@@ -50,7 +50,10 @@ if (date.diffNow('days').days < -1) {
                 {{ relativeCreatedAt }}
             </span>
         </div>
-        <p v-if="post.body" class="list-col-wrap my-2 ps-3 text-xs">
+        <p
+            v-if="post.body"
+            class="list-col-wrap my-2 ps-3 text-xs whitespace-pre-wrap"
+        >
             {{ post.body }}
         </p>
         <LocationDisplay

@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers\Inertia;
 
-use App\Http\Requests\PostCreateRequest;
+use App\Http\Requests\LocationPostRequest;
+use App\Http\Requests\PostRequest;
 use App\Http\Requests\TransportPostCreateRequest;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\RedirectResponse;
@@ -37,6 +38,11 @@ class PostController extends Controller
         return Inertia::render('NewPostDialog/CreateTransportPost');
     }
 
+    public function createText(): Response|ResponseFactory
+    {
+        return Inertia::render('NewPostDialog/CreateTextPost');
+    }
+
     public function storeTransport(TransportPostCreateRequest $request): RedirectResponse
     {
         $post = $this->postController->storeMotisTransport($request);
@@ -46,9 +52,18 @@ class PostController extends Controller
         ]);
     }
 
-    public function store(PostCreateRequest $request): RedirectResponse
+    public function storeText(PostRequest $request): RedirectResponse
     {
-        $post = $this->postController->store($request);
+        $post = $this->postController->storeText($request);
+
+        return to_route('posts.show', [
+            'postId' => $post->id,
+        ]);
+    }
+
+    public function storeLocation(LocationPostRequest $request): RedirectResponse
+    {
+        $post = $this->postController->storeLocation($request);
 
         return to_route('posts.show', [
             'postId' => $post->id,

@@ -4,24 +4,16 @@ import PostCreationForm from '@/Pages/NewPostDialog/Partials/PostCreationForm.vu
 import { Head, router } from '@inertiajs/vue3';
 import { reactive } from 'vue';
 
-// get url params
-const urlParams = new URLSearchParams(window.location.search);
-
-const emoji = urlParams.get('location[emoji]') || '📍';
-const name = urlParams.get('location[name]') || '';
-const id = urlParams.get('location[id]');
-
 function goBack() {
     window.history.back();
 }
 
 const form = reactive({
     body: '',
-    location: id,
 });
 
 function submitForm() {
-    router.post(route('posts.create.post.store'), form);
+    router.post(route('posts.create.text-post.store'), form);
 }
 </script>
 
@@ -36,8 +28,8 @@ function submitForm() {
         <div class="card bg-base-100 min-w-full shadow-md">
             <form @submit.prevent="submitForm">
                 <PostCreationForm
-                    :name="name"
-                    :emoji="emoji"
+                    name="New Post"
+                    emoji="✍"
                     v-model="form.body"
                     @cancel="goBack"
                 />

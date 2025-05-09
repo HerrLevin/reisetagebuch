@@ -29,14 +29,20 @@ Route::middleware('auth')->group(callback: function () {
 
     Route::prefix('posts')->group(callback: function () {
         Route::get('/create', [PostController::class, 'create'])->name('posts.create.post');
-        Route::get('/transport/create', [PostController::class, 'createTransport'])->name('posts.create.transport-post');
-        Route::post('/transport/create', [PostController::class, 'storeTransport'])->name('posts.create.transport-post.store');
-        Route::post('/create', [PostController::class, 'store'])->name('posts.create.post.store');
-        Route::get('/locations', [LocationController::class, 'nearby'])->name('posts.create.start');
-        Route::get('/departures', [LocationController::class, 'departures'])->name('posts.create.departures');
-        Route::get('/stopovers', [LocationController::class, 'stopovers'])->name('posts.create.stopovers');
-        Route::get('/new', [PostController::class, 'dashboard'])->name('posts.create.text');
+        Route::post('/create', [PostController::class, 'storeText'])->name('posts.create.text-post.store');
+        Route::get('/new', [PostController::class, 'createText'])->name('posts.create.text');
         Route::delete('/{postId}', [PostController::class, 'destroy'])->name('posts.destroy');
+
+        Route::prefix('/transport')->group(callback: function () {
+            Route::get('/departures', [LocationController::class, 'departures'])->name('posts.create.departures');
+            Route::get('/stopovers', [LocationController::class, 'stopovers'])->name('posts.create.stopovers');
+            Route::get('/create', [PostController::class, 'createTransport'])->name('posts.create.transport-post');
+            Route::post('/create', [PostController::class, 'storeTransport'])->name('posts.create.transport-post.store');
+        });
+        Route::prefix('/location')->group(callback: function () {
+            Route::post('/create', [PostController::class, 'storeLocation'])->name('posts.create.post.store');
+            Route::get('/', [LocationController::class, 'nearby'])->name('posts.create.start');
+        });
         // this belongs in an api
         Route::get('/new/prefetch/{latitude}/{longitude}', [BLocationController::class, 'nearby'])->name('posts.create.prefetch');
     });

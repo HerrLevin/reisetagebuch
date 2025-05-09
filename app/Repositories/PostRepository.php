@@ -23,7 +23,7 @@ class PostRepository
         $this->postHydrator = $postHydrator ?? new PostHydrator();
     }
 
-    public function store(User $user, Location $location, ?string $body = null): BasePost|LocationPost|TransportPost
+    public function storeLocation(User $user, Location $location, ?string $body = null): BasePost|LocationPost|TransportPost
     {
         try {
             DB::beginTransaction();
@@ -39,6 +39,25 @@ class PostRepository
             DB::commit();
 
             $post->load('locationPost');
+        } catch (Throwable $e) {
+            DB::rollBack();
+            report($e);
+        }
+
+        return $this->postHydrator->modelToDto($post);
+    }
+
+    public function storeText(User $user, string $body): BasePost|LocationPost|TransportPost
+    {
+        try {
+            DB::beginTransaction();
+            /** @var Post $post */
+            $post = Post::create([
+                'user_id' => $user->id,
+                'body' => $body,
+            ]);
+            DB::commit();
+
         } catch (Throwable $e) {
             DB::rollBack();
             report($e);

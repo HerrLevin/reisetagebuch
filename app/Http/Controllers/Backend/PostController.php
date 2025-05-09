@@ -7,7 +7,8 @@ namespace App\Http\Controllers\Backend;
 use App\Dto\MotisApi\StopDto;
 use App\Dto\PostPaginationDto;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\PostCreateRequest;
+use App\Http\Requests\LocationPostRequest;
+use App\Http\Requests\PostRequest;
 use App\Http\Requests\TransportPostCreateRequest;
 use App\Http\Resources\PostTypes\BasePost;
 use App\Http\Resources\PostTypes\LocationPost;
@@ -32,13 +33,21 @@ class PostController extends Controller
         $this->transitousRequestService = $transitousRequestService;
     }
 
-    public function store(PostCreateRequest $request): BasePost|LocationPost|TransportPost
+    public function storeLocation(LocationPostRequest $request): BasePost|LocationPost|TransportPost
     {
         $location = $this->locationRepository->getLocationById($request->input('location'));
 
-        return $this->postRepository->store(
+        return $this->postRepository->storeLocation(
             $request->user(),
             $location,
+            $request->input('body')
+        );
+    }
+
+    public function storeText(PostRequest $request): BasePost
+    {
+        return $this->postRepository->storeText(
+            $request->user(),
             $request->input('body')
         );
     }
