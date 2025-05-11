@@ -23,7 +23,7 @@ class PostController extends Controller
 
     public function create(): Response|ResponseFactory
     {
-        return Inertia::render('NewPostDialog/CreatePost');
+        return Inertia::render('NewPostDialog/CreateLocationPost');
     }
 
     public function show(string $postId): Response|ResponseFactory
