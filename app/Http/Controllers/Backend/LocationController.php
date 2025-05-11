@@ -8,6 +8,7 @@ use App\Dto\MotisApi\TripDto;
 use App\Http\Controllers\Controller;
 use App\Repositories\LocationRepository;
 use App\Services\TransitousRequestService;
+use Clickbar\Magellan\Data\Geometries\Point;
 use Illuminate\Database\Eloquent\Collection as DbCollection;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Collection;
@@ -23,22 +24,22 @@ class LocationController extends Controller
         $this->transitousRequestService = $transitousRequestService;
     }
 
-    public function nearby(float $latitude, float $longitude): DbCollection|Collection
+    public function nearby(Point $point): DbCollection|Collection
     {
-        if (!$this->locationRepository->recentNearbyRequests($latitude, $longitude)) {
-            $this->locationRepository->createRequestLocation($latitude, $longitude);
-            $this->locationRepository->fetchNearbyLocations($latitude, $longitude);
+        if (!$this->locationRepository->recentNearbyRequests($point)) {
+            $this->locationRepository->createRequestLocation($point);
+            $this->locationRepository->fetchNearbyLocations($point);
         }
 
-        return $this->locationRepository->getNearbyLocations($latitude, $longitude);
+        return $this->locationRepository->getNearbyLocations($point);
     }
 
     /**
      * @throws ConnectionException
      */
-    public function departures(float $latitude, float $longitude): ?DeparturesDto
+    public function departures(Point $point): ?DeparturesDto
     {
-        $stops = $this->transitousRequestService->getNearby($latitude, $longitude);
+        $stops = $this->transitousRequestService->getNearby($point);
         if ($stops->isEmpty()) {
             return null;
         }

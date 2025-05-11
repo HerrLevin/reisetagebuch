@@ -2,19 +2,20 @@
 
 namespace App\Repositories;
 
-use App\Helpers\LocationHelper;
 use App\Models\Location;
 use App\Models\LocationIdentifier;
 use App\Models\RequestLocation;
 use App\Services\OverpassRequestService;
+use Clickbar\Magellan\Data\Geometries\Point;
+use Clickbar\Magellan\Database\PostgisFunctions\ST;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
 
 class LocationRepository
 {
-    public function fetchNearbyLocations(float $latitude, float $longitude): SupportCollection
+    public function fetchNearbyLocations(Point $point): SupportCollection
     {
-        $service = new OverpassRequestService($latitude, $longitude);
+        $service = new OverpassRequestService($point->getLatitude(), $point->getLongitude());
 
         $data = collect();
         foreach ($service->getLocations() as $location) {
@@ -49,37 +50,32 @@ class LocationRepository
         return $data;
     }
 
-    public function createRequestLocation(float $latitude, float $longitude): void
+    public function createRequestLocation(Point $point): void
     {
-        RequestLocation::create([
-            'latitude' => $latitude,
-            'longitude' => $longitude,
-            'last_requested_at' => now(),
-        ]);
+        $requestLocation = new RequestLocation();
+        $requestLocation->location = $point;
+        $requestLocation->last_requested_at = now();
+
+        $requestLocation->save();
     }
 
-    public function recentNearbyRequests(float $latitude, float $longitude): bool
+    public function recentNearbyRequests(Point $position): bool
     {
-        $locations = LocationHelper::nearbyQueryFilter(
-            RequestLocation::class,
-            $latitude,
-            $longitude,
-            50,
-        );
+        $locations = RequestLocation::select()
+            ->addSelect(ST::distanceSphere($position, 'location')->as('distance'))
+            ->where(ST::distanceSphere($position, 'location'), '<=', 50);
+
         $locations->where([['last_requested_at', '>=', now()->subMinutes(30)]]);
         $locations = $locations->get();
 
         return $locations->where('distance', '<=', 50)->isNotEmpty();
     }
 
-    public function getNearbyLocations(float $latitude, float $longitude): Collection|SupportCollection
+    public function getNearbyLocations(Point $position): Collection|SupportCollection
     {
-        return LocationHelper::nearbyQueryFilter(
-            Location::class,
-            $latitude,
-            $longitude,
-            100,
-        )
+        return Location::select()
+            ->addSelect(ST::distanceSphere($position, 'location')->as('distance'))
+            ->where(ST::distanceSphere($position, 'location'), '<=', 100)
             ->where([['name', '!=', '']])
             ->with('tags')
             ->orderByDesc('distance')
@@ -108,12 +104,13 @@ class LocationRepository
 
     public function getOrCreateLocationByIdentifier(
         string $name,
-        float $latitude,
-        float $longitude,
+        float  $latitude,
+        float  $longitude,
         string $identifier,
         string $type,
         string $origin,
-    ): Location {
+    ): Location
+    {
         $location = $this->getLocationByIdentifier($identifier, $type, $origin);
 
         if ($location === null) {
@@ -125,17 +122,17 @@ class LocationRepository
 
     public function createLocation(
         string $name,
-        float $latitude,
-        float $longitude,
+        float  $latitude,
+        float  $longitude,
         string $identifier,
         string $identifierType,
         string $origin
-    ): Location {
-        $location = Location::create([
-            'name' => $name,
-            'latitude' => $latitude,
-            'longitude' => $longitude,
-        ]);
+    ): Location
+    {
+        $location = new Location();
+        $location->name = $name;
+        $location->location = Point::makeGeodetic($latitude, $longitude);
+        $location->save();
 
         $location->identifiers()->create([
             'identifier' => $identifier,

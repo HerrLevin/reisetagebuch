@@ -8,6 +8,7 @@ use App\Dto\MotisApi\StopTimeDto;
 use App\Dto\MotisApi\TripDto;
 use App\Hydrators\MotisHydrator;
 use Carbon\Carbon;
+use Clickbar\Magellan\Data\Geometries\Point;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
@@ -63,13 +64,13 @@ class TransitousRequestService
     }
 
     /**
-     * @param float $latitude
-     * @param float $longitude
+     * @param Point $point
      * @return Collection|StopDto[]
      * @throws ConnectionException
      */
-    public function getNearby(float $latitude, float $longitude): Collection|array {
-        $center = new Coordinate($latitude, $longitude);
+    public function getNearby(Point $point): Collection|array {
+        // TODO: convert to use the new Coordinate class
+        $center = new Coordinate($point->getLatitude(), $point->getLongitude());
         $bbox   = $this->geoService->getBoundingBox($center, 500);
 
         $response = Http::withUserAgent($this->versionService->getUserAgent())->get(self::API_URL . '/map/stops', [

@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\NearbyLocationRequest;
 use App\Http\Requests\StopoverRequest;
 use App\Http\Resources\LocationDto;
+use Clickbar\Magellan\Data\Geometries\Point;
 use Inertia\Response;
 use Inertia\ResponseFactory;
 
@@ -21,7 +22,8 @@ class LocationController extends Controller
 
     public function nearby(NearbyLocationRequest $request): Response|ResponseFactory
     {
-        $locations = $this->locationController->nearby($request->latitude, $request->longitude);
+        $point = Point::makeGeodetic($request->latitude, $request->longitude);
+        $locations = $this->locationController->nearby($point);
 
         return inertia('NewPostDialog/ListLocations', [
             'locations' => $locations->map(fn($location) => new LocationDto($location)),
@@ -32,7 +34,8 @@ class LocationController extends Controller
 
     public function departures(NearbyLocationRequest $request): Response|ResponseFactory
     {
-        $departures = $this->locationController->departures($request->latitude, $request->longitude);
+        $point = Point::makeGeodetic($request->latitude, $request->longitude);
+        $departures = $this->locationController->departures($point);
 
         return inertia('NewPostDialog/ListDepartures', [
             'departures' => $departures,
