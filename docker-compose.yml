@@ -26,7 +26,8 @@ services:
             - redis
             - mailpit
     pgsql:
-        image: 'postgres:17'
+        platform: 'linux/amd64' # Force x86_64 architecture for Postgres, because they don't support arm64 yet
+        image: 'postgis/postgis:17-master'
         ports:
             - '${FORWARD_DB_PORT:-5432}:5432'
         environment:

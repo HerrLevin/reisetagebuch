@@ -8,16 +8,29 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * @property ?string $id
- * @property string $user_id
- * @property ?string $avatar
- * @property ?string $header
- * @property ?string $bio
- * @property ?string $website
+ * 
  *
- * @property-read User $user
- * @property-read Carbon $created_at
- * @property-read Carbon $updated_at
+ * @property string $id
+ * @property string $user_id
+ * @property string|null $avatar
+ * @property string|null $bio
+ * @property string|null $website
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null $header
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile whereAvatar($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile whereBio($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile whereHeader($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile whereWebsite($value)
+ * @mixin \Eloquent
  */
 class Profile extends Model
 {
