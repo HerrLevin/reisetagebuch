@@ -19,8 +19,8 @@ class LocationDto
     public function __construct(Location $location) {
         $this->id = $location->id;
         $this->name = $location->name;
-        $this->latitude = $location->latitude;
-        $this->longitude = $location->longitude;
+        $this->latitude = $location->location->getLatitude();
+        $this->longitude = $location->location->getLongitude();
         $this->distance = $location->distance ?? null;
         $this->tags = $location->tags->map(fn($tag) => new LocationTagDto($tag))->toArray();
     }
