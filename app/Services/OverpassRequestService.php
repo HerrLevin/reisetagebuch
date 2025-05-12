@@ -39,6 +39,7 @@ class OverpassRequestService
             'first_aid_school',
             'kindergarten',
             'language_school',
+            'parcel_locker',
         ],
         'historic',
         'tourism',
