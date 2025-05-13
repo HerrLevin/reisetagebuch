@@ -48,7 +48,9 @@ const linkData = ref({
         <div class="text-3xl">{{ emoji }}</div>
         <div>
             <div>{{ name }}</div>
-            <div class="text-xs uppercase opacity-60"></div>
+            <div v-if="location?.distance" class="text-xs uppercase opacity-60">
+                {{ location!.distance }} m
+            </div>
         </div>
         <!--
         for now, we don't need this button
