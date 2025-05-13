@@ -92,6 +92,7 @@ class LocationRepository
             ->where([['name', '!=', '']])
             ->with('tags')
             ->orderBy('distance')
+            ->limit(100)
             ->get();
     }
 
