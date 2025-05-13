@@ -17,6 +17,7 @@ export type PageProps<
     };
     ziggy: Config & { location: string };
     canRegister: boolean;
+    canInvite: boolean;
 };
 
 export type TripDto = {
@@ -105,4 +106,11 @@ export type UserDto = {
     bio: string | null;
     website: string | null;
     createdAt: string;
+};
+
+export type Invite = {
+    id: string;
+    createdAt: string | null;
+    expiresAt: string | null;
+    usedAt: string | null;
 };

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\LocationController as ApiLocationController;
 use App\Http\Controllers\Inertia\AccountController;
+use App\Http\Controllers\Inertia\InviteController;
 use App\Http\Controllers\Inertia\LocationController;
 use App\Http\Controllers\Inertia\PostController;
 use App\Http\Controllers\Inertia\UserController;
@@ -49,6 +50,9 @@ Route::middleware('auth')->group(callback: function () {
 
     Route::post('profile/{username}', [UserController::class, 'update'])->name('profile.update');
 
+    Route::get('invites', [InviteController::class, 'index'])->name('invites.index');
+    Route::post('invites', [InviteController::class, 'store'])->name('invites.store');
+    Route::delete('invites/{inviteCode}', [InviteController::class, 'destroy'])->name('invites.destroy');
 });
 
 // Public routes
