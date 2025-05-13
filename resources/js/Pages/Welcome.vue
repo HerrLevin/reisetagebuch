@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import InformationCircle from '@/Icons/InformationCircle.vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 
 defineProps<{
-    canLogin?: boolean;
-    canRegister?: boolean;
     reisetagebuchVersion: string;
     laravelVersion: string;
     phpVersion: string;
@@ -25,7 +23,7 @@ defineProps<{
                     <div class="flex lg:col-start-2 lg:justify-center">
                         <ApplicationLogo class="h-12 w-auto lg:h-16" />
                     </div>
-                    <nav v-if="canLogin" class="-mx-3 flex flex-1 justify-end">
+                    <nav class="-mx-3 flex flex-1 justify-end">
                         <Link
                             v-if="$page.props.auth.user"
                             :href="route('dashboard')"
@@ -43,7 +41,7 @@ defineProps<{
                             </Link>
 
                             <Link
-                                v-if="canRegister"
+                                v-if="usePage().props.canRegister"
                                 :href="route('register')"
                                 class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
                             >
