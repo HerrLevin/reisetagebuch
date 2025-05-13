@@ -30,4 +30,12 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'recent_location' => [
+        'radius' => env('APP_RECENT_LOCATION_RADIUS', 200),
+        'timeout' => env('APP_RECENT_LOCATION_TIMEOUT', 30),
+    ],
+
+    'nearby' => [
+        'radius' => env('APP_NEARBY_RADIUS', 500),
+    ],
 ];

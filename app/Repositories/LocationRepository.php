@@ -15,7 +15,7 @@ class LocationRepository
 {
     public function fetchNearbyLocations(Point $point): SupportCollection
     {
-        $service = new OverpassRequestService($point->getLatitude(), $point->getLongitude());
+        $service = new OverpassRequestService($point->getLatitude(), $point->getLongitude(), config('app.nearby.radius'));
 
         $data = collect();
         foreach ($service->getLocations() as $location) {
@@ -61,24 +61,37 @@ class LocationRepository
 
     public function recentNearbyRequests(Point $position): bool
     {
+        $radius = config('app.recent_location.radius');
         $locations = RequestLocation::select()
             ->addSelect(ST::distanceSphere($position, 'location')->as('distance'))
-            ->where(ST::distanceSphere($position, 'location'), '<=', 50);
+            ->where(ST::distanceSphere($position, 'location'), '<=', $radius)
+            ->where(
+                'last_requested_at',
+                '>=',
+                now()->subMinutes(config('app.recent_location.timeout'))
+            );
 
-        $locations->where([['last_requested_at', '>=', now()->subMinutes(30)]]);
-        $locations = $locations->get();
+        return $locations->count() > 0;
+    }
 
-        return $locations->where('distance', '<=', 50)->isNotEmpty();
+    public function deleteOldNearbyRequests(): void
+    {
+        RequestLocation::where(
+            'last_requested_at',
+            '<=',
+            now()->subMinutes(config('app.recent_location.timeout'))
+        )
+            ->delete();
     }
 
     public function getNearbyLocations(Point $position): Collection|SupportCollection
     {
         return Location::select()
             ->addSelect(ST::distanceSphere($position, 'location')->as('distance'))
-            ->where(ST::distanceSphere($position, 'location'), '<=', 100)
+            ->where(ST::distanceSphere($position, 'location'), '<=', config('app.nearby.radius'))
             ->where([['name', '!=', '']])
             ->with('tags')
-            ->orderByDesc('distance')
+            ->orderBy('distance')
             ->get();
     }
 

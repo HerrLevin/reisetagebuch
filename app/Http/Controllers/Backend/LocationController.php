@@ -24,12 +24,18 @@ class LocationController extends Controller
         $this->transitousRequestService = $transitousRequestService;
     }
 
-    public function nearby(Point $point): DbCollection|Collection
+    public function prefetch(Point $point): void
     {
         if (!$this->locationRepository->recentNearbyRequests($point)) {
+            $this->locationRepository->deleteOldNearbyRequests();
             $this->locationRepository->createRequestLocation($point);
             $this->locationRepository->fetchNearbyLocations($point);
         }
+    }
+
+    public function nearby(Point $point): DbCollection|Collection
+    {
+        $this->prefetch($point);
 
         return $this->locationRepository->getNearbyLocations($point);
     }
