@@ -43,6 +43,6 @@ return [
 
     'invite' => [
         'enabled' => env('APP_INVITE_ENABLED', false),
-        'whitelist' => env('APP_INVITE_WHITELIST', ''),
+        'whitelist' => env('APP_INVITE_WHITELIST', '') ? explode(',', env('APP_INVITE_WHITELIST')) : [],
     ],
 ];

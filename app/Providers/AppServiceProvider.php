@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Http\Resources\PostTypes\BasePost;
+use App\Models\Invite;
+use App\Policies\InvitePolicy;
 use App\Policies\PostPolicy;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\App;
@@ -26,5 +28,6 @@ class AppServiceProvider extends ServiceProvider
 
         // Gates
         Gate::policy(BasePost::class, PostPolicy::class);
+        Gate::policy(Invite::class, InvitePolicy::class);
     }
 }

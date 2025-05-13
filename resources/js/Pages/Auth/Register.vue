@@ -11,7 +11,21 @@ const form = useForm({
     email: '',
     password: '',
     password_confirmation: '',
+    invite: '',
 });
+
+const props = defineProps({
+    inviteCode: {
+        type: String,
+        default: null,
+    },
+    invitedBy: {
+        type: String,
+        default: null,
+    },
+});
+
+form.invite = props.inviteCode;
 
 const submit = () => {
     form.post(route('register'), {
@@ -110,6 +124,7 @@ const submit = () => {
                     class="mt-2"
                     :message="form.errors.password_confirmation"
                 />
+                <InputError class="mt-2" :message="form.errors.invite" />
             </div>
 
             <div class="mt-4 flex items-center justify-end">

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ThemeSelector from '@/Layouts/Partials/ThemeSelector.vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 </script>
 
 <template>
@@ -33,6 +33,11 @@ import { Link } from '@inertiajs/vue3';
                 >
                     <li>
                         <Link :href="route('account.edit')">Settings</Link>
+                    </li>
+                    <li v-if="usePage()?.props?.canInvite">
+                        <Link :href="route('invites.index')">
+                            Invite Users
+                        </Link>
                     </li>
                     <li>
                         <Link :href="route('logout')" method="post" as="button">
