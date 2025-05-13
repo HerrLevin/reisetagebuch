@@ -38,4 +38,11 @@ return [
     'nearby' => [
         'radius' => env('APP_NEARBY_RADIUS', 500),
     ],
+
+    'registration' => env('APP_REGISTRATION', true),
+
+    'invite' => [
+        'enabled' => env('APP_INVITE_ENABLED', false),
+        'whitelist' => env('APP_INVITE_WHITELIST', ''),
+    ],
 ];

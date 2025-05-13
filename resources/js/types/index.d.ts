@@ -16,6 +16,7 @@ export type PageProps<
         user: User;
     };
     ziggy: Config & { location: string };
+    canRegister: boolean;
 };
 
 export type TripDto = {

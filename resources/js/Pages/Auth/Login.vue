@@ -3,7 +3,7 @@ import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
 import AuthLayout from '@/Layouts/AuthLayout.vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 
 defineProps<{
     canResetPassword?: boolean;
@@ -97,9 +97,12 @@ const submit = () => {
                 Log in
             </button>
         </form>
-        <div class="mt-4 text-center">
+        <div v-if="usePage().props.canRegister" class="mt-4 text-center">
             Don't have an account yet?
             <Link :href="route('register')" class="link"> Register </Link>
+        </div>
+        <div v-else class="mt-4 text-center">
+            Registration is currently closed.
         </div>
     </AuthLayout>
 </template>
