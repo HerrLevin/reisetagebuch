@@ -73,7 +73,7 @@ const submit = () => {
                     <label class="fieldset-label">
                         <input
                             type="checkbox"
-                            :checked="form.remember"
+                            v-model="form.remember"
                             class="checkbox"
                         />
                         Remember me

@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Backend\LocationController as BLocationController;
+use App\Http\Controllers\Api\LocationController as ApiLocationController;
 use App\Http\Controllers\Inertia\AccountController;
 use App\Http\Controllers\Inertia\LocationController;
 use App\Http\Controllers\Inertia\PostController;
@@ -44,7 +44,7 @@ Route::middleware('auth')->group(callback: function () {
             Route::get('/', [LocationController::class, 'nearby'])->name('posts.create.start');
         });
         // this belongs in an api
-        Route::get('/new/prefetch/{latitude}/{longitude}', [BLocationController::class, 'nearby'])->name('posts.create.prefetch');
+        Route::get('/new/prefetch/{latitude}/{longitude}', [ApiLocationController::class, 'prefetch'])->name('posts.create.prefetch');
     });
 
     Route::get('/home', [PostController::class, 'dashboard'])->name('dashboard');

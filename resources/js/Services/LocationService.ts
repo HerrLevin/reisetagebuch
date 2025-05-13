@@ -5,7 +5,7 @@
 import axios from 'axios';
 
 export class LocationService {
-    private static readonly REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes
+    private static readonly REFRESH_INTERVAL = 30; // 30 Seconds
 
     public static async getPosition(): Promise<GeolocationPosition> {
         const localStoragePosition = this.getFromLocalStorage();
