@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
+import FlashMessages from '@/Components/FlashMessages.vue';
 import NavBar from '@/Layouts/Partials/NavBar.vue';
 import SideMenu from '@/Layouts/Partials/SideMenu.vue';
 import Dock from '@/Pages/Settings/Partials/Dock.vue';
-import FlashMessages from '@/Components/FlashMessages.vue';
+import { Link } from '@inertiajs/vue3';
 </script>
 
 <template>
@@ -12,7 +13,11 @@ import FlashMessages from '@/Components/FlashMessages.vue';
             class="container mx-auto mb-2 max-w-screen-xl grow px-0 pt-0 sm:px-5 md:pt-2"
         >
             <NavBar>
-                <ApplicationLogo class="hidden h-10 w-10 md:inline-block" />
+                <Link as="div" :href="route('dashboard')">
+                    <ApplicationLogo
+                        class="hidden h-10 w-10 cursor-pointer md:inline-block"
+                    />
+                </Link>
                 <a
                     v-if="!$slots.header"
                     class="btn btn-ghost text-xl md:hidden"

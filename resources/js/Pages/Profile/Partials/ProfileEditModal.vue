@@ -4,7 +4,7 @@ import InputLabel from '@/Components/InputLabel.vue';
 import TextArea from '@/Components/TextArea.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { UserDto } from '@/types';
-import { useForm, usePage } from '@inertiajs/vue3';
+import { router, useForm, usePage } from '@inertiajs/vue3';
 import { PropType, ref, useTemplateRef } from 'vue';
 
 const authUser = usePage().props.auth.user;
@@ -24,26 +24,41 @@ const form = useForm({
     name: '',
 });
 
-form.name = authUser.name;
-form.bio = props.user.bio || '';
-form.website = props.user.website || '';
-
 const editModal = useTemplateRef('editModal');
 const avatarInput = ref('');
 const headerInput = ref('');
+
+const resetModal = () => {
+    form.reset();
+    avatarInput.value = '';
+    headerInput.value = '';
+    form.name = props.user.name;
+    form.bio = props.user.bio || '';
+    form.website = props.user.website || '';
+};
+
+const openModal = () => {
+    resetModal();
+    editModal.value?.show();
+};
 
 const submit = () => {
     form.post(route('profile.update', authUser.username), {
         preserveScroll: true,
         onSuccess: () => {
+            resetModal();
             editModal.value?.close();
-            avatarInput.value = '';
+            router.reload();
         },
         onError: () => {
-            // Handle error
-        },
-        onFinish: () => {
-            form.reset();
+            if (form.errors.avatar) {
+                avatarInput.value = '';
+                form.avatar = null;
+            }
+            if (form.errors.header) {
+                headerInput.value = '';
+                form.header = null;
+            }
         },
     });
 };
@@ -67,7 +82,7 @@ const headerUpload = (event: Event) => {
         class="btn rounded-full"
         v-if="user.id === authUser.id"
         type="button"
-        @click="editModal?.show()"
+        @click="openModal()"
     >
         <div class="flex items-center">Edit Profile</div>
     </button>
@@ -136,6 +151,7 @@ const headerUpload = (event: Event) => {
                         @input="avatarUpload"
                     />
                     <label class="label">Max size 2MB</label>
+                    <InputError :message="form.errors.avatar" class="mt-2" />
                 </fieldset>
             </div>
             <div class="">
@@ -149,6 +165,7 @@ const headerUpload = (event: Event) => {
                         @input="headerUpload"
                     />
                     <label class="label">Max size 2MB</label>
+                    <InputError :message="form.errors.header" class="mt-2" />
                 </fieldset>
             </div>
             <div class="modal-action">

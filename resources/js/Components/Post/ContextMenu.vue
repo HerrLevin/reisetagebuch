@@ -2,7 +2,7 @@
 import EllipsisHorizontal from '@/Icons/EllipsisHorizontal.vue';
 import Trash from '@/Icons/Trash.vue';
 import { BasePost } from '@/types/PostTypes';
-import { useForm } from '@inertiajs/vue3';
+import { useForm, usePage } from '@inertiajs/vue3';
 import { PropType, ref, useTemplateRef } from 'vue';
 
 const props = defineProps({
@@ -30,6 +30,10 @@ const deleteUser = () => {
         },
     });
 };
+
+const isSameUser = () => {
+    return props.post.user.id === usePage().props.auth?.user?.id;
+};
 </script>
 
 <template>
@@ -43,14 +47,16 @@ const deleteUser = () => {
         <ul
             class="menu dropdown-content bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
         >
-            <li><a>Edit</a></li>
-            <li class="mx-0 border-b-1"></li>
-            <li>
-                <a @click.prevent="deleteModal?.showModal()">
-                    <Trash class="size-4" />
-                    <span class="text-red-500">Delete</span>
-                </a>
-            </li>
+            <template v-if="isSameUser()">
+                <li><a>Edit</a></li>
+                <li class="mx-0 border-b-1"></li>
+                <li>
+                    <a @click.prevent="deleteModal?.showModal()">
+                        <Trash class="size-4" />
+                        <span class="text-red-500">Delete</span>
+                    </a>
+                </li>
+            </template>
         </ul>
     </details>
     <dialog ref="deleteModal" class="modal">
