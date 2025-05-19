@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\Location;
 use App\Models\LocationIdentifier;
 use App\Models\RequestLocation;
+use App\Services\OsmNameService;
 use App\Services\OverpassRequestService;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Clickbar\Magellan\Database\PostgisFunctions\ST;
@@ -13,12 +14,24 @@ use Illuminate\Support\Collection as SupportCollection;
 
 class LocationRepository
 {
+    private OsmNameService $osmNameService;
+
+    public function __construct(OsmNameService $osmNameService)
+    {
+        $this->osmNameService = $osmNameService;
+    }
+
     public function fetchNearbyLocations(Point $point): SupportCollection
     {
         $service = new OverpassRequestService($point->getLatitude(), $point->getLongitude(), config('app.nearby.radius'));
 
         $data = collect();
         foreach ($service->getLocations() as $location) {
+            $name = $this->osmNameService->getName($location);
+            if ($name === null) {
+                continue;
+            }
+
             $identifier = LocationIdentifier::where([
                 ['type', '=', $location->osmType],
                 ['identifier', '=', $location->osmId],
@@ -28,7 +41,7 @@ class LocationRepository
 
             if ($dbLocation === null) {
                 $dbLocation = $this->createLocation(
-                    $location->name,
+                    $name,
                     $location->latitude,
                     $location->longitude,
                     $location->osmId,

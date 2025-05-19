@@ -66,8 +66,13 @@ const osmCategoryToEmoji: Record<string, Record<string, string>> = {
         driving_school: '🚦',
         nursing_home: '🏡',
         childcare: '👶',
+        kindergarten: '👶',
         hunting_stand: '🏹',
         college: '🎓',
+        car_sharing: '🚗',
+        community_centre: '🏢',
+        research_institute: '🔬',
+        school: '🏫',
     },
     shop: {
         supermarket: '🛒',
@@ -131,6 +136,11 @@ const osmCategoryToEmoji: Record<string, Record<string, string>> = {
     office: {
         lawyer: '⚖️',
     },
+    boundary: {
+        administrative: '🏛️',
+        national_park: '🏞️',
+        protected_area: '🛡️',
+    },
 };
 
 const fallbackEmojis: Record<string, string> = {
@@ -141,6 +151,7 @@ const fallbackEmojis: Record<string, string> = {
     historic: '🗽',
     public_transport: '🚏',
     office: '🧑‍💻',
+    boundary: '🏛️',
 };
 
 export function osmCategoryToEmojiMapper(

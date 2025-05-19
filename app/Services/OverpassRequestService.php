@@ -13,34 +13,27 @@ class OverpassRequestService
     private float $longitude;
     private int $radius;
     private Client $client;
+    private const array EXCLUDE = [
+        'amenity' => [
+            'waste_basket',
+            'bicycle_parking',
+            'bench',
+            'lounger',
+            'trolley_bay',
+            'vending_machine',
+            'clock',
+            'telephone',
+            'parking_entrance',
+            'loading_dock',
+            'recycling',
+            'parking_space',
+
+        ]
+    ];
     private const array FILTERS = [
+        'amenity',
         'place' => ['village'],
         'admin_level' => ['2','4','8', '9', '10', '11'],
-        'amenity' => [
-            'cafe',
-            'bank',
-            'pub',
-            'bar',
-            'biergarten',
-            'restaurant',
-            'fast_food',
-            'food_court',
-            'ice_cream',
-            'pharmacy',
-            'doctors',
-            'clinic',
-            'library',
-            'toilets',
-            'fountain',
-            'lounge',
-            'college',
-            'dancing_school',
-            'driving_school',
-            'first_aid_school',
-            'kindergarten',
-            'language_school',
-            'parcel_locker',
-        ],
         'historic',
         'tourism',
         'office',
@@ -73,22 +66,47 @@ class OverpassRequestService
         $this->client = new Client();
     }
 
+    private function getExcludes(string $key): string
+    {
+        if (!isset(static::EXCLUDE[$key])) {
+            return '';
+        }
+        $excludes = static::EXCLUDE[$key] ?? [];
+
+        $string = '';
+        foreach ($excludes as $exclude) {
+            $string .= sprintf('["%s"!~"%s"]', $key, $exclude);
+        }
+
+        return $string;
+    }
+
     private function getQuery(): string
     {
         $query = "[out:json][timeout:25];(";
         foreach (static::FILTERS as $key => $filter) {
             if (is_array($filter)) {
                 $filters = implode('|', $filter);
+                $excludes = $this->getExcludes($key);
                 $query .= sprintf(
-                    'nwr(around:%d,%f,%f)["%s"~"%s"]["name"];',
+                    'nwr(around:%d,%f,%f)["%s"~"%s"]%s;',
                     $this->radius,
                     $this->latitude,
                     $this->longitude,
                     $key,
-                    $filters
+                    $filters,
+                    $excludes
                 );
             } else {
-                $query .= "nwr(around:$this->radius,$this->latitude,$this->longitude)[\"$filter\"][\"name\"];";
+                $excludes = $this->getExcludes($filter);
+                $query .= sprintf(
+                    'nwr(around:%d,%f,%f)["%s"]%s;',
+                    $this->radius,
+                    $this->latitude,
+                    $this->longitude,
+                    $filter,
+                    $excludes
+                );
             }
         }
 
@@ -119,10 +137,9 @@ class OverpassRequestService
         $response = $this->getElements();
 
         foreach ($response['elements'] as $element) {
-            if (in_array($element['type'], ['node', 'way', 'relation']) && isset($element['tags']['name'])) {
+            if (in_array($element['type'], ['node', 'way', 'relation'])) {
                 yield new OverpassLocation(
                     osmId: $element['id'],
-                    name: $element['tags']['name'] ?? '',
                     latitude: $element['lat'] ?? $element['center']['lat'] ?? 0,
                     longitude: $element['lon'] ?? $element['center']['lon'] ?? 0,
                     osmType: $element['type'],
