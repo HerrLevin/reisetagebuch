@@ -35,7 +35,7 @@ class LocationController extends Controller
     public function departures(NearbyLocationRequest $request): Response|ResponseFactory
     {
         $point = Point::makeGeodetic($request->latitude, $request->longitude);
-        $departures = $this->locationController->departures($point);
+        $departures = $this->locationController->departures($point, now());
 
         return inertia('NewPostDialog/ListDepartures', [
             'departures' => $departures,

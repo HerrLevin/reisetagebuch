@@ -15,12 +15,12 @@ class TransportPost extends BasePost
     public string $mode;
     public string $line;
 
-    public function __construct(Post $post, UserDto $userDto){
+    public function __construct(Post $post, UserDto $userDto) {
         parent::__construct($post, $userDto);
         $this->start = new LocationDto($post->transportPost->origin);
         $this->stop = new LocationDto($post->transportPost->destination);
-        $this->start_time = $post->transportPost->departure;
-        $this->stop_time = $post->transportPost->arrival;
+        $this->start_time = $post->transportPost->departure->toIso8601String();
+        $this->stop_time = $post->transportPost->arrival->toIso8601String();
         $this->mode = $post->transportPost->mode;
         $this->line = $post->transportPost->line;
     }

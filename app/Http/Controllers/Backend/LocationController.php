@@ -8,6 +8,7 @@ use App\Dto\MotisApi\TripDto;
 use App\Http\Controllers\Controller;
 use App\Repositories\LocationRepository;
 use App\Services\TransitousRequestService;
+use Carbon\Carbon;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Illuminate\Database\Eloquent\Collection as DbCollection;
 use Illuminate\Http\Client\ConnectionException;
@@ -43,7 +44,7 @@ class LocationController extends Controller
     /**
      * @throws ConnectionException
      */
-    public function departures(Point $point): ?DeparturesDto
+    public function departures(Point $point, Carbon $time): ?DeparturesDto
     {
         $stops = $this->transitousRequestService->getNearby($point);
         if ($stops->isEmpty()) {
@@ -56,7 +57,7 @@ class LocationController extends Controller
         $firstStop = $stops->first();
         return new DeparturesDto(
             stop: $firstStop,
-            departures: $this->transitousRequestService->getDepartures($firstStop->stopId, now())
+            departures: $this->transitousRequestService->getDepartures($firstStop->stopId, $time)
         );
     }
 

@@ -9,13 +9,13 @@ use App\Models\Invite;
 
 class InviteHydrator
 {
-    public function modelToDto(Invite $user): InviteDto
+    public function modelToDto(Invite $invite): InviteDto
     {
         $dto = new InviteDto();
-        $dto->id = $user->id;
-        $dto->createdAt = $user->created_at?->toIso8601String();
-        $dto->expiresAt = $user->expires_at?->toIso8601String();
-        $dto->usedAt = $user->used_at?->toIso8601String();
+        $dto->id = $invite->id;
+        $dto->createdAt = $invite->created_at?->toIso8601String();
+        $dto->expiresAt = $invite->expires_at?->toIso8601String();
+        $dto->usedAt = $invite->used_at?->toIso8601String();
 
         return $dto;
     }

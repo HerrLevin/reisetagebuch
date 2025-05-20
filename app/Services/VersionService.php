@@ -1,22 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use Exception;
 
 class VersionService
 {
-    public function getVersion() {
+    public function getVersion()
+    {
         $version = config('app.version');
         if (empty($version)) {
             $git = $this->getCurrentGitCommit();
             $version = $git ? substr($git, 0, 5) : 'unknown';
         }
+
         return $version;
     }
 
-
-    public function getUserAgent(): string {
+    public function getUserAgent(): string
+    {
         $version = $this->getVersion();
         return sprintf(
             '%s/%s (%s; bot; contact: %s)',
@@ -27,22 +31,31 @@ class VersionService
         );
     }
 
+    public function getCurrentGitCommit(): ?string
+    {
+        $head = $this->getGitHead();
+        if (!$head) {
+            return null;
+        }
 
-    private function getCurrentGitCommit(): bool|string {
         try {
-            if ($hash = @file_get_contents(base_path() . '/.git/' . $this->getGitHead())) {
+            $hash = file_get_contents(base_path() . '/.git/' . $this->getGitHead());
+            if ($hash) {
                 return $hash;
             }
         } catch (Exception $exception) {
             report($exception);
         }
-        return false;
+
+        return null;
     }
 
-    private function getGitHead(): bool|string {
-    if ($head = @file_get_contents(base_path() . '/.git/HEAD')) {
-        return substr($head, 5, -1);
+    public function getGitHead(): ?string
+    {
+        if ($head = file_get_contents(base_path() . '/.git/HEAD')) {
+            return substr($head, 5, -1);
+        }
+
+        return null;
     }
-    return false;
-}
 }

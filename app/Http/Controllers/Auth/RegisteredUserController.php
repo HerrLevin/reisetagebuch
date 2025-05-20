@@ -34,7 +34,7 @@ class RegisteredUserController extends Controller
 
         $invite = null;
         if (!config('app.registration') && config('app.invite.enabled')) {
-            $invite = $this->inviteRepository->getAvailableInviteById($request->invite);
+            $invite = $request->invite ? $this->inviteRepository->getAvailableInviteById($request->invite) : null;
 
             if (empty($invite)) {
                 abort(404, __('Invite code not found or expired.'));
