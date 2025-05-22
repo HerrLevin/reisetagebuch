@@ -1,17 +1,11 @@
 <script setup lang="ts">
+import InfiniteScroller from '@/Components/InfiniteScroller.vue';
 import Post from '@/Components/Post/Post.vue';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import AvatarMenu from '@/Pages/Profile/Partials/AvatarMenu.vue';
-import Banner from '@/Pages/Profile/Partials/Banner.vue';
-import BioText from '@/Pages/Profile/Partials/BioText.vue';
-import BottomInfo from '@/Pages/Profile/Partials/BottomInfo.vue';
-import ProfileMenu from '@/Pages/Profile/Partials/ProfileMenu.vue';
-import Statistics from '@/Pages/Profile/Partials/Statistics.vue';
+import ProfileWrapper from '@/Pages/Profile/ProfileWrapper.vue';
 import type { UserDto } from '@/types';
 import type { BasePost, LocationPost, TransportPost } from '@/types/PostTypes';
 import { Head, Link } from '@inertiajs/vue3';
 import type { PropType } from 'vue';
-import InfiniteScroller from '@/Components/InfiniteScroller.vue';
 
 defineProps({
     posts: {
@@ -38,28 +32,7 @@ defineProps({
 <template>
     <Head title="Profile" />
 
-    <AuthenticatedLayout>
-        <template #header>
-            <h2 class="text-xl leading-tight font-semibold">Profile</h2>
-        </template>
-        <Banner :src="user.header || ''" />
-
-        <div class="mb-4 space-y-1 px-5 md:px-0">
-            <AvatarMenu :user="user" />
-            <div class="-mt-1">
-                <div class="flex items-center">
-                    <h3 class="truncate text-2xl font-bold">{{ user.name }}</h3>
-                </div>
-                <div class="flex items-center space-x-3">
-                    <span class="text-sm">@{{ user.username }}</span>
-                </div>
-            </div>
-            <Statistics :user="user" />
-            <BioText :user="user" />
-            <BottomInfo :user="user" />
-            <ProfileMenu />
-        </div>
-
+    <ProfileWrapper :user="user">
         <div class="card bg-base-100 min-w-full shadow-md">
             <ul class="list" v-if="posts.length > 0">
                 <li v-for="post in posts" :key="post.id">
@@ -74,5 +47,5 @@ defineProps({
             </ul>
             <InfiniteScroller :only="['posts']" />
         </div>
-    </AuthenticatedLayout>
+    </ProfileWrapper>
 </template>

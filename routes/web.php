@@ -58,6 +58,9 @@ Route::middleware('auth')->group(callback: function () {
 // Public routes
 Route::get('posts/{postId}', [PostController::class, 'show'])->name('posts.show');
 Route::get('profile/{username}', [UserController::class, 'show'])->name('profile.show');
+Route::get('profile/{username}/map', [UserController::class, 'showMap'])->name('profile.map');
+Route::get('profile/{username}/map-data', [UserController::class, 'mapData'])->name('profile.mapdata');
+
 Route::middleware('cache.headers:public;max_age=2628000;etag')->get('/files/{path}', function ($path) {
     $disk = Storage::disk('public');
     if ($disk->exists($path)) {
