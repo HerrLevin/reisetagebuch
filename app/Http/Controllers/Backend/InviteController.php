@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreInviteCodeRequest;
-use App\Models\Invite;
 use App\Repositories\InviteRepository;
 
 class InviteController extends Controller
@@ -16,18 +14,16 @@ class InviteController extends Controller
         $this->inviteRepository = $inviteRepository;
     }
 
-    public function index(): array
+    public function index(string $userId): array
     {
-        $this->authorize('create', Invite::class);
-
-        return $this->inviteRepository->getAllInvitesForUser(auth()->user()->id);
+        return $this->inviteRepository->getAllInvitesForUser($userId);
     }
 
-    public function store(StoreInviteCodeRequest $request): void
+    public function store(string $userId, ?string $expiresAt = null): void
     {
         $this->inviteRepository->createInvite(
-            auth()->user()->id,
-            $request->input('expires_at')
+            $userId,
+            $expiresAt
         );
     }
 
