@@ -15,7 +15,6 @@ export class LocationService {
 
         const position = await this.getCurrentPosition();
         this.saveToLocalStorage(position);
-        this.prefetchLocationData(position);
         return position;
     }
 

@@ -17,6 +17,10 @@ onMounted(() => {
     LocationService.getPosition().then((position) => {
         latitude.value = position.coords.latitude;
         longitude.value = position.coords.longitude;
+
+        if (!isVenueRoute() && !isDeparturesRoute()) {
+            LocationService.prefetchLocationData(position);
+        }
     });
 });
 
