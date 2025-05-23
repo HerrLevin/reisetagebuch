@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 
 /**
- * 
+ *
  *
  * @property string $id
  * @property string $user_id
@@ -35,7 +35,7 @@ class Post extends Model
 {
     use HasUuids;
 
-    protected $fillable = ['user_id', 'body', 'published_at'];
+    protected $fillable = ['user_id', 'body', 'published_at', 'created_at'];
 
     protected $casts = [
         'published_at' => 'datetime',

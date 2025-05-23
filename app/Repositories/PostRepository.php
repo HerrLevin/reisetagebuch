@@ -6,6 +6,7 @@ use App\Dto\PostPaginationDto;
 use App\Http\Resources\PostTypes\BasePost;
 use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
+use App\Http\Resources\UserDto;
 use App\Hydrators\PostHydrator;
 use App\Models\Location;
 use App\Models\Post;
@@ -23,15 +24,21 @@ class PostRepository
         $this->postHydrator = $postHydrator ?? new PostHydrator();
     }
 
-    public function storeLocation(User $user, Location $location, ?string $body = null): BasePost|LocationPost|TransportPost
+    public function storeLocation(User|UserDto $user, Location $location, ?string $body = null, ?Carbon $createdAt = null): BasePost|LocationPost|TransportPost
     {
         try {
             DB::beginTransaction();
             /** @var Post $post */
-            $post = Post::create([
+            $postData = [
                 'user_id' => $user->id,
                 'body' => $body,
-            ]);
+            ];
+
+            if ($createdAt) {
+                $postData['created_at'] = $createdAt;
+            }
+
+            $post = Post::create($postData);
             // create location post
             $post->locationPost()->create([
                 'location_id' => $location->id,
