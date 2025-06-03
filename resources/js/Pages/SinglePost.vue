@@ -11,6 +11,8 @@ import {
     TransportPost,
 } from '@/types/PostTypes';
 import { Head } from '@inertiajs/vue3';
+import axios from 'axios';
+import { GeometryCollection } from 'geojson';
 import { LngLat } from 'maplibre-gl';
 import { PropType, ref } from 'vue';
 
@@ -26,6 +28,7 @@ const goBack = () => {
 };
 const startPoint = ref(null as LngLat | null);
 const endPoint = ref(null as LngLat | null);
+const lineString = ref(null as GeometryCollection | null);
 
 if (isLocationPost(props.post)) {
     startPoint.value = new LngLat(
@@ -41,6 +44,20 @@ if (isLocationPost(props.post)) {
         (props.post as TransportPost).destinationStop.location.longitude ?? 9,
         (props.post as TransportPost).destinationStop.location.latitude ?? 49,
     );
+
+    axios
+        .get(
+            '/posts/linestring/' +
+                props.post.originStop.id +
+                '/' +
+                props.post.destinationStop.id,
+        )
+        .then((response) => {
+            lineString.value = response.data;
+        })
+        .catch(() => {
+            lineString.value = null;
+        });
 } else {
     startPoint.value = null;
     endPoint.value = null;
@@ -79,6 +96,7 @@ if (props.post.body) {
                 v-if="startPoint"
                 :start-point="startPoint"
                 :end-point="endPoint"
+                :line-string="lineString"
             ></Map>
             <div class="p-4">
                 <ul class="list">
