@@ -4,6 +4,7 @@ import {
     MglGeoJsonSource,
     MglLineLayer,
     MglMap,
+    MglNavigationControl,
     MglRasterLayer,
     MglRasterSource,
 } from '@indoorequal/vue-maplibre-gl';
@@ -124,6 +125,23 @@ watch(
                 ],
             } as FeatureCollection;
         }
+
+        const mapBounds = new LngLatBounds();
+        geoJsonSource.value.features.forEach((feature) => {
+            if (feature.geometry.type === 'Point') {
+                mapBounds.extend(
+                    new LngLat(
+                        feature.geometry.coordinates[0],
+                        feature.geometry.coordinates[1],
+                    ),
+                );
+            } else if (feature.geometry.type === 'LineString') {
+                feature.geometry.coordinates.forEach((coordinate) => {
+                    mapBounds.extend(new LngLat(coordinate[0], coordinate[1]));
+                });
+            }
+        });
+        bounds.value = mapBounds;
     },
     { immediate: true },
 );
@@ -135,14 +153,18 @@ watch(
         :center="startPoint"
         :zoom="zoom"
         :max-zoom="18"
-        height="25vh"
-        :scroll-zoom="false"
+        height="50vh"
         :bounds="bounds"
         :fit-bounds-options="{
-            padding: 20,
+            padding: 40,
             maxZoom: 16,
         }"
     >
+        <mgl-navigation-control
+            position="top-right"
+            :show-zoom="true"
+            :show-compass="true"
+        />
         <mgl-raster-source
             source-id="raster-source"
             :tiles="osmTiles"
