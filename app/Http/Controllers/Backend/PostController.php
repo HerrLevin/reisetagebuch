@@ -18,7 +18,6 @@ use App\Repositories\LocationRepository;
 use App\Repositories\PostRepository;
 use App\Repositories\TransportTripRepository;
 use App\Services\TransitousRequestService;
-use Carbon\Carbon;
 use Illuminate\Auth\Access\AuthorizationException;
 
 class PostController extends Controller
@@ -92,13 +91,9 @@ class PostController extends Controller
 
         return $this->postRepository->storeTransport(
             $request->user(),
-            $startStopover->location,
-            Carbon::parse($request->startTime),
-            $stopStopover->location,
-            Carbon::parse($request->stopTime),
-            $trip->mode,
-            $trip->line_name,
-            $request->body
+            $trip,
+            $startStopover,
+            $stopStopover,
         );
     }
 
