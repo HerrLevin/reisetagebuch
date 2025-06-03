@@ -23,7 +23,7 @@ function sharePost(): void {
     if (isLocationPost(props.post)) {
         postText = `Check out ${props.post.user.name}'s post at ${props.post.location.name}!`;
     } else if (isTransportPost(props.post)) {
-        postText = `Check out ${props.post.user.name}'s travel from ${props.post.start.name} to ${props.post.stop.name}`;
+        postText = `Check out ${props.post.user.name}'s travel from ${props.post.originStop.location.name} to ${props.post.originStop.location.name}`;
     }
     const shareData = {
         title: 'Post',

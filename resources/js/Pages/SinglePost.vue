@@ -34,12 +34,12 @@ if (isLocationPost(props.post)) {
     );
 } else if (isTransportPost(props.post)) {
     startPoint.value = new LngLat(
-        (props.post as TransportPost).start?.longitude ?? 9,
-        (props.post as TransportPost).start?.latitude ?? 49,
+        (props.post as TransportPost).originStop.location.longitude ?? 9,
+        (props.post as TransportPost).originStop.location.latitude ?? 49,
     );
     endPoint.value = new LngLat(
-        (props.post as TransportPost).stop?.longitude ?? 9,
-        (props.post as TransportPost).stop?.latitude ?? 49,
+        (props.post as TransportPost).destinationStop.location.longitude ?? 9,
+        (props.post as TransportPost).destinationStop.location.latitude ?? 49,
     );
 } else {
     startPoint.value = null;
@@ -49,7 +49,7 @@ let head = `${props.post.user.name}'s post`;
 if (isLocationPost(props.post)) {
     head = `${props.post.user.name}'s post at ${props.post.location.name}`;
 } else if (isTransportPost(props.post)) {
-    head = `${props.post.user.name}'s travel from ${props.post.start.name} to ${props.post.stop.name}`;
+    head = `${props.post.user.name}'s travel from ${props.post.originStop.location.name} to ${props.post.destinationStop.location.name}`;
 }
 if (props.post.body) {
     head += `: ${props.post.body}`;
