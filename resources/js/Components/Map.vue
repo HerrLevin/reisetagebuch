@@ -7,14 +7,14 @@ import {
     MglRasterLayer,
     MglRasterSource,
 } from '@indoorequal/vue-maplibre-gl';
-import type { Feature, FeatureCollection } from 'geojson';
+import type { Feature, FeatureCollection, GeometryCollection } from 'geojson';
 import {
     LngLat,
     LngLatBounds,
     LngLatBoundsLike,
     StyleSpecification,
 } from 'maplibre-gl';
-import { PropType, ref } from 'vue';
+import { PropType, ref, watch } from 'vue';
 
 const props = defineProps({
     startPoint: {
@@ -24,6 +24,11 @@ const props = defineProps({
     },
     endPoint: {
         type: Object as PropType<LngLat | null>,
+        default: null,
+        required: false,
+    },
+    lineString: {
+        type: Object as PropType<GeometryCollection | null>,
         default: null,
         required: false,
     },
@@ -49,24 +54,7 @@ if (props.startPoint && props.endPoint) {
 } else {
     bounds.value = undefined;
 }
-const geoJsonSource = ref({
-    type: 'FeatureCollection',
-    features: [
-        {
-            type: 'Feature',
-            properties: {},
-            geometry: {
-                type: 'LineString',
-                coordinates: [
-                    [props.startPoint.lng, props.startPoint.lat],
-                    ...(props.endPoint
-                        ? [[props.endPoint.lng, props.endPoint.lat]]
-                        : []),
-                ],
-            },
-        },
-    ],
-} as FeatureCollection);
+const geoJsonSource = ref(null as FeatureCollection | null);
 const geoJsonA = ref({
     type: 'FeatureCollection',
     features: [],
@@ -96,6 +84,49 @@ if (props.endPoint) {
         getPointFeature(props.endPoint.lng, props.endPoint.lat),
     );
 }
+
+// watch props.lineString to update geoJsonSource
+watch(
+    () => props.lineString,
+    (newLineString) => {
+        if (newLineString) {
+            console.log(
+                'Updating geoJsonSource with new lineString:',
+                newLineString,
+            );
+            geoJsonSource.value = {
+                type: 'FeatureCollection',
+                features: [
+                    {
+                        type: 'Feature',
+                        properties: {},
+                        geometry: newLineString,
+                    },
+                ],
+            };
+        } else {
+            geoJsonSource.value = {
+                type: 'FeatureCollection',
+                features: [
+                    {
+                        type: 'Feature',
+                        properties: {},
+                        geometry: {
+                            type: 'LineString',
+                            coordinates: [
+                                [props.startPoint.lng, props.startPoint.lat],
+                                ...(props.endPoint
+                                    ? [[props.endPoint.lng, props.endPoint.lat]]
+                                    : []),
+                            ],
+                        },
+                    },
+                ],
+            } as FeatureCollection;
+        }
+    },
+    { immediate: true },
+);
 </script>
 
 <template>
@@ -121,10 +152,14 @@ if (props.endPoint) {
         >
             <mgl-raster-layer layer-id="raster-layer" />
         </mgl-raster-source>
-        <mgl-geo-json-source :data="geoJsonSource" source-id="geojson">
+        <mgl-geo-json-source
+            v-if="geoJsonSource"
+            :data="geoJsonSource"
+            source-id="geoJson"
+        >
             <mgl-line-layer
                 layer-id="line"
-                :source-id="'geojson'"
+                :source-id="'geoJson'"
                 :layout="{
                     'line-cap': 'round',
                     'line-join': 'round',

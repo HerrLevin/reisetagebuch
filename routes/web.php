@@ -6,6 +6,8 @@ use App\Http\Controllers\Inertia\InviteController;
 use App\Http\Controllers\Inertia\LocationController;
 use App\Http\Controllers\Inertia\PostController;
 use App\Http\Controllers\Inertia\UserController;
+use App\Models\TransportTripStop;
+use Clickbar\Magellan\Data\Geometries\LineString;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -44,6 +46,26 @@ Route::middleware('auth')->group(callback: function () {
         });
         // this belongs in an api
         Route::get('/new/prefetch/{latitude}/{longitude}', [ApiLocationController::class, 'prefetch'])->name('posts.create.prefetch');
+        Route::get('/linestring/{from}/{to}', function ($from, $to) {
+            // Todo: PLEASE REFACTOR THIS AND DONT USE THIS IN PRODUCTION
+            $start = TransportTripStop::whereId($from)->first();
+            $end = TransportTripStop::whereId($to)->first();
+
+            // get all stops between the two stops
+            $stops = TransportTripStop::whereBetween('stop_sequence', [$start->stop_sequence, $end->stop_sequence])
+                ->where('transport_trip_id', $start->transport_trip_id)
+                ->orderBy('id')
+                ->get();
+
+            $points = $stops->map(function ($stop) {
+                /** @var TransportTripStop $stop */
+                return $stop->location->location;
+            });
+
+            $linestring = LineString::make($points->toArray());
+
+            return response()->json($linestring);
+        });
     });
 
     Route::get('/home', [PostController::class, 'dashboard'])->name('dashboard');
