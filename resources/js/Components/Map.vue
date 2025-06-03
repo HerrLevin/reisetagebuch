@@ -4,17 +4,18 @@ import {
     MglGeoJsonSource,
     MglLineLayer,
     MglMap,
+    MglNavigationControl,
     MglRasterLayer,
     MglRasterSource,
 } from '@indoorequal/vue-maplibre-gl';
-import type { Feature, FeatureCollection } from 'geojson';
+import type { Feature, FeatureCollection, GeometryCollection } from 'geojson';
 import {
     LngLat,
     LngLatBounds,
     LngLatBoundsLike,
     StyleSpecification,
 } from 'maplibre-gl';
-import { PropType, ref } from 'vue';
+import { PropType, ref, watch } from 'vue';
 
 const props = defineProps({
     startPoint: {
@@ -24,6 +25,11 @@ const props = defineProps({
     },
     endPoint: {
         type: Object as PropType<LngLat | null>,
+        default: null,
+        required: false,
+    },
+    lineString: {
+        type: Object as PropType<GeometryCollection | null>,
         default: null,
         required: false,
     },
@@ -49,24 +55,7 @@ if (props.startPoint && props.endPoint) {
 } else {
     bounds.value = undefined;
 }
-const geoJsonSource = ref({
-    type: 'FeatureCollection',
-    features: [
-        {
-            type: 'Feature',
-            properties: {},
-            geometry: {
-                type: 'LineString',
-                coordinates: [
-                    [props.startPoint.lng, props.startPoint.lat],
-                    ...(props.endPoint
-                        ? [[props.endPoint.lng, props.endPoint.lat]]
-                        : []),
-                ],
-            },
-        },
-    ],
-} as FeatureCollection);
+const geoJsonSource = ref(null as FeatureCollection | null);
 const geoJsonA = ref({
     type: 'FeatureCollection',
     features: [],
@@ -96,6 +85,66 @@ if (props.endPoint) {
         getPointFeature(props.endPoint.lng, props.endPoint.lat),
     );
 }
+
+// watch props.lineString to update geoJsonSource
+watch(
+    () => props.lineString,
+    (newLineString) => {
+        if (newLineString) {
+            console.log(
+                'Updating geoJsonSource with new lineString:',
+                newLineString,
+            );
+            geoJsonSource.value = {
+                type: 'FeatureCollection',
+                features: [
+                    {
+                        type: 'Feature',
+                        properties: {},
+                        geometry: newLineString,
+                    },
+                ],
+            };
+        } else {
+            geoJsonSource.value = {
+                type: 'FeatureCollection',
+                features: [
+                    {
+                        type: 'Feature',
+                        properties: {},
+                        geometry: {
+                            type: 'LineString',
+                            coordinates: [
+                                [props.startPoint.lng, props.startPoint.lat],
+                                ...(props.endPoint
+                                    ? [[props.endPoint.lng, props.endPoint.lat]]
+                                    : []),
+                            ],
+                        },
+                    },
+                ],
+            } as FeatureCollection;
+        }
+
+        const mapBounds = new LngLatBounds();
+        geoJsonSource.value.features.forEach((feature) => {
+            if (feature.geometry.type === 'Point') {
+                mapBounds.extend(
+                    new LngLat(
+                        feature.geometry.coordinates[0],
+                        feature.geometry.coordinates[1],
+                    ),
+                );
+            } else if (feature.geometry.type === 'LineString') {
+                feature.geometry.coordinates.forEach((coordinate) => {
+                    mapBounds.extend(new LngLat(coordinate[0], coordinate[1]));
+                });
+            }
+        });
+        bounds.value = mapBounds;
+    },
+    { immediate: true },
+);
 </script>
 
 <template>
@@ -104,14 +153,18 @@ if (props.endPoint) {
         :center="startPoint"
         :zoom="zoom"
         :max-zoom="18"
-        height="25vh"
-        :scroll-zoom="false"
+        height="50vh"
         :bounds="bounds"
         :fit-bounds-options="{
-            padding: 20,
+            padding: 40,
             maxZoom: 16,
         }"
     >
+        <mgl-navigation-control
+            position="top-right"
+            :show-zoom="true"
+            :show-compass="true"
+        />
         <mgl-raster-source
             source-id="raster-source"
             :tiles="osmTiles"
@@ -121,10 +174,14 @@ if (props.endPoint) {
         >
             <mgl-raster-layer layer-id="raster-layer" />
         </mgl-raster-source>
-        <mgl-geo-json-source :data="geoJsonSource" source-id="geojson">
+        <mgl-geo-json-source
+            v-if="geoJsonSource"
+            :data="geoJsonSource"
+            source-id="geoJson"
+        >
             <mgl-line-layer
                 layer-id="line"
-                :source-id="'geojson'"
+                :source-id="'geoJson'"
                 :layout="{
                     'line-cap': 'round',
                     'line-join': 'round',
