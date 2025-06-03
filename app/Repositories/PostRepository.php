@@ -9,8 +9,9 @@ use App\Http\Resources\PostTypes\TransportPost;
 use App\Hydrators\PostHydrator;
 use App\Models\Location;
 use App\Models\Post;
+use App\Models\TransportTrip;
+use App\Models\TransportTripStop;
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
@@ -68,12 +69,9 @@ class PostRepository
 
     public function storeTransport(
         User     $user,
-        Location $start,
-        Carbon   $startTime,
-        Location $stop,
-        Carbon   $stopTime,
-        string   $mode,
-        string   $line,
+        TransportTrip $transportTrip,
+        TransportTripStop $originStop,
+        TransportTripStop $destinationStop,
         ?string  $body = null
     ): BasePost|LocationPost|TransportPost
     {
@@ -87,12 +85,12 @@ class PostRepository
 
             // create transport post
             $post->transportPost()->create([
-                'origin_id' => $start->id,
-                'departure' => $startTime,
-                'destination_id' => $stop->id,
-                'arrival' => $stopTime,
-                'mode' => $mode,
-                'line' => $line,
+                'transport_trip_id' => $transportTrip->id,
+                'origin_stop_id' => $originStop->id,
+                'destination_stop_id' => $destinationStop->id,
+                'departure' => now(),
+                'arrival' => now(),
+                'mode' => 'lol'
             ]);
             DB::commit();
 
@@ -107,7 +105,10 @@ class PostRepository
 
     public function getDashboardForUser(User $user): PostPaginationDto
     {
-        $posts = Post::with(['user', 'locationPost.location', 'locationPost.location.tags', 'transportPost', 'transportPost.origin', 'transportPost.destination'])
+        $posts = Post::with([
+            'user', 'locationPost.location', 'locationPost.location.tags', 'transportPost', 'transportPost.origin', 'transportPost.destination',
+            'transportPost.originStop.location', 'transportPost.destinationStop.location', 'transportPost.transportTrip',
+        ])
             ->latest()
             ->cursorPaginate(50);
 
