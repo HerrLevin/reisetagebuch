@@ -14,12 +14,25 @@ export type LocationPost = BasePost & {
 };
 
 export type TransportPost = BasePost & {
-    start: LocationEntry;
-    stop: LocationEntry;
-    start_time: string;
-    stop_time: string;
-    line: string;
+    originStop: Stop;
+    destinationStop: Stop;
+    trip: Trip;
+};
+
+export type Stop = {
+    id: string;
+    name: string;
+    location: LocationEntry;
+    arrivalTime: string | null;
+    departureTime: string | null;
+    arrivalDelay: number | null;
+    departureDelay: number | null;
+};
+
+export type Trip = {
+    id: string;
     mode: TransportMode;
+    lineName: string;
 };
 
 export const isLocationPost = (post: BasePost): post is LocationPost => {
@@ -27,5 +40,5 @@ export const isLocationPost = (post: BasePost): post is LocationPost => {
 };
 
 export const isTransportPost = (post: BasePost): post is TransportPost => {
-    return (post as TransportPost).start !== undefined;
+    return (post as TransportPost).originStop !== undefined;
 };
