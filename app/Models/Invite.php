@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- *
+ * 
  *
  * @property string $id
  * @property string $user_id
@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User $createdBy
  * @property-read \App\Models\User|null $usedBy
+ * @method static \Database\Factories\InviteFactory factory($count = null, $state = [])
  * @method static Builder<static>|Invite newModelQuery()
  * @method static Builder<static>|Invite newQuery()
  * @method static Builder<static>|Invite query()

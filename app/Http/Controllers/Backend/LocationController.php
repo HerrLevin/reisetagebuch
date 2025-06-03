@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Backend;
 
 use App\Dto\DeparturesDto;
 use App\Dto\MotisApi\StopDto;
+use App\Dto\MotisApi\StopPlaceDto;
 use App\Dto\MotisApi\TripDto;
 use App\Http\Controllers\Controller;
+use App\Hydrators\TripDtoHydrator;
 use App\Repositories\LocationRepository;
+use App\Repositories\TransportTripRepository;
 use App\Services\TransitousRequestService;
 use Carbon\Carbon;
 use Clickbar\Magellan\Data\Geometries\Point;
@@ -18,11 +21,20 @@ class LocationController extends Controller
 {
     private LocationRepository $locationRepository;
     private TransitousRequestService $transitousRequestService;
+    private TransportTripRepository $transportTripRepository;
+    private TripDtoHydrator $tripDtoHydrator;
 
-    public function __construct(LocationRepository $locationRepository, TransitousRequestService $transitousRequestService)
+    public function __construct(
+        LocationRepository $locationRepository,
+        TransitousRequestService $transitousRequestService,
+        TransportTripRepository $transportTripRepository,
+        TripDtoHydrator $tripDtoHydrator
+    )
     {
         $this->locationRepository = $locationRepository;
         $this->transitousRequestService = $transitousRequestService;
+        $this->transportTripRepository = $transportTripRepository;
+        $this->tripDtoHydrator = $tripDtoHydrator;
     }
 
     public function prefetch(Point $point): void
@@ -63,7 +75,56 @@ class LocationController extends Controller
 
     public function stopovers(string $tripId, string $startId, string $startTime): ?TripDto
     {
-        //todo: make more than one request
-        return $this->transitousRequestService->getStopTimes($tripId);
+        $dto = $this->transitousRequestService->getStopTimes($tripId);
+
+        // create a database trip
+        $trip = $this->transportTripRepository->getOrCreateTrip(
+            $dto->legs[0]->mode,
+            $dto->legs[0]->tripId,
+            'transitous',
+            $dto->legs[0]->routeShortName
+        );
+
+        // create stopovers
+        $stopovers = [$dto->legs[0]->from, ...$dto->legs[0]->intermediateStops, $dto->legs[0]->to];
+        /** @var StopPlaceDto[] $stops */
+        $stops = [];
+        $order = 0;
+        /** @var StopPlaceDto $stopover */
+        foreach ($stopovers as $stopover) {
+            $location = $this->locationRepository->getOrCreateLocationByIdentifier(
+                $stopover->name,
+                $stopover->latitude,
+                $stopover->longitude,
+                $stopover->stopId,
+                'stop',
+                'motis'
+            );
+
+            $stop = $this->transportTripRepository->addStopToTrip(
+                $trip,
+                $location,
+                $order,
+                $stopover->arrival,
+                $stopover->departure,
+                $stopover->scheduledArrival?->diffInSeconds($stopover->arrival),
+                $stopover->scheduledDeparture?->diffInSeconds($stopover->departure),
+                false,
+                null // todo: get route segment between stops
+            );
+
+            $stops[] = $this->tripDtoHydrator->hydrateStopPlace($stop, $location);
+            $order++;
+        }
+
+        $dto->legs[0]->setFrom($stops[0]);
+        $dto->legs[0]->setTo($stops[count($stops) - 1]);
+        $dto->legs[0]->setIntermediateStops(
+            array_slice($stops, 1, count($stops) - 2)
+        );
+
+
+        // return a trip dto with the stopovers
+        return $dto;
     }
 }

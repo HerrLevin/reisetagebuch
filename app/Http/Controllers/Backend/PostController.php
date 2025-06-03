@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Backend;
 
-use App\Dto\MotisApi\StopDto;
 use App\Dto\PostPaginationDto;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LocationPostRequest;
@@ -13,9 +12,11 @@ use App\Http\Requests\TransportPostCreateRequest;
 use App\Http\Resources\PostTypes\BasePost;
 use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
+use App\Models\TransportTripStop;
 use App\Models\User;
 use App\Repositories\LocationRepository;
 use App\Repositories\PostRepository;
+use App\Repositories\TransportTripRepository;
 use App\Services\TransitousRequestService;
 use Carbon\Carbon;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -25,12 +26,19 @@ class PostController extends Controller
     private PostRepository $postRepository;
     private LocationRepository $locationRepository;
     private TransitousRequestService $transitousRequestService;
+    private TransportTripRepository $transportTripRepository;
 
-    public function __construct(PostRepository $postRepository, LocationRepository $locationRepository, TransitousRequestService $transitousRequestService)
+    public function __construct(
+        PostRepository $postRepository,
+        LocationRepository $locationRepository,
+        TransitousRequestService $transitousRequestService,
+        TransportTripRepository $transportTripRepository
+    )
     {
         $this->locationRepository = $locationRepository;
         $this->postRepository = $postRepository;
         $this->transitousRequestService = $transitousRequestService;
+        $this->transportTripRepository = $transportTripRepository;
     }
 
     public function storeLocation(LocationPostRequest $request): BasePost|LocationPost|TransportPost
@@ -54,53 +62,42 @@ class PostController extends Controller
 
     public function storeMotisTransport(TransportPostCreateRequest $request): BasePost|LocationPost|TransportPost
     {
-        $trip = $this->transitousRequestService->getStopTimes($request->tripId);
+        $trip = $this->transportTripRepository->getTripByIdentifier(
+            $request->tripId,
+            'transitous',
+            ['stops', 'stops.location.identifiers']
+        );
 
-        $stopovers = [$trip->legs[0]->from, ...$trip->legs[0]->intermediateStops, $trip->legs[0]->to];
-        $start = null;
-        $stop = null;
-        /** @var StopDto $stopover */
-        foreach ($stopovers as $stopover) {
+        $startLocation = $this->locationRepository->getLocationByIdentifier($request->startId, 'stop', 'motis');
+        $stopLocation = $this->locationRepository->getLocationById($request->stopId) ??
+            $this->locationRepository->getLocationByIdentifier($request->stopId, 'stop', 'motis');
+
+        $startStopover = null;
+        $stopStopover = null;
+        /** @var TransportTripStop $stopover */
+        foreach ($trip->stops as $stopover) {
             // todo: fix ring lines
-            if ($stopover->stopId === $request->startId) {
-                $start = $stopover;
+            if ($stopover->location_id === $startLocation->id) {
+                $startStopover = $stopover;
             }
-            if ($stopover->stopId === $request->stopId) {
-                $stop = $stopover;
+            if ($stopover->location_id === $stopLocation->id) {
+                $stopStopover = $stopover;
             }
         }
 
-        if ($start === null || $stop === null) {
+        if ($startStopover === null || $stopStopover === null) {
             abort(422, 'Invalid stopover');
         }
-
-        $startLocation = $this->locationRepository->getOrCreateLocationByIdentifier(
-            $start->name,
-            $start->latitude,
-            $start->longitude,
-            $start->stopId,
-            'stop',
-            'motis'
-        );
-
-        $stopLocation = $this->locationRepository->getOrCreateLocationByIdentifier(
-            $stop->name,
-            $stop->latitude,
-            $stop->longitude,
-            $stop->stopId,
-            'stop',
-            'motis'
-        );
 
 
         return $this->postRepository->storeTransport(
             $request->user(),
-            $startLocation,
+            $startStopover->location,
             Carbon::parse($request->startTime),
-            $stopLocation,
+            $stopStopover->location,
             Carbon::parse($request->stopTime),
-            $trip->legs[0]->mode,
-            $trip->legs[0]->routeShortName,
+            $trip->mode,
+            $trip->line_name,
             $request->body
         );
     }
