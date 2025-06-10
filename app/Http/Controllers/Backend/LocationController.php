@@ -8,6 +8,8 @@ use App\Dto\MotisApi\StopPlaceDto;
 use App\Dto\MotisApi\TripDto;
 use App\Http\Controllers\Controller;
 use App\Hydrators\TripDtoHydrator;
+use App\Jobs\RerouteStops;
+use App\Models\TransportTripStop;
 use App\Repositories\LocationRepository;
 use App\Repositories\TransportTripRepository;
 use App\Services\TransitousRequestService;
@@ -80,7 +82,7 @@ class LocationController extends Controller
         // create a database trip
         $trip = $this->transportTripRepository->getOrCreateTrip(
             $dto->legs[0]->mode,
-            $dto->legs[0]->tripId,
+            $tripId,
             'transitous',
             $dto->legs[0]->routeShortName
         );
@@ -89,6 +91,8 @@ class LocationController extends Controller
         $stopovers = [$dto->legs[0]->from, ...$dto->legs[0]->intermediateStops, $dto->legs[0]->to];
         /** @var StopPlaceDto[] $stops */
         $stops = [];
+        /** @var TransportTripStop[] $stopModels */
+        $stopModels = [];
         $order = 0;
         /** @var StopPlaceDto $stopover */
         foreach ($stopovers as $stopover) {
@@ -113,6 +117,7 @@ class LocationController extends Controller
                 null // todo: get route segment between stops
             );
 
+            $stopModels[] = $stop;
             $stops[] = $this->tripDtoHydrator->hydrateStopPlace($stop, $location);
             $order++;
         }
@@ -124,6 +129,7 @@ class LocationController extends Controller
         );
 
 
+        RerouteStops::dispatch($dto, $stopModels);
         // return a trip dto with the stopovers
         return $dto;
     }

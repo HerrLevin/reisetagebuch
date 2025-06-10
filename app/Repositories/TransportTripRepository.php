@@ -9,6 +9,7 @@ use App\Models\RouteSegment;
 use App\Models\TransportTrip;
 use App\Models\TransportTripStop;
 use Carbon\Carbon;
+use Clickbar\Magellan\Database\PostgisFunctions\ST;
 
 class TransportTripRepository
 {
@@ -73,5 +74,46 @@ class TransportTripRepository
         $stop->save();
 
         return $stop;
+    }
+
+    public function createRouteSegment(
+        Location $fromLocation,
+        Location $toLocation,
+        ?int $duration = null,
+        ?string $pathType = null,
+        $geometry = null
+    ): RouteSegment {
+        $segment = new RouteSegment();
+        $segment->from_location_id = $fromLocation->id;
+        $segment->to_location_id = $toLocation->id;
+        $segment->distance = ST::distanceSphere($fromLocation->location, $toLocation->location);
+        $segment->duration = $duration;
+        $segment->path_type = $pathType;
+        $segment->geometry = $geometry;
+
+        $segment->save();
+
+        return $segment;
+    }
+
+    public function setRouteSegmentForStop(
+        TransportTripStop $stop,
+        RouteSegment $routeSegment
+    ): void {
+        $stop->route_segment_id = $routeSegment->id;
+        $stop->save();
+    }
+
+    public function getRouteSegmentBetweenStops(
+        TransportTripStop $start,
+        TransportTripStop $end,
+        int $duration,
+        string $pathType = 'rail'
+    ): ?RouteSegment {
+        return RouteSegment::where('from_location_id', $start->location_id)
+            ->where('to_location_id', $end->location_id)
+            ->where('duration', $duration)
+            ->where('path_type', $pathType)
+            ->first();
     }
 }
