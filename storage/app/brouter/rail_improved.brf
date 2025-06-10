@@ -1,0 +1,153 @@
+#
+# Car-Routing based on a kinematic model
+#
+# Depending on the vmax-parameter (target-speed)
+# this can be anything from least-time routing to eco-routing
+#
+#
+---model:btools.router.KinematicModel
+
+---context:global
+
+# Car profile
+assign validForCars        = true
+
+assign avoid_crossings = true # %avoid_crossings% | Avoid railway crossings | boolean
+
+
+# Kinematic model parameters
+assign vmax = 160 # %vmax% | Target speed (in km/h) | number
+assign recup_efficiency = 0.7    # %recup_efficiency% | (ratio) | number
+assign totalweight      = 1640   # %totalweight% | Total weight of the car (in kg) | number
+assign f_roll           = 232    # %f_roll% | Rolling friction (in Newton) | number
+assign f_air            = 0.4    # %f_air% | Drag force (in Newton / (m/s)^2), 0.5*cw*A*rho | number
+assign f_recup          = 400    # %f_recup% | Newton | number
+assign p_standby        = 250    # %p_standby% | Watt | number
+
+# Turn instructions settings
+assign turnInstructionMode          = 0     # %turnInstructionMode% | Mode for the generated turn instructions | [0=none, 1=auto-choose, 2=locus-style, 3=osmand-style, 4=comment-style, 5=gpsies-style, 6=oruxmaps-style]
+assign railMode          = 0     # %turnInstructionMode% | Mode for the generated turn instructions | [0=none, 1=auto-choose, 2=locus-style, 3=osmand-style, 4=comment-style, 5=gpsies-style, 6=oruxmaps-style]
+
+# Technical parameters
+assign pass1coefficient    = 1.3
+
+---context:way   # following code refers to way-tags
+assign caraccess_destination = 1
+
+#
+# for any change in initialclassifier, initialcost is added once
+#
+assign initialclassifier = 1
+
+
+#
+# calculate the initial cost
+# this is added to the total cost each time the costfactor
+# changed
+#
+assign initialcost = 0
+
+assign accessspeedlimit = 999
+
+assign isbadoneway = if reversedirection=yes then ( if oneway= then junction=roundabout else oneway=yes|true|1 ) else oneway=-1
+assign onewayspeedlimit = if isbadoneway then 0 else 999
+
+assign maxspeed_implicit =
+  switch railway=tram                 50
+  switch railway=subway               70
+  switch railway=narrow_gauge         50
+  switch railway=light_rail           90
+  switch railway=rail                190
+  0
+
+assign maxspeed_forward =
+  switch maxspeed:forward=50 50
+  switch maxspeed:forward=30 30
+  switch maxspeed:forward=10 10
+  switch maxspeed:forward=20 20
+  switch maxspeed:forward=40 40
+  switch maxspeed:forward=60 60
+  switch maxspeed:forward=70 70
+  switch maxspeed:forward=80 80
+  switch maxspeed:forward=90 90
+  switch maxspeed:forward=100 100
+  switch maxspeed:forward=110 110
+  switch maxspeed:forward=120 120
+  switch maxspeed:forward=130 130
+  999
+
+assign maxspeed_backward =
+  switch maxspeed:backward=50 50
+  switch maxspeed:backward=30 30
+  switch maxspeed:backward=10 10
+  switch maxspeed:backward=20 20
+  switch maxspeed:backward=40 40
+  switch maxspeed:backward=60 60
+  switch maxspeed:backward=70 70
+  switch maxspeed:backward=80 80
+  switch maxspeed:backward=90 90
+  switch maxspeed:backward=100 100
+  switch maxspeed:backward=110 110
+  switch maxspeed:backward=120 120
+  switch maxspeed:backward=130 130
+  switch maxspeed:backward=urban 50
+  switch maxspeed:backward=rural 100
+  999
+
+assign maxspeed_explicit =
+  switch maxspeed=50 50
+  switch maxspeed=30 30
+  switch maxspeed=10 10
+  switch maxspeed=20 20
+  switch maxspeed=40 40
+  switch maxspeed=60 60
+  switch maxspeed=70 70
+  switch maxspeed=80 80
+  switch maxspeed=90 90
+  switch maxspeed=100 100
+  switch maxspeed=110 110
+  switch maxspeed=120 120
+  switch maxspeed=130 130
+  if reversedirection=yes then maxspeed_backward else maxspeed_forward
+
+assign maxspeed =
+  min onewayspeedlimit
+  min accessspeedlimit
+  min maxspeed_explicit maxspeed_implicit
+
+assign costfactor = if equal maxspeed 0 then 10000 else 0
+
+assign minspeed =
+    switch highway=motorway|motorway_link|trunk  75 0
+
+# way priorities used for voice hint generation
+
+assign priorityclassifier =
+  if      ( railway=rail       ) then  30
+  else if ( railway=light_rail ) then  20
+  else if ( railway=tram       ) then  6
+  else 0
+
+# some more classifying bits used for voice hint generation...
+
+assign isgoodoneway = if reversedirection=yes then oneway=-1
+                      else oneway=yes|true|1
+
+# ... encoded into a bitmask
+
+assign classifiermask add          isbadoneway
+                      add multiply isgoodoneway   2
+                          multiply caraccess_destination 64
+
+---context:node  # following code refers to node tags
+
+#
+# calculate logical car access to nodes
+#
+assign initialcost = 0
+
+assign maxspeed =
+       if and avoid_crossings or railway=crossing railway=level_crossing
+       then
+         70
+       else 999

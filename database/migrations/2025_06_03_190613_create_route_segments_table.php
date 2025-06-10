@@ -16,7 +16,7 @@ return new class extends Migration
             $table->integer('distance')->comment('Distance in meters');
             $table->integer('duration')->comment('Duration in seconds')->nullable();
             $table->string('path_type')->comment('Type of path, e.g., rail, road, trail')->nullable();
-            $table->magellanLineString('geometry')
+            $table->magellanLineStringZ('geometry')
                 ->comment('Geospatial data representing the route segment');
             $table->timestamps();
         });
