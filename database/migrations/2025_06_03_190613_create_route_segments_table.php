@@ -19,6 +19,9 @@ return new class extends Migration
             $table->magellanLineStringZ('geometry')
                 ->comment('Geospatial data representing the route segment');
             $table->timestamps();
+
+            $table->index(['from_location_id', 'to_location_id'], 'route_segments_from_to_index');
+            $table->index(['from_location_id', 'to_location_id', 'duration', 'path_type'], 'route_segments_from_to_duration_path_type_index');
         });
     }
 
