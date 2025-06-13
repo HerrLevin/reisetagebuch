@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import FlashMessages from '@/Components/FlashMessages.vue';
+import Dock from '@/Layouts/Partials/Dock.vue';
 import NavBar from '@/Layouts/Partials/NavBar.vue';
 import SideMenu from '@/Layouts/Partials/SideMenu.vue';
-import Dock from '@/Pages/Settings/Partials/Dock.vue';
 import { Link } from '@inertiajs/vue3';
 </script>
 

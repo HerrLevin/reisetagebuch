@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Http\Requests\SettingsUpdateRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,6 +20,18 @@ class AccountBackend extends Controller
 
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
+        }
+
+        $user->save();
+    }
+
+    public function updateSettings(SettingsUpdateRequest $request): void
+    {
+        /** @var User $user */
+        $user = $request->user();
+
+        if (!empty($request->defaultNewPostView)) {
+            $user->default_new_post_view = $request->defaultNewPostView;
         }
 
         $user->save();

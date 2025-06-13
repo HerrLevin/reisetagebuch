@@ -7,6 +7,7 @@ use App\Http\Controllers\Inertia\InviteController;
 use App\Http\Controllers\Inertia\LocationController;
 use App\Http\Controllers\Inertia\PostController;
 use App\Http\Controllers\Inertia\UserController;
+use App\Http\Controllers\Inertia\UserSettingsController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -25,6 +26,10 @@ Route::middleware('auth')->group(callback: function () {
         Route::get('/', [AccountController::class, 'edit'])->name('account.edit');
         Route::patch('/', [AccountController::class, 'update'])->name('account.update');
         Route::delete('/', [AccountController::class, 'destroy'])->name('account.destroy');
+    });
+
+    Route::prefix('settings')->group(function () {
+        Route::patch('/', [UserSettingsController::class, 'update'])->name('account.settings.update');
     });
 
     Route::prefix('posts')->group(callback: function () {

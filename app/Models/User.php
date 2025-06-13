@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\DefaultNewPostView;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -24,6 +25,7 @@ use Illuminate\Notifications\Notifiable;
  * @property string|null $remember_token
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property DefaultNewPostView $default_new_post_view
  * @property-read Collection<int, \App\Models\Invite> $invites
  * @property-read int|null $invites_count
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
@@ -31,6 +33,7 @@ use Illuminate\Notifications\Notifiable;
  * @property-read Collection<int, \App\Models\Post> $posts
  * @property-read int|null $posts_count
  * @property-read \App\Models\Profile|null $profile
+ * @property-read \App\Models\UserSettings|null $settings
  * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newQuery()
@@ -67,6 +70,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'default_new_post_view' => DefaultNewPostView::class,
     ];
 
     protected function casts(): array
@@ -90,5 +94,10 @@ class User extends Authenticatable
     public function invites(): HasMany
     {
         return $this->hasMany(Invite::class);
+    }
+
+    public function settings(): HasOne
+    {
+        return $this->hasOne(UserSettings::class);
     }
 }
