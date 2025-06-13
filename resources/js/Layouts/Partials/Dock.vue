@@ -47,6 +47,16 @@ const isTextRoute = () => {
 const isProfileRoute = () => {
     return route().current('profile.show', user?.username ?? '');
 };
+
+const defaultNewPostRoute = () => {
+    if (user.settings?.default_new_post_view === 'text') {
+        return 'posts.create.text';
+    } else if (user.settings?.default_new_post_view === 'departures') {
+        return 'posts.create.departures';
+    } else {
+        return 'posts.create.start';
+    }
+};
 </script>
 
 <template>
@@ -104,7 +114,7 @@ const isProfileRoute = () => {
             <template v-if="user">
                 <Link
                     :href="
-                        route('posts.create.start', {
+                        route(defaultNewPostRoute(), {
                             latitude: latitude,
                             longitude: longitude,
                         })

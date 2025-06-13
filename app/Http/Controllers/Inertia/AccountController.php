@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Inertia;
 use App\Http\Controllers\Backend\AccountBackend;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Http\Requests\SettingsUpdateRequest;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -32,6 +33,12 @@ class AccountController extends Controller
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $this->accountBackend->update($request);
+        return Redirect::route('account.edit');
+    }
+
+    public function updateSettings(SettingsUpdateRequest $request): RedirectResponse
+    {
+        $this->accountBackend->updateSettings($request);
         return Redirect::route('account.edit');
     }
 

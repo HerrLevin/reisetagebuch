@@ -91,6 +91,7 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
         $user->profile()->create();
+        $user->settings()->create();
         $invite?->update([
             'used_by' => $user->id,
             'used_at' => now(),
