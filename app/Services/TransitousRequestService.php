@@ -36,7 +36,7 @@ class TransitousRequestService
      * @returns Collection|StopTimeDto[]
      * @throws ConnectionException
      */
-    public function getDepartures(string $identifier, Carbon $when): Collection
+    public function getDepartures(string $identifier, Carbon $when, array $filter = []): Collection
     {
         $params = [
             'stopId' => $identifier,
@@ -44,6 +44,10 @@ class TransitousRequestService
             'time'   => $when->toIso8601String(),
             'n'      => config('app.motis.results', 100),
         ];
+
+        if (!empty($filter)) {
+            $params['mode'] = implode(',', $filter);
+        }
 
         $response = Http::withUserAgent($this->versionService->getUserAgent())
             ->get(self::API_URL . '/stoptimes', $params);

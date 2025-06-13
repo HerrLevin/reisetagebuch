@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Inertia;
 
 use App\Http\Controllers\Backend\LocationController as BackendLocationController;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\DeparturesRequest;
 use App\Http\Requests\NearbyLocationRequest;
 use App\Http\Requests\StopoverRequest;
 use App\Http\Resources\LocationDto;
@@ -32,13 +33,15 @@ class LocationController extends Controller
         ]);
     }
 
-    public function departures(NearbyLocationRequest $request): Response|ResponseFactory
+    public function departures(DeparturesRequest $request): Response|ResponseFactory
     {
         $point = Point::makeGeodetic($request->latitude, $request->longitude);
-        $departures = $this->locationController->departures($point, now());
+        $filter = $request->filter ? explode(',', $request->filter) : [];
+        $departures = $this->locationController->departures($point, now(), $filter);
 
         return inertia('NewPostDialog/ListDepartures', [
             'departures' => $departures,
+            'filter' => $filter,
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
         ]);

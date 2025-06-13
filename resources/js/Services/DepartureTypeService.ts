@@ -28,6 +28,20 @@ export function getEmoji(mode: TransportMode): string {
     return TransportModeEmoji[mode] ?? '🚏';
 }
 
+export const FilterGroups: Record<string, TransportMode[]> = {
+    'Long Distance': [
+        TransportMode.HIGHSPEED_RAIL,
+        TransportMode.LONG_DISTANCE,
+        TransportMode.NIGHT_RAIL,
+    ],
+    Regional: [TransportMode.REGIONAL_FAST_RAIL, TransportMode.REGIONAL_RAIL],
+    Metro: [TransportMode.METRO],
+    Tram: [TransportMode.TRAM],
+    Subway: [TransportMode.SUBWAY],
+    Bus: [TransportMode.BUS, TransportMode.COACH, TransportMode.ODM],
+    Ferry: [TransportMode.FERRY],
+};
+
 export function getColor(mode: TransportMode): string {
     switch (mode) {
         case TransportMode.TRANSIT:

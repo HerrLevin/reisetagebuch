@@ -58,7 +58,7 @@ class LocationController extends Controller
     /**
      * @throws ConnectionException
      */
-    public function departures(Point $point, Carbon $time): ?DeparturesDto
+    public function departures(Point $point, Carbon $time, array $filter = []): ?DeparturesDto
     {
         $stops = $this->transitousRequestService->getNearby($point);
         if ($stops->isEmpty()) {
@@ -71,7 +71,7 @@ class LocationController extends Controller
         $firstStop = $stops->first();
         return new DeparturesDto(
             stop: $firstStop,
-            departures: $this->transitousRequestService->getDepartures($firstStop->stopId, $time)
+            departures: $this->transitousRequestService->getDepartures($firstStop->stopId, $time, $filter)
         );
     }
 
