@@ -36,15 +36,22 @@ class LocationController extends Controller
 
     public function departures(DeparturesRequest $request): Response|ResponseFactory
     {
-        $point = Point::makeGeodetic($request->latitude, $request->longitude);
         $filter = $request->filter ? explode(',', $request->filter) : [];
         $time = $request->when ? Carbon::parse($request->when) : now()->subMinutes(2);
-        $departures = $this->locationController->departures($point, $time, $filter);
+
+        if (!empty($request->identifier)) {
+            $departures = $this->locationController->departuresByIdentifier($request->identifier, $time, $filter);
+        } else {
+            $point = Point::makeGeodetic($request->latitude, $request->longitude);
+            $departures = $this->locationController->departuresNearby($point, $time, $filter);
+        }
+
 
         return inertia('NewPostDialog/ListDepartures', [
             'departures' => $departures,
             'filter' => $filter,
             'requestTime' => $time->toIso8601String(),
+            'requestIdentifier' => $request->identifier,
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
         ]);

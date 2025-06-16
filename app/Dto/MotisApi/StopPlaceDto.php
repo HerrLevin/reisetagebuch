@@ -4,40 +4,12 @@ namespace App\Dto\MotisApi;
 
 use Carbon\Carbon;
 
-class StopPlaceDto
+class StopPlaceDto extends StopDto
 {
-    public string $name;
-    public string $stopId;
-    public float $latitude;
-    public float $longitude;
     public ?Carbon $arrival;
     public ?Carbon $departure;
     public ?Carbon $scheduledArrival;
     public ?Carbon $scheduledDeparture;
-
-    public function setName(string $name): StopPlaceDto
-    {
-        $this->name = $name;
-        return $this;
-    }
-
-    public function setStopId(string $stopId): StopPlaceDto
-    {
-        $this->stopId = $stopId;
-        return $this;
-    }
-
-    public function setLatitude(float $latitude): StopPlaceDto
-    {
-        $this->latitude = $latitude;
-        return $this;
-    }
-
-    public function setLongitude(float $longitude): StopPlaceDto
-    {
-        $this->longitude = $longitude;
-        return $this;
-    }
 
     public function setArrival(?Carbon $arrival): StopPlaceDto
     {

@@ -2,7 +2,10 @@
 
 namespace App\Hydrators;
 
+use App\Dto\MotisApi\AreaDto;
+use App\Dto\MotisApi\GeocodeResponseEntry;
 use App\Dto\MotisApi\LegDto;
+use App\Dto\MotisApi\LocationType;
 use App\Dto\MotisApi\StopDto;
 use App\Dto\MotisApi\StopPlaceDto;
 use App\Dto\MotisApi\StopTimeDto;
@@ -13,13 +16,12 @@ class MotisHydrator
 {
     public function hydrateStop(array $data, ?float $distance = null): StopDto
     {
-        return new StopDto(
-            $data['stopId'],
-            $data['name'],
-            (float) $data['lat'],
-            (float) $data['lon'],
-            $distance
-        );
+        return new StopDto()
+            ->setStopId($data['stopId'])
+            ->setName($data['name'])
+            ->setLatitude((float) $data['lat'])
+            ->setLongitude((float) $data['lon'])
+            ->setDistance($data['distance'] ?? null);
     }
 
     public function hydrateStopTime(array $data): StopTimeDto
@@ -66,7 +68,8 @@ class MotisHydrator
             ->setLegs($legs);
     }
 
-    public function hydrateLeg(array $data) {
+    public function hydrateLeg(array $data): LegDto
+    {
         $intermediateStops = [];
         foreach ($data['intermediateStops'] as $stop) {
             $intermediateStops[] = $this->hydrateStopPlace($stop);
@@ -91,5 +94,40 @@ class MotisHydrator
             ->setIntermediateStops($intermediateStops);
 
 
+    }
+
+    public function hydrateArea(array $data): AreaDto
+    {
+        return new AreaDto()
+            ->setName($data['name'])
+            ->setDefault($data['default'] ?? null)
+            ->setAdminLevel($data['adminLevel'] ?? null)
+            ->setMatched($data['matched'] ?? false)
+            ->setUnique($data['unique'] ?? false);
+    }
+
+    public function hydrateGeocodeEntry(array $data): GeocodeResponseEntry
+    {
+        $areas = [];
+
+        if (isset($data['areas']) && is_array($data['areas'])) {
+            foreach ($data['areas'] as $area) {
+                $areas[] = $this->hydrateArea($area);
+            }
+        }
+
+        return new GeocodeResponseEntry()
+            ->setType(LocationType::tryFrom($data['type']))
+            ->setTokens($data['tokens'])
+            ->setName($data['name'])
+            ->setId($data['id'])
+            ->setLat((float) $data['lat'])
+            ->setLon((float) $data['lon'])
+            ->setLevel($data['level'] ?? null)
+            ->setStreet($data['street'] ?? null)
+            ->setHouseNumber($data['houseNumber'] ?? null)
+            ->setZip($data['zip'] ?? null)
+            ->setAreas($areas)
+            ->setScore((float) $data['score']);
     }
 }

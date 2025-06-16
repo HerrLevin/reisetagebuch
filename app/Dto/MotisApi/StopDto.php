@@ -4,22 +4,39 @@ namespace App\Dto\MotisApi;
 
 class StopDto
 {
-    public readonly string $stopId;
-    public readonly string $name;
-    public readonly float $latitude;
-    public readonly float $longitude;
+    public string $stopId;
+    public string $name;
+    public float $latitude;
+    public float $longitude;
     public ?int $distance = null;
-    public function __construct(
-        string $stopId,
-        string $name,
-        float $latitude,
-        float $longitude,
-        ?int $distance = null
-    ) {
-        $this->stopId    = $stopId;
-        $this->name      = $name;
-        $this->latitude  = $latitude;
+
+    public function setStopId(string $stopId): StopDto
+    {
+        $this->stopId = $stopId;
+        return $this;
+    }
+
+    public function setName(string $name): StopDto
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    public function setLatitude(float $latitude): StopDto
+    {
+        $this->latitude = $latitude;
+        return $this;
+    }
+
+    public function setLongitude(float $longitude): StopDto
+    {
         $this->longitude = $longitude;
-        $this->distance  = $distance;
+        return $this;
+    }
+
+    public function setDistance(?int $distance): StopDto
+    {
+        $this->distance = $distance;
+        return $this;
     }
 }

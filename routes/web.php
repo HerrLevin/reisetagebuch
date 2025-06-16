@@ -41,6 +41,7 @@ Route::middleware('auth')->group(callback: function () {
         Route::prefix('/transport')->group(callback: function () {
             Route::get('/departures', [LocationController::class, 'departures'])->name('posts.create.departures');
             Route::get('/stopovers', [LocationController::class, 'stopovers'])->name('posts.create.stopovers');
+            Route::get('/geocode', [ApiLocationController::class, 'geocode'])->name('posts.create.geocode');
             Route::get('/create', [PostController::class, 'createTransport'])->name('posts.create.transport-post');
             Route::post('/create', [PostController::class, 'storeTransport'])->name('posts.create.transport-post.store');
         });

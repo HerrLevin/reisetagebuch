@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Backend\LocationController as BackendLocationController;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\GeocodeRequest;
 use Clickbar\Magellan\Data\Geometries\Point;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\JsonResponse;
 
 class LocationController extends Controller
 {
@@ -21,5 +24,21 @@ class LocationController extends Controller
         $this->locationController->prefetch($point);
 
         abort('204');
+    }
+
+    public function geocode(GeocodeRequest $request): JsonResponse
+    {
+        $point = null;
+        if ($request->latitude && $request->longitude) {
+            $point = Point::makeGeodetic($request->latitude, $request->longitude);
+        }
+
+        try {
+            $locations = $this->locationController->geocode($request->get('query'), $point);
+        } catch (ConnectionException $e) {
+            return response()->json(['error' => 'Connection error'], 503);
+        }
+
+        return response()->json($locations);
     }
 }

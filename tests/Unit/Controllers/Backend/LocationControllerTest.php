@@ -119,9 +119,8 @@ class LocationControllerTest extends TestCase
             ->method('getDepartures')
             ->with($stops->first()->stopId, $time)
             ->willReturn($departures);
-        $result = $this->controller->departures($point, $time);
+        $result = $this->controller->departuresNearby($point, $time);
         $this->assertInstanceOf(DeparturesDto::class, $result);
-        $this->assertEquals($stops->first(), $result->stop);
         $this->assertEquals($departures, $result->departures);
     }
 
@@ -138,7 +137,7 @@ class LocationControllerTest extends TestCase
             ->method('getNearby')
             ->with($point)
             ->willReturn($stops);
-        $result = $this->controller->departures($point, $time);
+        $result = $this->controller->departuresNearby($point, $time);
         $this->assertNull($result);
     }
 

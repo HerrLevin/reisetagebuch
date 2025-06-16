@@ -37,6 +37,7 @@
         "@tailwindcss/postcss": "^4.1.2",
         "luxon": "^3.6.1",
         "maplibre-gl": "^5.4.0",
-        "vite-plugin-pwa": "^1.0.0"
+        "vite-plugin-pwa": "^1.0.0",
+        "vue-debounce": "^5.0.1"
     }
 }
