@@ -6,10 +6,11 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * @property float $latitude
- * @property float $longitude
- * @property string', 'null $filter
+ * @property float|null$latitude
+ * @property float|null $longitude
+ * @property string|null $filter
  * @property string|null $when
+ * @property string|null $identifier
  */
 class DeparturesRequest extends FormRequest
 {
@@ -22,8 +23,9 @@ class DeparturesRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'latitude' => 'required', 'numeric',
-            'longitude' => 'required', 'numeric',
+            'latitude' => 'required_if:locationId,null', 'numeric',
+            'longitude' => 'required_if:locationId,null', 'numeric',
+            'identifier' => 'nullable', 'string',
             'filter' => 'nullable', 'string',
             'when' => 'nullable', 'date',
         ];

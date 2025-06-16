@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Backend;
 
 use App\Dto\DeparturesDto;
+use App\Dto\MotisApi\GeocodeResponseEntry;
+use App\Dto\MotisApi\LocationType;
 use App\Dto\MotisApi\StopDto;
 use App\Dto\MotisApi\StopPlaceDto;
 use App\Dto\MotisApi\TripDto;
@@ -58,7 +60,7 @@ class LocationController extends Controller
     /**
      * @throws ConnectionException
      */
-    public function departures(Point $point, Carbon $time, array $filter = []): ?DeparturesDto
+    public function departuresNearby(Point $point, Carbon $time, array $filter = []): ?DeparturesDto
     {
         $stops = $this->transitousRequestService->getNearby($point);
         if ($stops->isEmpty()) {
@@ -73,6 +75,33 @@ class LocationController extends Controller
             stop: $firstStop,
             departures: $this->transitousRequestService->getDepartures($firstStop->stopId, $time, $filter)
         );
+    }
+
+    public function departuresByIdentifier(string $identifier, Carbon $when, array $filter = []): ?DeparturesDto
+    {
+        $departures = $this->transitousRequestService->getDepartures($identifier, $when, $filter);
+        if ($departures->isEmpty()) {
+            return null;
+        }
+
+        /** @var StopPlaceDto $firstStop */
+        $firstStop = $departures->first()?->place;
+
+        return new DeparturesDto(
+            stop: $firstStop,
+            departures: $departures
+        );
+    }
+
+    /**
+     * @param string $query
+     * @param Point|null $point
+     * @return GeocodeResponseEntry[]
+     * @throws ConnectionException
+     */
+    public function geocode(string $query, ?Point $point): array
+    {
+        return $this->transitousRequestService->geocode($query, null, LocationType::STOP, $point);
     }
 
     public function stopovers(string $tripId, string $startId, string $startTime): ?TripDto

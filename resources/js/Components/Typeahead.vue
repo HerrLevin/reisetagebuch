@@ -13,12 +13,14 @@ defineProps({
         default: () => [],
     },
     suggestions: {
-        type: Array as PropType<{ label: string; value: any }[]>,
+        type: Array as PropType<
+            { label: string; value: any; subLabel: string | undefined }[]
+        >,
         default: () => [],
     },
 });
 
-defineEmits(['submit', 'select', 'update:modelValue']);
+defineEmits(['submit', 'select', 'update:modelValue', 'focus']);
 
 const loading = ref(false);
 </script>
@@ -32,6 +34,7 @@ const loading = ref(false);
             v-model="model"
             :class="{ 'input-error': errors.length }"
             :name="name"
+            @focusin="$emit('focus')"
             @keydown="$emit('update:modelValue', model)"
             @keydown.enter="$emit('submit')"
         />
@@ -41,7 +44,10 @@ const loading = ref(false);
         >
             <li v-for="(suggestion, index) in suggestions" :key="index">
                 <a @click="$emit('select', suggestion)">
-                    {{ suggestion.label }}
+                    <h3 class="font-bold">{{ suggestion.label }}</h3>
+                    <h2 class="opacity-60" v-if="suggestion.subLabel">
+                        {{ suggestion.subLabel }}
+                    </h2>
                 </a>
             </li>
             <div v-if="!suggestions.length">
@@ -57,16 +63,6 @@ const loading = ref(false);
     <div v-if="loading" class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Loading...</span>
     </div>
-    <ul v-if="suggestions.length" class="list-group mt-2">
-        <li
-            v-for="(suggestion, index) in suggestions"
-            :key="index"
-            class="list-group-item list-group-item-action"
-            @click="$emit('select', suggestion)"
-        >
-            {{ suggestion.label }}
-        </li>
-    </ul>
 </template>
 
 <style scoped></style>

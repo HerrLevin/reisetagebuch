@@ -7,10 +7,13 @@ import {
     getColor,
     getEmoji,
 } from '@/Services/DepartureTypeService';
+import { Area, StopDto } from '@/types';
 import { TransportMode } from '@/types/enums';
 import { Link } from '@inertiajs/vue3';
+import axios from 'axios';
 import { DateTime } from 'luxon';
-import { PropType, ref, watch } from 'vue';
+import { PropType, ref } from 'vue';
+import { debounce } from 'vue-debounce';
 
 const props = defineProps({
     filter: {
@@ -29,29 +32,67 @@ const props = defineProps({
         type: Number,
         default: 0,
     },
+    location: {
+        type: Object as PropType<StopDto | null>,
+        required: false,
+        default: () => null,
+    },
 });
 
 const search = ref('');
-const suggestions = ref<{ label: string; value: any }[]>([]);
+const suggestions = ref<
+    { label: string; value: any; subLabel: string | undefined }[]
+>([]);
 
-const testStations = [
-    'Karlsruhe Hbf',
-    'Mannheim Hbf',
-    'Stuttgart Hbf',
-    'Freiburg Hbf',
-];
+search.value = props.location?.name || '';
 
-watch(search, (newValue) => {
-    if (newValue.length > 2) {
-        suggestions.value = testStations
-            .filter((station) =>
-                station.toLowerCase().includes(newValue.toLowerCase()),
-            )
-            .map((station) => ({ label: station, value: station }));
-    } else {
+const modelChange = debounce(() => fetchSuggestions(), 300);
+
+function fetchSuggestions() {
+    if (search.value.length < 3) {
         suggestions.value = [];
+        return;
     }
-});
+
+    const url = route('posts.create.geocode');
+    axios
+        .get(url, {
+            params: {
+                query: search.value,
+                latitude: props.latitude,
+                longitude: props.longitude,
+            },
+        })
+        .then((response) => {
+            suggestions.value = response.data.map((item: any) => ({
+                label: item.name,
+                value: item.id,
+                subLabel: getArea(item.areas || []),
+            }));
+        })
+        .catch((error) => {
+            console.error('Error fetching suggestions:', error);
+        });
+}
+
+function getArea(areas: Array<Area>) {
+    if (areas.length === 0) {
+        return '';
+    }
+
+    let defaultArea: undefined | Area = areas.find(
+        (area: Area) => area.default,
+    );
+    let country: undefined | Area = areas.find(
+        (area: Area) => area.adminLevel === 2,
+    );
+
+    if (defaultArea) {
+        return country
+            ? `${defaultArea.name}, ${country.name}`
+            : defaultArea.name;
+    }
+}
 
 const selectedTime = ref<DateTime | null>(null);
 if (props.requestTime) {
@@ -85,8 +126,23 @@ function selectTime(time: EventTarget | null) {
     }
 }
 
-function test(test: any) {
-    console.log('test', test);
+function submitTypeahead(test: any) {
+    let identifier: string | undefined = undefined;
+    if (test === undefined) {
+        identifier = suggestions.value[0]?.value;
+    }
+    if (test?.value && typeof test.value === 'string') {
+        identifier = test.value;
+    }
+
+    if (identifier) {
+        window.location.href = route('posts.create.departures', {
+            latitude: props.latitude,
+            longitude: props.longitude,
+            identifier: identifier,
+            when: selectedTime.value?.toISO(),
+        });
+    }
 }
 </script>
 
@@ -100,10 +156,12 @@ function test(test: any) {
                         class="input input-bordered w-full"
                         name="departure-search"
                         :required="false"
-                        @submit="test($event)"
-                        @select="test($event)"
+                        @submit="submitTypeahead($event)"
+                        @select="submitTypeahead($event)"
+                        @focus="modelChange()"
                         v-model="search"
                         :suggestions="suggestions"
+                        @update:modelValue="modelChange()"
                     />
                 </div>
                 <button
@@ -152,6 +210,7 @@ function test(test: any) {
                                 latitude: latitude,
                                 longitude: longitude,
                                 when: selectedTime?.toISO(),
+                                identifier: location?.stopId,
                             })
                         "
                     >
@@ -169,6 +228,7 @@ function test(test: any) {
                         route('posts.create.departures', {
                             latitude: latitude,
                             longitude: longitude,
+                            identifier: location?.stopId,
                         })
                     "
                 >
@@ -186,6 +246,7 @@ function test(test: any) {
                             latitude: latitude,
                             longitude: longitude,
                             filter: mode.join(','),
+                            identifier: location?.stopId,
                         })
                     "
                     :style="`background-color: ${getColor(mode[0])}`"

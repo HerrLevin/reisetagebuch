@@ -6,9 +6,10 @@ import { LocationService } from '@/Services/LocationService';
 import { DeparturesDto } from '@/types';
 import { TransportMode } from '@/types/enums';
 import { Head } from '@inertiajs/vue3';
+import { DateTime } from 'luxon';
 import { onMounted, PropType, ref } from 'vue';
 
-defineProps({
+const props = defineProps({
     departures: {
         type: Object as PropType<DeparturesDto> | null,
         required: false,
@@ -21,7 +22,14 @@ defineProps({
         type: String,
         default: '',
     },
+    requestIdentifier: {
+        type: String as PropType<string | null>,
+        default: '',
+    },
 });
+
+const time = ref(null as DateTime | null);
+time.value = DateTime.fromISO(props.requestTime);
 
 const latitude = ref(0);
 const longitude = ref(0);
@@ -48,12 +56,20 @@ showStartButton.value = route().current('posts.create.start');
             :longitude="longitude"
             :filter="filter"
             :requestTime="requestTime"
+            :location="requestIdentifier ? departures?.stop : null"
         />
         <div class="card bg-base-100 min-w-full shadow-md">
             <!-- Results -->
             <ul class="list">
                 <li class="p-4 pb-2 text-xs tracking-wide opacity-60">
-                    Departures at {{ departures?.stop.name }}
+                    {{ departures?.stop.name }} departures at
+                    {{
+                        time
+                            ? time?.hasSame(DateTime.now(), 'day')
+                                ? time.toLocaleString(DateTime.TIME_SIMPLE)
+                                : time.toLocaleString(DateTime.DATETIME_MED)
+                            : 'unknown'
+                    }}
                 </li>
                 <DeparturesListEntry
                     v-for="(departure, index) in departures?.departures"

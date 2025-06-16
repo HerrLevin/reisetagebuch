@@ -119,3 +119,9 @@ export type Invite = {
     expiresAt: string | null;
     usedAt: string | null;
 };
+
+export type Area = {
+    name: string;
+    default: boolean;
+    adminLevel: number;
+};
