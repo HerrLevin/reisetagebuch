@@ -8,7 +8,8 @@ use Illuminate\Foundation\Http\FormRequest;
 /**
  * @property float $latitude
  * @property float $longitude
- * @property string|null $filter
+ * @property string', 'null $filter
+ * @property string|null $when
  */
 class DeparturesRequest extends FormRequest
 {
@@ -16,14 +17,15 @@ class DeparturesRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, ValidationRule|array|string>
+     * @return array<string, ValidationRule', 'array', 'string>
      */
     public function rules(): array
     {
         return [
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
-            'filter' => 'nullable|string',
+            'latitude' => 'required', 'numeric',
+            'longitude' => 'required', 'numeric',
+            'filter' => 'nullable', 'string',
+            'when' => 'nullable', 'date',
         ];
     }
 }

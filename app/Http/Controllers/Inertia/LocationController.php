@@ -8,6 +8,7 @@ use App\Http\Requests\DeparturesRequest;
 use App\Http\Requests\NearbyLocationRequest;
 use App\Http\Requests\StopoverRequest;
 use App\Http\Resources\LocationDto;
+use Carbon\Carbon;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Inertia\Response;
 use Inertia\ResponseFactory;
@@ -37,11 +38,13 @@ class LocationController extends Controller
     {
         $point = Point::makeGeodetic($request->latitude, $request->longitude);
         $filter = $request->filter ? explode(',', $request->filter) : [];
-        $departures = $this->locationController->departures($point, now(), $filter);
+        $time = $request->when ? Carbon::parse($request->when) : now()->subMinutes(2);
+        $departures = $this->locationController->departures($point, $time, $filter);
 
         return inertia('NewPostDialog/ListDepartures', [
             'departures' => $departures,
             'filter' => $filter,
+            'requestTime' => $time->toIso8601String(),
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
         ]);
