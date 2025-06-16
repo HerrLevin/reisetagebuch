@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Typeahead from '@/Components/Typeahead.vue';
 import Clock from '@/Icons/Clock.vue';
 import XMark from '@/Icons/XMark.vue';
 import {
@@ -9,7 +10,7 @@ import {
 import { TransportMode } from '@/types/enums';
 import { Link } from '@inertiajs/vue3';
 import { DateTime } from 'luxon';
-import { PropType, ref } from 'vue';
+import { PropType, ref, watch } from 'vue';
 
 const props = defineProps({
     filter: {
@@ -28,6 +29,28 @@ const props = defineProps({
         type: Number,
         default: 0,
     },
+});
+
+const search = ref('');
+const suggestions = ref<{ label: string; value: any }[]>([]);
+
+const testStations = [
+    'Karlsruhe Hbf',
+    'Mannheim Hbf',
+    'Stuttgart Hbf',
+    'Freiburg Hbf',
+];
+
+watch(search, (newValue) => {
+    if (newValue.length > 2) {
+        suggestions.value = testStations
+            .filter((station) =>
+                station.toLowerCase().includes(newValue.toLowerCase()),
+            )
+            .map((station) => ({ label: station, value: station }));
+    } else {
+        suggestions.value = [];
+    }
 });
 
 const selectedTime = ref<DateTime | null>(null);
@@ -61,16 +84,31 @@ function selectTime(time: EventTarget | null) {
             : timeObject;
     }
 }
+
+function test(test: any) {
+    console.log('test', test);
+}
 </script>
 
 <template>
     <!-- Filters -->
     <div class="card bg-base-100 mb-4 min-w-full shadow-md">
         <ul class="list">
-            <li>
+            <li class="list-row">
+                <div class="list-col-grow">
+                    <Typeahead
+                        class="input input-bordered w-full"
+                        name="departure-search"
+                        :required="false"
+                        @submit="test($event)"
+                        @select="test($event)"
+                        v-model="search"
+                        :suggestions="suggestions"
+                    />
+                </div>
                 <button
                     popovertarget="datetime-picker"
-                    class="btn btn-sm btn-neutral"
+                    class="btn btn-neutral"
                     id="cally1"
                 >
                     <Clock class="h-4 w-4" />
