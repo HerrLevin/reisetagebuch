@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import XCircle from '@/Icons/XCircle.vue';
 import { PropType, ref } from 'vue';
 
 const model = defineModel<string>({ required: true });
@@ -27,27 +28,46 @@ const loading = ref(false);
 
 <template>
     <div class="dropdown w-full">
-        <input
-            type="text"
-            tabindex="0"
-            class="input input-bordered w-full"
-            v-model="model"
-            :class="{ 'input-error': errors.length }"
-            :name="name"
-            @focusin="$emit('focus')"
-            @keydown="$emit('update:modelValue', model)"
-            @keydown.enter="$emit('submit')"
-        />
+        <label class="input input-bordered w-full">
+            <input
+                type="text"
+                tabindex="0"
+                class="w-full"
+                v-model="model"
+                :class="{ 'input-error': errors.length }"
+                :name="name"
+                @focusin="$emit('focus')"
+                @keydown="$emit('update:modelValue', model)"
+                @keydown.enter="$emit('submit')"
+            />
+            <XCircle
+                v-if="model"
+                class="h-[1.5em] cursor-pointer"
+                @click="model = ''"
+            />
+        </label>
         <ul
             tabindex="0"
             class="dropdown-content menu bg-base-100 rounded-box z-1 w-full p-2 shadow-sm"
         >
-            <li v-for="(suggestion, index) in suggestions" :key="index">
-                <a @click="$emit('select', suggestion)">
-                    <h3 class="font-bold">{{ suggestion.label }}</h3>
-                    <h2 class="opacity-60" v-if="suggestion.subLabel">
+            <li
+                v-for="(suggestion, index) in suggestions"
+                :key="index"
+                class="max-w-full"
+            >
+                <a
+                    @click="$emit('select', suggestion)"
+                    class="inline-block w-full"
+                >
+                    <h3 class="truncate font-bold">
+                        {{ suggestion.label }}
+                    </h3>
+                    <h6
+                        class="truncate text-xs opacity-60"
+                        v-if="suggestion.subLabel"
+                    >
                         {{ suggestion.subLabel }}
-                    </h2>
+                    </h6>
                 </a>
             </li>
             <div v-if="!suggestions.length">
