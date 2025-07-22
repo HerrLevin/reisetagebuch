@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * 
- *
  * @property string $id
  * @property string $transport_trip_id
  * @property string $location_id
@@ -24,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\Location $location
  * @property-read \App\Models\RouteSegment|null $routeSegment
  * @property-read \App\Models\TransportTrip $transportTrip
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTripStop newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTripStop newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTripStop query()
@@ -39,6 +38,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTripStop whereStopSequence($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTripStop whereTransportTripId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTripStop whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class TransportTripStop extends Model

@@ -7,11 +7,17 @@ use App\Models\TransportTripStop;
 class StopDto
 {
     public string $id;
+
     public string $name;
+
     public LocationDto $location;
+
     public ?string $arrivalTime;
+
     public ?string $departureTime;
+
     public ?int $arrivalDelay = null;
+
     public ?int $departureDelay = null;
 
     public function __construct(TransportTripStop $stop)

@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class InviteHydratorTest extends TestCase
 {
-    public function testModelToDto()
+    public function test_model_to_dto()
     {
         $invite = $this->createMock(\App\Models\Invite::class);
         $invite->method('__get')->willReturnCallback(function ($property) {
@@ -20,7 +20,7 @@ class InviteHydratorTest extends TestCase
             };
         });
 
-        $inviteHydrator = new \App\Hydrators\InviteHydrator();
+        $inviteHydrator = new \App\Hydrators\InviteHydrator;
         $dto = $inviteHydrator->modelToDto($invite);
 
         $this->assertEquals('asdf', $dto->id);

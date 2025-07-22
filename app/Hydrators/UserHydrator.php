@@ -19,12 +19,12 @@ class UserHydrator
 
     public function modelToDto(User $user): UserDto
     {
-        $dto = new UserDto();
+        $dto = new UserDto;
         $dto->id = $user->id;
         $dto->name = $user->name;
         $dto->username = $user->username;
-        $dto->avatar = $user->profile?->avatar ? $this->urlGenerator->to('/files/'. $user->profile?->avatar) : null;
-        $dto->header = $user->profile?->header ? $this->urlGenerator->to('/files/'. $user->profile?->header) : null;
+        $dto->avatar = $user->profile?->avatar ? $this->urlGenerator->to('/files/'.$user->profile?->avatar) : null;
+        $dto->header = $user->profile?->header ? $this->urlGenerator->to('/files/'.$user->profile?->header) : null;
         $dto->bio = $user->profile?->bio;
         $dto->website = $user->profile?->website;
         $dto->createdAt = $user->created_at->toIso8601String();

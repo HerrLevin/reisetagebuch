@@ -2,14 +2,11 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * 
- *
  * @property string $id
  * @property string $post_id
  * @property string $location_id
@@ -17,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Location|null $location
  * @property-read \App\Models\Post $post
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|LocationPost newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|LocationPost newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|LocationPost query()
@@ -25,6 +23,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|LocationPost whereLocationId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|LocationPost wherePostId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|LocationPost whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class LocationPost extends Model

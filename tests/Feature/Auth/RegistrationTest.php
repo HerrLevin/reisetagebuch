@@ -29,8 +29,8 @@ class RegistrationTest extends TestCase
             'password_confirmation' => 'password',
         ]);
 
-            $this->assertAuthenticated();
-            $response->assertRedirect(route('dashboard', absolute: false));
+        $this->assertAuthenticated();
+        $response->assertRedirect(route('dashboard', absolute: false));
     }
 
     public function test_new_users_cannot_register_with_registration_disabled(): void
@@ -84,5 +84,4 @@ class RegistrationTest extends TestCase
         $this->assertAuthenticated();
         $response->assertRedirect(route('dashboard', absolute: false));
     }
-
 }

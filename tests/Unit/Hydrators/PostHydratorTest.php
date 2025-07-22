@@ -20,7 +20,7 @@ class PostHydratorTest extends TestCase
 {
     private function userMock(): UserDto
     {
-        $userDto = new UserDto();
+        $userDto = new UserDto;
         $userDto->id = '1';
         $userDto->name = 'John Doe';
         $userDto->username = 'johndoe';
@@ -40,7 +40,7 @@ class PostHydratorTest extends TestCase
                 'updated_at' => Carbon::parse('2023-01-01 00:00:01'),
                 'transportPost' => $transportPost,
                 'locationPost' => $locationPost,
-                'user' => new User(),
+                'user' => new User,
                 default => null,
             };
         });
@@ -51,7 +51,7 @@ class PostHydratorTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testModelToDto()
+    public function test_model_to_dto()
     {
         $userHydrator = $this->createMock(UserHydrator::class);
         $userHydrator->method('modelToDto')
@@ -72,7 +72,7 @@ class PostHydratorTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testModelToDtoWithLocationPost()
+    public function test_model_to_dto_with_location_post()
     {
         $location = $this->getLocationMock();
 
@@ -102,7 +102,7 @@ class PostHydratorTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testModelToDtoWithTransportPost()
+    public function test_model_to_dto_with_transport_post()
     {
         $transportPost = $this->createMock(TransportPost::class);
         $transportPost->method('__get')->willReturnCallback(function ($property) {
@@ -138,7 +138,7 @@ class PostHydratorTest extends TestCase
         $this->assertEquals('Test Location', $dto->start->name);
         $this->assertEquals(1.1, $dto->start->latitude);
         $this->assertEquals(2.1, $dto->start->longitude);
-        
+
     }
 
     /**
@@ -157,7 +157,7 @@ class PostHydratorTest extends TestCase
                 'name' => 'Test Location',
                 'location' => $point,
                 'distance' => 10,
-                'tags' => new Collection(),
+                'tags' => new Collection,
                 default => null,
             };
         });

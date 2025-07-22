@@ -8,7 +8,6 @@ use Illuminate\Validation\Rule;
 
 /**
  * @property-read ?DefaultNewPostView $defaultNewPostView
- *
  */
 class SettingsUpdateRequest extends FormRequest
 {
@@ -20,7 +19,7 @@ class SettingsUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'defaultNewPostView' => ['nullable', 'string', Rule::enum(DefaultNewPostView::class),],
+            'defaultNewPostView' => ['nullable', 'string', Rule::enum(DefaultNewPostView::class)],
         ];
     }
 }

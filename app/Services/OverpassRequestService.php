@@ -10,9 +10,13 @@ use GuzzleHttp\Exception\GuzzleException;
 class OverpassRequestService
 {
     private float $latitude;
+
     private float $longitude;
+
     private int $radius;
+
     private Client $client;
+
     private const array EXCLUDE = [
         'amenity' => [
             'waste_basket',
@@ -28,12 +32,13 @@ class OverpassRequestService
             'recycling',
             'parking_space',
 
-        ]
+        ],
     ];
+
     private const array FILTERS = [
         'amenity',
         'place' => ['village'],
-        'admin_level' => ['2','4','8', '9', '10', '11'],
+        'admin_level' => ['2', '4', '8', '9', '10', '11'],
         'historic',
         'tourism',
         'office',
@@ -43,7 +48,7 @@ class OverpassRequestService
             'office',
         ],
         'landuse' => [
-            'events'
+            'events',
         ],
         'railway' => [
             'station',
@@ -63,12 +68,12 @@ class OverpassRequestService
         $this->latitude = $latitude;
         $this->longitude = $longitude;
         $this->radius = $radius;
-        $this->client = new Client();
+        $this->client = new Client;
     }
 
     private function getExcludes(string $key): string
     {
-        if (!isset(static::EXCLUDE[$key])) {
+        if (! isset(static::EXCLUDE[$key])) {
             return '';
         }
         $excludes = static::EXCLUDE[$key] ?? [];
@@ -83,7 +88,7 @@ class OverpassRequestService
 
     private function getQuery(): string
     {
-        $query = "[out:json][timeout:25];(";
+        $query = '[out:json][timeout:25];(';
         foreach (static::FILTERS as $key => $filter) {
             if (is_array($filter)) {
                 $filters = implode('|', $filter);
@@ -110,7 +115,8 @@ class OverpassRequestService
             }
         }
 
-        $query .= ");out center;";
+        $query .= ');out center;';
+
         return $query;
     }
 
@@ -118,7 +124,7 @@ class OverpassRequestService
     {
         $query = $this->getQuery();
 
-        $url = "https://overpass-api.de/api/interpreter?data=" . urlencode($query);
+        $url = 'https://overpass-api.de/api/interpreter?data='.urlencode($query);
         try {
             $response = $this->client->get($url);
         } catch (GuzzleException) {

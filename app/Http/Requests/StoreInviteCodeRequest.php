@@ -9,7 +9,7 @@ class StoreInviteCodeRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        if (!config('app.invite.enabled')) {
+        if (! config('app.invite.enabled')) {
             return false;
         }
 

@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * 
- *
  * @property string $id
  * @property string $post_id
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -21,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\Location|null $origin
  * @property-read \App\Models\TransportTripStop $originStop
  * @property-read \App\Models\TransportTrip $transportTrip
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost query()
@@ -31,6 +30,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost wherePostId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost whereTransportTripId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class TransportPost extends Model

@@ -18,12 +18,12 @@ class UserSettingsBackend extends Controller
         $settings = $user->settings;
 
         if ($settings === null) {
-            $settings = new UserSettings();
+            $settings = new UserSettings;
             $settings->user_id = $user->id;
             $user->settings()->save($settings);
         }
 
-        if (!empty($request->defaultNewPostView)) {
+        if (! empty($request->defaultNewPostView)) {
             $settings->default_new_post_view = $request->defaultNewPostView;
         }
 

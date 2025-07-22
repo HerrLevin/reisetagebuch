@@ -24,8 +24,11 @@ use Illuminate\Support\Collection;
 class LocationController extends Controller
 {
     private LocationRepository $locationRepository;
+
     private TransitousRequestService $transitousRequestService;
+
     private TransportTripRepository $transportTripRepository;
+
     private TripDtoHydrator $tripDtoHydrator;
 
     public function __construct(
@@ -33,8 +36,7 @@ class LocationController extends Controller
         TransitousRequestService $transitousRequestService,
         TransportTripRepository $transportTripRepository,
         TripDtoHydrator $tripDtoHydrator
-    )
-    {
+    ) {
         $this->locationRepository = $locationRepository;
         $this->transitousRequestService = $transitousRequestService;
         $this->transportTripRepository = $transportTripRepository;
@@ -43,7 +45,7 @@ class LocationController extends Controller
 
     public function prefetch(Point $point): void
     {
-        if (!$this->locationRepository->recentNearbyRequests($point)) {
+        if (! $this->locationRepository->recentNearbyRequests($point)) {
             $this->locationRepository->deleteOldNearbyRequests();
             $this->locationRepository->createRequestLocation($point);
             $this->locationRepository->fetchNearbyLocations($point);
@@ -71,6 +73,7 @@ class LocationController extends Controller
          * @var StopDto $firstStop
          */
         $firstStop = $stops->first();
+
         return new DeparturesDto(
             stop: $firstStop,
             departures: $this->transitousRequestService->getDepartures($firstStop->stopId, $time, $filter)
@@ -94,9 +97,8 @@ class LocationController extends Controller
     }
 
     /**
-     * @param string $query
-     * @param Point|null $point
      * @return GeocodeResponseEntry[]
+     *
      * @throws ConnectionException
      */
     public function geocode(string $query, ?Point $point): array
@@ -157,8 +159,8 @@ class LocationController extends Controller
             array_slice($stops, 1, count($stops) - 2)
         );
 
-
         RerouteStops::dispatch($dto, $stopModels);
+
         // return a trip dto with the stopovers
         return $dto;
     }

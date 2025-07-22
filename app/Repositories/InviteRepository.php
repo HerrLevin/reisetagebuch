@@ -11,7 +11,7 @@ class InviteRepository
 
     public function __construct(?InviteHydrator $inviteHydrator = null)
     {
-        $this->inviteHydrator = $inviteHydrator ?? new InviteHydrator();
+        $this->inviteHydrator = $inviteHydrator ?? new InviteHydrator;
     }
 
     public function getAllInvitesForUser(string $userId): array
@@ -39,13 +39,13 @@ class InviteRepository
     public function getAvailableInviteById(string $inviteId): ?Invite
     {
         return Invite::where('id', $inviteId)
-                ->where(function ($query) {
-                    $query->whereNull('expires_at')
-                        ->orWhere('expires_at', '>=', now());
+            ->where(function ($query) {
+                $query->whereNull('expires_at')
+                    ->orWhere('expires_at', '>=', now());
 
-                })
-                ->whereNull('used_at')
-                ->first();
+            })
+            ->whereNull('used_at')
+            ->first();
     }
 
     public function createInvite(string $userId, ?string $expiresAt = null): Invite

@@ -21,22 +21,24 @@ class TransitousRequestService
     private const API_URL = 'https://api.transitous.org/api/v1';
 
     private VersionService $versionService;
+
     private GeoService $geoService;
+
     private MotisHydrator $hydrator;
 
     public function __construct(
         ?VersionService $versionService = null,
-        ?GeoService     $geoService = null,
-        ?MotisHydrator  $hydrator = null
-    )
-    {
-        $this->versionService = $versionService ?? new VersionService();
-        $this->geoService = $geoService ?? new GeoService();
-        $this->hydrator = $hydrator ?? new MotisHydrator();
+        ?GeoService $geoService = null,
+        ?MotisHydrator $hydrator = null
+    ) {
+        $this->versionService = $versionService ?? new VersionService;
+        $this->geoService = $geoService ?? new GeoService;
+        $this->hydrator = $hydrator ?? new MotisHydrator;
     }
 
     /**
      * @returns Collection|StopTimeDto[]
+     *
      * @throws ConnectionException
      */
     public function getDepartures(string $identifier, Carbon $when, array $filter = []): Collection
@@ -48,31 +50,33 @@ class TransitousRequestService
             'n' => config('app.motis.results', 100),
         ];
 
-        if (!empty($filter)) {
+        if (! empty($filter)) {
             $params['mode'] = implode(',', $filter);
         }
 
         $response = Http::withUserAgent($this->versionService->getUserAgent())
-            ->get(self::API_URL . '/stoptimes', $params);
+            ->get(self::API_URL.'/stoptimes', $params);
 
-        if (!$response->ok()) {
+        if (! $response->ok()) {
             Log::error('Unknown response (getDepartures)', [
                 'status' => $response->status(),
-                'body' => $response->body()
+                'body' => $response->body(),
             ]);
+
             return collect();
         }
 
         $entries = $response->json('stopTimes');
         $entries = collect($entries);
+
         return $entries->map(function ($entry) {
             return $this->hydrator->hydrateStopTime($entry);
         });
     }
 
     /**
-     * @param Point $point
      * @return Collection|StopDto[]
+     *
      * @throws ConnectionException
      */
     public function getNearby(Point $point): Collection|array
@@ -81,16 +85,17 @@ class TransitousRequestService
         $center = new Coordinate($point->getLatitude(), $point->getLongitude());
         $bbox = $this->geoService->getBoundingBox($center, 500);
 
-        $response = Http::withUserAgent($this->versionService->getUserAgent())->get(self::API_URL . '/map/stops', [
-            'min' => (string)$bbox->lowerRight,
-            'max' => (string)$bbox->upperLeft,
+        $response = Http::withUserAgent($this->versionService->getUserAgent())->get(self::API_URL.'/map/stops', [
+            'min' => (string) $bbox->lowerRight,
+            'max' => (string) $bbox->upperLeft,
         ]);
 
-        if (!$response->ok()) {
+        if (! $response->ok()) {
             Log::error('Unknown response (getNearby)', [
                 'status' => $response->status(),
-                'body' => $response->body()
+                'body' => $response->body(),
             ]);
+
             return collect();
         }
 
@@ -110,13 +115,14 @@ class TransitousRequestService
 
     public function getStopTimes(string $tripId): ?TripDto
     {
-        $response = Http::withUserAgent($this->versionService->getUserAgent())->get(self::API_URL . '/trip/?tripId=' . $tripId);
+        $response = Http::withUserAgent($this->versionService->getUserAgent())->get(self::API_URL.'/trip/?tripId='.$tripId);
 
-        if (!$response->ok()) {
+        if (! $response->ok()) {
             Log::error('Unknown response (getStopTimes)', [
                 'status' => $response->status(),
-                'body' => $response->body()
+                'body' => $response->body(),
             ]);
+
             return null;
         }
 
@@ -124,11 +130,12 @@ class TransitousRequestService
     }
 
     /**
-     * @param string $text the (potentially partially typed) address to resolve
-     * @param string|null $language language tags as used in OpenStreetMap (usually ISO 639-1, or ISO 639-2 if there's no ISO 639-1)
-     * @param LocationType|null $type Enum: "ADDRESS" "PLACE" "STOP". Default is all
-     * @param Point|null $place Used for biasing results towards the coordinate.
+     * @param  string  $text  the (potentially partially typed) address to resolve
+     * @param  string|null  $language  language tags as used in OpenStreetMap (usually ISO 639-1, or ISO 639-2 if there's no ISO 639-1)
+     * @param  LocationType|null  $type  Enum: "ADDRESS" "PLACE" "STOP". Default is all
+     * @param  Point|null  $place  Used for biasing results towards the coordinate.
      * @return GeocodeResponseEntry[]
+     *
      * @throws ConnectionException
      */
     public function geocode(string $text, ?string $language = null, ?LocationType $type = null, ?Point $place = null): array
@@ -146,17 +153,17 @@ class TransitousRequestService
         }
 
         if ($place) {
-            $request['place'] = $place->getLatitude() . ',' . $place->getLongitude();
+            $request['place'] = $place->getLatitude().','.$place->getLongitude();
         }
 
+        $response = Http::withUserAgent($this->versionService->getUserAgent())->get(self::API_URL.'/geocode', $request);
 
-        $response = Http::withUserAgent($this->versionService->getUserAgent())->get(self::API_URL . '/geocode', $request);
-
-        if (!$response->ok()) {
+        if (! $response->ok()) {
             Log::error('Unknown response (geocode)', [
                 'status' => $response->status(),
-                'body' => $response->body()
+                'body' => $response->body(),
             ]);
+
             return [];
         }
 
@@ -172,7 +179,7 @@ class TransitousRequestService
             } catch (\Exception $e) {
                 Log::error('Error hydrating geocode entry', [
                     'entry' => $entry,
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
                 ]);
             }
         }

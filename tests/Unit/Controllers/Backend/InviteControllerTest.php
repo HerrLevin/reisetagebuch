@@ -9,16 +9,18 @@ use PHPUnit\Framework\TestCase;
 class InviteControllerTest extends TestCase
 {
     private InviteRepository $repository;
+
     private InviteController $controller;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->repository = $this->createMock(InviteRepository::class);
         $this->controller = new InviteController($this->repository);
     }
 
-    public function testIndex() {
+    public function test_index()
+    {
         $userId = 'userId';
         $invites = ['invite1', 'invite2'];
 
@@ -27,12 +29,12 @@ class InviteControllerTest extends TestCase
             ->with($userId)
             ->willReturn($invites);
 
-
         $result = $this->controller->index($userId);
         $this->assertEquals($invites, $result);
     }
 
-    public function testStore() {
+    public function test_store()
+    {
         $userId = 'userId';
         $expiresAt = '2023-12-31';
 

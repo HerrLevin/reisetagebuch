@@ -11,6 +11,7 @@ use Illuminate\Support\Collection;
 class DeparturesDto
 {
     public readonly StopDto $stop;
+
     /** @var Collection|StopTimeDto[] */
     public readonly Collection|array $departures;
 
@@ -18,7 +19,7 @@ class DeparturesDto
         StopDto $stop,
         Collection $departures
     ) {
-        $this->stop       = $stop;
+        $this->stop = $stop;
         $this->departures = $departures;
     }
 }

@@ -21,7 +21,7 @@ class MapController extends Controller
         $start = $this->transportTripRepository->getStopById($from);
         $end = $this->transportTripRepository->getStopById($to);
 
-        if (!$start || !$end) {
+        if (! $start || ! $end) {
             return null;
         }
 

@@ -47,18 +47,18 @@ class OsmNameServiceTest extends TestCase
         ];
     }
 
-    public function testGetNameWithNoTags(): void
+    public function test_get_name_with_no_tags(): void
     {
-        $osmNameService = new OsmNameService();
+        $osmNameService = new OsmNameService;
         $location = $this->getMockLocation([]);
 
         $name = $osmNameService->getName($location);
         $this->assertNull($name);
     }
 
-    public function testGetNameWithNameTag(): void
+    public function test_get_name_with_name_tag(): void
     {
-        $osmNameService = new OsmNameService();
+        $osmNameService = new OsmNameService;
         $location = $this->getMockLocation(['name' => 'Test Name']);
 
         $name = $osmNameService->getName($location);
@@ -66,9 +66,9 @@ class OsmNameServiceTest extends TestCase
     }
 
     #[DataProvider('getNameWithAmenityTagDataProvider')]
-    public function testGetNameWithTag(?string $expectedName, array $tags): void
+    public function test_get_name_with_tag(?string $expectedName, array $tags): void
     {
-        $osmNameService = new OsmNameService();
+        $osmNameService = new OsmNameService;
         $location = $this->getMockLocation($tags);
 
         $name = $osmNameService->getName($location);

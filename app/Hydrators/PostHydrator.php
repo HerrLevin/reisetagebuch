@@ -15,7 +15,7 @@ class PostHydrator
 
     public function __construct(?UserHydrator $userHydrator = null)
     {
-        $this->userHydrator = $userHydrator ?? new UserHydrator();
+        $this->userHydrator = $userHydrator ?? new UserHydrator;
     }
 
     public function modelToDto(Post $post): LocationPost|TransportPost|BasePost

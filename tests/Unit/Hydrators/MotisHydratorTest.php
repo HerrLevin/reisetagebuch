@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class MotisHydratorTest extends TestCase
 {
-    public function testHydrateStop()
+    public function test_hydrate_stop()
     {
         $data = [
             'stopId' => '123',
@@ -17,7 +17,7 @@ class MotisHydratorTest extends TestCase
             'lon' => 98.765432,
         ];
 
-        $hydrator = new MotisHydrator();
+        $hydrator = new MotisHydrator;
         $stopDto = $hydrator->hydrateStop($data);
 
         $this->assertEquals('123', $stopDto->stopId);
@@ -26,7 +26,7 @@ class MotisHydratorTest extends TestCase
         $this->assertEquals(98.765432, $stopDto->longitude);
     }
 
-    public function testHydrateStopTime()
+    public function test_hydrate_stop_time()
     {
         $data = [
             'place' => [
@@ -45,7 +45,7 @@ class MotisHydratorTest extends TestCase
             'source' => 'Test Source',
         ];
 
-        $hydrator = new MotisHydrator();
+        $hydrator = new MotisHydrator;
         $stopTimeDto = $hydrator->hydrateStopTime($data);
 
         $this->assertEquals('Test Place', $stopTimeDto->place->name);
@@ -107,16 +107,16 @@ class MotisHydratorTest extends TestCase
         ];
     }
 
-    public function testHydrateLeg()
+    public function test_hydrate_leg()
     {
         $data = $this->legData();
-        $hydrator = new MotisHydrator();
+        $hydrator = new MotisHydrator;
         $legDto = $hydrator->hydrateLeg($data);
 
         $this->legAsserts($legDto);
     }
 
-    public function testHydrateTrip()
+    public function test_hydrate_trip()
     {
         $leg = $this->legData();
         $data = [
@@ -127,7 +127,7 @@ class MotisHydratorTest extends TestCase
             'legs' => [$leg],
         ];
 
-        $hydrator = new MotisHydrator();
+        $hydrator = new MotisHydrator;
         $tripDto = $hydrator->hydrateTrip($data);
 
         $this->assertEquals(7200, $tripDto->duration);
@@ -140,7 +140,8 @@ class MotisHydratorTest extends TestCase
         $this->legAsserts($tripDto->legs[0]);
     }
 
-    private function legAsserts(LegDto $legDto) {
+    private function legAsserts(LegDto $legDto)
+    {
 
         $this->assertEquals(3600, $legDto->duration);
         $this->assertEquals('Test Source', $legDto->source);

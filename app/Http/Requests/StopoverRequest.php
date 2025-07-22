@@ -7,7 +7,6 @@ use Illuminate\Foundation\Http\FormRequest;
 /**
  * Class StopoverRequest
  *
- * @package App\Http\Requests
  *
  * @property string $tripId
  * @property string $headSign

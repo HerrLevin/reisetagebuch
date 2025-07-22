@@ -22,7 +22,7 @@ class FileRepository
     public function uploadFile(?string $path, ?UploadedFile $file): string
     {
         if ($path) {
-            $filename = uniqid() . '.' . $file->getClientOriginalExtension();
+            $filename = uniqid().'.'.$file->getClientOriginalExtension();
 
             return Storage::disk('public')->putFileAs($path, $file, $filename);
         }

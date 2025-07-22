@@ -23,8 +23,11 @@ use Illuminate\Auth\Access\AuthorizationException;
 class PostController extends Controller
 {
     private PostRepository $postRepository;
+
     private LocationRepository $locationRepository;
+
     private TransitousRequestService $transitousRequestService;
+
     private TransportTripRepository $transportTripRepository;
 
     public function __construct(
@@ -32,8 +35,7 @@ class PostController extends Controller
         LocationRepository $locationRepository,
         TransitousRequestService $transitousRequestService,
         TransportTripRepository $transportTripRepository
-    )
-    {
+    ) {
         $this->locationRepository = $locationRepository;
         $this->postRepository = $postRepository;
         $this->transitousRequestService = $transitousRequestService;
@@ -88,7 +90,6 @@ class PostController extends Controller
             abort(422, 'Invalid stopover');
         }
 
-
         return $this->postRepository->storeTransport(
             $request->user(),
             $trip,
@@ -102,10 +103,6 @@ class PostController extends Controller
         return $this->postRepository->getDashboardForUser($user);
     }
 
-    /**
-     * @param User|string $user
-     * @return PostPaginationDto
-     */
     public function postsForUser(User|string $user): PostPaginationDto
     {
         return $this->postRepository->getPostsForUser($user);

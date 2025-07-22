@@ -19,7 +19,7 @@ class MapController extends Controller
     {
         $linestring = $this->locationController->fromTo($from, $to);
 
-        if (!$linestring) {
+        if (! $linestring) {
             return response()->json(['error' => 'Invalid stops provided'], 400);
         }
 

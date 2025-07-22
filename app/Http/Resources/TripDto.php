@@ -7,7 +7,9 @@ use App\Models\TransportTrip;
 class TripDto
 {
     public string $id;
+
     public string $mode;
+
     public string $lineName;
 
     public function __construct(TransportTrip $trip)

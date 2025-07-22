@@ -22,6 +22,7 @@ class VersionService
     public function getUserAgent(): string
     {
         $version = $this->getVersion();
+
         return sprintf(
             '%s/%s (%s; bot; contact: %s)',
             config('app.name'),
@@ -34,12 +35,12 @@ class VersionService
     public function getCurrentGitCommit(): ?string
     {
         $head = $this->getGitHead();
-        if (!$head) {
+        if (! $head) {
             return null;
         }
 
         try {
-            $hash = file_get_contents(base_path() . '/.git/' . $this->getGitHead());
+            $hash = file_get_contents(base_path().'/.git/'.$this->getGitHead());
             if ($hash) {
                 return $hash;
             }
@@ -52,7 +53,7 @@ class VersionService
 
     public function getGitHead(): ?string
     {
-        if ($head = file_get_contents(base_path() . '/.git/HEAD')) {
+        if ($head = file_get_contents(base_path().'/.git/HEAD')) {
             return substr($head, 5, -1);
         }
 

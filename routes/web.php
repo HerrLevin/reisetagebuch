@@ -81,4 +81,4 @@ Route::middleware('cache.headers:public;max_age=2628000;etag')->get('/files/{pat
     abort(404);
 })->where('path', '.*')->name('files.show');
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

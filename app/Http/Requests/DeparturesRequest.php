@@ -6,7 +6,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * @property float|null$latitude
+ * @property float|null $latitude
  * @property float|null $longitude
  * @property string|null $filter
  * @property string|null $when
@@ -14,7 +14,6 @@ use Illuminate\Foundation\Http\FormRequest;
  */
 class DeparturesRequest extends FormRequest
 {
-
     /**
      * Get the validation rules that apply to the request.
      *

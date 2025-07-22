@@ -12,7 +12,7 @@ class UserRepositoryTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testGetUserByUsername()
+    public function test_get_user_by_username()
     {
         $user = User::factory()->create();
         $user->profile()->create([
@@ -22,7 +22,7 @@ class UserRepositoryTest extends TestCase
             'header' => $user->header,
         ]);
 
-        $repository = new UserRepository();
+        $repository = new UserRepository;
         $result = $repository->getUserByUsername($user->username);
 
         $this->assertEquals($user->id, $result->id);
@@ -34,7 +34,7 @@ class UserRepositoryTest extends TestCase
         $this->assertNull($result2);
     }
 
-    public function testUpdateUser()
+    public function test_update_user()
     {
         $user = User::factory()->create();
         $user->profile()->create([
@@ -44,7 +44,7 @@ class UserRepositoryTest extends TestCase
             'header' => $user->header,
         ]);
 
-        $repository = new UserRepository();
+        $repository = new UserRepository;
         $updatedUser = $repository->updateUser($user, 'New Name', 'New Bio', 'New Website', 'new_avatar.png', 'new_header.png');
 
         $this->assertEquals('New Name', $updatedUser->name);
@@ -63,11 +63,11 @@ class UserRepositoryTest extends TestCase
         $this->assertNull($updatedUser->header);
     }
 
-    public function testCreateProfileIfNotExists()
+    public function test_create_profile_if_not_exists()
     {
         $user = User::factory()->create();
 
-        $repository = new UserRepository();
+        $repository = new UserRepository;
         $updatedUser = $repository->updateUser($user, 'New Name', 'New Bio', null, null, null);
 
         $this->assertEquals('New Name', $updatedUser->name);

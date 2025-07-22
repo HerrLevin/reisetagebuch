@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         Schema::create('transport_trips', function (Blueprint $table) {
@@ -18,7 +19,6 @@ return new class extends Migration {
             $table->unique(['provider', 'foreign_trip_id'], 'unique_provider_mode_foreign_trip');
         });
     }
-
 
     public function down(): void
     {

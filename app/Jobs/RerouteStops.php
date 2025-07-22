@@ -13,8 +13,10 @@ class RerouteStops implements ShouldQueue
     use Queueable;
 
     private RerouteStopsController $rerouteStopsController;
+
     private TripDto $tripDto;
-    /** @var TransportTripStop[] $stops */
+
+    /** @var TransportTripStop[] */
     private array $stops;
 
     public function __construct(TripDto $tripDto, array $stops, ?RerouteStopsController $rerouteStopsController = null)

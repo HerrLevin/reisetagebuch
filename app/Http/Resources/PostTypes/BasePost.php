@@ -8,9 +8,13 @@ use App\Models\Post;
 class BasePost
 {
     public string $id;
+
     public UserDto $user;
+
     public ?string $body = null;
+
     public string $created_at;
+
     public string $updated_at;
 
     public function __construct(Post $post, UserDto $userDto)

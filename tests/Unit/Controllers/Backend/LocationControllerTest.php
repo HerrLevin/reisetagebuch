@@ -17,10 +17,12 @@ use PHPUnit\Framework\TestCase;
 class LocationControllerTest extends TestCase
 {
     private LocationRepository $repository;
+
     private TransitousRequestService $transitousRequestService;
+
     private LocationController $controller;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->repository = $this->createMock(LocationRepository::class);
@@ -31,7 +33,7 @@ class LocationControllerTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testPrefetch(): void
+    public function test_prefetch(): void
     {
         $point = $this->createMock(Point::class);
         $this->repository->expects($this->once())
@@ -53,7 +55,7 @@ class LocationControllerTest extends TestCase
         $this->controller->prefetch($point);
     }
 
-    public function testPrefetchWithNoRequests(): void
+    public function test_prefetch_with_no_requests(): void
     {
         $point = $this->createMock(Point::class);
         $this->repository->expects($this->once())
@@ -73,7 +75,7 @@ class LocationControllerTest extends TestCase
         $this->controller->prefetch($point);
     }
 
-    public function testNearby(): void
+    public function test_nearby(): void
     {
         $point = $this->createMock(Point::class);
         $this->repository->expects($this->once())
@@ -95,7 +97,7 @@ class LocationControllerTest extends TestCase
         $this->repository->expects($this->once())
             ->method('getNearbyLocations')
             ->with($point)
-            ->willReturn(new Collection());
+            ->willReturn(new Collection);
 
         $result = $this->controller->nearby($point);
         $this->assertInstanceOf(Collection::class, $result);
@@ -105,7 +107,7 @@ class LocationControllerTest extends TestCase
      * @throws Exception
      * @throws ConnectionException
      */
-    public function testDepartures(): void
+    public function test_departures(): void
     {
         $point = $this->createMock(Point::class);
         $stops = new Collection([new StopDto('id', 'name', 1.1, 1.1, 123)]);
@@ -128,10 +130,10 @@ class LocationControllerTest extends TestCase
      * @throws Exception
      * @throws ConnectionException
      */
-    public function testDeparturesWithNoStops(): void
+    public function test_departures_with_no_stops(): void
     {
         $point = $this->createMock(Point::class);
-        $stops = new Collection();
+        $stops = new Collection;
         $time = now();
         $this->transitousRequestService->expects($this->once())
             ->method('getNearby')
@@ -144,7 +146,7 @@ class LocationControllerTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testStopovers(): void
+    public function test_stopovers(): void
     {
         $tripId = 'tripId';
         $startId = 'startId';

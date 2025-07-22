@@ -11,7 +11,7 @@ class InviteHydrator
 {
     public function modelToDto(Invite $invite): InviteDto
     {
-        $dto = new InviteDto();
+        $dto = new InviteDto;
         $dto->id = $invite->id;
         $dto->createdAt = $invite->created_at?->toIso8601String();
         $dto->expiresAt = $invite->expires_at?->toIso8601String();

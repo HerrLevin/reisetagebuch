@@ -10,7 +10,7 @@ use Tests\TestCase;
 
 class LocationControllerTest extends TestCase
 {
-    public function testPrefetch(): void
+    public function test_prefetch(): void
     {
         $locationControllerMock = $this->createMock(LocationControllerBackend::class);
         $locationControllerMock->expects($this->once())

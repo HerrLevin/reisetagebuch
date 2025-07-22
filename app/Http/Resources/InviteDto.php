@@ -7,7 +7,10 @@ namespace App\Http\Resources;
 class InviteDto
 {
     public string $id;
+
     public ?string $createdAt;
+
     public ?string $expiresAt;
+
     public ?string $usedAt;
 }

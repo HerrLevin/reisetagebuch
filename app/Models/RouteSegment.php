@@ -8,8 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * 
- *
  * @property string $id
  * @property string $from_location_id
  * @property string $to_location_id
@@ -21,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Location $fromLocation
  * @property-read \App\Models\Location $toLocation
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RouteSegment newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RouteSegment newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RouteSegment query()
@@ -33,6 +32,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RouteSegment wherePathType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RouteSegment whereToLocationId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RouteSegment whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class RouteSegment extends Model

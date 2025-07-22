@@ -28,12 +28,12 @@ class RegisteredUserController extends Controller
 
     public function create(Request $request): Application|RedirectResponse|Response
     {
-        if (!config('app.registration') && !config('app.invite.enabled')) {
+        if (! config('app.registration') && ! config('app.invite.enabled')) {
             return redirect(route('login', absolute: false));
         }
 
         $invite = null;
-        if (!config('app.registration') && config('app.invite.enabled')) {
+        if (! config('app.registration') && config('app.invite.enabled')) {
             $invite = $request->invite ? $this->inviteRepository->getAvailableInviteById($request->invite) : null;
 
             if (empty($invite)) {
@@ -55,20 +55,20 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        if (!config('app.registration') && !config('app.invite.enabled')) {
+        if (! config('app.registration') && ! config('app.invite.enabled')) {
             return redirect(route('login', absolute: false));
         }
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'username' => 'required|string|alpha_dash|max:30|unique:' . User::class,
-            'email' => 'required|string|lowercase|email|max:255|unique:' . User::class,
+            'username' => 'required|string|alpha_dash|max:30|unique:'.User::class,
+            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'invite' => 'nullable|string|exists:invites,id',
         ]);
 
         $invite = null;
-        if (!config('app.registration') && config('app.invite.enabled')) {
+        if (! config('app.registration') && config('app.invite.enabled')) {
             $invite = $this->inviteRepository->getInviteById($request->invite);
 
             if ($invite->used_at) {

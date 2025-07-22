@@ -6,13 +6,10 @@ use Illuminate\Support\Collection;
 
 class PaginationDto
 {
-
     /**
-     * @param int $perPage
-     * @param ?string $nextCursor
-     * @param ?string $previousCursor
      * @template T
-     * @param T[]|Collection $items
+     *
+     * @param  T[]|Collection  $items
      */
     public function __construct(
         public int $perPage,

@@ -21,7 +21,7 @@ class PostRepository
 
     public function __construct(?PostHydrator $postHydrator = null)
     {
-        $this->postHydrator = $postHydrator ?? new PostHydrator();
+        $this->postHydrator = $postHydrator ?? new PostHydrator;
     }
 
     public function storeLocation(User $user, Location $location, ?string $body = null): BasePost|LocationPost|TransportPost
@@ -68,13 +68,12 @@ class PostRepository
     }
 
     public function storeTransport(
-        User     $user,
+        User $user,
         TransportTrip $transportTrip,
         TransportTripStop $originStop,
         TransportTripStop $destinationStop,
-        ?string  $body = null
-    ): BasePost|LocationPost|TransportPost
-    {
+        ?string $body = null
+    ): BasePost|LocationPost|TransportPost {
         try {
             DB::beginTransaction();
             /** @var Post $post */
@@ -90,7 +89,7 @@ class PostRepository
                 'destination_stop_id' => $destinationStop->id,
                 'departure' => now(),
                 'arrival' => now(),
-                'mode' => 'lol'
+                'mode' => 'lol',
             ]);
             DB::commit();
 
@@ -124,10 +123,6 @@ class PostRepository
         );
     }
 
-    /**
-     * @param User|string $user
-     * @return PostPaginationDto
-     */
     public function getPostsForUser(User|string $user): PostPaginationDto
     {
         if ($user instanceof User) {
@@ -138,7 +133,6 @@ class PostRepository
             ->where('user_id', $user)
             ->latest()
             ->cursorPaginate(50);
-
 
         $mapped = $posts->map(function (Post $post) {
             return $this->postHydrator->modelToDto($post);

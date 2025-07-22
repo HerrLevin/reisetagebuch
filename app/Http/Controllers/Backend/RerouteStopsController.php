@@ -16,7 +16,9 @@ use GuzzleHttp\Exception\GuzzleException;
 class RerouteStopsController extends Controller
 {
     private BrouterRequestService $brouterRequestService;
+
     private TransportTripRepository $transportTripRepository;
+
     private GeoJsonParser $geoJsonParser;
 
     public function __construct(
@@ -30,14 +32,13 @@ class RerouteStopsController extends Controller
     }
 
     /**
-     * @param TripDto $tripDto
-     * @param TransportTripStop[] $stops
+     * @param  TransportTripStop[]  $stops
      */
     public function rerouteStops(TripDto $tripDto, array $stops): void
     {
         foreach ($stops as $key => $stop) {
             $previousStop = $stops[$key - 1] ?? null;
-            if (!$previousStop) {
+            if (! $previousStop) {
                 continue;
             }
 
@@ -48,7 +49,7 @@ class RerouteStopsController extends Controller
 
     private function rerouteBetween(TransportTripStop $start, TransportTripStop $end, ?string $pathType): void
     {
-        if (!$pathType) {
+        if (! $pathType) {
             return;
         }
 
@@ -57,15 +58,15 @@ class RerouteStopsController extends Controller
 
         $duration = (int) round($startTime->diffInSeconds($endTime));
 
-
         $segment = $this->transportTripRepository->getRouteSegmentBetweenStops($start, $end, $duration, $pathType);
         if ($segment) {
             $this->transportTripRepository->setRouteSegmentForStop($start, $segment);
+
             return; // already rerouted
         }
         try {
             $route = $this->brouterRequestService->getRoute($start->location->location, $end->location->location, $pathType);
-        } catch (BrouterRouteCreationFailed | GuzzleException $e) {
+        } catch (BrouterRouteCreationFailed|GuzzleException $e) {
             report($e);
             $route = null;
         }

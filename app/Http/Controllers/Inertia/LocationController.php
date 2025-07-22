@@ -28,7 +28,7 @@ class LocationController extends Controller
         $locations = $this->locationController->nearby($point);
 
         return inertia('NewPostDialog/ListLocations', [
-            'locations' => $locations->map(fn($location) => new LocationDto($location)),
+            'locations' => $locations->map(fn ($location) => new LocationDto($location)),
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
         ]);
@@ -39,13 +39,12 @@ class LocationController extends Controller
         $filter = $request->filter ? explode(',', $request->filter) : [];
         $time = $request->when ? Carbon::parse($request->when) : now()->subMinutes(2);
 
-        if (!empty($request->identifier)) {
+        if (! empty($request->identifier)) {
             $departures = $this->locationController->departuresByIdentifier($request->identifier, $time, $filter);
         } else {
             $point = Point::makeGeodetic($request->latitude, $request->longitude);
             $departures = $this->locationController->departuresNearby($point, $time, $filter);
         }
-
 
         return inertia('NewPostDialog/ListDepartures', [
             'departures' => $departures,

@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * 
- *
  * @property string $id
  * @property string|null $foreign_trip_id Unique identifier for the trip in the external system
  * @property string|null $provider Name of the data provider, e.g., "TransportAPI"
@@ -18,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\TransportTripStop> $stops
  * @property-read int|null $stops_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip query()
@@ -28,6 +27,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereMode($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereProvider($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class TransportTrip extends Model

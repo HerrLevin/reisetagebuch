@@ -14,7 +14,7 @@ class UserRepository
 
     public function __construct(?UserHydrator $userHydrator = null)
     {
-        $this->userHydrator = $userHydrator ?? new UserHydrator();
+        $this->userHydrator = $userHydrator ?? new UserHydrator;
     }
 
     public function getUserByUsername(string $username): UserDto
@@ -37,7 +37,7 @@ class UserRepository
             'avatar' => $avatarPath,
         ];
 
-        if (!$user->profile) {
+        if (! $user->profile) {
             $user->profile()->create($profileData);
         } else {
             $user->profile()->update($profileData);

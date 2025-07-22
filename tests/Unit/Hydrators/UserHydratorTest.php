@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class UserHydratorTest extends TestCase
 {
-    public function testModelToDto()
+    public function test_model_to_dto()
     {
         // Mock the Profile model
         $profile = $this->createMock(Profile::class);
@@ -57,7 +57,7 @@ class UserHydratorTest extends TestCase
         $this->assertEquals('https://example.com', $dto->website);
     }
 
-    public function testModelToDtoWithoutProfile()
+    public function test_model_to_dto_without_profile()
     {
         // Mock the User model without a profile
         $user = $this->createMock(User::class);

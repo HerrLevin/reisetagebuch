@@ -33,12 +33,14 @@ class AccountController extends Controller
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $this->accountBackend->update($request);
+
         return Redirect::route('account.edit');
     }
 
     public function updateSettings(SettingsUpdateRequest $request): RedirectResponse
     {
         $this->accountBackend->updateSettings($request);
+
         return Redirect::route('account.edit');
     }
 

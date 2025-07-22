@@ -65,7 +65,7 @@ class LocationRepository
 
     public function createRequestLocation(Point $point): void
     {
-        $requestLocation = new RequestLocation();
+        $requestLocation = new RequestLocation;
         $requestLocation->location = $point;
         $requestLocation->last_requested_at = now();
 
@@ -131,13 +131,12 @@ class LocationRepository
 
     public function getOrCreateLocationByIdentifier(
         string $name,
-        float  $latitude,
-        float  $longitude,
+        float $latitude,
+        float $longitude,
         string $identifier,
         string $type,
         string $origin,
-    ): Location
-    {
+    ): Location {
         $location = $this->getLocationByIdentifier($identifier, $type, $origin);
 
         if ($location === null) {
@@ -149,14 +148,13 @@ class LocationRepository
 
     public function createLocation(
         string $name,
-        float  $latitude,
-        float  $longitude,
+        float $latitude,
+        float $longitude,
         string $identifier,
         string $identifierType,
         string $origin
-    ): Location
-    {
-        $location = new Location();
+    ): Location {
+        $location = new Location;
         $location->name = $name;
         $location->location = Point::makeGeodetic($latitude, $longitude);
         $location->save();

@@ -13,6 +13,7 @@ use App\Repositories\UserRepository;
 class UserController extends Controller
 {
     private UserRepository $userRepository;
+
     private FileRepository $fileRepository;
 
     public function __construct(UserRepository $userRepository, FileRepository $fileRepository)

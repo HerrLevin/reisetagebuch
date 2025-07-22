@@ -28,7 +28,8 @@ class OsmNameService
             $brand = $location->tags['brand'] ?? null;
             $ref = $location->tags['ref'] ?? null;
             $name = $brand ?? $operator;
-            return $ref ? $name . ' ' . $ref : $name;
+
+            return $ref ? $name.' '.$ref : $name;
         }
 
         return null;

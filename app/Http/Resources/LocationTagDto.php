@@ -7,6 +7,7 @@ use App\Models\LocationTag;
 class LocationTagDto
 {
     public string $key;
+
     public string $value;
 
     public function __construct(LocationTag $locationTag)

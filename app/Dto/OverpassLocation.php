@@ -5,9 +5,13 @@ namespace App\Dto;
 readonly class OverpassLocation
 {
     public string $osmId;
+
     public float $latitude;
+
     public float $longitude;
+
     public string $osmType;
+
     public array $tags;
 
     public function __construct(

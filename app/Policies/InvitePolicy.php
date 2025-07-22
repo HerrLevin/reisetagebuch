@@ -10,6 +10,7 @@ class InvitePolicy
     public function create(User $user): bool
     {
         $whitelist = config('app.invite.whitelist');
+
         return empty($whitelist) || in_array($user->id, $whitelist);
     }
 

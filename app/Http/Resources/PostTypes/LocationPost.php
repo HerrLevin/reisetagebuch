@@ -15,5 +15,4 @@ class LocationPost extends BasePost
         parent::__construct($post, $userDto);
         $this->location = new LocationDto($post->locationPost->location);
     }
-
 }
