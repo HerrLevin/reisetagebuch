@@ -14,7 +14,6 @@ if [ ! -f /var/www/html/.env ]; then
 fi
 
 # Set correct permissions
-chown -R www-data:www-data /var/www/html/database/database.sqlite
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Start Supervisor in the background
