@@ -9,6 +9,8 @@ use App\Models\Location;
 use App\Models\LocationPost;
 use App\Models\Post;
 use App\Models\TransportPost;
+use App\Models\TransportTrip;
+use App\Models\TransportTripStop;
 use App\Models\User;
 use Carbon\Carbon;
 use Clickbar\Magellan\Data\Geometries\Point;
@@ -23,7 +25,7 @@ class PostHydratorTest extends TestCase
         $userDto = new UserDto;
         $userDto->id = '1';
         $userDto->name = 'John Doe';
-        $userDto->username = 'johndoe';
+        $userDto->username = 'johnDoe';
         $userDto->createdAt = Carbon::now()->toIso8601String();
 
         return $userDto;
@@ -31,7 +33,11 @@ class PostHydratorTest extends TestCase
 
     private function postMock(?TransportPost $transportPost = null, ?LocationPost $locationPost = null): Post
     {
-        $post = $this->createMock(\App\Models\Post::class);
+        $post = $this->getMockBuilder(Post::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['__get'])
+            ->getMock();
+
         $post->method('__get')->willReturnCallback(function ($property) use ($transportPost, $locationPost) {
             return match ($property) {
                 'id' => 'asdf',
@@ -104,15 +110,31 @@ class PostHydratorTest extends TestCase
      */
     public function test_model_to_dto_with_transport_post()
     {
-        $transportPost = $this->createMock(TransportPost::class);
-        $transportPost->method('__get')->willReturnCallback(function ($property) {
+        $transportTrip = $this->getMockBuilder(TransportTrip::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['__get'])
+            ->getMock();
+
+        $transportTrip->method('__get')->willReturnCallback(function ($property) {
             return match ($property) {
-                'origin' => $this->getLocationMock(),
-                'destination' => $this->getLocationMock(),
-                'departure' => Carbon::parse('2023-01-01 00:00:00'),
-                'arrival' => Carbon::parse('2023-01-01 00:00:01'),
+                'id' => 'trip-id',
+                'provider' => 'Test Provider',
                 'mode' => 'bus',
-                'line' => '123',
+                'line_name' => '123',
+                default => null,
+            };
+        });
+
+        $transportPost = $this->getMockBuilder(TransportPost::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['__get'])
+            ->getMock();
+
+        $transportPost->method('__get')->willReturnCallback(function ($property) use ($transportTrip) {
+            return match ($property) {
+                'originStop' => $this->getTransportTripStop('2023-01-01 00:00:00'),
+                'destinationStop' => $this->getTransportTripStop(),
+                'transportTrip' => $transportTrip,
                 default => null,
             };
         });
@@ -130,21 +152,41 @@ class PostHydratorTest extends TestCase
         $this->assertEquals('2023-01-01T00:00:00+00:00', $dto->created_at);
         $this->assertEquals('2023-01-01T00:00:01+00:00', $dto->updated_at);
         $this->assertEquals($userHydrator->modelToDto($post->user), $dto->user);
-        $this->assertEquals('2023-01-01T00:00:00+00:00', $dto->start_time);
-        $this->assertEquals('2023-01-01T00:00:01+00:00', $dto->stop_time);
-        $this->assertEquals('bus', $dto->mode);
-        $this->assertEquals('123', $dto->line);
-        $this->assertEquals('location-id', $dto->start->id);
-        $this->assertEquals('Test Location', $dto->start->name);
-        $this->assertEquals(1.1, $dto->start->latitude);
-        $this->assertEquals(2.1, $dto->start->longitude);
+        $this->assertEquals('2023-01-01T00:00:00+00:00', $dto->originStop->arrivalTime);
+        $this->assertEquals('2023-01-01T00:00:01+00:00', $dto->destinationStop->arrivalTime);
+        $this->assertEquals('bus', $dto->trip->mode);
+        $this->assertEquals('123', $dto->trip->lineName);
+        $this->assertEquals('location-id', $dto->originStop->location->id);
+        $this->assertEquals('Test Location', $dto->originStop->location->name);
+        $this->assertEquals(1.1, $dto->originStop->location->latitude);
+        $this->assertEquals(2.1, $dto->originStop->location->longitude);
 
+    }
+
+    private function getTransportTripStop(
+        string $departureTime = '2023-01-01 00:00:01'
+    ): TransportTripStop {
+        $arrivalTime = '2023-01-01 00:00:00';
+        $stop = $this->createMock(TransportTripStop::class);
+        $stop->method('__get')->willReturnCallback(function ($property) use ($departureTime, $arrivalTime) {
+            return match ($property) {
+                'id' => 'stop-id',
+                'location' => $this->getLocationMock(),
+                'arrival_time' => Carbon::parse($departureTime),
+                'departure_time' => Carbon::parse($arrivalTime),
+                'arrival_delay' => 5,
+                'departure_delay' => 10,
+                default => null,
+            };
+        });
+
+        return $stop;
     }
 
     /**
      * @throws Exception
      */
-    private function getLocationMock()
+    private function getLocationMock(): Location
     {
         $point = $this->createMock(Point::class);
         $point->method('getLatitude')->willReturn(1.1);

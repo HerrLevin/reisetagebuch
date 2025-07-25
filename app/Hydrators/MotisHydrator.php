@@ -41,16 +41,17 @@ class MotisHydrator
 
     }
 
-    private function hydrateStopPlace(array $data): StopPlaceDto {
+    private function hydrateStopPlace(array $data): StopPlaceDto
+    {
         return new StopPlaceDto()
             ->setName($data['name'])
             ->setStopId($data['stopId'])
             ->setLatitude((float) $data['lat'])
             ->setLongitude((float) $data['lon'])
-            ->setArrival(!empty($data['arrival']) ? Carbon::parse($data['arrival']) : null)
-            ->setDeparture(!empty($data['departure']) ? Carbon::parse($data['departure']) : null)
-            ->setScheduledArrival(!empty($data['scheduledArrival']) ? Carbon::parse($data['scheduledArrival']) : null)
-            ->setScheduledDeparture(!empty($data['scheduledDeparture']) ? Carbon::parse($data['scheduledDeparture']) : null);
+            ->setArrival(! empty($data['arrival']) ? Carbon::parse($data['arrival']) : null)
+            ->setDeparture(! empty($data['departure']) ? Carbon::parse($data['departure']) : null)
+            ->setScheduledArrival(! empty($data['scheduledArrival']) ? Carbon::parse($data['scheduledArrival']) : null)
+            ->setScheduledDeparture(! empty($data['scheduledDeparture']) ? Carbon::parse($data['scheduledDeparture']) : null);
     }
 
     public function hydrateTrip(array $data): TripDto
@@ -62,8 +63,8 @@ class MotisHydrator
 
         return new TripDto()
             ->setDuration($data['duration'])
-            ->setStartTime(!empty($data['startTime']) ? Carbon::parse($data['startTime']) : null)
-            ->setEndTime(!empty($data['endTime']) ? Carbon::parse($data['endTime']) : null)
+            ->setStartTime(! empty($data['startTime']) ? Carbon::parse($data['startTime']) : null)
+            ->setEndTime(! empty($data['endTime']) ? Carbon::parse($data['endTime']) : null)
             ->setTransfers($data['transfers'])
             ->setLegs($legs);
     }
@@ -77,11 +78,11 @@ class MotisHydrator
 
         return new LegDto()
             ->setDuration($data['duration'])
-            ->setStartTime(!empty($data['startTime']) ? Carbon::parse($data['startTime']) : null)
-            ->setEndTime(!empty($data['endTime']) ? Carbon::parse($data['endTime']) : null)
+            ->setStartTime(! empty($data['startTime']) ? Carbon::parse($data['startTime']) : null)
+            ->setEndTime(! empty($data['endTime']) ? Carbon::parse($data['endTime']) : null)
             ->setRealTime($data['realTime'])
-            ->setScheduledStartTime(!empty($data['scheduledStartTime']) ? Carbon::parse($data['scheduledStartTime']) : null)
-            ->setScheduledEndTime(!empty($data['scheduledEndTime']) ? Carbon::parse($data['scheduledEndTime']) : null)
+            ->setScheduledStartTime(! empty($data['scheduledStartTime']) ? Carbon::parse($data['scheduledStartTime']) : null)
+            ->setScheduledEndTime(! empty($data['scheduledEndTime']) ? Carbon::parse($data['scheduledEndTime']) : null)
             ->setMode($data['mode'])
             ->setFrom($this->hydrateStopPlace($data['from']))
             ->setTo($this->hydrateStopPlace($data['to']))
@@ -92,7 +93,6 @@ class MotisHydrator
             ->setRouteShortName($data['routeShortName'])
             ->setSource($data['source'])
             ->setIntermediateStops($intermediateStops);
-
 
     }
 

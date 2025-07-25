@@ -49,14 +49,14 @@ class VersionServiceTest extends TestCase
         $this->assertEquals('unknown', $version);
     }
 
-    public function test_git_version_with_defecitve_head()
+    public function test_git_version_with_defective_head()
     {
         config()->set('app.version', '');
         $versionServiceMock = $this->getMockBuilder(VersionService::class)
             ->onlyMethods(['getGitHead'])
             ->getMock();
 
-        $versionServiceMock->method('getGitHead')->willReturn('foobar');
+        $versionServiceMock->method('getGitHead')->willReturn('ThisWillNotWork');
 
         $version = $versionServiceMock->getVersion();
         $this->assertEquals('unknown', $version);

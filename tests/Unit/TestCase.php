@@ -1,15 +1,12 @@
 <?php
 
-namespace Tests;
+namespace Tests\Unit;
 
 use App\Dto\MotisApi\StopPlaceDto;
 use Carbon\Carbon;
-use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
-abstract class TestCase extends BaseTestCase
+abstract class TestCase extends \PHPUnit\Framework\TestCase
 {
-    //
-
     protected function createStopPlaceDto(
         string $stopId = 'fromStopId',
         string $name = 'From Stop',

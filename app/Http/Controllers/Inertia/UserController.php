@@ -17,6 +17,7 @@ use Request;
 class UserController extends Controller
 {
     private BackendUserController $userController;
+
     private PostController $postController;
 
     public function __construct(BackendUserController $userController, PostController $postController)
@@ -29,7 +30,6 @@ class UserController extends Controller
     {
         $user = $this->userController->show($username);
         $posts = $this->postController->postsForUser($user->id);
-
 
         return inertia('Profile/Show', [
             'posts' => Inertia::merge($posts->items),

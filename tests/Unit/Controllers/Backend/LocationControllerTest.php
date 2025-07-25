@@ -3,18 +3,22 @@
 namespace Tests\Unit\Controllers\Backend;
 
 use App\Dto\DeparturesDto;
+use App\Dto\MotisApi\LegDto;
 use App\Dto\MotisApi\StopDto;
 use App\Dto\MotisApi\TripDto;
 use App\Http\Controllers\Backend\LocationController;
+use App\Hydrators\TripDtoHydrator;
+use App\Jobs\RerouteStops;
 use App\Repositories\LocationRepository;
+use App\Repositories\TransportTripRepository;
 use App\Services\TransitousRequestService;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Client\ConnectionException;
 use PHPUnit\Framework\MockObject\Exception;
-use PHPUnit\Framework\TestCase;
+use Queue;
 
-class LocationControllerTest extends TestCase
+class LocationControllerTest extends \Tests\TestCase
 {
     private LocationRepository $repository;
 
@@ -22,12 +26,24 @@ class LocationControllerTest extends TestCase
 
     private LocationController $controller;
 
+    private TransportTripRepository $transportTripRepository;
+
+    private TripDtoHydrator $tripDtoHydrator;
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->repository = $this->createMock(LocationRepository::class);
         $this->transitousRequestService = $this->createMock(TransitousRequestService::class);
-        $this->controller = new LocationController($this->repository, $this->transitousRequestService);
+        $this->transportTripRepository = $this->createMock(TransportTripRepository::class);
+        $this->tripDtoHydrator = $this->createMock(TripDtoHydrator::class);
+
+        $this->controller = new LocationController(
+            $this->repository,
+            $this->transitousRequestService,
+            $this->transportTripRepository,
+            $this->tripDtoHydrator
+        );
     }
 
     /**
@@ -110,7 +126,15 @@ class LocationControllerTest extends TestCase
     public function test_departures(): void
     {
         $point = $this->createMock(Point::class);
-        $stops = new Collection([new StopDto('id', 'name', 1.1, 1.1, 123)]);
+
+        $demoStop = new StopDto()
+            ->setStopId('stopId')
+            ->setName('Demo Stop')
+            ->setLatitude(48.8566)
+            ->setLongitude(2.3522)
+            ->setDistance(100);
+
+        $stops = new Collection([$demoStop]);
         $departures = new Collection([$this->createMock(TripDto::class)]);
         $time = now();
         $this->transitousRequestService->expects($this->once())
@@ -148,10 +172,20 @@ class LocationControllerTest extends TestCase
      */
     public function test_stopovers(): void
     {
+        Queue::fake([
+            RerouteStops::class,
+        ]);
         $tripId = 'tripId';
         $startId = 'startId';
         $startTime = now();
-        $trip = new TripDto($tripId, $startId, $startTime, []);
+        $leg = new LegDto()
+            ->setMode('bus')
+            ->setRouteShortName('Route 42')
+            ->setFrom($this->createStopPlaceDto())
+            ->setIntermediateStops([])
+            ->setTo($this->createStopPlaceDto());
+
+        $trip = new TripDto()->setLegs([$leg]);
 
         $this->transitousRequestService->expects($this->once())
             ->method('getStopTimes')
@@ -160,5 +194,7 @@ class LocationControllerTest extends TestCase
 
         $result = $this->controller->stopovers($tripId, $startId, $startTime);
         $this->assertEquals($trip, $result);
+
+        Queue::assertPushed(RerouteStops::class);
     }
 }
