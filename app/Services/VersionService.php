@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use Exception;
+use Log;
 
 class VersionService
 {
@@ -39,16 +40,30 @@ class VersionService
             return null;
         }
 
+        $gitCommit = null;
         try {
-            $hash = file_get_contents(base_path().'/.git/'.$this->getGitHead());
-            if ($hash) {
-                return $hash;
-            }
+            $gitCommit = file_get_contents(base_path().'/.git/'.$this->getGitHead());
         } catch (Exception $exception) {
+            // if .git/HEAD is detached, we can still try to read the commit hash
+            try {
+                $hash = $this->getGitHead();
+                $gitLog = file_get_contents(base_path().'/.git/logs/HEAD');
+
+                // check if the log contains the commit hash
+                if (str_contains($gitLog, $hash)) {
+                    return $hash;
+                }
+
+            } catch (Exception $exception) {
+                Log::error('Failed to read git logs', [
+                    'exception' => $exception,
+                ]);
+            }
+
             report($exception);
         }
 
-        return null;
+        return $gitCommit;
     }
 
     public function getGitHead(): ?string

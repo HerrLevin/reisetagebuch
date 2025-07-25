@@ -24,5 +24,4 @@ class TripDtoHydrator
             ->setScheduledArrival($stop->arrival_time)
             ->setScheduledDeparture($stop->departure_time);
     }
-
 }

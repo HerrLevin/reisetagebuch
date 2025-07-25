@@ -18,7 +18,8 @@ class TransportPost extends BasePost
     public function __construct(Post $post, UserDto $userDto)
     {
         parent::__construct($post, $userDto);
-        $this->originStop = new StopDto($post->transportPost->originStop);
+        $asdf = $post->transportPost->originStop;
+        $this->originStop = new StopDto($asdf);
         $this->destinationStop = new StopDto($post->transportPost->destinationStop);
         $this->trip = new TripDto($post->transportPost->transportTrip);
     }
