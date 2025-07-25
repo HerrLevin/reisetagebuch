@@ -21,12 +21,12 @@ defineExpose({ focus: () => input.value?.focus() });
 
 <template>
     <select
+        ref="input"
+        v-model="model"
         class="select input-bordered w-full"
         :class="{
             'input-error': props.error,
         }"
-        v-model="model"
-        ref="input"
     >
         <option
             v-for="option in props.options"

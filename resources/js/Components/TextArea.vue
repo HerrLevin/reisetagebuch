@@ -20,11 +20,11 @@ defineExpose({ focus: () => input.value?.focus() });
 
 <template>
     <textarea
+        ref="input"
+        v-model="model"
         class="textarea w-full"
         :class="{
             'input-error': props.error,
         }"
-        v-model="model"
-        ref="input"
     />
 </template>

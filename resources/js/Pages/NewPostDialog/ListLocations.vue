@@ -59,12 +59,12 @@ filterLocations();
                         </g>
                     </svg>
                     <input
+                        v-model="search"
                         type="search"
                         class="grow"
                         placeholder="Search"
-                        @keyup="filterLocations"
-                        v-model="search"
                         autofocus
+                        @keyup="filterLocations"
                     />
                     <!--                    <kbd class="kbd kbd-sm">⌘</kbd>-->
                     <!--                    <kbd class="kbd kbd-sm">K</kbd>-->
@@ -78,11 +78,11 @@ filterLocations();
                 </li>
 
                 <LocationListEntry
-                    :data="{ location: location }"
                     v-for="location in filteredLocations"
-                    :location
-                    :showStartButton
                     :key="location.id"
+                    :data="{ location: location }"
+                    :location
+                    :show-start-button
                 />
             </ul>
         </div>

@@ -5,7 +5,7 @@ import SelectInput from '@/Components/SelectInput.vue';
 import { useForm, usePage } from '@inertiajs/vue3';
 
 defineProps<{
-    status?: String;
+    status?: string;
 }>();
 
 const user = usePage().props.auth.user;
@@ -24,17 +24,17 @@ const form = useForm({
         </header>
 
         <form
-            @submit.prevent="form.patch(route('account.settings.update'))"
             class="mt-6 space-y-6"
+            @submit.prevent="form.patch(route('account.settings.update'))"
         >
             <div>
                 <InputLabel for="defaultNewPostView" value="Default New Post" />
 
                 <SelectInput
                     id="defaultNewPostView"
+                    v-model="form.defaultNewPostView"
                     class="mt-1 block w-full"
                     :error="form.errors.defaultNewPostView"
-                    v-model="form.defaultNewPostView"
                     :options="[
                         { value: 'location', label: 'Location' },
                         { value: 'departures', label: 'Departures' },

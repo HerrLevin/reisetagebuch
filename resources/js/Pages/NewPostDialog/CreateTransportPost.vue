@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PostCreationForm from '@/Pages/NewPostDialog/Partials/PostCreationForm.vue';
-import { Head, router } from '@inertiajs/vue3';
-import { reactive } from 'vue';
 import { getEmoji } from '@/Services/DepartureTypeService';
 import { TransportMode } from '@/types/enums';
+import { Head, router } from '@inertiajs/vue3';
+import { reactive } from 'vue';
 
 // get url params
 const urlParams = new URLSearchParams(window.location.search);
@@ -54,9 +54,9 @@ function submitForm() {
         <div class="card bg-base-100 min-w-full shadow-md">
             <form @submit.prevent="submitForm">
                 <PostCreationForm
+                    v-model="form.body"
                     :name="title"
                     :emoji="emoji"
-                    v-model="form.body"
                     @cancel="goBack"
                 />
             </form>

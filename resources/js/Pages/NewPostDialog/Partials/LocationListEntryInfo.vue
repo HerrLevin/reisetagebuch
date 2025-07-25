@@ -33,22 +33,22 @@ function openModal() {
 </script>
 
 <template>
-    <slot name="activator" :onClick="openModal" />
+    <slot name="activator" :on-click="openModal" />
     <dialog
         ref="tagModal"
         class="modal modal-bottom sm:modal-middle"
         @click.prevent=""
     >
-        <div class="modal-box p-0" ref="modalBox">
+        <div ref="modalBox" class="modal-box p-0">
             <ul class="list">
                 <li class="text p-4 pb-2 tracking-wide opacity-60">
                     {{ location.name }}
                 </li>
 
                 <li
-                    class="list-row py-3"
                     v-for="tag in location.tags"
                     :key="tag.key"
+                    class="list-row py-3"
                 >
                     <div>
                         <div class="text-xs opacity-60">{{ tag.key }}</div>

@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
+ * 
+ *
  * @property string $id
  * @property string $user_id
  * @property string|null $used_by
@@ -18,7 +20,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User $createdBy
  * @property-read \App\Models\User|null $usedBy
- *
  * @method static \Database\Factories\InviteFactory factory($count = null, $state = [])
  * @method static Builder<static>|Invite newModelQuery()
  * @method static Builder<static>|Invite newQuery()
@@ -30,7 +31,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static Builder<static>|Invite whereUsedAt($value)
  * @method static Builder<static>|Invite whereUsedBy($value)
  * @method static Builder<static>|Invite whereUserId($value)
- *
  * @mixin \Eloquent
  */
 class Invite extends Model

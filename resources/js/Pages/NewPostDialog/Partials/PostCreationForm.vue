@@ -1,6 +1,5 @@
 <script setup lang="ts">
-
-const model = defineModel({ default: '' });
+const model = defineModel({ default: '', type: String });
 
 defineProps({
     emoji: {
@@ -23,9 +22,9 @@ defineEmits(['cancel']);
     </div>
     <div class="w-full">
         <textarea
+            v-model="model"
             class="textarea textarea-ghost bg-base-200 w-full"
             placeholder="Statustext"
-            v-model="model"
         ></textarea>
     </div>
     <div class="flex w-full justify-end gap-4 px-8 py-4">

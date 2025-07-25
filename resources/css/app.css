@@ -1,11 +1,15 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @import 'maplibre-gl/dist/maplibre-gl.css';
 
 @plugin "daisyui" {
-    themes: light --default, dark --prefersdark;
+    themes:
+        light --default,
+        dark --prefersdark;
 }
 
 /* Input fontsize to prevent zooming on mobile */
-input, textarea, select {
+input,
+textarea,
+select {
     font-size: 1rem;
 }

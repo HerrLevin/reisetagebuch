@@ -41,6 +41,7 @@ const props = defineProps({
 
 const search = ref('');
 const suggestions = ref<
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     { label: string; value: any; subLabel: string | undefined }[]
 >([]);
 
@@ -64,6 +65,7 @@ function fetchSuggestions() {
             },
         })
         .then((response) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             suggestions.value = response.data.map((item: any) => ({
                 label: item.name,
                 value: item.id,
@@ -80,10 +82,10 @@ function getArea(areas: Array<Area>) {
         return '';
     }
 
-    let defaultArea: undefined | Area = areas.find(
+    const defaultArea: undefined | Area = areas.find(
         (area: Area) => area.default,
     );
-    let country: undefined | Area = areas.find(
+    const country: undefined | Area = areas.find(
         (area: Area) => area.adminLevel === 2,
     );
 
@@ -103,7 +105,7 @@ if (props.requestTime) {
 
 function selectDate(date: EventTarget | null) {
     if (date && date instanceof HTMLInputElement) {
-        let dateObject = DateTime.fromISO(date.value);
+        const dateObject = DateTime.fromISO(date.value);
         selectedTime.value = selectedTime.value
             ? selectedTime.value.set({
                   year: dateObject.year,
@@ -116,7 +118,7 @@ function selectDate(date: EventTarget | null) {
 
 function selectTime(time: EventTarget | null) {
     if (time && time instanceof HTMLInputElement) {
-        let timeObject = DateTime.fromISO(time.value);
+        const timeObject = DateTime.fromISO(time.value);
         selectedTime.value = selectedTime.value
             ? selectedTime.value.set({
                   hour: timeObject.hour,
@@ -126,6 +128,7 @@ function selectTime(time: EventTarget | null) {
     }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function submitTypeahead(test: any) {
     let identifier: string | undefined = undefined;
     if (test === undefined) {
@@ -153,27 +156,27 @@ function submitTypeahead(test: any) {
             <li class="list-row">
                 <div class="list-col-grow">
                     <Typeahead
+                        v-model="search"
                         class="input input-bordered w-full"
                         name="departure-search"
                         :required="false"
+                        :suggestions="suggestions"
                         @submit="submitTypeahead($event)"
                         @select="submitTypeahead($event)"
                         @focus="modelChange()"
-                        v-model="search"
-                        :suggestions="suggestions"
-                        @update:modelValue="modelChange()"
+                        @update:model-value="modelChange()"
                     />
                 </div>
                 <button
+                    id="cally1"
                     popovertarget="datetime-picker"
                     class="btn btn-neutral"
-                    id="cally1"
                 >
                     <Clock class="h-4 w-4" />
                 </button>
                 <div
-                    popover
                     id="datetime-picker"
+                    popover
                     class="dropdown bg-base-100 rounded-box p-3 shadow-lg"
                     style="position-anchor: --cally1"
                 >
@@ -236,6 +239,8 @@ function submitTypeahead(test: any) {
                 </Link>
 
                 <Link
+                    v-for="(mode, name) in FilterGroups"
+                    :key="name"
                     class="btn btn-sm text-white"
                     :class="{
                         'opacity-60':
@@ -250,8 +255,6 @@ function submitTypeahead(test: any) {
                         })
                     "
                     :style="`background-color: ${getColor(mode[0])}`"
-                    v-for="(mode, name) in FilterGroups"
-                    :key="name"
                 >
                     {{ getEmoji(mode[0]) }}
 

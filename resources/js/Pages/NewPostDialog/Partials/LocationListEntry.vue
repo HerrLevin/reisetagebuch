@@ -78,7 +78,7 @@ const linkData = ref({
         </Link>
         -->
         <LocationListEntryInfo :location>
-            <template v-slot:activator="{ onClick }">
+            <template #activator="{ onClick }">
                 <button
                     class="btn btn-square btn-ghost"
                     @click.prevent="onClick"

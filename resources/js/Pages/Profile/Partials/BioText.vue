@@ -13,8 +13,8 @@ defineProps({
 <template>
     <div>
         <p
-            class="line-clamp-15 overflow-ellipsis whitespace-pre-wrap"
             v-if="user.bio"
+            class="line-clamp-15 overflow-ellipsis whitespace-pre-wrap"
         >
             {{ user.bio }}
         </p>

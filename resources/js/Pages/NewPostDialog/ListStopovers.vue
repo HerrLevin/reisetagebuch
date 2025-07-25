@@ -11,6 +11,7 @@ const props = defineProps({
     trip: {
         type: Object as PropType<TripDto> | null,
         required: false,
+        default: () => null,
     },
     startTime: {
         type: String,
@@ -82,8 +83,8 @@ function getTitle() {
                     :key="index"
                     :stop="stopover"
                     :mode="trip?.legs[0].mode"
-                    :shortName="trip?.legs[0].routeShortName"
-                    :realTime="trip?.legs[0].realTime"
+                    :short-name="trip?.legs[0].routeShortName"
+                    :real-time="trip?.legs[0].realTime"
                     @click="redirectCreatePost(stopover)"
                 />
             </ul>

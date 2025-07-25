@@ -7,5 +7,6 @@ defineProps({
 });
 </script>
 <template>
+    <!-- eslint-disable-next-line -->
     <img src="/assets/logo.webp" alt="Logo" :class />
 </template>

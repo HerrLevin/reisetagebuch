@@ -49,6 +49,7 @@ fetch('/profile/' + props.user.username + '/map-data')
     .then((json) => {
         geoJson.value = json;
         const mapBounds = new LngLatBounds();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         json.geometries.forEach((geometry: any) => {
             mapBounds.extend(geometry.coordinates);
         });

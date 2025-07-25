@@ -39,7 +39,7 @@ const delay = ref(timeService.delay);
                 :planned="plannedTime"
                 :time="time"
                 :delay="delay"
-                :realTime="realTime"
+                :real-time="realTime"
             />
         </div>
     </li>

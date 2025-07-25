@@ -75,7 +75,7 @@ const linkData = ref({
                 :planned="plannedTime"
                 :time="time"
                 :delay="delay"
-                :realTime="props.stopTime.realTime"
+                :real-time="props.stopTime.realTime"
             />
         </div>
     </Link>
