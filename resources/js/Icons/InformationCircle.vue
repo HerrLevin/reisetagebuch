@@ -5,6 +5,7 @@ defineProps(Icon);
 </script>
 <template>
     <!-- Icon from https://github.com/tailwindlabs/heroicons/, licensed under MIT -->
+    <!-- eslint-disable -->
     <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
@@ -13,6 +14,7 @@ defineProps(Icon);
         :stroke="stroke"
         :class
     >
+        <!-- eslint-enable -->
         <path
             stroke-linecap="round"
             stroke-linejoin="round"

@@ -22,7 +22,7 @@ createServer((page) =>
                 .use(plugin)
                 .use(ZiggyVue, {
                     ...page.props.ziggy,
-                    region: new URL(page.props.ziggy.location),
+                    location: new URL(page.props.ziggy.location),
                 });
         },
     }),

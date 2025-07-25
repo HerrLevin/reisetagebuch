@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
+ * 
+ *
  * @property string $id
  * @property string $location_id
  * @property string $type
@@ -16,7 +18,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Location $location
- *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|LocationIdentifier newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|LocationIdentifier newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|LocationIdentifier query()
@@ -28,7 +29,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|LocationIdentifier whereOrigin($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|LocationIdentifier whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|LocationIdentifier whereUpdatedAt($value)
- *
  * @mixin \Eloquent
  */
 class LocationIdentifier extends Model

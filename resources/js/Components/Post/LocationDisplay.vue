@@ -20,7 +20,7 @@ defineProps({
                     v-if="post.location"
                     :location="post.location"
                 >
-                    <template v-slot:activator="{ onClick }">
+                    <template #activator="{ onClick }">
                         <a href="#" @click.prevent="onClick">
                             {{ getEmojiFromTags(post.location.tags) }}
                             {{ post.location.name }}

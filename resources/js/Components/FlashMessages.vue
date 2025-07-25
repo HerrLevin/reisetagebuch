@@ -1,3 +1,26 @@
+<!-- eslint-disable-next-line vue/block-lang -->
+<script>
+import CheckCircle from '@/Icons/CheckCircle.vue';
+import XCircle from '@/Icons/XCircle.vue';
+import XMark from '@/Icons/XMark.vue';
+
+export default {
+    components: { XCircle, XMark, CheckCircle },
+    data() {
+        return {
+            show: false,
+        };
+    },
+    watch: {
+        '$page.props?.flash': {
+            handler() {
+                this.show = true;
+            },
+            deep: true,
+        },
+    },
+};
+</script>
 <template>
     <div :class="{ 'mb-4': show }">
         <div
@@ -57,26 +80,3 @@
         </div>
     </div>
 </template>
-
-<script>
-import CheckCircle from '@/Icons/CheckCircle.vue';
-import XCircle from '@/Icons/XCircle.vue';
-import XMark from '@/Icons/XMark.vue';
-
-export default {
-    components: { XCircle, XMark, CheckCircle },
-    data() {
-        return {
-            show: false,
-        };
-    },
-    watch: {
-        '$page.props?.flash': {
-            handler() {
-                this.show = true;
-            },
-            deep: true,
-        },
-    },
-};
-</script>

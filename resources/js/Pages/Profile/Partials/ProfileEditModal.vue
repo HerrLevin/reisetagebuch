@@ -79,8 +79,8 @@ const headerUpload = (event: Event) => {
 
 <template>
     <button
-        class="btn rounded-full"
         v-if="user.id === authUser.id"
+        class="btn rounded-full"
         type="button"
         @click="openModal()"
     >

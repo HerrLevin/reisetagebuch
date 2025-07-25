@@ -40,9 +40,9 @@ const submit = () => {
 
                 <TextInput
                     id="email"
+                    v-model="form.email"
                     type="email"
                     class="mt-1 block w-full"
-                    v-model="form.email"
                     :error="form.errors.email"
                     required
                     autofocus
@@ -57,9 +57,9 @@ const submit = () => {
 
                 <TextInput
                     id="password"
+                    v-model="form.password"
                     type="password"
                     class="mt-1 block w-full"
-                    v-model="form.password"
                     :error="form.errors.password"
                     required
                     autocomplete="current-password"
@@ -72,8 +72,8 @@ const submit = () => {
                 <fieldset class="form-control">
                     <label class="fieldset-label">
                         <input
-                            type="checkbox"
                             v-model="form.remember"
+                            type="checkbox"
                             class="checkbox"
                         />
                         Remember me

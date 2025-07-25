@@ -13,6 +13,7 @@ const props = defineProps({
     departures: {
         type: Object as PropType<DeparturesDto> | null,
         required: false,
+        default: () => null,
     },
     filter: {
         type: Array as PropType<TransportMode[]>,
@@ -55,7 +56,7 @@ showStartButton.value = route().current('posts.create.start');
             :latitude="latitude"
             :longitude="longitude"
             :filter="filter"
-            :requestTime="requestTime"
+            :request-time="requestTime"
             :location="requestIdentifier ? departures?.stop : null"
         />
         <div class="card bg-base-100 min-w-full shadow-md">
@@ -74,8 +75,8 @@ showStartButton.value = route().current('posts.create.start');
                 <DeparturesListEntry
                     v-for="(departure, index) in departures?.departures"
                     :key="index"
-                    :stopTime="departure"
-                    :showStartButton="showStartButton"
+                    :stop-time="departure"
+                    :show-start-button="showStartButton"
                     :stop="departures!.stop"
                 />
             </ul>

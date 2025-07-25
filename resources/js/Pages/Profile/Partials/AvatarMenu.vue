@@ -2,8 +2,8 @@
 import EllipsisVertical from '@/Icons/EllipsisVertical.vue';
 import ProfileEditModal from '@/Pages/Profile/Partials/ProfileEditModal.vue';
 import type { UserDto } from '@/types';
-import { PropType } from 'vue';
 import { usePage } from '@inertiajs/vue3';
+import { PropType } from 'vue';
 
 const authUser = usePage().props.auth.user ?? null;
 defineProps({

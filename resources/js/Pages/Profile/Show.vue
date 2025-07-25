@@ -34,7 +34,7 @@ defineProps({
 
     <ProfileWrapper :user="user">
         <div class="card bg-base-100 min-w-full shadow-md">
-            <ul class="list" v-if="posts.length > 0">
+            <ul v-if="posts.length > 0" class="list">
                 <li v-for="post in posts" :key="post.id">
                     <Link
                         class="list-row hover-list-entry cursor-pointer"

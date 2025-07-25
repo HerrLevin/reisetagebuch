@@ -15,6 +15,7 @@ defineProps({
     },
     suggestions: {
         type: Array as PropType<
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             { label: string; value: any; subLabel: string | undefined }[]
         >,
         default: () => [],
@@ -30,10 +31,10 @@ const loading = ref(false);
     <div class="dropdown w-full">
         <label class="input input-bordered w-full">
             <input
+                v-model="model"
                 type="text"
                 tabindex="0"
                 class="w-full"
-                v-model="model"
                 :class="{ 'input-error': errors.length }"
                 :name="name"
                 @focusin="$emit('focus')"
@@ -56,15 +57,15 @@ const loading = ref(false);
                 class="max-w-full"
             >
                 <a
-                    @click="$emit('select', suggestion)"
                     class="inline-block w-full"
+                    @click="$emit('select', suggestion)"
                 >
                     <h3 class="truncate font-bold">
                         {{ suggestion.label }}
                     </h3>
                     <h6
-                        class="truncate text-xs opacity-60"
                         v-if="suggestion.subLabel"
+                        class="truncate text-xs opacity-60"
                     >
                         {{ suggestion.subLabel }}
                     </h6>

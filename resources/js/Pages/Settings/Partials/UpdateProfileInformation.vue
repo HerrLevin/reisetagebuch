@@ -5,8 +5,8 @@ import TextInput from '@/Components/TextInput.vue';
 import { Link, useForm, usePage } from '@inertiajs/vue3';
 
 defineProps<{
-    mustVerifyEmail?: Boolean;
-    status?: String;
+    mustVerifyEmail?: boolean;
+    status?: string;
 }>();
 
 const user = usePage().props.auth.user;
@@ -29,17 +29,17 @@ const form = useForm({
         </header>
 
         <form
-            @submit.prevent="form.patch(route('account.update'))"
             class="mt-6 space-y-6"
+            @submit.prevent="form.patch(route('account.update'))"
         >
             <div>
                 <InputLabel for="name" value="Name" />
 
                 <TextInput
                     id="name"
+                    v-model="form.name"
                     type="text"
                     class="mt-1 block w-full"
-                    v-model="form.name"
                     :error="form.errors.name"
                     required
                     autofocus
@@ -54,9 +54,9 @@ const form = useForm({
 
                 <TextInput
                     id="name"
+                    v-model="form.username"
                     type="text"
                     class="mt-1 block w-full"
-                    v-model="form.username"
                     :error="form.errors.username"
                     required
                     autofocus
@@ -71,9 +71,9 @@ const form = useForm({
 
                 <TextInput
                     id="email"
+                    v-model="form.email"
                     type="email"
                     class="mt-1 block w-full"
-                    v-model="form.email"
                     :error="form.errors.email"
                     required
                     autocomplete="username"

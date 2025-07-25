@@ -29,10 +29,10 @@ watch(checkBox, (newValue) => {
     <label class="swap swap-rotate">
         <!-- this hidden checkbox controls the state -->
         <input
+            v-model="checkBox"
             type="checkbox"
             class="theme-controller"
             value="light"
-            v-model="checkBox"
         />
 
         <!-- sun icon -->

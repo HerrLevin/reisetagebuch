@@ -28,9 +28,9 @@ function submitForm() {
         <div class="card bg-base-100 min-w-full shadow-md">
             <form @submit.prevent="submitForm">
                 <PostCreationForm
+                    v-model="form.body"
                     name="New Post"
                     emoji="✍"
-                    v-model="form.body"
                     @cancel="goBack"
                 />
             </form>

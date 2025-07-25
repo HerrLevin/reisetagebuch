@@ -14,6 +14,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 /**
+ * 
+ *
  * @property string $id
  * @property string $name
  * @property string $username
@@ -32,7 +34,6 @@ use Illuminate\Notifications\Notifiable;
  * @property-read int|null $posts_count
  * @property-read \App\Models\Profile|null $profile
  * @property-read \App\Models\UserSettings|null $settings
- *
  * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newQuery()
@@ -46,7 +47,6 @@ use Illuminate\Notifications\Notifiable;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUsername($value)
- *
  * @mixin \Eloquent
  */
 class User extends Authenticatable
