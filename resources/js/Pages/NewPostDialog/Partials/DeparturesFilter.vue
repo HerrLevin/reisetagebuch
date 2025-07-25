@@ -41,7 +41,6 @@ const props = defineProps({
 
 const search = ref('');
 const suggestions = ref<
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     { label: string; value: any; subLabel: string | undefined }[]
 >([]);
 

@@ -24,6 +24,7 @@ class VersionServiceTest extends TestCase
 
         $versionService = new VersionService;
         $userAgent = $versionService->getUserAgent();
+        $this->assertTrue(false);
         $this->assertEquals('TestApp/1.2.3 (https://example.com; bot; contact: mail@example.com)', $userAgent);
     }
 
