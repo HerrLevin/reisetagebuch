@@ -65,15 +65,18 @@ class LocationRepository
             $dbLocation = $identifier->location ?? null;
 
             if ($dbLocation === null) {
-                $dbLocation = $this->createLocation(
-                    $name,
-                    $location->latitude,
-                    $location->longitude,
-                    $location->osmId,
-                    $location->osmType,
-                    'osm'
-                );
+                $dbLocation = new Location;
             }
+
+            $this->setLocationData(
+                $dbLocation,
+                $name,
+                $location->latitude,
+                $location->longitude,
+                $location->osmId,
+                $location->osmType,
+                'osm'
+            );
 
             foreach ($location->tags as $key => $value) {
                 $dbLocation->tags()->updateOrCreate([
@@ -165,34 +168,32 @@ class LocationRepository
         $location = $this->getLocationByIdentifier($identifier, $type, $origin);
 
         if ($location === null) {
-            $location = $this->createLocation($name, $latitude, $longitude, $identifier, $type, $origin);
+            $location = new Location;
+            $this->setLocationData($location, $name, $latitude, $longitude, $identifier, $type, $origin);
         }
 
         return $location;
     }
 
-    public function createLocation(
+    public function setLocationData(
+        Location $location,
         string $name,
         float $latitude,
         float $longitude,
         string $identifier,
         string $identifierType,
         string $origin
-    ): Location {
-        $location = new Location;
+    ): void {
         $location->name = $name;
         $location->location = Point::makeGeodetic($latitude, $longitude);
         $location->save();
 
-        $location->identifiers()->create([
-            'identifier' => $identifier,
-            'type' => $identifierType,
-            'origin' => $origin,
-            'name' => $name,
-        ]);
-        $location->save();
+        $location->identifiers()->updateOrCreate(
+            ['identifier' => $identifier, 'type' => $identifierType, 'origin' => $origin],
+            ['name' => $name]
+        );
 
-        return $location;
+        $location->save();
     }
 
     public function canTimestampedUserWaypointBeCreated(
