@@ -32,6 +32,10 @@ Route::middleware('auth')->group(callback: function () {
         Route::patch('/', [UserSettingsController::class, 'update'])->name('account.settings.update');
     });
 
+    Route::prefix('location-history')->group(function () {
+        Route::get('/', [LocationController::class, 'index'])->name('location-history.index');
+    });
+
     Route::prefix('posts')->group(callback: function () {
         Route::get('/create', [PostController::class, 'create'])->name('posts.create.post');
         Route::post('/create', [PostController::class, 'storeText'])->name('posts.create.text-post.store');

@@ -8,6 +8,7 @@ use App\Http\Requests\GeocodeRequest;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class LocationController extends Controller
 {
@@ -18,9 +19,10 @@ class LocationController extends Controller
         $this->locationController = $locationController;
     }
 
-    public function prefetch(float $latitude, float $longitude): void
+    public function prefetch(float $latitude, float $longitude, Request $request): void
     {
         $point = Point::makeGeodetic($latitude, $longitude);
+        $this->locationController->createTimestampedUserWaypoint($request->user()->id, $point);
         $this->locationController->prefetch($point);
 
         abort('204');
@@ -31,6 +33,7 @@ class LocationController extends Controller
         $point = null;
         if ($request->latitude && $request->longitude) {
             $point = Point::makeGeodetic($request->latitude, $request->longitude);
+            $this->locationController->createTimestampedUserWaypoint($request->user()->id, $point);
         }
 
         try {

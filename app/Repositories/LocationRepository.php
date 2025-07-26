@@ -4,9 +4,12 @@ namespace App\Repositories;
 
 use App\Models\Location;
 use App\Models\LocationIdentifier;
+use App\Models\LocationPost;
 use App\Models\RequestLocation;
+use App\Models\TimestampedUserWaypoint;
 use App\Services\OsmNameService;
 use App\Services\OverpassRequestService;
+use Carbon\Carbon;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Clickbar\Magellan\Database\PostgisFunctions\ST;
 use Illuminate\Database\Eloquent\Collection;
@@ -19,6 +22,28 @@ class LocationRepository
     public function __construct(OsmNameService $osmNameService)
     {
         $this->osmNameService = $osmNameService;
+    }
+
+    public function getLocationsForUser(string $userId, Carbon $fromDate, Carbon $untilDate): Collection
+    {
+        return LocationPost::join('posts', 'posts.id', '=', 'location_posts.post_id')
+            ->where('posts.user_id', $userId)
+            ->where('posts.created_at', '>=', $fromDate)
+            ->where('posts.created_at', '<=', $untilDate)
+            ->orderBy('posts.created_at', 'desc')
+            ->limit(100_000)
+            ->get();
+    }
+
+    public function getTimestampedUserWaypoints(string $userId, Carbon $fromDate, Carbon $untilDate): Collection
+    {
+        $query = TimestampedUserWaypoint::where('user_id', $userId)
+            ->where('created_at', '>=', $fromDate)
+            ->where('created_at', '<=', $untilDate)
+            ->orderBy('created_at', 'desc')
+            ->limit(100_000);
+
+        return $query->get();
     }
 
     public function fetchNearbyLocations(Point $point): SupportCollection
@@ -168,5 +193,25 @@ class LocationRepository
         $location->save();
 
         return $location;
+    }
+
+    public function canTimestampedUserWaypointBeCreated(
+        string $userId,
+        Point $point
+    ): bool {
+        return TimestampedUserWaypoint::where('user_id', $userId)
+            ->where(ST::dWithinGeography('location', $point, 50), '=', true) // todo: make radius configurable
+            ->where('created_at', '>=', now()->subMinutes(10))
+            ->count() === 0;
+    }
+
+    public function createTimestampedUserWaypoint(
+        string $userId,
+        Point $point
+    ): void {
+        $waypoint = new TimestampedUserWaypoint;
+        $waypoint->user_id = $userId;
+        $waypoint->location = $point;
+        $waypoint->save();
     }
 }

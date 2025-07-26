@@ -62,4 +62,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(UserSettings::class);
     }
+
+    public function locationHistory(): HasMany
+    {
+        return $this->hasMany(TimestampedUserWaypoint::class);
+    }
 }

@@ -233,6 +233,26 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property string $id
+ * @property string $user_id
+ * @property \Clickbar\Magellan\Data\Geometries\Point|null $location
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimestampedUserWaypoint newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimestampedUserWaypoint newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimestampedUserWaypoint query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimestampedUserWaypoint whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimestampedUserWaypoint whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimestampedUserWaypoint whereLocation($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimestampedUserWaypoint whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimestampedUserWaypoint whereUserId($value)
+ */
+	class TimestampedUserWaypoint extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property string $id
  * @property string $post_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -333,6 +353,8 @@ namespace App\Models{
  * @property \App\Enums\DefaultNewPostView $default_new_post_view
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Invite> $invites
  * @property-read int|null $invites_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\TimestampedUserWaypoint> $locationHistory
+ * @property-read int|null $location_history_count
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Post> $posts
