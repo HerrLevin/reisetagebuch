@@ -9,8 +9,11 @@ use App\Dto\MotisApi\StopDto;
 use App\Dto\MotisApi\StopPlaceDto;
 use App\Dto\MotisApi\TripDto;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\LocationDto;
+use App\Http\Resources\LocationHistoryDto;
 use App\Hydrators\TripDtoHydrator;
 use App\Jobs\RerouteStops;
+use App\Models\TimestampedUserWaypoint;
 use App\Models\TransportTripStop;
 use App\Repositories\LocationRepository;
 use App\Repositories\TransportTripRepository;
@@ -43,12 +46,39 @@ class LocationController extends Controller
         $this->tripDtoHydrator = $tripDtoHydrator;
     }
 
+    /**
+     * @return LocationDto[]|Collection
+     */
+    public function index(string $userId, Carbon $fromDate, Carbon $untilDate): Collection
+    {
+        $locations = $this->locationRepository->getLocationsForUser($userId, $fromDate, $untilDate);
+        $timestampedLocations = $this->locationRepository->getTimestampedUserWaypoints($userId, $fromDate, $untilDate);
+
+        $locations = $locations->merge($timestampedLocations);
+
+        // Sort locations by created_at in descending order
+        return $locations->sortByDesc('created_at')->map(function ($location) {
+            if ($location instanceof TimestampedUserWaypoint) {
+                return LocationHistoryDto::fromWaypoint($location);
+            }
+
+            return LocationHistoryDto::fromLocationPost($location);
+        })->values();
+    }
+
     public function prefetch(Point $point): void
     {
         if (! $this->locationRepository->recentNearbyRequests($point)) {
             $this->locationRepository->deleteOldNearbyRequests();
             $this->locationRepository->createRequestLocation($point);
             $this->locationRepository->fetchNearbyLocations($point);
+        }
+    }
+
+    public function createTimestampedUserWaypoint(string $userId, Point $point): void
+    {
+        if ($this->locationRepository->canTimestampedUserWaypointBeCreated($userId, $point)) {
+            $this->locationRepository->createTimestampedUserWaypoint($userId, $point);
         }
     }
 

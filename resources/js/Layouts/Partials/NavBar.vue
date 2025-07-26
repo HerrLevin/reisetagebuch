@@ -40,6 +40,11 @@ import { Link, usePage } from '@inertiajs/vue3';
                         </Link>
                     </li>
                     <li>
+                        <Link :href="route('location-history.index')">
+                            Location History
+                        </Link>
+                    </li>
+                    <li>
                         <Link :href="route('logout')" method="post" as="button">
                             Log Out
                         </Link>

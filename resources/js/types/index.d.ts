@@ -97,6 +97,15 @@ export type LocationEntry = {
     tags: LocationTag[];
 };
 
+export type LocationHistoryDto = {
+    id: string;
+    name: string | null;
+    latitude: number;
+    longitude: number;
+    type: string;
+    timestamp: string;
+};
+
 export type LocationTag = {
     key: string;
     value: string;
