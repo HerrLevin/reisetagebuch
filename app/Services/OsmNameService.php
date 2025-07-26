@@ -32,6 +32,20 @@ class OsmNameService
             return $ref ? $name.' '.$ref : $name;
         }
 
+        if ($location->tags['amenity'] === 'charging_station') {
+            $operator = $location->tags['operator'] ?? null;
+            $ref = $location->tags['ref'] ?? null;
+            $name = 'Charging Station';
+
+            if ($ref) {
+                $name .= ' '.$ref;
+            } elseif ($operator) {
+                $name .= sprintf(' (%s)', $operator);
+            }
+
+            return $name;
+        }
+
         return null;
     }
 }
