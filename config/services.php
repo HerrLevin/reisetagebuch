@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Third Party Services
@@ -35,4 +34,10 @@ return [
         ],
     ],
 
+    'traewelling' => [
+        'client_id' => env('TRAEWELLING_CLIENT_ID'),
+        'client_secret' => env('TRAEWELLING_CLIENT_SECRET'),
+        'redirect' => env('TRAEWELLING_REDIRECT_URI'),
+        'base_uri' => env('TRAEWELLING_BASE_URI', 'https://traewelling.de'),
+    ],
 ];
