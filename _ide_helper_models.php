@@ -140,6 +140,8 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\LocationPost|null $locationPost
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PostMetaInfo> $metaInfos
+ * @property-read int|null $meta_infos_count
  * @property-read \App\Models\TransportPost|null $transportPost
  * @property-read \App\Models\User $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post newModelQuery()
@@ -153,6 +155,28 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereUserId($value)
  */
 	class Post extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property string $id
+ * @property int $post_id
+ * @property string $key
+ * @property string|null $value
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Post $post
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PostMetaInfo newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PostMetaInfo newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PostMetaInfo query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PostMetaInfo whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PostMetaInfo whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PostMetaInfo whereKey($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PostMetaInfo wherePostId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PostMetaInfo whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PostMetaInfo whereValue($value)
+ */
+	class PostMetaInfo extends \Eloquent {}
 }
 
 namespace App\Models{

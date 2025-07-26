@@ -12,12 +12,12 @@ use App\Http\Requests\TransportPostCreateRequest;
 use App\Http\Resources\PostTypes\BasePost;
 use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
+use App\Jobs\TraewellingCrossCheckInJob;
 use App\Models\TransportTripStop;
 use App\Models\User;
 use App\Repositories\LocationRepository;
 use App\Repositories\PostRepository;
 use App\Repositories\TransportTripRepository;
-use App\Services\TransitousRequestService;
 use Illuminate\Auth\Access\AuthorizationException;
 
 class PostController extends Controller
@@ -26,19 +26,15 @@ class PostController extends Controller
 
     private LocationRepository $locationRepository;
 
-    private TransitousRequestService $transitousRequestService;
-
     private TransportTripRepository $transportTripRepository;
 
     public function __construct(
         PostRepository $postRepository,
         LocationRepository $locationRepository,
-        TransitousRequestService $transitousRequestService,
         TransportTripRepository $transportTripRepository
     ) {
         $this->locationRepository = $locationRepository;
         $this->postRepository = $postRepository;
-        $this->transitousRequestService = $transitousRequestService;
         $this->transportTripRepository = $transportTripRepository;
     }
 
@@ -90,12 +86,17 @@ class PostController extends Controller
             abort(422, 'Invalid stopover');
         }
 
-        return $this->postRepository->storeTransport(
+        $post = $this->postRepository->storeTransport(
             $request->user(),
             $trip,
             $startStopover,
             $stopStopover,
+            $request->body
         );
+
+        TraewellingCrossCheckInJob::dispatch($post->id);
+
+        return $post;
     }
 
     public function dashboard(User $user): PostPaginationDto
