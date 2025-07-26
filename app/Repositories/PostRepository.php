@@ -7,6 +7,7 @@ use App\Http\Resources\PostTypes\BasePost;
 use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
 use App\Hydrators\PostHydrator;
+use App\Jobs\TraewellingCrossCheckInJob;
 use App\Models\Location;
 use App\Models\Post;
 use App\Models\TransportTrip;
