@@ -234,6 +234,33 @@ namespace App\Models{
 /**
  * @property string $id
  * @property string $user_id
+ * @property string $provider
+ * @property string $provider_user_id
+ * @property string $access_token
+ * @property string|null $refresh_token
+ * @property \Illuminate\Support\Carbon|null $token_expires_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SocialAccount newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SocialAccount newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SocialAccount query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SocialAccount whereAccessToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SocialAccount whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SocialAccount whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SocialAccount whereProvider($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SocialAccount whereProviderUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SocialAccount whereRefreshToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SocialAccount whereTokenExpiresAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SocialAccount whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SocialAccount whereUserId($value)
+ */
+	class SocialAccount extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property string $id
+ * @property string $user_id
  * @property \Clickbar\Magellan\Data\Geometries\Point|null $location
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -361,6 +388,9 @@ namespace App\Models{
  * @property-read int|null $posts_count
  * @property-read \App\Models\Profile|null $profile
  * @property-read \App\Models\UserSettings|null $settings
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SocialAccount> $socialAccounts
+ * @property-read int|null $social_accounts_count
+ * @property-read \App\Models\SocialAccount|null $traewellingAccount
  * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newQuery()
