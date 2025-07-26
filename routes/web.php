@@ -8,6 +8,7 @@ use App\Http\Controllers\Inertia\LocationController;
 use App\Http\Controllers\Inertia\PostController;
 use App\Http\Controllers\Inertia\UserController;
 use App\Http\Controllers\Inertia\UserSettingsController;
+use App\Http\Controllers\TraewellingOAuthController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -68,6 +69,12 @@ Route::middleware('auth')->group(callback: function () {
     Route::get('invites', [InviteController::class, 'index'])->name('invites.index');
     Route::post('invites', [InviteController::class, 'store'])->name('invites.store');
     Route::delete('invites/{inviteCode}', [InviteController::class, 'destroy'])->name('invites.destroy');
+
+    Route::prefix('socialite')->group(callback: function () {
+        Route::get('/traewelling/connect', [TraewellingOAuthController::class, 'redirectToProvider'])->name('traewelling.connect');
+        Route::get('/traewelling/callback', [TraewellingOAuthController::class, 'handleProviderCallback'])->name('traewelling.callback');
+        Route::get('/traewelling/disconnect', [AccountController::class, 'disconnectTraewelling'])->name('traewelling.disconnect');
+    });
 });
 
 // Public routes

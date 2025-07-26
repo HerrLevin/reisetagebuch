@@ -67,4 +67,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(TimestampedUserWaypoint::class);
     }
+
+    public function socialAccounts(): HasMany
+    {
+        return $this->hasMany(SocialAccount::class);
+    }
+
+    public function traewellingAccount(): HasOne
+    {
+        return $this->hasOne(SocialAccount::class)->where('provider', 'traewelling');
+    }
 }
