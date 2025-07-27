@@ -73,6 +73,7 @@ const osmCategoryToEmoji: Record<string, Record<string, string>> = {
         community_centre: '🏢',
         research_institute: '🔬',
         school: '🏫',
+        music_venue: '🎶',
     },
     shop: {
         supermarket: '🛒',
@@ -140,6 +141,24 @@ const osmCategoryToEmoji: Record<string, Record<string, string>> = {
         administrative: '🏛️',
         national_park: '🏞️',
         protected_area: '🛡️',
+    },
+    bridge: {
+        yes: '🌉',
+    },
+    natural: {
+        water: '🌊',
+        wood: '🌲',
+        forest: '🌳',
+        mountain: '⛰️',
+        hill: '⛰️',
+        peak: '🏔️',
+        beach: '🏖️',
+        glacier: '🧊',
+        cave: '🕳️',
+        wetland: '🌾',
+        grassland: '🌾',
+        heath: '🌾',
+        moor: '🌾',
     },
 };
 

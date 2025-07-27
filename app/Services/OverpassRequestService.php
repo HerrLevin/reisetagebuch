@@ -31,22 +31,27 @@ class OverpassRequestService
             'loading_dock',
             'recycling',
             'parking_space',
-
         ],
+    ];
+
+    private const array FILTERS_FORCE_NAME = [
+        'leisure',
+        'natural',
+        'bridge',
+        'building' => [
+            'office',
+        ],
+        'parking',
+        'admin_level' => ['2', '4', '8', '9', '10', '11'],
     ];
 
     private const array FILTERS = [
         'amenity',
         'place' => ['village'],
-        'admin_level' => ['2', '4', '8', '9', '10', '11'],
         'historic',
         'tourism',
         'office',
         'shop',
-        'parking',
-        'building' => [
-            'office',
-        ],
         'landuse' => [
             'events',
         ],
@@ -89,10 +94,21 @@ class OverpassRequestService
     private function getQuery(): string
     {
         $query = '[out:json][timeout:25];(';
-        foreach (static::FILTERS as $key => $filter) {
+        $query .= $this->getNwrFor(self::FILTERS_FORCE_NAME, '[name]');
+        $query .= $this->getNwrFor(self::FILTERS);
+
+        $query .= ');out center;';
+
+        return $query;
+    }
+
+    private function getNwrFor(array $filters, string $append = '')
+    {
+        $query = '';
+        foreach ($filters as $key => $filter) {
             if (is_array($filter)) {
                 $filters = implode('|', $filter);
-                $excludes = $this->getExcludes($key);
+                $append .= $this->getExcludes($key);
                 $query .= sprintf(
                     'nwr(around:%d,%f,%f)["%s"~"%s"]%s;',
                     $this->radius,
@@ -100,22 +116,20 @@ class OverpassRequestService
                     $this->longitude,
                     $key,
                     $filters,
-                    $excludes
+                    $append
                 );
             } else {
-                $excludes = $this->getExcludes($filter);
+                $append .= $this->getExcludes($filter);
                 $query .= sprintf(
                     'nwr(around:%d,%f,%f)["%s"]%s;',
                     $this->radius,
                     $this->latitude,
                     $this->longitude,
                     $filter,
-                    $excludes
+                    $append
                 );
             }
         }
-
-        $query .= ');out center;';
 
         return $query;
     }
