@@ -45,6 +45,7 @@ class TraewellingCrossCheckInJob implements ShouldQueue
         $originStop = $post->transportPost->originStop;
         $destinationStop = $post->transportPost->destinationStop;
 
+        // todo: get from database
         $trwlOriginIdentifier = $this->getTrwlStationFromIdentifier($originStop->location->identifiers->firstWhere('origin', 'motis')?->identifier ?? '');
         $trwlDestinationIdentifier = $this->getTrwlStationFromIdentifier($destinationStop->location->identifiers->firstWhere('origin', 'motis')?->identifier ?? '');
         if (! $trwlOriginIdentifier || ! $trwlDestinationIdentifier) {
@@ -85,7 +86,7 @@ class TraewellingCrossCheckInJob implements ShouldQueue
 
         $data = json_decode($response->getBody()->getContents(), true);
 
-        return $data['data'] ?? null;
+        return $data['data'][0] ?? null;
     }
 
     public function getAccessToken(Post $post): void
