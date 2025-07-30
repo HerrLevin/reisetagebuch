@@ -17,6 +17,11 @@ class LocationDto
     public ?int $distance;
 
     /**
+     * @var LocationIdentifierDto[]
+     */
+    public array $identifiers = [];
+
+    /**
      * @var LocationTagDto[]
      */
     public array $tags;
@@ -29,5 +34,6 @@ class LocationDto
         $this->longitude = $location->location->getLongitude();
         $this->distance = $location->distance ? round($location->distance) : null;
         $this->tags = $location->tags->map(fn ($tag) => new LocationTagDto($tag))->toArray();
+        $this->identifiers = $location->identifiers->map(fn ($identifier) => new LocationIdentifierDto($identifier))->toArray();
     }
 }

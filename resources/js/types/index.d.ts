@@ -95,6 +95,13 @@ export type LocationEntry = {
     longitude: number;
     distance: ?number;
     tags: LocationTag[];
+    identifiers: LocationIdentifier[];
+};
+
+export type LocationIdentifier = {
+    type: string;
+    identifier: string;
+    origin: string;
 };
 
 export type LocationHistoryDto = {

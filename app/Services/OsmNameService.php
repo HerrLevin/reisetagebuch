@@ -29,7 +29,7 @@ class OsmNameService
             $ref = $location->tags['ref'] ?? null;
             $name = $brand ?? $operator;
 
-            return $ref ? $name . ' ' . $ref : $name;
+            return $ref ? $name.' '.$ref : $name;
         }
 
         if ($location->tags['amenity'] === 'charging_station') {
@@ -38,7 +38,7 @@ class OsmNameService
             $name = 'Charging Station';
 
             if ($ref) {
-                $name .= ' ' . $ref;
+                $name .= ' '.$ref;
             } elseif ($operator) {
                 $name .= sprintf(' (%s)', $operator);
             }
@@ -46,7 +46,7 @@ class OsmNameService
             return $name;
         }
 
-        if ($location->tags['amenity'] === 'car_sharing' && !empty($location->tags['ref'])) {
+        if ($location->tags['amenity'] === 'car_sharing' && ! empty($location->tags['ref'])) {
             $operator = $location->tags['brand'] ?? $location->tags['network'] ?? $location->tags['operator'] ?? null;
             $name = $location->tags['ref'];
 

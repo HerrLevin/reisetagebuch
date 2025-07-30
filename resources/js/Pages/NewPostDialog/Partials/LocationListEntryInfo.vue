@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { defineProps, ref } from 'vue';
-import { LocationEntry } from '@/types';
+import { LocationEntry, LocationIdentifier } from '@/types';
 
-defineProps({
+const props = defineProps({
     location: {
         type: Object,
         default: () => ({}) as LocationEntry,
@@ -19,6 +19,22 @@ defineProps({
 
 const tagModal = ref<HTMLDialogElement | null>(null);
 const modalBox = ref<HTMLElement | null>(null);
+
+const osmIdentifier = ref<LocationIdentifier | null>(null);
+
+osmIdentifier.value = props.location.identifiers.find(
+    (id: LocationIdentifier) => id.origin === 'osm',
+);
+
+function getOsmLink(identifier: LocationIdentifier): string {
+    return `https://www.openstreetmap.org/${identifier.type}/${identifier.identifier}`;
+}
+
+function openOsmLink() {
+    if (osmIdentifier.value) {
+        window.open(getOsmLink(osmIdentifier.value), '_blank');
+    }
+}
 
 function closeModal() {
     tagModal.value?.close();
@@ -43,6 +59,21 @@ function openModal() {
             <ul class="list">
                 <li class="text p-4 pb-2 tracking-wide opacity-60">
                     {{ location.name }}
+                </li>
+                <li
+                    v-if="osmIdentifier"
+                    class="text p-4 pb-2 tracking-wide opacity-60"
+                >
+                    <span class="text-xs opacity-60"></span>
+                    <span class="font-semibold">
+                        <a
+                            :href="getOsmLink(osmIdentifier)"
+                            target="_blank"
+                            @click.prevent="openOsmLink()"
+                        >
+                            Open in OSM
+                        </a>
+                    </span>
                 </li>
 
                 <li

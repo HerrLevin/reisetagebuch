@@ -131,7 +131,7 @@ class LocationRepository
             ->addSelect(ST::distanceSphere($position, 'location')->as('distance'))
             ->where(ST::distanceSphere($position, 'location'), '<=', config('app.nearby.radius'))
             ->where([['name', '!=', '']])
-            ->with('tags')
+            ->with(['tags', 'identifiers'])
             ->orderBy('distance')
             ->limit(100)
             ->get();
