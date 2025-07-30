@@ -8,6 +8,7 @@ use App\Dto\MotisApi\LocationType;
 use App\Dto\MotisApi\StopDto;
 use App\Dto\MotisApi\StopPlaceDto;
 use App\Dto\MotisApi\TripDto;
+use App\Dto\RequestLocationDto;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\LocationDto;
 use App\Http\Resources\LocationHistoryDto;
@@ -66,12 +67,19 @@ class LocationController extends Controller
         })->values();
     }
 
+    public function getRecentRequestLocation(Point $point): ?RequestLocationDto
+    {
+        $recent = $this->locationRepository->getRecentRequestLocation($point);
+
+        return $recent ? RequestLocationDto::fromModel($recent) : null;
+    }
+
     public function prefetch(Point $point): void
     {
         if (! $this->locationRepository->recentNearbyRequests($point)) {
             $this->locationRepository->deleteOldNearbyRequests();
-            $this->locationRepository->createRequestLocation($point);
-            $this->locationRepository->fetchNearbyLocations($point);
+            $requestLocation = $this->locationRepository->createRequestLocation($point);
+            $this->locationRepository->fetchNearbyLocations($point, $requestLocation);
         }
     }
 
