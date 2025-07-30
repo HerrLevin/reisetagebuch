@@ -200,6 +200,7 @@ class PostHydratorTest extends TestCase
                 'location' => $point,
                 'distance' => 10,
                 'tags' => new Collection,
+                'identifiers' => new Collection,
                 default => null,
             };
         });
