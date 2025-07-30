@@ -107,6 +107,7 @@ class LocationRepository
     {
         $requestLocation = new RequestLocation;
         $requestLocation->location = $point;
+        $requestLocation->to_fetch = 1000;
         $requestLocation->last_requested_at = now();
 
         $requestLocation->save();
