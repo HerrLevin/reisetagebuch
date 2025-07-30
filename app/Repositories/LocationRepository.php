@@ -137,7 +137,7 @@ class LocationRepository
 
     public function recentNearbyRequests(Point $position): bool
     {
-        $locations = $this->getRecentRequestLocation($position);
+        $locations = $this->recentRequestLocationQuery($position);
 
         return $locations->count() > 0;
     }
