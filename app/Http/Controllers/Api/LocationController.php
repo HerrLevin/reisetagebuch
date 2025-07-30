@@ -28,6 +28,18 @@ class LocationController extends Controller
         abort('204');
     }
 
+    public function getRecentRequestLocation(float $latitude, float $longitude): JsonResponse
+    {
+        $point = Point::makeGeodetic($latitude, $longitude);
+        $location = $this->locationController->getRecentRequestLocation($point);
+
+        if ($location === null) {
+            return response()->json(['error' => 'Location not found'], 404);
+        }
+
+        return response()->json($location);
+    }
+
     public function geocode(GeocodeRequest $request): JsonResponse
     {
         $point = null;

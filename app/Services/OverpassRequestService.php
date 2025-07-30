@@ -134,7 +134,7 @@ class OverpassRequestService
         return $query;
     }
 
-    private function getElements(): array
+    public function getElements(): array
     {
         $query = $this->getQuery();
 
@@ -152,10 +152,8 @@ class OverpassRequestService
     /**
      * @return Generator<OverpassLocation>
      */
-    public function getLocations(): Generator
+    public function parseLocations(array $response): Generator
     {
-        $response = $this->getElements();
-
         foreach ($response['elements'] as $element) {
             if (in_array($element['type'], ['node', 'way', 'relation'])) {
                 yield new OverpassLocation(

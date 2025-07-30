@@ -46,12 +46,19 @@ class LocationRepository
         return $query->get();
     }
 
-    public function fetchNearbyLocations(Point $point): SupportCollection
+    public function fetchNearbyLocations(Point $point, ?RequestLocation $requestLocation): SupportCollection
     {
         $service = new OverpassRequestService($point->getLatitude(), $point->getLongitude(), config('app.nearby.radius'));
 
         $data = collect();
-        foreach ($service->getLocations() as $location) {
+        $response = $service->getElements();
+
+        $requestLocation?->update([
+            'to_fetch' => count($response['elements']),
+            'fetched' => 0,
+        ]);
+
+        foreach ($service->parseLocations($response) as $location) {
             $name = $this->osmNameService->getName($location);
             if ($name === null) {
                 continue;
@@ -86,24 +93,32 @@ class LocationRepository
             }
 
             $data->push($dbLocation);
+            $requestLocation?->increment('fetched');
         }
+
+        $requestLocation->update([
+            'fetched' => $requestLocation->to_fetch,
+        ]);
 
         return $data;
     }
 
-    public function createRequestLocation(Point $point): void
+    public function createRequestLocation(Point $point): RequestLocation
     {
         $requestLocation = new RequestLocation;
         $requestLocation->location = $point;
         $requestLocation->last_requested_at = now();
 
         $requestLocation->save();
+
+        return $requestLocation;
     }
 
-    public function recentNearbyRequests(Point $position): bool
+    private function recentRequestLocationQuery(Point $position): \Illuminate\Database\Eloquent\Builder
     {
         $radius = config('app.recent_location.radius');
-        $locations = RequestLocation::select()
+
+        return RequestLocation::select()
             ->addSelect(ST::distanceSphere($position, 'location')->as('distance'))
             ->where(ST::distanceSphere($position, 'location'), '<=', $radius)
             ->where(
@@ -111,6 +126,18 @@ class LocationRepository
                 '>=',
                 now()->subMinutes(config('app.recent_location.timeout'))
             );
+    }
+
+    public function getRecentRequestLocation(Point $position): ?RequestLocation
+    {
+        return $this->recentRequestLocationQuery($position)
+            ->addSelect('*')
+            ->first();
+    }
+
+    public function recentNearbyRequests(Point $position): bool
+    {
+        $locations = $this->getRecentRequestLocation($position);
 
         return $locations->count() > 0;
     }

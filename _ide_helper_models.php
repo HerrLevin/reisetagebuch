@@ -209,17 +209,21 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property string $id
- * @property string|null $last_requested_at
+ * @property \Illuminate\Support\Carbon|null $last_requested_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Clickbar\Magellan\Data\Geometries\Point $location
+ * @property int $fetched
+ * @property int $to_fetch
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RequestLocation newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RequestLocation newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RequestLocation query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RequestLocation whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RequestLocation whereFetched($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RequestLocation whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RequestLocation whereLastRequestedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RequestLocation whereLocation($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RequestLocation whereToFetch($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RequestLocation whereUpdatedAt($value)
  */
 	class RequestLocation extends \Eloquent {}

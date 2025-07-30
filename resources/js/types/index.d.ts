@@ -104,6 +104,13 @@ export type LocationIdentifier = {
     origin: string;
 };
 
+export type RequestLocationDto = {
+    fetched: number;
+    toFetch: number;
+    updatedAt: string;
+    lastRequestedAt: string | null;
+};
+
 export type LocationHistoryDto = {
     id: string;
     name: string | null;
