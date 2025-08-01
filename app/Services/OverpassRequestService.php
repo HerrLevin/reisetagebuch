@@ -3,15 +3,14 @@
 namespace App\Services;
 
 use App\Dto\OverpassLocation;
+use Clickbar\Magellan\Data\Geometries\Point;
 use Generator;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 
 class OverpassRequestService
 {
-    private float $latitude;
-
-    private float $longitude;
+    private Point $point;
 
     private int $radius;
 
@@ -68,12 +67,20 @@ class OverpassRequestService
         ],
     ];
 
-    public function __construct(float $latitude, float $longitude, int $radius = 200)
+    public function __construct(int $radius = 200, ?Client $client = null)
     {
-        $this->latitude = $latitude;
-        $this->longitude = $longitude;
         $this->radius = $radius;
-        $this->client = new Client;
+        $this->client = $client ?? new Client;
+    }
+
+    public function setRadius(int $radius): void
+    {
+        $this->radius = $radius;
+    }
+
+    public function setCoordinates(Point $point): void
+    {
+        $this->point = $point;
     }
 
     private function getExcludes(string $key): string
@@ -112,8 +119,8 @@ class OverpassRequestService
                 $query .= sprintf(
                     'nwr(around:%d,%f,%f)["%s"~"%s"]%s;',
                     $this->radius,
-                    $this->latitude,
-                    $this->longitude,
+                    $this->point->getLatitude(),
+                    $this->point->getLongitude(),
                     $key,
                     $filters,
                     $append
@@ -123,8 +130,8 @@ class OverpassRequestService
                 $query .= sprintf(
                     'nwr(around:%d,%f,%f)["%s"]%s;',
                     $this->radius,
-                    $this->latitude,
-                    $this->longitude,
+                    $this->point->getLatitude(),
+                    $this->point->getLongitude(),
                     $filter,
                     $append
                 );

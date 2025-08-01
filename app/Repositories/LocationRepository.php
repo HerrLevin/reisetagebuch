@@ -12,16 +12,21 @@ use App\Services\OverpassRequestService;
 use Carbon\Carbon;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Clickbar\Magellan\Database\PostgisFunctions\ST;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
+use Log;
 
 class LocationRepository
 {
     private OsmNameService $osmNameService;
 
-    public function __construct(OsmNameService $osmNameService)
+    private OverpassRequestService $overpassRequestService;
+
+    public function __construct(OsmNameService $osmNameService, OverpassRequestService $overpassRequestService)
     {
         $this->osmNameService = $osmNameService;
+        $this->overpassRequestService = $overpassRequestService;
     }
 
     public function getLocationsForUser(string $userId, Carbon $fromDate, Carbon $untilDate): Collection
@@ -46,61 +51,67 @@ class LocationRepository
         return $query->get();
     }
 
-    public function fetchNearbyLocations(Point $point, ?RequestLocation $requestLocation): SupportCollection
+    public function fetchNearbyLocations(Point $point, ?RequestLocation $requestLocation): void
     {
-        $service = new OverpassRequestService($point->getLatitude(), $point->getLongitude(), config('app.nearby.radius'));
+        $this->overpassRequestService->setCoordinates($point);
 
-        $data = collect();
-        $response = $service->getElements();
+        $response = $this->overpassRequestService->getElements();
 
         $requestLocation?->update([
             'to_fetch' => count($response['elements']),
             'fetched' => 0,
         ]);
 
-        foreach ($service->parseLocations($response) as $location) {
-            $name = $this->osmNameService->getName($location);
-            if ($name === null) {
-                continue;
+        foreach ($this->overpassRequestService->parseLocations($response) as $location) {
+            try {
+                $this->updateOrCreateLocation($location);
+            } catch (Exception $e) {
+                Log::error('Error processing location', [$location]);
+                report($e);
             }
 
-            $identifier = LocationIdentifier::where([
-                ['type', '=', $location->osmType],
-                ['identifier', '=', $location->osmId],
-                ['origin', '=', 'osm'],
-            ])->with('location')->first();
-            $dbLocation = $identifier->location ?? null;
-
-            if ($dbLocation === null) {
-                $dbLocation = new Location;
-            }
-
-            $this->setLocationData(
-                $dbLocation,
-                $name,
-                $location->latitude,
-                $location->longitude,
-                $location->osmId,
-                $location->osmType,
-                'osm'
-            );
-
-            foreach ($location->tags as $key => $value) {
-                $dbLocation->tags()->updateOrCreate([
-                    'key' => $key,
-                    'value' => $value,
-                ]);
-            }
-
-            $data->push($dbLocation);
             $requestLocation?->increment('fetched');
         }
 
         $requestLocation->update([
             'fetched' => $requestLocation->to_fetch,
         ]);
+    }
 
-        return $data;
+    public function updateOrCreateLocation($location): void
+    {
+        $name = $this->osmNameService->getName($location);
+        if ($name === null) {
+            return;
+        }
+
+        $identifier = LocationIdentifier::where([
+            ['type', '=', $location->osmType],
+            ['identifier', '=', $location->osmId],
+            ['origin', '=', 'osm'],
+        ])->with('location')->first();
+        $dbLocation = $identifier->location ?? null;
+
+        if ($dbLocation === null) {
+            $dbLocation = new Location;
+        }
+
+        $this->setLocationData(
+            $dbLocation,
+            $name,
+            $location->latitude,
+            $location->longitude,
+            $location->osmId,
+            $location->osmType,
+            'osm'
+        );
+
+        foreach ($location->tags as $key => $value) {
+            $dbLocation->tags()->updateOrCreate([
+                'key' => $key,
+                'value' => $value,
+            ]);
+        }
     }
 
     public function createRequestLocation(Point $point): RequestLocation
