@@ -8,25 +8,19 @@ use App\Models\LocationPost;
 use App\Models\RequestLocation;
 use App\Models\TimestampedUserWaypoint;
 use App\Services\OsmNameService;
-use App\Services\OverpassRequestService;
 use Carbon\Carbon;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Clickbar\Magellan\Database\PostgisFunctions\ST;
-use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
-use Log;
 
 class LocationRepository
 {
     private OsmNameService $osmNameService;
 
-    private OverpassRequestService $overpassRequestService;
-
-    public function __construct(OsmNameService $osmNameService, OverpassRequestService $overpassRequestService)
+    public function __construct(OsmNameService $osmNameService)
     {
         $this->osmNameService = $osmNameService;
-        $this->overpassRequestService = $overpassRequestService;
     }
 
     public function getLocationsForUser(string $userId, Carbon $fromDate, Carbon $untilDate): Collection
@@ -49,33 +43,6 @@ class LocationRepository
             ->limit(100_000);
 
         return $query->get();
-    }
-
-    public function fetchNearbyLocations(Point $point, ?RequestLocation $requestLocation): void
-    {
-        $this->overpassRequestService->setCoordinates($point);
-
-        $response = $this->overpassRequestService->getElements();
-
-        $requestLocation?->update([
-            'to_fetch' => count($response['elements']),
-            'fetched' => 0,
-        ]);
-
-        foreach ($this->overpassRequestService->parseLocations($response) as $location) {
-            try {
-                $this->updateOrCreateLocation($location);
-            } catch (Exception $e) {
-                Log::error('Error processing location', [$location]);
-                report($e);
-            }
-
-            $requestLocation?->increment('fetched');
-        }
-
-        $requestLocation->update([
-            'fetched' => $requestLocation->to_fetch,
-        ]);
     }
 
     public function updateOrCreateLocation($location): void
