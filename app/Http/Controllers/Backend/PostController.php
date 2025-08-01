@@ -12,6 +12,7 @@ use App\Http\Requests\TransportPostCreateRequest;
 use App\Http\Resources\PostTypes\BasePost;
 use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
+use App\Jobs\PrefetchJob;
 use App\Jobs\TraewellingCrossCheckInJob;
 use App\Models\TransportTripStop;
 use App\Models\User;
@@ -95,6 +96,7 @@ class PostController extends Controller
         );
 
         TraewellingCrossCheckInJob::dispatch($post->id);
+        PrefetchJob::dispatch($stopStopover->location->location);
 
         return $post;
     }

@@ -92,6 +92,7 @@ class LocationController extends Controller
 
     public function nearby(Point $point): DbCollection|Collection
     {
+        // Prefetch nearby locations if not already done by job
         $this->prefetch($point);
 
         return $this->locationRepository->getNearbyLocations($point);

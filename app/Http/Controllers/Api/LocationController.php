@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Backend\LocationController as BackendLocationController;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GeocodeRequest;
+use App\Jobs\PrefetchJob;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\JsonResponse;
@@ -23,7 +24,7 @@ class LocationController extends Controller
     {
         $point = Point::makeGeodetic($latitude, $longitude);
         $this->locationController->createTimestampedUserWaypoint($request->user()->id, $point);
-        $this->locationController->prefetch($point);
+        PrefetchJob::dispatch($point);
 
         abort('204');
     }
