@@ -9,16 +9,20 @@ use App\Dto\MotisApi\TripDto;
 use App\Http\Controllers\Backend\LocationController;
 use App\Hydrators\TripDtoHydrator;
 use App\Jobs\RerouteStops;
+use App\Models\RequestLocation;
 use App\Repositories\LocationRepository;
 use App\Repositories\TransportTripRepository;
+use App\Services\OverpassRequestService;
 use App\Services\TransitousRequestService;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Client\ConnectionException;
+use Mockery;
 use PHPUnit\Framework\MockObject\Exception;
 use Queue;
+use Tests\TestCase;
 
-class LocationControllerTest extends \Tests\TestCase
+class LocationControllerTest extends TestCase
 {
     private LocationRepository $repository;
 
@@ -30,6 +34,8 @@ class LocationControllerTest extends \Tests\TestCase
 
     private TripDtoHydrator $tripDtoHydrator;
 
+    private OverpassRequestService $overpassRequestService;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -37,13 +43,55 @@ class LocationControllerTest extends \Tests\TestCase
         $this->transitousRequestService = $this->createMock(TransitousRequestService::class);
         $this->transportTripRepository = $this->createMock(TransportTripRepository::class);
         $this->tripDtoHydrator = $this->createMock(TripDtoHydrator::class);
+        $this->overpassRequestService = $this->createMock(OverpassRequestService::class);
 
         $this->controller = new LocationController(
             $this->repository,
             $this->transitousRequestService,
             $this->transportTripRepository,
-            $this->tripDtoHydrator
+            $this->tripDtoHydrator,
+            $this->overpassRequestService
         );
+    }
+
+    public function test_fetch_nearby_locations_runs_through_all_elements_even_on_exception()
+    {
+        $mockPoint = Mockery::mock(Point::class);
+        $requestLocation = Mockery::mock(RequestLocation::class);
+
+        $this->overpassRequestService->expects($this->once())
+            ->method('setCoordinates')->with($mockPoint);
+        $this->overpassRequestService->expects($this->once())
+            ->method('getElements')
+            ->willReturn([
+                'elements' => [1, 2, 3],
+            ]);
+        $requestLocation->shouldReceive('update')->once();
+
+        $this->overpassRequestService->expects($this->once())
+            ->method('parseLocations')
+            ->willReturnCallback(function () {
+                yield 'loc1';
+                yield 'loc2';
+                yield 'loc3';
+            });
+
+        $this->repository->expects($this->exactly(3))
+            ->method('updateOrCreateLocation')
+            ->willReturnOnConsecutiveCalls(
+                null,
+                $this->throwException(new \Exception('fail')),
+                null
+            );
+
+        $requestLocation->shouldAllowMockingProtectedMethods();
+        $requestLocation->shouldReceive('increment')->times(3);
+        $requestLocation->shouldReceive('update')->once();
+        $requestLocation->shouldReceive('getAttribute')->with('to_fetch')->andReturn(3);
+
+        // The method under test
+        $this->controller->fetchNearbyLocations($mockPoint, $requestLocation);
+        $this->assertTrue(true); // If we reach here, the loop did not break on exception
     }
 
     /**
@@ -64,9 +112,9 @@ class LocationControllerTest extends \Tests\TestCase
             ->method('createRequestLocation')
             ->with($point);
 
-        $this->repository->expects($this->once())
-            ->method('fetchNearbyLocations')
-            ->with($point);
+        $this->overpassRequestService->expects($this->once())
+            ->method('getElements')
+            ->willReturn(['elements' => []]);
 
         $this->controller->prefetch($point);
     }
@@ -85,8 +133,8 @@ class LocationControllerTest extends \Tests\TestCase
         $this->repository->expects($this->never())
             ->method('createRequestLocation');
 
-        $this->repository->expects($this->never())
-            ->method('fetchNearbyLocations');
+        $this->overpassRequestService->expects($this->never())
+            ->method('getElements');
 
         $this->controller->prefetch($point);
     }
@@ -106,9 +154,9 @@ class LocationControllerTest extends \Tests\TestCase
             ->method('createRequestLocation')
             ->with($point);
 
-        $this->repository->expects($this->once())
-            ->method('fetchNearbyLocations')
-            ->with($point);
+        $this->overpassRequestService->expects($this->once())
+            ->method('getElements')
+            ->willReturn(['elements' => []]);
 
         $this->repository->expects($this->once())
             ->method('getNearbyLocations')

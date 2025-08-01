@@ -14,16 +14,20 @@ use App\Http\Resources\LocationDto;
 use App\Http\Resources\LocationHistoryDto;
 use App\Hydrators\TripDtoHydrator;
 use App\Jobs\RerouteStops;
+use App\Models\RequestLocation;
 use App\Models\TimestampedUserWaypoint;
 use App\Models\TransportTripStop;
 use App\Repositories\LocationRepository;
 use App\Repositories\TransportTripRepository;
+use App\Services\OverpassRequestService;
 use App\Services\TransitousRequestService;
 use Carbon\Carbon;
 use Clickbar\Magellan\Data\Geometries\Point;
+use Exception;
 use Illuminate\Database\Eloquent\Collection as DbCollection;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Collection;
+use Log;
 
 class LocationController extends Controller
 {
@@ -35,16 +39,20 @@ class LocationController extends Controller
 
     private TripDtoHydrator $tripDtoHydrator;
 
+    private OverpassRequestService $overpassRequestService;
+
     public function __construct(
         LocationRepository $locationRepository,
         TransitousRequestService $transitousRequestService,
         TransportTripRepository $transportTripRepository,
-        TripDtoHydrator $tripDtoHydrator
+        TripDtoHydrator $tripDtoHydrator,
+        OverpassRequestService $overpassRequestService
     ) {
         $this->locationRepository = $locationRepository;
         $this->transitousRequestService = $transitousRequestService;
         $this->transportTripRepository = $transportTripRepository;
         $this->tripDtoHydrator = $tripDtoHydrator;
+        $this->overpassRequestService = $overpassRequestService;
     }
 
     /**
@@ -79,7 +87,7 @@ class LocationController extends Controller
         if (! $this->locationRepository->recentNearbyRequests($point)) {
             $this->locationRepository->deleteOldNearbyRequests();
             $requestLocation = $this->locationRepository->createRequestLocation($point);
-            $this->locationRepository->fetchNearbyLocations($point, $requestLocation);
+            $this->fetchNearbyLocations($point, $requestLocation);
         }
     }
 
@@ -96,6 +104,33 @@ class LocationController extends Controller
         $this->prefetch($point);
 
         return $this->locationRepository->getNearbyLocations($point);
+    }
+
+    public function fetchNearbyLocations(Point $point, ?RequestLocation $requestLocation): void
+    {
+        $this->overpassRequestService->setCoordinates($point);
+
+        $response = $this->overpassRequestService->getElements();
+
+        $requestLocation?->update([
+            'to_fetch' => count($response['elements']),
+            'fetched' => 0,
+        ]);
+
+        foreach ($this->overpassRequestService->parseLocations($response) as $location) {
+            try {
+                $this->locationRepository->updateOrCreateLocation($location);
+            } catch (Exception $e) {
+                Log::error('Error processing location', [$location]);
+                report($e);
+            }
+
+            $requestLocation?->increment('fetched');
+        }
+
+        $requestLocation->update([
+            'fetched' => $requestLocation->to_fetch,
+        ]);
     }
 
     /**

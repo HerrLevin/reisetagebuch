@@ -6,6 +6,7 @@ use App\Http\Controllers\Backend\LocationController;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\App;
 
 class PrefetchJob implements ShouldQueue
 {
@@ -13,16 +14,20 @@ class PrefetchJob implements ShouldQueue
 
     public Point $point;
 
-    private LocationController $locationController;
+    private ?LocationController $locationController;
 
     public function __construct(Point $point, ?LocationController $locationController = null)
     {
         $this->point = $point;
-        $this->locationController = $locationController ?? app(LocationController::class);
+        $this->locationController = $locationController;
     }
 
     public function handle(): void
     {
+        // we can't inject the controller in the constructor because of serialization issues
+        if ($this->locationController === null) {
+            $this->locationController = App::make(LocationController::class);
+        }
         $this->locationController->prefetch($this->point);
     }
 }

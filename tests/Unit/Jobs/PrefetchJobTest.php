@@ -5,7 +5,7 @@ namespace Tests\Unit\Jobs;
 use App\Http\Controllers\Backend\LocationController;
 use App\Jobs\PrefetchJob;
 use Clickbar\Magellan\Data\Geometries\Point;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Foundation\Testing\TestCase;
 
 class PrefetchJobTest extends TestCase
 {
