@@ -14,6 +14,7 @@ class UserSettings extends Model
     protected $fillable = [
         'user_id',
         'default_new_post_view',
+        'motis_radius',
     ];
 
     protected $casts = [

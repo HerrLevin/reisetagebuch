@@ -12,6 +12,7 @@ const user = usePage().props.auth.user;
 
 const form = useForm({
     defaultNewPostView: user.settings?.default_new_post_view || 'location',
+    motisRadius: user.settings?.motis_radius || null,
 });
 </script>
 
@@ -46,6 +47,26 @@ const form = useForm({
                     class="mt-2"
                     :message="form.errors.defaultNewPostView"
                 />
+            </div>
+
+            <div>
+                <InputLabel for="motisRadius" value="Departure Radius" />
+
+                <SelectInput
+                    id="motisRadius"
+                    v-model="form.motisRadius"
+                    class="mt-1 block w-full"
+                    :error="form.errors.motisRadius"
+                    :options="[
+                        { value: null, label: 'Default (500 meters)' },
+                        { value: 50, label: '50 meters' },
+                        { value: 100, label: '100 meters' },
+                        { value: 200, label: '200 meters' },
+                        { value: 300, label: '300 meters' },
+                        { value: 400, label: '400 meters' },
+                        { value: 500, label: '500 meters' },
+                    ]"
+                ></SelectInput>
             </div>
 
             <div class="flex items-center gap-4">

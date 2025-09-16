@@ -9,6 +9,7 @@ use App\Http\Requests\LocationHistoryRequest;
 use App\Http\Requests\NearbyLocationRequest;
 use App\Http\Requests\StopoverRequest;
 use App\Http\Resources\LocationDto;
+use App\Models\User;
 use Carbon\Carbon;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Inertia\Response;
@@ -51,12 +52,16 @@ class LocationController extends Controller
     {
         $filter = $request->filter ? explode(',', $request->filter) : [];
         $time = $request->when ? Carbon::parse($request->when) : now()->subMinutes(2);
+        $request->user()->load('settings');
+        /** @var User $user */
+        $user = $request->user();
+        $radius = $user->settings->motis_radius;
 
         if (! empty($request->identifier)) {
             $departures = $this->locationController->departuresByIdentifier($request->identifier, $time, $filter);
         } else {
             $point = Point::makeGeodetic($request->latitude, $request->longitude);
-            $departures = $this->locationController->departuresNearby($point, $time, $filter);
+            $departures = $this->locationController->departuresNearby($point, $time, $filter, $radius);
         }
 
         return inertia('NewPostDialog/ListDepartures', [

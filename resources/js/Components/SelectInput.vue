@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 
-const model = defineModel<string>({ required: true });
+const model = defineModel<string | number | null>({ required: true });
 
 const props = defineProps<{
     error?: string | null;
-    options: Array<{ value: string; label: string }>;
+    options: Array<{ value: string | number | null; label: string }>;
 }>();
 
 const input = ref<HTMLInputElement | null>(null);

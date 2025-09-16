@@ -8,6 +8,7 @@ use Illuminate\Validation\Rule;
 
 /**
  * @property-read ?DefaultNewPostView $defaultNewPostView
+ * @property-read ?int $motisRadius
  */
 class SettingsUpdateRequest extends FormRequest
 {
@@ -20,6 +21,7 @@ class SettingsUpdateRequest extends FormRequest
     {
         return [
             'defaultNewPostView' => ['nullable', 'string', Rule::enum(DefaultNewPostView::class)],
+            'motisRadius' => ['nullable', 'integer', Rule::in([50, 100, 200, 500])],
         ];
     }
 }
