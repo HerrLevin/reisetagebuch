@@ -12,6 +12,7 @@ export interface User {
 
 export interface Settings {
     default_new_post_view: 'location' | 'departures' | 'text';
+    motis_radius: number | null;
 }
 
 export type PageProps<

@@ -27,6 +27,8 @@ class UserSettingsBackend extends Controller
             $settings->default_new_post_view = $request->defaultNewPostView;
         }
 
+        $settings->motis_radius = $request->motisRadius;
+
         $settings->save();
     }
 }

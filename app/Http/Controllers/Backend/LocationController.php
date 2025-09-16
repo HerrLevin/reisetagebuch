@@ -100,7 +100,7 @@ class LocationController extends Controller
     /**
      * @throws ConnectionException
      */
-    public function departuresNearby(Point $point, Carbon $time, array $filter = []): ?DeparturesDto
+    public function departuresNearby(Point $point, Carbon $time, array $filter = [], ?int $radius = null): ?DeparturesDto
     {
         $stops = $this->transitousRequestService->getNearby($point);
         if ($stops->isEmpty()) {
@@ -114,13 +114,14 @@ class LocationController extends Controller
 
         return new DeparturesDto(
             stop: $firstStop,
-            departures: $this->transitousRequestService->getDepartures($firstStop->stopId, $time, $filter)
+            departures: $this->transitousRequestService->getDepartures($firstStop->stopId, $time, $filter, $radius)
         );
     }
 
-    public function departuresByIdentifier(string $identifier, Carbon $when, array $filter = []): ?DeparturesDto
+    public function departuresByIdentifier(string $identifier, Carbon $when, array $filter = [], ?int $radius = null): ?DeparturesDto
     {
-        $departures = $this->transitousRequestService->getDepartures($identifier, $when, $filter);
+        $radius = $radius ?? config('app.motis.single_location_radius', 100);
+        $departures = $this->transitousRequestService->getDepartures($identifier, $when, $filter, $radius);
         if ($departures->isEmpty()) {
             return null;
         }

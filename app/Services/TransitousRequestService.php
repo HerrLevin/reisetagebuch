@@ -41,11 +41,13 @@ class TransitousRequestService
      *
      * @throws ConnectionException
      */
-    public function getDepartures(string $identifier, Carbon $when, array $filter = []): Collection
+    public function getDepartures(string $identifier, Carbon $when, array $filter = [], ?int $radius = null): Collection
     {
+        $radius = $radius ?? config('app.motis.radius', 500);
+
         $params = [
             'stopId' => $identifier,
-            'radius' => config('app.motis.radius', 500),
+            'radius' => $radius,
             'time' => $when->toIso8601String(),
             'n' => config('app.motis.results', 100),
         ];

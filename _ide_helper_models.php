@@ -443,6 +443,7 @@ namespace App\Models{
  * @property \App\Enums\DefaultNewPostView $default_new_post_view Default view for new posts, e.g., location, departures, post
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int|null $motis_radius
  * @property-read \App\Models\User $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings newQuery()
@@ -450,6 +451,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings whereDefaultNewPostView($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings whereMotisRadius($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings whereUserId($value)
  */

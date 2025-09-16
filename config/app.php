@@ -35,6 +35,11 @@ return [
         'timeout' => env('APP_RECENT_LOCATION_TIMEOUT', 60 * 24),
     ],
 
+    'motis' => [
+        'radius' => env('APP_MOTIS_RADIUS', 500),
+        'single_location_radius' => env('APP_MOTIS_SINGLE_LOCATION_RADIUS', 100),
+    ],
+
     'nearby' => [
         'radius' => env('APP_NEARBY_RADIUS', 500),
     ],
