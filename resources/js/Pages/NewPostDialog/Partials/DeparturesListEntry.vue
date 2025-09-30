@@ -72,7 +72,7 @@ const linkData = ref({
         </div>
         <div class="col col-span-2 text-right">
             <TimeDisplay
-                :planned="plannedTime"
+                :planned-time="plannedTime"
                 :time="time"
                 :delay="delay"
                 :real-time="props.stopTime.realTime"

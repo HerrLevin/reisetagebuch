@@ -29,9 +29,7 @@ defineProps({
     >
         {{ time }}
     </div>
-    <div v-if="delay" class="line-through opacity-60">
+    <div v-show="delay > 0" class="text-xs line-through opacity-60">
         {{ plannedTime }}
     </div>
 </template>
-
-<style scoped></style>
