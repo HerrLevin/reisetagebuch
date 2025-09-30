@@ -37,7 +37,7 @@ class StopTime {
 
     get delay(): number {
         const luxonTime = this.actualTime;
-        const luxonSchedule = this.actualTime;
+        const luxonSchedule = this.scheduledTime;
         return luxonTime && luxonSchedule
             ? luxonTime.diff(luxonSchedule, 'minutes').minutes
             : -1;
