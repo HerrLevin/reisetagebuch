@@ -16,12 +16,14 @@ class MotisHydrator
 {
     public function hydrateStop(array $data, ?float $distance = null): StopDto
     {
+        $distance = (int) $distance;
+        
         return new StopDto()
             ->setStopId($data['stopId'])
             ->setName($data['name'])
             ->setLatitude((float) $data['lat'])
             ->setLongitude((float) $data['lon'])
-            ->setDistance($data['distance'] ?? null);
+            ->setDistance($data['distance'] ?? $distance ?? null);
     }
 
     public function hydrateStopTime(array $data): StopTimeDto
