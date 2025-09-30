@@ -103,7 +103,14 @@ class LocationController extends Controller
         // Prefetch nearby locations if not already done by job
         $this->prefetch($point);
 
-        return $this->locationRepository->getNearbyLocations($point);
+        $locations = $this->locationRepository->getNearbyLocations($point);
+
+        // remove locations with motis identifier
+        return $locations->filter(function ($location) {
+            return ! $location->identifiers->contains(function ($identifier) {
+                return $identifier->origin === 'motis';
+            });
+        });
     }
 
     public function fetchNearbyLocations(Point $point, ?RequestLocation $requestLocation): void
