@@ -11,9 +11,9 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\Token;
-use Log;
 use Throwable;
 
 class TraewellingCrossCheckInJob implements ShouldQueue
@@ -36,8 +36,11 @@ class TraewellingCrossCheckInJob implements ShouldQueue
     {
         $post = Post::with(['transportPost.originStop.location.identifiers', 'transportPost.destinationStop.location.identifiers', 'transportPost.transportTrip'])->find($this->postId);
         $hasTrwlMeta = $post?->metaInfos->where('key', 'traewelling_trip_id')->count() > 0;
+        $isTrwlUser = SocialAccount::whereUserId($post?->user->id)->whereProvider('traewelling')->exists();
 
-        if ($hasTrwlMeta || $post?->transportPost?->transportTrip?->provider !== 'transitous') {
+        if (! $isTrwlUser || $hasTrwlMeta || $post?->transportPost?->transportTrip?->provider !== 'transitous') {
+            Log::debug('Skipping Traewelling check-in for post '.$this->postId);
+
             return;
         }
         $this->getAccessToken($post);
@@ -137,7 +140,7 @@ class TraewellingCrossCheckInJob implements ShouldQueue
             'force' => $force,
         ];
         try {
-            Log::info('Traewelling API checkin request', [
+            Log::debug('Traewelling API checkin request', [
                 'post_id' => $post->id,
                 'body' => $body,
             ]);
