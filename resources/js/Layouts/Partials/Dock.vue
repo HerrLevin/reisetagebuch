@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import Cog from '@/Icons/Cog.vue';
-import House from '@/Icons/House.vue';
-import List from '@/Icons/List.vue';
-import PencilSquare from '@/Icons/PencilSquare.vue';
-import Pin from '@/Icons/Pin.vue';
-import PlusCircle from '@/Icons/PlusCircle.vue';
-import UserIcon from '@/Icons/UserIcon.vue';
 import { LocationService } from '@/Services/LocationService';
 import { Link, usePage } from '@inertiajs/vue3';
+import {
+    CirclePlus,
+    House,
+    List,
+    MapPin,
+    Route,
+    SquarePen,
+    User,
+} from 'lucide-vue-next';
 import { onMounted, ref } from 'vue';
 
 const latitude = ref(0);
@@ -26,14 +28,14 @@ onMounted(() => {
 
 const user = usePage().props.auth.user ?? null;
 
+const isTripsCreateRoute = () => {
+    return route().current()?.startsWith('trips.create');
+};
 const isPostsCreateRoute = () => {
     return route().current()?.startsWith('posts.create');
 };
 const isDashboardRoute = () => {
     return route().current('dashboard');
-};
-const isSettingsRoute = () => {
-    return route().current('account.edit');
 };
 const isVenueRoute = () => {
     return route().current('posts.create.start');
@@ -78,7 +80,7 @@ const defaultNewPostRoute = () => {
                     class="btn btn-soft btn-info btn-s join-item"
                     :class="{ 'btn-active': isVenueRoute() }"
                 >
-                    <Pin />
+                    <MapPin />
                 </Link>
                 <Link
                     :href="
@@ -98,7 +100,7 @@ const defaultNewPostRoute = () => {
                     class="btn btn-soft btn-info btn-s join-item"
                     :class="{ 'btn-active': isTextRoute() }"
                 >
-                    <PencilSquare />
+                    <SquarePen />
                 </Link>
             </div>
         </div>
@@ -122,24 +124,24 @@ const defaultNewPostRoute = () => {
                     as="button"
                     :class="{ 'dock-active': isPostsCreateRoute() }"
                 >
-                    <PlusCircle class="size-[1.2em]" />
+                    <CirclePlus class="size-[1.2em]" />
                     <span class="dock-label">New Post</span>
+                </Link>
+                <Link
+                    :href="route('trips.create')"
+                    as="button"
+                    :class="{ 'dock-active': isTripsCreateRoute() }"
+                >
+                    <Route class="size-[1.2em]" />
+                    <span class="dock-label">New Trip</span>
                 </Link>
                 <Link
                     :href="route('profile.show', user.username)"
                     as="button"
                     :class="{ 'dock-active': isProfileRoute() }"
                 >
-                    <UserIcon class="size-[1.2em]" />
+                    <User class="size-[1.2em]" />
                     <span class="dock-label">Profile</span>
-                </Link>
-                <Link
-                    :href="route('account.edit')"
-                    as="button"
-                    :class="{ 'dock-active': isSettingsRoute() }"
-                >
-                    <Cog class="size-[1.2em]" />
-                    <span class="dock-label">Settings</span>
                 </Link>
             </template>
         </div>

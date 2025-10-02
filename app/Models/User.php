@@ -77,4 +77,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(SocialAccount::class)->where('provider', 'traewelling');
     }
+
+    public function trips(): HasMany
+    {
+        return $this->hasMany(TransportTrip::class);
+    }
 }

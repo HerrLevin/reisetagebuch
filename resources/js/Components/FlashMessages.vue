@@ -1,11 +1,9 @@
 <!-- eslint-disable-next-line vue/block-lang -->
 <script>
-import CheckCircle from '@/Icons/CheckCircle.vue';
-import XCircle from '@/Icons/XCircle.vue';
-import XMark from '@/Icons/XMark.vue';
+import { CircleCheck, CircleX, X } from 'lucide-vue-next';
 
 export default {
-    components: { XCircle, XMark, CheckCircle },
+    components: { CircleCheck, CircleX, X },
     data() {
         return {
             show: false,
@@ -28,7 +26,7 @@ export default {
             role="alert"
             class="alert alert-success"
         >
-            <CheckCircle class="h-6 w-6 shrink-0 stroke-current" />
+            <CircleCheck class="h-6 w-6 shrink-0 stroke-current" />
             <span>
                 {{ $page.props?.flash?.success }}
             </span>
@@ -38,7 +36,7 @@ export default {
                     class="btn btn-ghost btn-sm btn-circle"
                     @click="show = false"
                 >
-                    <XMark class="h-5 w-5" aria-hidden="true" />
+                    <X class="h-5 w-5" aria-hidden="true" />
                 </button>
             </div>
         </div>
@@ -52,7 +50,7 @@ export default {
             role="alert"
             class="alert alert-error"
         >
-            <XCircle class="h-6 w-6 shrink-0 stroke-current" />
+            <CircleX class="h-6 w-6 shrink-0 stroke-current" />
             <div
                 v-if="$page.props?.flash?.error"
                 class="py-4 text-sm font-medium text-white"
@@ -74,7 +72,7 @@ export default {
                     class="btn btn-ghost btn-sm btn-circle"
                     @click="show = false"
                 >
-                    <XMark class="h-5 w-5" aria-hidden="true" />
+                    <X class="h-5 w-5" aria-hidden="true" />
                 </button>
             </div>
         </div>

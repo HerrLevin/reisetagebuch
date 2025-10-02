@@ -342,18 +342,27 @@ namespace App\Models{
  * @property string|null $line_name Name of the transport line, e.g., "Line 1", "Route A"
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null $route_long_name
+ * @property string|null $trip_short_name
+ * @property string|null $display_name
+ * @property string|null $user_id
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\TransportTripStop> $stops
  * @property-read int|null $stops_count
+ * @property-read \App\Models\User|null $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereDisplayName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereForeignTripId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereLineName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereMode($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereProvider($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereRouteLongName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereTripShortName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereUserId($value)
  */
 	class TransportTrip extends \Eloquent {}
 }
@@ -419,6 +428,8 @@ namespace App\Models{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SocialAccount> $socialAccounts
  * @property-read int|null $social_accounts_count
  * @property-read \App\Models\SocialAccount|null $traewellingAccount
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\TransportTrip> $trips
+ * @property-read int|null $trips_count
  * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newQuery()

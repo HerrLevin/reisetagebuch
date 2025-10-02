@@ -45,7 +45,7 @@ class MotisHydrator
 
     }
 
-    private function hydrateStopPlace(array $data): StopPlaceDto
+    public function hydrateStopPlace(array $data): StopPlaceDto
     {
         return new StopPlaceDto()
             ->setName($data['name'])

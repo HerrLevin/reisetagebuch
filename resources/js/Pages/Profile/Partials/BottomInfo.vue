@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import Calendar from '@/Icons/Calendar.vue';
-import Link from '@/Icons/Link.vue';
 import type { UserDto } from '@/types';
+import { Calendar, Link } from 'lucide-vue-next';
 import { DateTime } from 'luxon';
 import { PropType } from 'vue';
 

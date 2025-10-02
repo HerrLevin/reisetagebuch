@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import EllipsisVertical from '@/Icons/EllipsisVertical.vue';
 import ProfileEditModal from '@/Pages/Profile/Partials/ProfileEditModal.vue';
 import type { UserDto } from '@/types';
 import { usePage } from '@inertiajs/vue3';
+import { EllipsisVertical } from 'lucide-vue-next';
 import { PropType } from 'vue';
 
 const authUser = usePage().props.auth.user ?? null;

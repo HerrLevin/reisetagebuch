@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Backend;
 use App\Dto\MotisApi\TripDto;
 use App\Exceptions\BrouterRouteCreationFailed;
 use App\Http\Controllers\Controller;
+use App\Models\TransportTrip;
 use App\Models\TransportTripStop;
 use App\Repositories\TransportTripRepository;
 use App\Services\BrouterRequestService;
@@ -34,7 +35,7 @@ class RerouteStopsController extends Controller
     /**
      * @param  TransportTripStop[]  $stops
      */
-    public function rerouteStops(TripDto $tripDto, array $stops): void
+    public function rerouteStops(TripDto|TransportTrip $tripDto, array $stops): void
     {
         foreach ($stops as $key => $stop) {
             $previousStop = $stops[$key - 1] ?? null;
@@ -42,7 +43,14 @@ class RerouteStopsController extends Controller
                 continue;
             }
 
-            $pathType = $this->getPathType($tripDto);
+            if ($tripDto instanceof TripDto) {
+                $leg = $tripDto->legs[0] ?? null;
+                $mode = $leg?->mode;
+            } else {
+                $mode = $tripDto->mode;
+            }
+
+            $pathType = $this->getPathType($mode);
             $this->rerouteBetween($previousStop, $stop, $pathType);
         }
     }
@@ -56,7 +64,10 @@ class RerouteStopsController extends Controller
         $startTime = $start->departure_time ?? $start->arrival_time;
         $endTime = $end->arrival_time ?? $end->departure_time;
 
-        $duration = (int) round($startTime->diffInSeconds($endTime));
+        $duration = -1;
+        if ($startTime && $endTime) {
+            $duration = (int) round($startTime->diffInSeconds($endTime));
+        }
 
         $segment = $this->transportTripRepository->getRouteSegmentBetweenStops($start, $end, $duration, $pathType);
         if ($segment) {
@@ -81,10 +92,8 @@ class RerouteStopsController extends Controller
         }
     }
 
-    private function getPathType(TripDto $tripDto): ?string
+    private function getPathType(string $mode): ?string
     {
-        $leg = $tripDto->legs[0] ?? null;
-        $mode = $leg?->mode;
         $railModes = [
             'RAIL',
             'HIGHSPEED_RAIL',

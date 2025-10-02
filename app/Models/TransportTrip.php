@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TransportTrip extends Model
@@ -27,6 +28,11 @@ class TransportTrip extends Model
 
     public function stops(): HasMany
     {
-        return $this->hasMany(TransportTripStop::class, 'transport_trip_id', 'id');
+        return $this->hasMany(TransportTripStop::class, 'transport_trip_id', 'id')->orderBy('stop_sequence');
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }

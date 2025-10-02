@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Dto\MotisApi\TripDto;
 use App\Http\Controllers\Backend\RerouteStopsController;
+use App\Models\TransportTrip;
 use App\Models\TransportTripStop;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -14,12 +15,12 @@ class RerouteStops implements ShouldQueue
 
     private RerouteStopsController $rerouteStopsController;
 
-    private TripDto $tripDto;
+    private TripDto|TransportTrip $tripDto;
 
     /** @var TransportTripStop[] */
     private array $stops;
 
-    public function __construct(TripDto $tripDto, array $stops, ?RerouteStopsController $rerouteStopsController = null)
+    public function __construct(TripDto|TransportTrip $tripDto, array $stops, ?RerouteStopsController $rerouteStopsController = null)
     {
         $this->rerouteStopsController = $rerouteStopsController ?? app(RerouteStopsController::class);
         $this->tripDto = $tripDto;

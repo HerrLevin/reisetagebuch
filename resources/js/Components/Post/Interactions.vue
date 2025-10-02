@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import ContextMenu from '@/Components/Post/ContextMenu.vue';
-import ArrowUpOnSquare from '@/Icons/ArrowUpOnSquare.vue';
-import Heart from '@/Icons/Heart.vue';
 import {
     BasePost,
     isLocationPost,
@@ -9,6 +7,7 @@ import {
     LocationPost,
     TransportPost,
 } from '@/types/PostTypes';
+import { Heart, Share } from 'lucide-vue-next';
 import { PropType } from 'vue';
 
 const props = defineProps({
@@ -55,11 +54,9 @@ function sharePost(): void {
             class="btn btn-ghost btn-sm btn-circle"
             @click.prevent="sharePost()"
         >
-            <ArrowUpOnSquare />
+            <Share />
         </button>
 
         <ContextMenu :post />
     </div>
 </template>
-
-<style scoped></style>
