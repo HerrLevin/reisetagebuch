@@ -33,7 +33,10 @@ class TransportTripRepository
         string $mode,
         ?string $foreignId = null,
         ?string $provider = null,
-        ?string $lineName = null
+        ?string $lineName = null,
+        ?string $routeLongName = null,
+        ?string $tripShortName = null,
+        ?string $displayName = null
     ): TransportTrip {
         $trip = $this->getTripByIdentifier($foreignId, $provider);
 
@@ -46,6 +49,9 @@ class TransportTripRepository
         $trip->foreign_trip_id = $foreignId;
         $trip->provider = $provider;
         $trip->line_name = $lineName;
+        $trip->route_long_name = $routeLongName;
+        $trip->trip_short_name = $tripShortName;
+        $trip->display_name = $displayName;
         $trip->save();
 
         return $trip;

@@ -20,6 +20,10 @@ class StopTimeDto
 
     public string $routeShortName;
 
+    public ?string $routeLongName;
+
+    public ?string $tripShortName;
+
     public string $source;
 
     public function setPlace(StopPlaceDto $place): StopTimeDto
@@ -81,6 +85,20 @@ class StopTimeDto
     public function setSource(string $source): StopTimeDto
     {
         $this->source = $source;
+
+        return $this;
+    }
+
+    public function setRouteLongName(?string $routeLongName): StopTimeDto
+    {
+        $this->routeLongName = $routeLongName;
+
+        return $this;
+    }
+
+    public function setTripShortName(?string $tripShortName): StopTimeDto
+    {
+        $this->tripShortName = $tripShortName;
 
         return $this;
     }

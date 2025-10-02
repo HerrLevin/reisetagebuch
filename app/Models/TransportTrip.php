@@ -15,6 +15,9 @@ class TransportTrip extends Model
         'provider',
         'mode',
         'line_name',
+        'route_long_name',
+        'trip_short_name',
+        'display_name',
     ];
 
     protected $casts = [
