@@ -9,6 +9,9 @@ use App\Models\RouteSegment;
 use App\Models\TransportTrip;
 use App\Models\TransportTripStop;
 use Carbon\Carbon;
+use Clickbar\Magellan\Data\Geometries\Dimension;
+use Clickbar\Magellan\Data\Geometries\Geometry;
+use Clickbar\Magellan\Data\Geometries\LineString;
 use Clickbar\Magellan\Database\PostgisFunctions\ST;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -83,7 +86,7 @@ class TransportTripRepository
         Location $toLocation,
         ?int $duration = null,
         ?string $pathType = null,
-        $geometry = null
+        ?Geometry $geometry = null
     ): RouteSegment {
         $segment = new RouteSegment;
         $segment->from_location_id = $fromLocation->id;
@@ -91,6 +94,14 @@ class TransportTripRepository
         $segment->distance = ST::distanceSphere($fromLocation->location, $toLocation->location);
         $segment->duration = $duration;
         $segment->path_type = $pathType;
+        if (! $geometry->getDimension()->hasZDimension()) {
+            $points = [];
+            foreach ($geometry->getPoints() as $point) {
+                $point->setZ(0);
+                $points[] = $point;
+            }
+            $geometry = LineString::make($points, $geometry->getSrid(), Dimension::DIMENSION_3DZ);
+        }
         $segment->geometry = $geometry;
 
         $segment->save();
