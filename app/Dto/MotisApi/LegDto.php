@@ -36,6 +36,12 @@ class LegDto
 
     public string $routeShortName;
 
+    public ?string $routeLongName = null;
+
+    public ?string $tripShortName = null;
+
+    public ?string $displayName = null;
+
     public string $source;
 
     /**
@@ -151,6 +157,27 @@ class LegDto
     public function setScheduledEndTime(?Carbon $scheduledEndTime): LegDto
     {
         $this->scheduledEndTime = $scheduledEndTime;
+
+        return $this;
+    }
+
+    public function setRouteLongName(?string $routeLongName): LegDto
+    {
+        $this->routeLongName = $routeLongName;
+
+        return $this;
+    }
+
+    public function setTripShortName(?string $tripShortName): LegDto
+    {
+        $this->tripShortName = $tripShortName;
+
+        return $this;
+    }
+
+    public function setDisplayName(?string $displayName): LegDto
+    {
+        $this->displayName = $displayName;
 
         return $this;
     }

@@ -17,7 +17,7 @@ class MotisHydrator
     public function hydrateStop(array $data, ?float $distance = null): StopDto
     {
         $distance = (int) $distance;
-        
+
         return new StopDto()
             ->setStopId($data['stopId'])
             ->setName($data['name'])
@@ -39,6 +39,8 @@ class MotisHydrator
             ->setAgencyId($data['agencyId'] ?? null)
             ->setTripId($data['tripId'])
             ->setRouteShortName($data['routeShortName'])
+            ->setRouteLongName($data['routeLongName'] ?? null)
+            ->setTripShortName($data['tripShortName'] ?? null)
             ->setSource($data['source']);
 
     }
@@ -78,6 +80,14 @@ class MotisHydrator
             $intermediateStops[] = $this->hydrateStopPlace($stop);
         }
 
+        $shortName = null;
+        if (isset($data['tripShortName'])) {
+            $shortName = $data['tripShortName'];
+            if (is_numeric($shortName)) {
+                $shortName = (string) (int) $shortName; // remove leading zeros
+            }
+        }
+
         return new LegDto()
             ->setDuration($data['duration'])
             ->setStartTime(! empty($data['startTime']) ? Carbon::parse($data['startTime']) : null)
@@ -93,6 +103,9 @@ class MotisHydrator
             ->setAgencyId($data['agencyId'] ?? null)
             ->setTripId($data['tripId'])
             ->setRouteShortName($data['routeShortName'])
+            ->setRouteLongName($data['routeLongName'] ?? null)
+            ->setTripShortName($shortName)
+            ->setDisplayName($data['displayName'] ?? null)
             ->setSource($data['source'])
             ->setIntermediateStops($intermediateStops);
 

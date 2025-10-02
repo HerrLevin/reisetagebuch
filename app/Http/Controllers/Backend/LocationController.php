@@ -197,7 +197,10 @@ class LocationController extends Controller
             $dto->legs[0]->mode,
             $tripId,
             'transitous',
-            $dto->legs[0]->routeShortName
+            $dto->legs[0]->routeShortName,
+            $dto->legs[0]->routeLongName,
+            $dto->legs[0]->tripShortName,
+            $dto->legs[0]->displayName
         );
 
         // create stopovers
