@@ -8,6 +8,7 @@ use App\Models\Location;
 use App\Models\RouteSegment;
 use App\Models\TransportTrip;
 use App\Models\TransportTripStop;
+use App\Models\User;
 use Carbon\Carbon;
 use Clickbar\Magellan\Data\Geometries\Dimension;
 use Clickbar\Magellan\Data\Geometries\Geometry;
@@ -22,8 +23,10 @@ class TransportTripRepository
         ?string $provider = null,
         ?array $with = null
     ): ?TransportTrip {
-        $query = TransportTrip::where('foreign_trip_id', $foreignId)
-            ->where('provider', $provider);
+        $query = TransportTrip::where('foreign_trip_id', $foreignId);
+        if ($provider) {
+            $query->where('provider', $provider);
+        }
 
         if ($with) {
             $query->with($with);
@@ -39,7 +42,8 @@ class TransportTripRepository
         ?string $lineName = null,
         ?string $routeLongName = null,
         ?string $tripShortName = null,
-        ?string $displayName = null
+        ?string $displayName = null,
+        ?User $user = null
     ): TransportTrip {
         $trip = $this->getTripByIdentifier($foreignId, $provider);
 
@@ -55,6 +59,7 @@ class TransportTripRepository
         $trip->route_long_name = $routeLongName;
         $trip->trip_short_name = $tripShortName;
         $trip->display_name = $displayName;
+        $trip->user_id = $user?->id;
         $trip->save();
 
         return $trip;

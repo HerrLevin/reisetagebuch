@@ -10,7 +10,7 @@ class TripDto
 
     public string $mode;
 
-    public string $lineName;
+    public ?string $lineName;
 
     public ?string $routeLongName = null;
 

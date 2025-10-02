@@ -6,6 +6,7 @@ use App\Dto\Coordinate;
 use App\Dto\MotisApi\GeocodeResponseEntry;
 use App\Dto\MotisApi\LocationType;
 use App\Dto\MotisApi\StopDto;
+use App\Dto\MotisApi\StopPlaceDto;
 use App\Dto\MotisApi\StopTimeDto;
 use App\Dto\MotisApi\TripDto;
 use App\Hydrators\MotisHydrator;
@@ -36,12 +37,12 @@ class TransitousRequestService
         $this->hydrator = $hydrator ?? new MotisHydrator;
     }
 
-    /**
-     * @returns Collection|StopTimeDto[]
-     *
-     * @throws ConnectionException
-     */
-    public function getDepartures(string $identifier, Carbon $when, array $filter = [], ?int $radius = null): Collection
+    public function getLocationByIdentifier(string $identifier): ?StopPlaceDto
+    {
+        return $this->getDeparturesWithStop($identifier, Carbon::now())['stop'];
+    }
+
+    private function getDeparturesWithStop(string $identifier, Carbon $when, array $filter = [], ?int $radius = null): array
     {
         $radius = $radius ?? config('app.motis.radius', 500);
 
@@ -65,15 +66,32 @@ class TransitousRequestService
                 'body' => $response->body(),
             ]);
 
-            return collect();
+            return ['entries' => collect(), 'stop' => null];
         }
+
+        $stop = $this->hydrator->hydrateStopPlace($response->json('place'));
 
         $entries = $response->json('stopTimes');
         $entries = collect($entries);
 
-        return $entries->map(function ($entry) {
+        $entries = $entries->map(function ($entry) {
             return $this->hydrator->hydrateStopTime($entry);
         });
+
+        return [
+            'entries' => $entries,
+            'stop' => $stop,
+        ];
+    }
+
+    /**
+     * @returns Collection|StopTimeDto[]
+     *
+     * @throws ConnectionException
+     */
+    public function getDepartures(string $identifier, Carbon $when, array $filter = [], ?int $radius = null): Collection
+    {
+        return $this->getDeparturesWithStop($identifier, $when, $filter, $radius)['entries'];
     }
 
     /**

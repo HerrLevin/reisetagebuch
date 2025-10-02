@@ -1,19 +1,16 @@
 <script setup lang="ts">
-import Typeahead from '@/Components/Typeahead.vue';
-import Clock from '@/Icons/Clock.vue';
-import XMark from '@/Icons/XMark.vue';
+import TransitousSearch from '@/Pages/NewPostDialog/Partials/TransitousSearch.vue';
 import {
     FilterGroups,
     getColor,
     getEmoji,
 } from '@/Services/DepartureTypeService';
-import { Area, StopDto } from '@/types';
+import { StopDto } from '@/types';
 import { TransportMode } from '@/types/enums';
 import { Link } from '@inertiajs/vue3';
-import axios from 'axios';
+import { Clock, X } from 'lucide-vue-next';
 import { DateTime } from 'luxon';
 import { PropType, ref } from 'vue';
-import { debounce } from 'vue-debounce';
 
 const props = defineProps({
     filter: {
@@ -38,63 +35,6 @@ const props = defineProps({
         default: () => null,
     },
 });
-
-const search = ref('');
-const suggestions = ref<
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    { label: string; value: any; subLabel: string | undefined }[]
->([]);
-
-search.value = props.location?.name || '';
-
-const modelChange = debounce(() => fetchSuggestions(), 300);
-
-function fetchSuggestions() {
-    if (search.value.length < 3) {
-        suggestions.value = [];
-        return;
-    }
-
-    const url = route('posts.create.geocode');
-    axios
-        .get(url, {
-            params: {
-                query: search.value,
-                latitude: props.latitude,
-                longitude: props.longitude,
-            },
-        })
-        .then((response) => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            suggestions.value = response.data.map((item: any) => ({
-                label: item.name,
-                value: item.id,
-                subLabel: getArea(item.areas || []),
-            }));
-        })
-        .catch((error) => {
-            console.error('Error fetching suggestions:', error);
-        });
-}
-
-function getArea(areas: Array<Area>) {
-    if (areas.length === 0) {
-        return '';
-    }
-
-    const defaultArea: undefined | Area = areas.find(
-        (area: Area) => area.default,
-    );
-    const country: undefined | Area = areas.find(
-        (area: Area) => area.adminLevel === 2,
-    );
-
-    if (defaultArea) {
-        return country
-            ? `${defaultArea.name}, ${country.name}`
-            : defaultArea.name;
-    }
-}
 
 const selectedTime = ref<DateTime | null>(null);
 if (props.requestTime) {
@@ -128,16 +68,7 @@ function selectTime(time: EventTarget | null) {
     }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function submitTypeahead(test: any) {
-    let identifier: string | undefined = undefined;
-    if (test === undefined) {
-        identifier = suggestions.value[0]?.value;
-    }
-    if (test?.value && typeof test.value === 'string') {
-        identifier = test.value;
-    }
-
+function submitTypeahead(identifier: string | null) {
     if (identifier) {
         window.location.href = route('posts.create.departures', {
             latitude: props.latitude,
@@ -155,16 +86,11 @@ function submitTypeahead(test: any) {
         <ul class="list">
             <li class="list-row">
                 <div class="list-col-grow">
-                    <Typeahead
-                        v-model="search"
-                        class="input input-bordered w-full"
-                        name="departure-search"
-                        :required="false"
-                        :suggestions="suggestions"
-                        @submit="submitTypeahead($event)"
-                        @select="submitTypeahead($event)"
-                        @focus="modelChange()"
-                        @update:model-value="modelChange()"
+                    <TransitousSearch
+                        :location-name="props.location?.name"
+                        :latitude="props.latitude"
+                        :longitude="props.longitude"
+                        @select-identifier="submitTypeahead"
                     />
                 </div>
                 <button
@@ -235,7 +161,7 @@ function submitTypeahead(test: any) {
                         })
                     "
                 >
-                    <XMark class="h-4 w-4" />
+                    <X class="h-4 w-4" />
                 </Link>
 
                 <Link
@@ -264,5 +190,3 @@ function submitTypeahead(test: any) {
         </ul>
     </div>
 </template>
-
-<style scoped></style>

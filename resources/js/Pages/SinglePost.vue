@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import Map from '@/Components/Map.vue';
 import Post from '@/Components/Post/Post.vue';
-import ArrowLeft from '@/Icons/ArrowLeft.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import {
     BasePost,
@@ -13,6 +12,7 @@ import {
 import { Head } from '@inertiajs/vue3';
 import axios from 'axios';
 import { GeometryCollection } from 'geojson';
+import { ArrowLeft } from 'lucide-vue-next';
 import { LngLat } from 'maplibre-gl';
 import { PropType, ref } from 'vue';
 

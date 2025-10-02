@@ -21,7 +21,7 @@ const TransportModeEmoji: Record<TransportMode, string> = {
     [TransportMode.NIGHT_RAIL]: '🌙',
     [TransportMode.REGIONAL_FAST_RAIL]: '🚆',
     [TransportMode.REGIONAL_RAIL]: '🚆',
-    [TransportMode.OTHER]: '🚏',
+    [TransportMode.OTHER]: '🫥',
 };
 
 export function getEmoji(mode: TransportMode): string {

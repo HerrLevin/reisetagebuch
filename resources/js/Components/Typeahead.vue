@@ -1,8 +1,14 @@
 <script setup lang="ts">
-import XCircle from '@/Icons/XCircle.vue';
+import { CircleX } from 'lucide-vue-next';
 import { PropType, ref } from 'vue';
 
 const model = defineModel<string>({ required: true });
+
+export type Suggestion = {
+    label: string;
+    value: object | string;
+    subLabel: string | undefined;
+};
 
 defineProps({
     name: {
@@ -14,10 +20,7 @@ defineProps({
         default: () => [],
     },
     suggestions: {
-        type: Array as PropType<
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            { label: string; value: any; subLabel: string | undefined }[]
-        >,
+        type: Array as PropType<Suggestion[]>,
         default: () => [],
     },
 });
@@ -25,6 +28,10 @@ defineProps({
 defineEmits(['submit', 'select', 'update:modelValue', 'focus']);
 
 const loading = ref(false);
+
+function blur() {
+    (document.activeElement as HTMLElement)?.blur();
+}
 </script>
 
 <template>
@@ -41,7 +48,7 @@ const loading = ref(false);
                 @keydown="$emit('update:modelValue', model)"
                 @keydown.enter="$emit('submit')"
             />
-            <XCircle
+            <CircleX
                 v-if="model"
                 class="h-[1.5em] cursor-pointer"
                 @click="model = ''"
@@ -58,7 +65,10 @@ const loading = ref(false);
             >
                 <a
                     class="inline-block w-full"
-                    @click="$emit('select', suggestion)"
+                    @click="
+                        $emit('select', suggestion);
+                        blur();
+                    "
                 >
                     <h3 class="truncate font-bold">
                         {{ suggestion.label }}
@@ -85,5 +95,3 @@ const loading = ref(false);
         <span class="visually-hidden">Loading...</span>
     </div>
 </template>
-
-<style scoped></style>

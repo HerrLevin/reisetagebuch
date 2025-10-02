@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import Cog from '@/Icons/Cog.vue';
-import House from '@/Icons/House.vue';
-import List from '@/Icons/List.vue';
-import PencilSquare from '@/Icons/PencilSquare.vue';
-import Pin from '@/Icons/Pin.vue';
-import PlusCircle from '@/Icons/PlusCircle.vue';
-import UserIcon from '@/Icons/UserIcon.vue';
 import { LocationService } from '@/Services/LocationService';
 import { Link, usePage } from '@inertiajs/vue3';
+import {
+    CirclePlus,
+    Cog,
+    House,
+    List,
+    MapPin,
+    Route,
+    SquarePen,
+    User,
+} from 'lucide-vue-next';
 import { onMounted, ref } from 'vue';
 
 const latitude = ref(0);
@@ -42,6 +45,9 @@ const isTextRoute = () => {
 const isProfileRoute = () => {
     return route().current('profile.show', user?.username ?? '');
 };
+const isTripRoute = () => {
+    return route().current('trips.create');
+};
 
 const defaultNewPostRoute = () => {
     if (user.settings?.default_new_post_view === 'text') {
@@ -61,7 +67,7 @@ const defaultNewPostRoute = () => {
                 :href="route('dashboard')"
                 :class="{ 'menu-active': isDashboardRoute() }"
             >
-                <House class="h-5 w-5" />
+                <House class="size-5" />
 
                 Dashboard
             </Link>
@@ -76,7 +82,7 @@ const defaultNewPostRoute = () => {
                         })
                     "
                 >
-                    <PlusCircle class="h-5 w-5" />
+                    <CirclePlus class="size-5" />
                     <span class="dock-label">New Post</span>
                 </Link>
                 <ul v-if="isPostsCreateRoute()">
@@ -90,7 +96,7 @@ const defaultNewPostRoute = () => {
                             "
                             :class="{ 'menu-active': isVenueRoute() }"
                         >
-                            <Pin class="h-5 w-5" />
+                            <MapPin class="size-5" />
                             Locations
                         </Link>
                     </li>
@@ -105,7 +111,7 @@ const defaultNewPostRoute = () => {
                             "
                             :class="{ 'menu-active': isDeparturesRoute() }"
                         >
-                            <List class="h-5 w-5" />
+                            <List class="size-5" />
                             Departures
                         </Link>
                     </li>
@@ -119,7 +125,7 @@ const defaultNewPostRoute = () => {
                             "
                             :class="{ 'menu-active': isTextRoute() }"
                         >
-                            <PencilSquare class="h-5 w-5" />
+                            <SquarePen class="size-5" />
                             Text
                         </Link>
                     </li>
@@ -127,10 +133,19 @@ const defaultNewPostRoute = () => {
             </li>
             <li>
                 <Link
+                    :href="route('trips.create')"
+                    :class="{ 'menu-active': isTripRoute() }"
+                >
+                    <Route class="size-5" />
+                    New Route
+                </Link>
+            </li>
+            <li>
+                <Link
                     :href="route('profile.show', user?.username)"
                     :class="{ 'menu-active': isProfileRoute() }"
                 >
-                    <UserIcon class="h-5 w-5" />
+                    <User class="size-5" />
                     Profile
                 </Link>
             </li>
@@ -139,7 +154,7 @@ const defaultNewPostRoute = () => {
                     :href="route('account.edit')"
                     :class="{ 'menu-active': isSettingsRoute() }"
                 >
-                    <Cog class="h-5 w-5" />
+                    <Cog class="size-5" />
                     Settings
                 </Link>
             </li>
@@ -149,5 +164,3 @@ const defaultNewPostRoute = () => {
         </template>
     </ul>
 </template>
-
-<style scoped></style>

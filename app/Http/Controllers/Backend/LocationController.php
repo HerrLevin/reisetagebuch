@@ -12,6 +12,7 @@ use App\Dto\RequestLocationDto;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\LocationDto;
 use App\Http\Resources\LocationHistoryDto;
+use App\Hydrators\DbTripHydrator;
 use App\Hydrators\TripDtoHydrator;
 use App\Jobs\RerouteStops;
 use App\Models\RequestLocation;
@@ -190,6 +191,17 @@ class LocationController extends Controller
 
     public function stopovers(string $tripId, string $startId, string $startTime): ?TripDto
     {
+        $trip = $this->transportTripRepository->getTripByIdentifier(
+            $tripId,
+            null,
+            ['stops', 'stops.location.identifiers']
+        );
+
+        $hydrator = new DbTripHydrator;
+        if ($trip !== null) {
+            return $hydrator->hydrateTrip($trip);
+        }
+
         $dto = $this->transitousRequestService->getStopTimes($tripId);
 
         // create a database trip
@@ -225,8 +237,8 @@ class LocationController extends Controller
                 $trip,
                 $location,
                 $order,
-                $stopover->arrival,
-                $stopover->departure,
+                $stopover->scheduledArrival,
+                $stopover->scheduledDeparture,
                 $stopover->scheduledArrival?->diffInSeconds($stopover->arrival),
                 $stopover->scheduledDeparture?->diffInSeconds($stopover->departure),
                 false,

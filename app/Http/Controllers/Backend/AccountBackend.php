@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Backend;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Http\Requests\SettingsUpdateRequest;
+use App\Models\TransportTrip;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -48,9 +49,14 @@ class AccountBackend extends Controller
         Auth::logout();
 
         /** @var User $user */
-        $user->delete();
+        foreach ($user->trips()->get() as $trip) {
+            /** @var TransportTrip $trip */
+            $trip->stops()->delete();
+            $trip->delete();
+        }
         $user->posts()->delete();
         $user->profile()->delete();
+        $user->delete();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

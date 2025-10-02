@@ -62,11 +62,12 @@ class PostController extends Controller
     {
         $trip = $this->transportTripRepository->getTripByIdentifier(
             $request->tripId,
-            'transitous',
+            null,
             ['stops', 'stops.location.identifiers']
         );
 
-        $startLocation = $this->locationRepository->getLocationByIdentifier($request->startId, 'stop', 'motis');
+        $startLocation = $this->locationRepository->getLocationByIdentifier($request->startId, 'stop', 'motis') ??
+            $this->locationRepository->getLocationById($request->startId);
         $stopLocation = $this->locationRepository->getLocationById($request->stopId) ??
             $this->locationRepository->getLocationByIdentifier($request->stopId, 'stop', 'motis');
 

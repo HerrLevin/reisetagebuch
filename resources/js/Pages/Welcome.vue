@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
-import InformationCircle from '@/Icons/InformationCircle.vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
+import { CircleAlert } from 'lucide-vue-next';
 
 defineProps<{
     reisetagebuchVersion: string;
@@ -59,7 +59,7 @@ defineProps<{
                             <div
                                 class="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#FF2D20]/10 sm:size-16"
                             >
-                                <information-circle
+                                <CircleAlert
                                     class="size-5 sm:size-6"
                                     stroke="#FF2D20"
                                 />

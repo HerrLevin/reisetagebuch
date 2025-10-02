@@ -69,5 +69,3 @@ function selectDate(newValue: string) {
         </div>
     </AuthenticatedLayout>
 </template>
-
-<style scoped></style>

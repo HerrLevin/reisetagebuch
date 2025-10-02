@@ -11,7 +11,7 @@ class Location extends Model
 {
     use HasUuids;
 
-    protected $fillable = ['name', 'location'];
+    protected $fillable = ['name', 'location', 'type'];
 
     protected $relations = ['identifiers'];
 

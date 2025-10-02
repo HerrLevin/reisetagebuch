@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import EllipsisHorizontal from '@/Icons/EllipsisHorizontal.vue';
-import Trash from '@/Icons/Trash.vue';
 import { BasePost } from '@/types/PostTypes';
 import { useForm, usePage } from '@inertiajs/vue3';
+import { Ellipsis, Trash2 } from 'lucide-vue-next';
 import { PropType, ref, useTemplateRef } from 'vue';
 
 const props = defineProps({
@@ -42,7 +41,7 @@ const isSameUser = () => {
             class="btn btn-ghost btn-sm btn-circle"
             @click.prevent="dropdownOpen = !dropdownOpen"
         >
-            <EllipsisHorizontal />
+            <Ellipsis />
         </summary>
         <ul
             class="menu dropdown-content bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
@@ -52,7 +51,7 @@ const isSameUser = () => {
                 <li class="mx-0 border-b-1"></li>
                 <li>
                     <a @click.prevent="deleteModal?.showModal()">
-                        <Trash class="size-4" />
+                        <Trash2 class="size-4" />
                         <span class="text-red-500">Delete</span>
                     </a>
                 </li>
@@ -87,5 +86,3 @@ const isSameUser = () => {
         </form>
     </dialog>
 </template>
-
-<style scoped></style>

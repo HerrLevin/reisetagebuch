@@ -6,6 +6,7 @@ use App\Http\Controllers\Inertia\AccountController;
 use App\Http\Controllers\Inertia\InviteController;
 use App\Http\Controllers\Inertia\LocationController;
 use App\Http\Controllers\Inertia\PostController;
+use App\Http\Controllers\Inertia\TripController;
 use App\Http\Controllers\Inertia\UserController;
 use App\Http\Controllers\Inertia\UserSettingsController;
 use App\Http\Controllers\TraewellingOAuthController;
@@ -58,6 +59,8 @@ Route::middleware('auth')->group(callback: function () {
         Route::get('/new/prefetch/{latitude}/{longitude}', [ApiLocationController::class, 'prefetch'])->name('posts.create.prefetch');
         Route::get('/request-location/{latitude}/{longitude}', [ApiLocationController::class, 'getRecentRequestLocation'])->name('api.request-location.get');
     });
+
+    Route::resource('trips', TripController::class);
 
     Route::prefix('map')->group(function () {
         Route::get('/linestring/{from}/{to}', [MapController::class, 'getLineStringBetween'])->name('posts.get.linestring');
