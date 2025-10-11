@@ -74,6 +74,10 @@ watch(fetchingProgress, (newValue) => {
         }
     }
 });
+
+watch(search, () => {
+    filterLocations();
+});
 </script>
 
 <template>
@@ -109,7 +113,6 @@ watch(fetchingProgress, (newValue) => {
                         class="grow"
                         placeholder="Search"
                         autofocus
-                        @keyup="filterLocations"
                     />
                     <!--                    <kbd class="kbd kbd-sm">⌘</kbd>-->
                     <!--                    <kbd class="kbd kbd-sm">K</kbd>-->
