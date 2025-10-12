@@ -1,10 +1,11 @@
-import { TransportMode } from '@/types/enums';
+import { TransportMode, Visibility } from '@/types/enums';
 import { LocationEntry, UserDto } from '@/types/index';
 
 export type BasePost = {
     id: string;
     body: string;
     user: UserDto;
+    visibility: Visibility;
     created_at: string;
     updated_at: string;
 };

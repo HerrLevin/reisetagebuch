@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\PostTypes;
 
+use App\Enums\Visibility;
 use App\Http\Resources\UserDto;
 use App\Models\Post;
 
@@ -13,6 +14,8 @@ class BasePost
 
     public ?string $body = null;
 
+    public Visibility $visibility;
+
     public string $created_at;
 
     public string $updated_at;
@@ -22,6 +25,7 @@ class BasePost
         $this->id = $post->id;
         $this->body = $post->body;
         $this->user = $userDto;
+        $this->visibility = $post->visibility;
         $this->created_at = $post->created_at->toIso8601String();
         $this->updated_at = $post->updated_at->toIso8601String();
     }

@@ -2,6 +2,7 @@
 import Interactions from '@/Components/Post/Interactions.vue';
 import LocationDisplay from '@/Components/Post/LocationDisplay.vue';
 import RouteDisplay from '@/Components/Post/RouteDisplay.vue';
+import { getIcon } from '@/Services/VisibilityMapping';
 import {
     BasePost,
     isLocationPost,
@@ -47,6 +48,10 @@ if (date.diffNow('days').days < -1) {
             </Link>
             ·
             <span class="text-xs opacity-60">
+                <component
+                    :is="getIcon(post.visibility)"
+                    class="iconSize inline"
+                />
                 {{ relativeCreatedAt }}
             </span>
         </div>
@@ -68,4 +73,9 @@ if (date.diffNow('days').days < -1) {
     </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.iconSize {
+    width: 1em;
+    height: 1em;
+}
+</style>

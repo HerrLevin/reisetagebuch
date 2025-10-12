@@ -2,7 +2,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PostCreationForm from '@/Pages/NewPostDialog/Partials/PostCreationForm.vue';
 import { getEmoji } from '@/Services/DepartureTypeService';
-import { TransportMode } from '@/types/enums';
+import { TransportMode, Visibility } from '@/types/enums';
 import { Head, router } from '@inertiajs/vue3';
 import { reactive } from 'vue';
 
@@ -36,6 +36,7 @@ const form = reactive({
     startTime: startTime,
     stopId: stopId,
     stopTime: stopTime,
+    visibility: Visibility.PUBLIC,
 });
 
 function submitForm() {
@@ -58,6 +59,9 @@ function submitForm() {
                     :name="title"
                     :emoji="emoji"
                     @cancel="goBack"
+                    @select-visibility="
+                        (visibility) => (form.visibility = visibility)
+                    "
                 />
             </form>
         </div>

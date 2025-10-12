@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\Visibility;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 /**
  * @property string $body
@@ -18,6 +20,7 @@ class TransportPostCreateRequest extends FormRequest
     {
         return [
             'body' => 'nullable|string|max:255',
+            'visibility' => 'required', Rule::enum(Visibility::class),
             'tripId' => 'required',
             'startId' => 'required',
             'startTime' => 'required',

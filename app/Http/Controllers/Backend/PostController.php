@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Backend;
 
 use App\Dto\PostPaginationDto;
+use App\Enums\Visibility;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LocationPostRequest;
 use App\Http\Requests\PostRequest;
@@ -19,6 +20,7 @@ use App\Models\User;
 use App\Repositories\LocationRepository;
 use App\Repositories\PostRepository;
 use App\Repositories\TransportTripRepository;
+use Auth;
 use Illuminate\Auth\Access\AuthorizationException;
 
 class PostController extends Controller
@@ -46,6 +48,7 @@ class PostController extends Controller
         return $this->postRepository->storeLocation(
             $request->user(),
             $location,
+            Visibility::from($request->input('visibility')),
             $request->input('body')
         );
     }
@@ -54,7 +57,8 @@ class PostController extends Controller
     {
         return $this->postRepository->storeText(
             $request->user(),
-            $request->input('body')
+            Visibility::from($request->input('visibility')),
+            $request->input('body'),
         );
     }
 
@@ -93,6 +97,7 @@ class PostController extends Controller
             $trip,
             $startStopover,
             $stopStopover,
+            Visibility::from($request->input('visibility')),
             $request->body
         );
 
@@ -114,7 +119,7 @@ class PostController extends Controller
 
     public function show(string $postId): BasePost|LocationPost|TransportPost
     {
-        return $this->postRepository->getById($postId);
+        return $this->postRepository->getById($postId, Auth::user());
     }
 
     /**
@@ -122,7 +127,7 @@ class PostController extends Controller
      */
     public function destroy(string $postId): void
     {
-        $post = $this->postRepository->getById($postId);
+        $post = $this->postRepository->getById($postId, Auth::user());
 
         $this->authorize('delete', $post);
 

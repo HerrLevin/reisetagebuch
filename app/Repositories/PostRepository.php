@@ -25,7 +25,7 @@ class PostRepository
         $this->postHydrator = $postHydrator ?? new PostHydrator;
     }
 
-    public function storeLocation(User $user, Location $location, ?string $body = null): BasePost|LocationPost|TransportPost
+    public function storeLocation(User $user, Location $location, Visibility $visibility, ?string $body = null): BasePost|LocationPost|TransportPost
     {
         try {
             DB::beginTransaction();
@@ -33,6 +33,7 @@ class PostRepository
             $post = Post::create([
                 'user_id' => $user->id,
                 'body' => $body,
+                'visibility' => $visibility,
             ]);
             // create location post
             $post->locationPost()->create([
@@ -49,7 +50,7 @@ class PostRepository
         return $this->postHydrator->modelToDto($post);
     }
 
-    public function storeText(User $user, string $body): BasePost|LocationPost|TransportPost
+    public function storeText(User $user, Visibility $visibility, string $body): BasePost|LocationPost|TransportPost
     {
         try {
             DB::beginTransaction();
@@ -57,6 +58,7 @@ class PostRepository
             $post = Post::create([
                 'user_id' => $user->id,
                 'body' => $body,
+                'visibility' => $visibility,
             ]);
             DB::commit();
 
@@ -73,6 +75,7 @@ class PostRepository
         TransportTrip $transportTrip,
         TransportTripStop $originStop,
         TransportTripStop $destinationStop,
+        Visibility $visibility,
         ?string $body = null
     ): BasePost|LocationPost|TransportPost {
         try {
@@ -81,6 +84,7 @@ class PostRepository
             $post = Post::create([
                 'user_id' => $user->id,
                 'body' => $body,
+                'visibility' => $visibility,
             ]);
 
             // create transport post

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PostCreationForm from '@/Pages/NewPostDialog/Partials/PostCreationForm.vue';
+import { Visibility } from '@/types/enums';
 import { Head, router } from '@inertiajs/vue3';
 import { reactive } from 'vue';
 
@@ -10,6 +11,7 @@ function goBack() {
 
 const form = reactive({
     body: '',
+    visibility: Visibility.PUBLIC,
 });
 
 function submitForm() {
@@ -32,6 +34,9 @@ function submitForm() {
                     name="New Post"
                     emoji="✍"
                     @cancel="goBack"
+                    @select-visibility="
+                        (visibility) => (form.visibility = visibility)
+                    "
                 />
             </form>
         </div>
