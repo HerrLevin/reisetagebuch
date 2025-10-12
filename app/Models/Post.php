@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\Visibility;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,12 +12,13 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Post extends Model
 {
-    use HasUuids;
+    use HasFactory, HasUuids;
 
-    protected $fillable = ['user_id', 'body', 'published_at'];
+    protected $fillable = ['user_id', 'body', 'published_at', 'visibility'];
 
     protected $casts = [
         'published_at' => 'datetime',
+        'visibility' => Visibility::class,
     ];
 
     public function user(): BelongsTo

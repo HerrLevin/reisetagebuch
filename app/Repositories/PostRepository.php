@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Dto\PostPaginationDto;
+use App\Enums\Visibility;
 use App\Http\Resources\PostTypes\BasePost;
 use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
@@ -108,6 +109,8 @@ class PostRepository
             'user', 'locationPost.location', 'locationPost.location.tags', 'transportPost', 'transportPost.origin', 'transportPost.destination',
             'transportPost.originStop.location', 'transportPost.destinationStop.location', 'transportPost.transportTrip',
         ])
+            ->where('user_id', '=', $user->id)
+            ->orWhere('visibility', Visibility::PUBLIC->value)
             ->latest()
             ->cursorPaginate(50);
 
@@ -123,14 +126,21 @@ class PostRepository
         );
     }
 
-    public function getPostsForUser(User|string $user): PostPaginationDto
+    public function getPostsForUser(User|string $user, ?User $visitingUser = null): PostPaginationDto
     {
         if ($user instanceof User) {
             $user = $user->id;
         }
 
         $posts = Post::with(['user', 'locationPost.location', 'locationPost.location.tags', 'transportPost', 'transportPost.origin', 'transportPost.destination'])
-            ->where('user_id', $user)
+            ->where('user_id', $user);
+
+        if ($visitingUser?->id !== $user) {
+            // not the owner, show only public posts
+            $posts->where('visibility', Visibility::PUBLIC->value);
+        }
+
+        $posts = $posts
             ->latest()
             ->cursorPaginate(50);
 
@@ -146,11 +156,15 @@ class PostRepository
         );
     }
 
-    public function getById(string $postId): BasePost|LocationPost|TransportPost
+    public function getById(string $postId, ?User $visitingUser = null): BasePost|LocationPost|TransportPost
     {
         $post = Post::with(['user', 'locationPost.location', 'locationPost.location.tags', 'transportPost', 'transportPost.origin', 'transportPost.destination'])
             ->where('id', $postId)
             ->firstOrFail();
+
+        if ($visitingUser?->id !== $post->user_id && ! in_array($post->visibility, [Visibility::PUBLIC, Visibility::UNLISTED], true)) {
+            abort(403);
+        }
 
         return $this->postHydrator->modelToDto($post);
     }

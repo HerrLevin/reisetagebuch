@@ -6,6 +6,7 @@ use App\Http\Controllers\Backend\PostController;
 use App\Http\Controllers\Backend\UserController as BackendUserController;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Models\Location;
+use Auth;
 use Clickbar\Magellan\Data\Geometries\GeometryCollection;
 use Clickbar\Magellan\IO\Generator\Geojson\GeojsonGenerator;
 use Illuminate\Http\RedirectResponse;
@@ -26,10 +27,10 @@ class UserController extends Controller
         $this->userController = $userController;
     }
 
-    public function show(string $username): Response|ResponseFactory
+    public function show(string $username, Request $request): Response|ResponseFactory
     {
         $user = $this->userController->show($username);
-        $posts = $this->postController->postsForUser($user->id);
+        $posts = $this->postController->postsForUser($user->id, Auth::user());
 
         return inertia('Profile/Show', [
             'posts' => Inertia::merge($posts->items),

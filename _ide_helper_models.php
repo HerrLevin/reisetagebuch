@@ -139,11 +139,13 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $published_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \App\Enums\Visibility $visibility
  * @property-read \App\Models\LocationPost|null $locationPost
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PostMetaInfo> $metaInfos
  * @property-read int|null $meta_infos_count
  * @property-read \App\Models\TransportPost|null $transportPost
  * @property-read \App\Models\User $user
+ * @method static \Database\Factories\PostFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post query()
@@ -153,6 +155,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post wherePublishedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereVisibility($value)
  */
 	class Post extends \Eloquent {}
 }

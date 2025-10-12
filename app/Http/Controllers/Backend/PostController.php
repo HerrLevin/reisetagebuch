@@ -107,9 +107,9 @@ class PostController extends Controller
         return $this->postRepository->getDashboardForUser($user);
     }
 
-    public function postsForUser(User|string $user): PostPaginationDto
+    public function postsForUser(User|string $user, ?User $visitingUser = null): PostPaginationDto
     {
-        return $this->postRepository->getPostsForUser($user);
+        return $this->postRepository->getPostsForUser($user, $visitingUser);
     }
 
     public function show(string $postId): BasePost|LocationPost|TransportPost
