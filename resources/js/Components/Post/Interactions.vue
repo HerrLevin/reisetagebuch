@@ -1,60 +1,21 @@
 <script setup lang="ts">
 import ContextMenu from '@/Components/Post/ContextMenu.vue';
-import {
-    BasePost,
-    isLocationPost,
-    isTransportPost,
-    LocationPost,
-    TransportPost,
-} from '@/types/PostTypes';
-import { Heart, Share } from 'lucide-vue-next';
+import { BasePost, LocationPost, TransportPost } from '@/types/PostTypes';
+import { Heart } from 'lucide-vue-next';
 import { PropType } from 'vue';
 
-const props = defineProps({
+defineProps({
     post: {
         type: Object as PropType<BasePost | TransportPost | LocationPost>,
         required: true,
     },
 });
-
-function sharePost(): void {
-    let postText = `Check out ${props.post.user.name}'s post!`;
-    if (isLocationPost(props.post)) {
-        postText = `Check out ${props.post.user.name}'s post at ${props.post.location.name}!`;
-    } else if (isTransportPost(props.post)) {
-        postText = `Check out ${props.post.user.name}'s travel from ${props.post.originStop.location.name} to ${props.post.originStop.location.name}`;
-    }
-    const shareData = {
-        title: 'Post',
-        text: postText,
-        url: route('posts.show', props.post.id),
-    };
-
-    if (navigator.canShare && navigator.canShare(shareData)) {
-        navigator.share(shareData).then().catch();
-    } else {
-        // copy the link to the clipboard
-        navigator.clipboard
-            .writeText(shareData.url)
-            .then(() => {
-                alert('Post link copied to clipboard');
-            })
-            .catch();
-    }
-}
 </script>
 
 <template>
-    <div class="flex items-center justify-between">
+    <div class="flex items-center justify-end">
         <button class="btn btn-ghost btn-sm btn-circle hidden">
             <Heart />
-        </button>
-
-        <button
-            class="btn btn-ghost btn-sm btn-circle"
-            @click.prevent="sharePost()"
-        >
-            <Share />
         </button>
 
         <ContextMenu :post />
