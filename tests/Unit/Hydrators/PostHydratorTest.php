@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Hydrators;
 
+use App\Enums\Visibility;
 use App\Http\Resources\UserDto;
 use App\Hydrators\PostHydrator;
 use App\Hydrators\UserHydrator;
@@ -46,6 +47,7 @@ class PostHydratorTest extends TestCase
                 'updated_at' => Carbon::parse('2023-01-01 00:00:01'),
                 'transportPost' => $transportPost,
                 'locationPost' => $locationPost,
+                'visibility' => Visibility::PUBLIC,
                 'user' => new User,
                 default => null,
             };

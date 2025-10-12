@@ -21,3 +21,9 @@ export enum TransportMode {
     REGIONAL_RAIL = 'REGIONAL_RAIL',
     OTHER = 'OTHER',
 }
+
+export enum Visibility {
+    PUBLIC = 'public',
+    PRIVATE = 'private',
+    UNLISTED = 'unlisted',
+}

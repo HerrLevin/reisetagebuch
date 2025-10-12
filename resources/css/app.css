@@ -13,3 +13,10 @@ textarea,
 select {
     font-size: 1rem;
 }
+
+.transparent-input {
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    outline: none;
+}
