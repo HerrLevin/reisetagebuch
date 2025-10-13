@@ -1,4 +1,5 @@
 import { TransportMode } from '@/types/enums';
+import { GeometryCollection } from 'geojson';
 import { Config } from 'ziggy-js';
 
 export interface User {
@@ -119,6 +120,11 @@ export type LocationHistoryDto = {
     longitude: number;
     type: string;
     timestamp: string;
+};
+
+export type TripHistoryEntryDto = {
+    id: string;
+    geometry: GeometryCollection | null;
 };
 
 export type LocationTag = {
