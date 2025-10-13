@@ -7,6 +7,7 @@ use App\Models\LocationIdentifier;
 use App\Models\LocationPost;
 use App\Models\RequestLocation;
 use App\Models\TimestampedUserWaypoint;
+use App\Models\TransportPost;
 use App\Services\OsmNameService;
 use Carbon\Carbon;
 use Clickbar\Magellan\Data\Geometries\Point;
@@ -43,6 +44,29 @@ class LocationRepository
             ->limit(100_000);
 
         return $query->get();
+    }
+
+    /**
+     * @return Collection<int, TransportPost>
+     */
+    public function getTransportPostLocationsForUser(string $userId, Carbon $fromDate, Carbon $untilDate): Collection
+    {
+        return TransportPost::join('posts', 'posts.id', '=', 'transport_posts.post_id')
+            ->join('transport_trip_stops as origin_stops', 'origin_stops.id', '=', 'transport_posts.origin_stop_id')
+            ->join('transport_trip_stops as destination_stops', 'destination_stops.id', '=', 'transport_posts.destination_stop_id')
+            ->where('posts.user_id', $userId)
+            ->where(function ($query) use ($fromDate, $untilDate) {
+                $query->where(function ($q) use ($fromDate, $untilDate) {
+                    $q->where('origin_stops.departure_time', '>=', $fromDate)
+                        ->where('origin_stops.departure_time', '<=', $untilDate);
+                })->orWhere(function ($q) use ($fromDate, $untilDate) {
+                    $q->where('destination_stops.arrival_time', '>=', $fromDate)
+                        ->where('destination_stops.arrival_time', '<=', $untilDate);
+                });
+            })
+            ->orderBy('posts.created_at', 'desc')
+            ->limit(100_000)
+            ->get();
     }
 
     public function updateOrCreateLocation($location): void

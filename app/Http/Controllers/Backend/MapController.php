@@ -16,10 +16,10 @@ class MapController extends Controller
         $this->transportTripRepository = $transportTripRepository;
     }
 
-    public function fromTo(string $from, string $to): ?LineString
+    public function fromTo(string $fromStopId, string $toStopId): ?LineString
     {
-        $start = $this->transportTripRepository->getStopById($from);
-        $end = $this->transportTripRepository->getStopById($to);
+        $start = $this->transportTripRepository->getStopById($fromStopId);
+        $end = $this->transportTripRepository->getStopById($toStopId);
 
         if (! $start || ! $end) {
             return null;

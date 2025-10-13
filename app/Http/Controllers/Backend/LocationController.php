@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend;
 
 use App\Dto\DeparturesDto;
+use App\Dto\LocationHistoryDto;
 use App\Dto\MotisApi\GeocodeResponseEntry;
 use App\Dto\MotisApi\LocationType;
 use App\Dto\MotisApi\StopDto;
@@ -11,7 +12,8 @@ use App\Dto\MotisApi\TripDto;
 use App\Dto\RequestLocationDto;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\LocationDto;
-use App\Http\Resources\LocationHistoryDto;
+use App\Http\Resources\LocationHistoryEntryDto;
+use App\Http\Resources\TripHistoryEntryDto;
 use App\Hydrators\DbTripHydrator;
 use App\Hydrators\TripDtoHydrator;
 use App\Jobs\RerouteStops;
@@ -42,38 +44,56 @@ class LocationController extends Controller
 
     private OverpassRequestService $overpassRequestService;
 
+    private MapController $mapController;
+
     public function __construct(
         LocationRepository $locationRepository,
         TransitousRequestService $transitousRequestService,
         TransportTripRepository $transportTripRepository,
         TripDtoHydrator $tripDtoHydrator,
-        OverpassRequestService $overpassRequestService
+        OverpassRequestService $overpassRequestService,
+        MapController $mapController
     ) {
         $this->locationRepository = $locationRepository;
         $this->transitousRequestService = $transitousRequestService;
         $this->transportTripRepository = $transportTripRepository;
         $this->tripDtoHydrator = $tripDtoHydrator;
         $this->overpassRequestService = $overpassRequestService;
+        $this->mapController = $mapController;
     }
 
     /**
      * @return LocationDto[]|Collection
      */
-    public function index(string $userId, Carbon $fromDate, Carbon $untilDate): Collection
+    public function index(string $userId, Carbon $fromDate, Carbon $untilDate): LocationHistoryDto
     {
         $locations = $this->locationRepository->getLocationsForUser($userId, $fromDate, $untilDate);
         $timestampedLocations = $this->locationRepository->getTimestampedUserWaypoints($userId, $fromDate, $untilDate);
+        $transportPosts = $this->locationRepository->getTransportPostLocationsForUser($userId, $fromDate, $untilDate);
 
         $locations = $locations->merge($timestampedLocations);
+        $routes = collect();
 
         // Sort locations by created_at in descending order
-        return $locations->sortByDesc('created_at')->map(function ($location) {
+        $locations = $locations->sortByDesc('created_at')->map(function ($location) {
             if ($location instanceof TimestampedUserWaypoint) {
-                return LocationHistoryDto::fromWaypoint($location);
+                return LocationHistoryEntryDto::fromWaypoint($location);
             }
 
-            return LocationHistoryDto::fromLocationPost($location);
+            return LocationHistoryEntryDto::fromLocationPost($location);
         })->values();
+
+        // Add transport post locations
+        foreach ($transportPosts as $post) {
+            $postLocations = LocationHistoryEntryDto::fromTransportPost($post);
+            $route = $this->mapController->fromTo($post->origin_stop_id, $post->destination_stop_id);
+            $routes->push(new TripHistoryEntryDto($post, $route));
+            foreach ($postLocations as $loc) {
+                $locations->push($loc);
+            }
+        }
+
+        return new LocationHistoryDto($locations, $routes);
     }
 
     public function getRecentRequestLocation(Point $point): ?RequestLocationDto
