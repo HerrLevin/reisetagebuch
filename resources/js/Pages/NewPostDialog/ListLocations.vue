@@ -3,7 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import LocationListEntry from '@/Pages/NewPostDialog/Partials/LocationListEntry.vue';
 import { LocationService } from '@/Services/LocationService';
 import { LocationEntry, RequestLocationDto } from '@/types';
-import { Head } from '@inertiajs/vue3';
+import { Head, usePage } from '@inertiajs/vue3';
 import { ref, watch } from 'vue';
 
 const props = defineProps({
@@ -22,29 +22,31 @@ const search = ref<string>('');
 const fetchingProgress = ref<RequestLocationDto | null>(null);
 
 function fetchRequestLocation() {
-    LocationService.getPosition().then((position) => {
-        fetch(
-            route('api.request-location.get', {
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude,
-            }),
-        )
-            .then((response: Response) => {
-                if (response.ok) {
-                    response.json().then((data: RequestLocationDto) => {
-                        fetchingProgress.value = data;
-                    });
-                } else {
-                    console.error(
-                        'Failed to fetch request location:',
-                        response.statusText,
-                    );
-                }
-            })
-            .catch((error) => {
-                console.error('Error fetching request location:', error);
-            });
-    });
+    LocationService.getPosition(!!usePage().props.auth.user)
+        .then((position) => {
+            fetch(
+                route('api.request-location.get', {
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                }),
+            )
+                .then((response: Response) => {
+                    if (response.ok) {
+                        response.json().then((data: RequestLocationDto) => {
+                            fetchingProgress.value = data;
+                        });
+                    } else {
+                        console.error(
+                            'Failed to fetch request location:',
+                            response.statusText,
+                        );
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error fetching request location:', error);
+                });
+        })
+        .catch(() => {});
 }
 
 function filterLocations() {

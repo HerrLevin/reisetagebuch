@@ -19,10 +19,12 @@ const longitude = ref(0);
 const user = usePage().props.auth.user ?? null;
 
 onMounted(() => {
-    LocationService.getPosition().then((position) => {
-        latitude.value = position.coords.latitude;
-        longitude.value = position.coords.longitude;
-    });
+    LocationService.getPosition(!!user)
+        .then((position) => {
+            latitude.value = position.coords.latitude;
+            longitude.value = position.coords.longitude;
+        })
+        .catch(() => {});
 });
 const isPostsCreateRoute = () => {
     return route().current()?.startsWith('posts.create');

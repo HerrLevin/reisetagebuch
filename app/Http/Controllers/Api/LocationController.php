@@ -20,10 +20,24 @@ class LocationController extends Controller
         $this->locationController = $locationController;
     }
 
+    private function canStoreHistory(Request $request): bool
+    {
+        if ($request->hasCookie('rtb_disallow_history') || $request->hasHeader('X-RTB-DISALLOW-HISTORY')) {
+            return false;
+        }
+        if ($request->hasCookie('rtb_allow_history') || $request->hasHeader('X-RTB-ALLOW-HISTORY')) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function prefetch(float $latitude, float $longitude, Request $request): void
     {
         $point = Point::makeGeodetic($latitude, $longitude);
-        $this->locationController->createTimestampedUserWaypoint($request->user()->id, $point);
+        if ($this->canStoreHistory($request)) {
+            $this->locationController->createTimestampedUserWaypoint($request->user()->id, $point);
+        }
         PrefetchJob::dispatch($point);
 
         abort('204');
@@ -46,7 +60,9 @@ class LocationController extends Controller
         $point = null;
         if ($request->latitude && $request->longitude) {
             $point = Point::makeGeodetic($request->latitude, $request->longitude);
-            $this->locationController->createTimestampedUserWaypoint($request->user()->id, $point);
+            if ($this->canStoreHistory($request)) {
+                $this->locationController->createTimestampedUserWaypoint($request->user()->id, $point);
+            }
         }
 
         try {

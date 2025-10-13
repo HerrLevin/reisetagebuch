@@ -18,9 +18,6 @@ function cursor(cursor: string | unknown) {
 
     return cursor?.length > 5 ? cursor : null;
 }
-
-console.log('cursor', cursor(usePage().props.nextCursor));
-console.log(usePage().props);
 </script>
 
 <template>
@@ -40,5 +37,3 @@ console.log(usePage().props);
     </WhenVisible>
     <div v-else class="p-4 pb-8 text-center">You've reached the end!</div>
 </template>
-
-<style scoped></style>

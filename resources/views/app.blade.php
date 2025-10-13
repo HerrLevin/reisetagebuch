@@ -9,7 +9,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#191e24">
     <link rel="shortcut icon" sizes="512x512" href="{{ asset('/assets/pwa-512x512.png') }}">
-    <link rel="shortcut icon" sizes="128x128" href="{{ asset('/assets/pwa-128x128.png') }}">
+    <link rel="shortcut icon" sizes="128x128" href="{{ asset('/assets/pwa-192x192.png') }}">
     <link rel="manifest" href="{{ asset('/build/manifest.webmanifest') }}" />
     <meta name="name" content="{{ config('app.name', 'Reisetagebuch') }}">
 
