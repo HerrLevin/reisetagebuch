@@ -20,6 +20,8 @@ export type TransportPost = BasePost & {
     trip: Trip;
 };
 
+export type AllPosts = BasePost | LocationPost | TransportPost;
+
 export type Stop = {
     id: string;
     name: string;

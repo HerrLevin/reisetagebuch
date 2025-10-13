@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
+use App\Enums\Visibility;
 use App\Http\Resources\PostTypes\BasePost;
-use App\Models\Post;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
@@ -14,9 +14,13 @@ class PostPolicy
         return true;
     }
 
-    public function view(User $user, Post $post): bool
+    public function view(?User $user, BasePost $post): bool
     {
-        return true;
+        if ($post->visibility === Visibility::PRIVATE) {
+            return $user?->id === $post->user->id;
+        }
+
+        return in_array($post->visibility, [Visibility::PUBLIC, Visibility::UNLISTED], true);
     }
 
     public function create(User $user): bool
@@ -24,9 +28,9 @@ class PostPolicy
         return true;
     }
 
-    public function update(User $user, Post $post): Response
+    public function update(User $user, BasePost $post): Response
     {
-        return $user->id === $post->user_id
+        return $user->id === $post->user->id
             ? Response::allow()
             : Response::deny('You do not own this post.');
     }

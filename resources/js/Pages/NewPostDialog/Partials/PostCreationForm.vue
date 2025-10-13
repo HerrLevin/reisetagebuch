@@ -9,7 +9,7 @@ import { ref } from 'vue';
 
 const model = defineModel({ default: '', type: String });
 
-defineProps({
+const props = defineProps({
     emoji: {
         type: String,
         required: true,
@@ -18,10 +18,22 @@ defineProps({
         type: String,
         required: true,
     },
+    defaultVisibility: {
+        type: String as () => Visibility,
+        default: Visibility.PUBLIC,
+    },
+    subtitle: {
+        type: String || null,
+        default: null,
+    },
+    confirmButtonText: {
+        type: String,
+        default: 'Post',
+    },
 });
 
 const emit = defineEmits(['cancel', 'selectVisibility', 'update:modelValue']);
-const selectedVisibility = ref(Visibility.PUBLIC);
+const selectedVisibility = ref(props.defaultVisibility);
 
 function selectVisibility(visibility: Visibility) {
     selectedVisibility.value = visibility;
@@ -35,9 +47,15 @@ function blur() {
 </script>
 
 <template>
-    <div class="flex w-full items-center gap-4 p-8">
+    <div
+        class="flex w-full items-center gap-4 p-8"
+        :class="{ 'pb-0': !!subtitle }"
+    >
         <div class="text-3xl">{{ emoji }}</div>
         <div class="text-xl">{{ name }}</div>
+    </div>
+    <div v-if="subtitle" class="px-8 pb-8 text-sm opacity-70">
+        {{ subtitle }}
     </div>
     <div class="bg-base-200 w-full">
         <div class="dropdown px-4 py-2">
@@ -96,7 +114,9 @@ function blur() {
         <button class="btn btn-secondary" @click.prevent="$emit('cancel')">
             Cancel
         </button>
-        <button class="btn btn-primary" type="submit">Post</button>
+        <button class="btn btn-primary" type="submit">
+            {{ confirmButtonText }}
+        </button>
     </div>
 </template>
 

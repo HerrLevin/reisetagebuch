@@ -117,9 +117,42 @@ class PostController extends Controller
         return $this->postRepository->getPostsForUser($user, $visitingUser);
     }
 
+    /**
+     * @throws AuthorizationException
+     */
     public function show(string $postId): BasePost|LocationPost|TransportPost
     {
-        return $this->postRepository->getById($postId, Auth::user());
+        $post = $this->postRepository->getById($postId, Auth::user());
+
+        $this->authorize('view', $post);
+
+        return $post;
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function edit(string $postId): BasePost|LocationPost|TransportPost
+    {
+        $post = $this->postRepository->getById($postId, Auth::user());
+        $this->authorize('update', $post);
+
+        return $post;
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function updatePost(string $postId, PostRequest $request): BasePost
+    {
+        $post = $this->postRepository->getById($postId, Auth::user());
+        $this->authorize('update', $post);
+
+        return $this->postRepository->updateBasePost(
+            $post,
+            Visibility::from($request->input('visibility')),
+            $request->exists('body') ? ($request->input('body') ?? '') : null,
+        );
     }
 
     /**

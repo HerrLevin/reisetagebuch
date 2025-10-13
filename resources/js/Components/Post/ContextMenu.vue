@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { BasePost, isLocationPost, isTransportPost } from '@/types/PostTypes';
-import { useForm, usePage } from '@inertiajs/vue3';
+import { getOwnShareText, getShareText } from '@/Services/PostTextService';
+import { BasePost } from '@/types/PostTypes';
+import { Link, useForm, usePage } from '@inertiajs/vue3';
 import { Ellipsis, Share, SquarePen, Trash2 } from 'lucide-vue-next';
 import { PropType, useTemplateRef } from 'vue';
 
@@ -36,15 +37,11 @@ const isSameUser = () => {
 function sharePost(): void {
     blur();
 
-    let postText = `Check out ${props.post.user.name}'s post!`;
-    if (isLocationPost(props.post)) {
-        postText = `Check out ${props.post.user.name}'s post at ${props.post.location.name}!`;
-    } else if (isTransportPost(props.post)) {
-        postText = `Check out ${props.post.user.name}'s travel from ${props.post.originStop.location.name} to ${props.post.originStop.location.name}`;
-    }
     const shareData = {
         title: 'Post',
-        text: postText,
+        text: isSameUser()
+            ? getOwnShareText(props.post)
+            : getShareText(props.post),
         url: route('posts.show', props.post.id),
     };
 
@@ -83,10 +80,10 @@ function blur() {
             </li>
             <template v-if="isSameUser()">
                 <li>
-                    <a>
+                    <Link :href="route('posts.edit', post.id)">
                         <SquarePen class="size-4" />
                         Edit
-                    </a>
+                    </Link>
                 </li>
                 <li class="mx-0 border-b-1"></li>
                 <li>
