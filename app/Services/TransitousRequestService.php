@@ -121,6 +121,10 @@ class TransitousRequestService
 
         $stops = $response->json();
         $stops = collect($stops);
+        $stops = $stops->filter(function ($stop) {
+            return ! empty($stop['stopId']);
+        });
+
         $stops = $stops->map(function ($stop) use ($center) {
             $distance = $this->geoService->getDistance(
                 new Coordinate($stop['lat'], $stop['lon']),
