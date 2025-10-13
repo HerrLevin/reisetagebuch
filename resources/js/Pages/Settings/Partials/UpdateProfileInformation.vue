@@ -42,7 +42,6 @@ const form = useForm({
                     class="mt-1 block w-full"
                     :error="form.errors.name"
                     required
-                    autofocus
                     autocomplete="name"
                 />
 
@@ -59,7 +58,6 @@ const form = useForm({
                     class="mt-1 block w-full"
                     :error="form.errors.username"
                     required
-                    autofocus
                     autocomplete="name"
                 />
 

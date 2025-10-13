@@ -7,7 +7,12 @@ import axios from 'axios';
 export class LocationService {
     private static readonly REFRESH_INTERVAL = 30; // 30 Seconds
 
-    public static async getPosition(): Promise<GeolocationPosition> {
+    public static async getPosition(
+        isAuthenticated: boolean,
+    ): Promise<GeolocationPosition> {
+        if (!isAuthenticated) {
+            throw new Error('User is not authenticated.');
+        }
         const localStoragePosition = this.getFromLocalStorage();
         if (localStoragePosition) {
             return localStoragePosition;
@@ -59,11 +64,7 @@ export class LocationService {
                     longitude: position.coords.longitude,
                 }),
             )
-            .then(() => {
-                console.log('Location data prefetched successfully.');
-            })
-            .catch((error) => {
-                console.error('Error prefetching location data:', error);
-            });
+            .then(() => {})
+            .catch(() => {});
     }
 }

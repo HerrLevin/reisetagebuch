@@ -5,7 +5,7 @@ import DeparturesListEntry from '@/Pages/NewPostDialog/Partials/DeparturesListEn
 import { LocationService } from '@/Services/LocationService';
 import { DeparturesDto } from '@/types';
 import { TransportMode } from '@/types/enums';
-import { Head } from '@inertiajs/vue3';
+import { Head, usePage } from '@inertiajs/vue3';
 import { DateTime } from 'luxon';
 import { onMounted, PropType, ref } from 'vue';
 
@@ -35,10 +35,12 @@ time.value = DateTime.fromISO(props.requestTime);
 const latitude = ref(0);
 const longitude = ref(0);
 onMounted(() => {
-    LocationService.getPosition().then((position) => {
-        latitude.value = position.coords.latitude;
-        longitude.value = position.coords.longitude;
-    });
+    LocationService.getPosition(!!usePage().props.auth.user)
+        .then((position) => {
+            latitude.value = position.coords.latitude;
+            longitude.value = position.coords.longitude;
+        })
+        .catch(() => {});
 });
 
 const showStartButton = ref(false);

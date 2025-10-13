@@ -16,14 +16,16 @@ const latitude = ref(0);
 const longitude = ref(0);
 
 onMounted(() => {
-    LocationService.getPosition().then((position) => {
-        latitude.value = position.coords.latitude;
-        longitude.value = position.coords.longitude;
+    LocationService.getPosition(!!usePage().props.auth.user)
+        .then((position) => {
+            latitude.value = position.coords.latitude;
+            longitude.value = position.coords.longitude;
 
-        if (!isVenueRoute() && !isDeparturesRoute()) {
-            LocationService.prefetchLocationData(position);
-        }
-    });
+            if (!isVenueRoute() && !isDeparturesRoute()) {
+                LocationService.prefetchLocationData(position);
+            }
+        })
+        .catch(() => {});
 });
 
 const user = usePage().props.auth.user ?? null;

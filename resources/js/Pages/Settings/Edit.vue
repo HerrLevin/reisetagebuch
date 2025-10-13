@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import UpdateAccountSettingsForm from '@/Pages/Settings/Partials/UpdateAccountSettingsForm.vue';
+import UpdateDeviceSettingsForm from '@/Pages/Settings/Partials/UpdateDeviceSettingsForm.vue';
 import { Head, Link } from '@inertiajs/vue3';
 import DeleteUserForm from './Partials/DeleteUserForm.vue';
 import UpdateAccountInformationForm from './Partials/UpdateAccountInformationForm.vue';
@@ -22,6 +23,9 @@ function connectTraewelling() {
 
     <AuthenticatedLayout>
         <div class="min-w-full space-y-6">
+            <div class="card bg-base-100 min-w-full p-8 shadow-md">
+                <UpdateDeviceSettingsForm :status="status" class="max-w-xl" />
+            </div>
             <div class="card bg-base-100 min-w-full p-8 shadow-md">
                 <UpdateAccountSettingsForm :status="status" class="max-w-xl" />
             </div>

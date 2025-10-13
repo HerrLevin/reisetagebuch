@@ -2,6 +2,7 @@
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import FlashMessages from '@/Components/FlashMessages.vue';
 import Dock from '@/Layouts/Partials/Dock.vue';
+import LocationHistoryChecker from '@/Layouts/Partials/LocationHistoryChecker.vue';
 import NavBar from '@/Layouts/Partials/NavBar.vue';
 import SideMenu from '@/Layouts/Partials/SideMenu.vue';
 import { Link } from '@inertiajs/vue3';
@@ -45,5 +46,6 @@ import { Link } from '@inertiajs/vue3';
             </div>
         </div>
         <Dock class="flex md:hidden" />
+        <LocationHistoryChecker />
     </div>
 </template>

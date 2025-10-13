@@ -93,10 +93,6 @@ watch(
     () => props.lineString,
     (newLineString) => {
         if (newLineString) {
-            console.log(
-                'Updating geoJsonSource with new lineString:',
-                newLineString,
-            );
             geoJsonSource.value = {
                 type: 'FeatureCollection',
                 features: [
