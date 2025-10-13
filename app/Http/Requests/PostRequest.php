@@ -11,8 +11,9 @@ class PostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'body' => 'required|string|max:255',
-            'visibility' => 'required', Rule::enum(Visibility::class),
+            'id' => ['sometimes', 'uuid', ' exists:posts,id'],
+            'body' => ['required_without:id', 'string', 'max:255'],
+            'visibility' => ['required_without:id', Rule::enum(Visibility::class)],
         ];
     }
 }

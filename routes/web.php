@@ -43,6 +43,8 @@ Route::middleware('auth')->group(callback: function () {
         Route::post('/create', [PostController::class, 'storeText'])->name('posts.create.text-post.store');
         Route::get('/new', [PostController::class, 'createText'])->name('posts.create.text');
         Route::delete('/{postId}', [PostController::class, 'destroy'])->name('posts.destroy');
+        Route::patch('/{postId}', [PostController::class, 'update'])->name('posts.update');
+        Route::get('/{postId}/edit', [PostController::class, 'edit'])->name('posts.edit');
 
         Route::prefix('/transport')->group(callback: function () {
             Route::get('/departures', [LocationController::class, 'departures'])->name('posts.create.departures');

@@ -70,6 +70,31 @@ class PostRepository
         return $this->postHydrator->modelToDto($post);
     }
 
+    public function updateBasePost(BasePost $basePost, ?Visibility $visibility, ?string $body): BasePost|LocationPost|TransportPost
+    {
+        try {
+            DB::beginTransaction();
+            /** @var Post $post */
+            $post = Post::where('id', $basePost->id)->firstOrFail();
+
+            if ($body !== null) {
+                $post->body = $body;
+            }
+            if ($visibility !== null) {
+                $post->visibility = $visibility;
+            }
+            $post->save();
+            DB::commit();
+
+            $post->load('locationPost', 'transportPost');
+        } catch (Throwable $e) {
+            DB::rollBack();
+            report($e);
+        }
+
+        return $this->postHydrator->modelToDto($post);
+    }
+
     public function storeTransport(
         User $user,
         TransportTrip $transportTrip,

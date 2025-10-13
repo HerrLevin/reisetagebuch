@@ -26,6 +26,9 @@ class PostController extends Controller
         return Inertia::render('NewPostDialog/CreateLocationPost');
     }
 
+    /**
+     * @throws AuthorizationException
+     */
     public function show(string $postId): Response|ResponseFactory
     {
         return Inertia::render('SinglePost', [
@@ -90,5 +93,29 @@ class PostController extends Controller
         $this->postController->destroy($postId);
 
         return to_route('dashboard');
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function edit(string $postId): Response|ResponseFactory
+    {
+        $post = $this->postController->edit($postId);
+
+        return Inertia::render('EditPost', [
+            'post' => $post,
+        ]);
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function update(string $postId, PostRequest $request): RedirectResponse
+    {
+        $post = $this->postController->updatePost($postId, $request);
+
+        return to_route('posts.show', [
+            'postId' => $post->id,
+        ]);
     }
 }
