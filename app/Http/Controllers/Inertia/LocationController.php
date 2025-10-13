@@ -31,7 +31,8 @@ class LocationController extends Controller
         $data = $this->locationController->index($request->user()->id, $when->startOfDay(), $when->clone()->endOfDay());
 
         return inertia('LocationHistory/Index', [
-            'locations' => $data,
+            'locations' => $data->locations,
+            'trips' => $data->trips,
             'when' => $when->toIso8601String(),
         ]);
     }

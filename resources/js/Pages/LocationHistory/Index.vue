@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import LocationHistoryMap from '@/Components/Maps/LocationHistoryMap.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { LocationHistoryDto } from '@/types';
+import { LocationHistoryDto, TripHistoryEntryDto } from '@/types';
 import { DateTime } from 'luxon';
 import { ref } from 'vue';
 
 const props = defineProps({
     locations: {
         type: Array as () => LocationHistoryDto[],
+        required: true,
+    },
+    trips: {
+        type: Array as () => TripHistoryEntryDto[],
         required: true,
     },
     when: {
@@ -58,6 +62,7 @@ function selectDate(newValue: string) {
             <LocationHistoryMap
                 v-if="locations.length > 0"
                 :locations="locations"
+                :trips="trips"
             />
             <div
                 v-else

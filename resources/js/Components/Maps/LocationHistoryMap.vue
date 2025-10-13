@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import { LocationHistoryDto, UserDto } from '@/types';
+import { LocationHistoryDto, TripHistoryEntryDto, UserDto } from '@/types';
 import {
     MglCircleLayer,
+    MglFullscreenControl,
     MglGeoJsonSource,
+    MglLineLayer,
     MglMap,
+    MglNavigationControl,
     MglRasterLayer,
     MglRasterSource,
 } from '@indoorequal/vue-maplibre-gl';
-import type { GeometryCollection } from 'geojson';
+import type { FeatureCollection, GeometryCollection } from 'geojson';
 import {
     LngLat,
     LngLatBounds,
@@ -25,10 +28,15 @@ const props = defineProps({
         type: Array as PropType<LocationHistoryDto[]>,
         required: true,
     },
+    trips: {
+        type: Array as PropType<TripHistoryEntryDto[]>,
+        default: () => [],
+    },
 });
 
 const style = {
     version: 8,
+    projection: { type: 'globe' },
     sources: {},
     layers: [],
 } as StyleSpecification;
@@ -42,9 +50,10 @@ const center = new LngLat(8.403, 49);
 const bounds = ref(undefined as LngLatBoundsLike | undefined);
 const geoJson = ref(undefined as GeometryCollection | undefined);
 const postsJson = ref(undefined as GeometryCollection | undefined);
+const tripsJson = ref(undefined as FeatureCollection | undefined);
 
 const mapBounds = new LngLatBounds();
-props.locations?.forEach((location) => {
+for (const location of props.locations) {
     if (!geoJson.value) {
         geoJson.value = {
             type: 'GeometryCollection',
@@ -73,7 +82,32 @@ props.locations?.forEach((location) => {
     }
 
     mapBounds.extend([location.longitude, location.latitude]);
-});
+}
+
+for (const trip of props.trips) {
+    if (!tripsJson.value) {
+        tripsJson.value = {
+            type: 'FeatureCollection',
+            features: [],
+        };
+    }
+    if (trip.geometry) {
+        tripsJson.value.features.push({
+            type: 'Feature',
+            properties: {},
+            geometry: trip.geometry,
+        });
+        for (const geometry of trip.geometry.geometries || []) {
+            if (geometry.type === 'LineString') {
+                for (const coordinate of geometry.coordinates || []) {
+                    mapBounds.extend(coordinate as [number, number]);
+                }
+            } else if (geometry.type === 'Point') {
+                mapBounds.extend(geometry.coordinates as [number, number]);
+            }
+        }
+    }
+}
 
 bounds.value = mapBounds;
 </script>
@@ -83,7 +117,7 @@ bounds.value = mapBounds;
         :map-style="style"
         :zoom="zoom"
         :max-zoom="18"
-        height="80vh"
+        height="50vh"
         :center="center"
         :bounds="bounds"
         :fit-bounds-options="{
@@ -91,6 +125,12 @@ bounds.value = mapBounds;
             maxZoom: 16,
         }"
     >
+        <mgl-fullscreen-control />
+        <mgl-navigation-control
+            position="top-right"
+            :show-zoom="true"
+            :show-compass="true"
+        />
         <mgl-raster-source
             source-id="raster-source"
             :tiles="osmTiles"
@@ -126,7 +166,26 @@ bounds.value = mapBounds;
                 }"
             />
         </mgl-geo-json-source>
+
+        <mgl-geo-json-source
+            v-if="tripsJson"
+            :data="tripsJson"
+            source-id="tripsJson"
+        >
+            <mgl-line-layer
+                layer-id="line"
+                :source-id="'tripsJson'"
+                :layout="{
+                    'line-cap': 'round',
+                    'line-join': 'round',
+                    visibility: 'visible',
+                }"
+                :paint="{
+                    'line-color': '#FF0000',
+                    'line-width': 4,
+                    'line-opacity': 0.8,
+                }"
+            />
+        </mgl-geo-json-source>
     </mgl-map>
 </template>
-
-<style scoped></style>

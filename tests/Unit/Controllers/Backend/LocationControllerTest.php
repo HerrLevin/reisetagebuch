@@ -7,6 +7,7 @@ use App\Dto\MotisApi\LegDto;
 use App\Dto\MotisApi\StopDto;
 use App\Dto\MotisApi\TripDto;
 use App\Http\Controllers\Backend\LocationController;
+use App\Http\Controllers\Backend\MapController;
 use App\Hydrators\TripDtoHydrator;
 use App\Jobs\RerouteStops;
 use App\Models\RequestLocation;
@@ -50,7 +51,8 @@ class LocationControllerTest extends TestCase
             $this->transitousRequestService,
             $this->transportTripRepository,
             $this->tripDtoHydrator,
-            $this->overpassRequestService
+            $this->overpassRequestService,
+            $this->createMock(MapController::class)
         );
     }
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
     MglCircleLayer,
+    MglFullscreenControl,
     MglGeoJsonSource,
     MglLineLayer,
     MglMap,
@@ -37,6 +38,7 @@ const props = defineProps({
 
 const style = {
     version: 8,
+    projection: { type: 'globe' },
     sources: {},
     layers: [],
 } as StyleSpecification;
@@ -127,7 +129,7 @@ watch(
         }
 
         const mapBounds = new LngLatBounds();
-        geoJsonSource.value.features.forEach((feature) => {
+        for (const feature of geoJsonSource.value.features || []) {
             if (feature.geometry.type === 'Point') {
                 mapBounds.extend(
                     new LngLat(
@@ -136,11 +138,11 @@ watch(
                     ),
                 );
             } else if (feature.geometry.type === 'LineString') {
-                feature.geometry.coordinates.forEach((coordinate) => {
+                for (const coordinate of feature.geometry.coordinates || []) {
                     mapBounds.extend(new LngLat(coordinate[0], coordinate[1]));
-                });
+                }
             }
-        });
+        }
         bounds.value = mapBounds;
     },
     { immediate: true },
@@ -160,6 +162,7 @@ watch(
             maxZoom: 16,
         }"
     >
+        <mgl-fullscreen-control />
         <mgl-navigation-control
             position="top-right"
             :show-zoom="true"
@@ -208,5 +211,3 @@ watch(
         </mgl-geo-json-source>
     </mgl-map>
 </template>
-
-<style scoped></style>
