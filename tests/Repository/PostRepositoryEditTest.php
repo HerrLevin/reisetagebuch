@@ -66,11 +66,11 @@ class PostRepositoryEditTest extends TestCase
         $repo = new PostRepository;
         $updatedPost = $repo->updateBasePost(new PostHydrator()->modelToDto($post), Visibility::PUBLIC, null);
 
-        $this->assertEquals('Original body', $updatedPost->body);
+        $this->assertEquals(null, $updatedPost->body);
         $this->assertEquals(Visibility::PUBLIC, $updatedPost->visibility);
 
         $post->refresh();
-        $this->assertEquals('Original body', $post->body);
+        $this->assertEquals(null, $post->body);
         $this->assertEquals(Visibility::PUBLIC, $post->visibility);
     }
 }

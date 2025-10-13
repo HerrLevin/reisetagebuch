@@ -77,9 +77,7 @@ class PostRepository
             /** @var Post $post */
             $post = Post::where('id', $basePost->id)->firstOrFail();
 
-            if ($body !== null) {
-                $post->body = $body;
-            }
+            $post->body = $body;
             if ($visibility !== null) {
                 $post->visibility = $visibility;
             }

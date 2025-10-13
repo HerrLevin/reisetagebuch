@@ -20,11 +20,14 @@ function goBack() {
 
 const form = reactive({
     id: '',
-    body: '',
+    body: '' as string | undefined,
     visibility: Visibility.PUBLIC,
 });
 
 function submitForm() {
+    if (!form.body?.trim()) {
+        form.body = undefined;
+    }
     router.patch(route('posts.update', props.post.id), form);
 }
 

@@ -151,7 +151,7 @@ class PostController extends Controller
         return $this->postRepository->updateBasePost(
             $post,
             Visibility::from($request->input('visibility')),
-            $request->exists('body') ? ($request->input('body') ?? '') : null,
+            $request->input('body'),
         );
     }
 
