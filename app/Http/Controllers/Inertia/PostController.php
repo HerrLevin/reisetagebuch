@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Inertia;
 use App\Http\Requests\LocationPostRequest;
 use App\Http\Requests\PostRequest;
 use App\Http\Requests\TransportPostCreateRequest;
+use App\Http\Requests\TransportPostUpdateRequest;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -113,6 +114,32 @@ class PostController extends Controller
     public function update(string $postId, PostRequest $request): RedirectResponse
     {
         $post = $this->postController->updatePost($postId, $request);
+
+        return to_route('posts.show', [
+            'postId' => $post->id,
+        ]);
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function editTransport(string $postId): Response|ResponseFactory
+    {
+        $trip = $this->postController->editTransport($postId);
+
+        return inertia('NewPostDialog/ListStopovers', [
+            'trip' => $trip,
+            'startTime' => $trip->startTime,
+            'postId' => $postId,
+        ]);
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function updateTransport(string $postId, TransportPostUpdateRequest $request): RedirectResponse
+    {
+        $post = $this->postController->updateTransport($postId, $request);
 
         return to_route('posts.show', [
             'postId' => $post->id,

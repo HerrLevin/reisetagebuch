@@ -7,6 +7,7 @@ use App\Dto\MotisApi\StopPlaceDto;
 use App\Dto\MotisApi\TripDto;
 use App\Models\TransportTrip;
 use App\Models\TransportTripStop;
+use Illuminate\Support\Collection;
 
 class DbTripHydrator
 {
@@ -15,6 +16,7 @@ class DbTripHydrator
         return new StopPlaceDto()
             ->setName($stop->location->name)
             ->setStopId($stop->location->id)
+            ->setTripStopId($stop->id)
             ->setLatitude((float) $stop->location->latitude)
             ->setLongitude((float) $stop->location->longitude)
             ->setArrival($stop->arrival_delay ? $stop->arrival_time?->addSeconds($stop->arrival_delay) : $stop->arrival_time)
@@ -23,9 +25,12 @@ class DbTripHydrator
             ->setScheduledDeparture($stop->departure_time);
     }
 
-    public function hydrateTrip(TransportTrip $trip): TripDto
+    /**
+     * @param  Collection<TransportTripStop>|null  $stops
+     */
+    public function hydrateTrip(TransportTrip $trip, ?Collection $stops = null): TripDto
     {
-        $leg = $this->hydrateLeg($trip);
+        $leg = $this->hydrateLeg($trip, $stops);
 
         return new TripDto()
             ->setDuration(0)
@@ -35,11 +40,20 @@ class DbTripHydrator
             ->setLegs([$leg]);
     }
 
-    public function hydrateLeg(TransportTrip $trip): LegDto
+    /**
+     * @param  Collection<int, TransportTripStop>|null  $givenStops
+     */
+    public function hydrateLeg(TransportTrip $trip, ?Collection $givenStops = null): LegDto
     {
         $stops = [];
-        foreach ($trip->stops as $stop) {
-            $stops[] = $this->hydrateStopPlace($stop);
+        if ($givenStops) {
+            foreach ($givenStops as $givenStop) {
+                $stops[] = $this->hydrateStopPlace($givenStop);
+            }
+        } else {
+            foreach ($trip->stops as $stop) {
+                $stops[] = $this->hydrateStopPlace($stop);
+            }
         }
 
         /** @var StopPlaceDto $origin */

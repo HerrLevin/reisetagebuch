@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { getOwnShareText, getShareText } from '@/Services/PostTextService';
-import { BasePost } from '@/types/PostTypes';
+import { BasePost, isTransportPost } from '@/types/PostTypes';
 import { Link, useForm, usePage } from '@inertiajs/vue3';
-import { Ellipsis, Share, SquarePen, Trash2 } from 'lucide-vue-next';
+import { Ellipsis, Route, Share, SquarePen, Trash2 } from 'lucide-vue-next';
 import { PropType, useTemplateRef } from 'vue';
 
 const props = defineProps({
@@ -64,7 +64,7 @@ function blur() {
 </script>
 
 <template>
-    <div class="dropdown dropdown-bottom dropdown-end" @click.prevent>
+    <div class="dropdown dropdown-top dropdown-end" @click.prevent>
         <div tabindex="0" role="button" class="btn btn-ghost btn-sm btn-circle">
             <Ellipsis />
         </div>
@@ -79,10 +79,17 @@ function blur() {
                 </a>
             </li>
             <template v-if="isSameUser()">
+                <li class="mx-0 border-b-1"></li>
                 <li>
                     <Link :href="route('posts.edit', post.id)">
                         <SquarePen class="size-4" />
                         Edit
+                    </Link>
+                </li>
+                <li v-if="isTransportPost(post)">
+                    <Link :href="route('posts.edit.transport-post', post.id)">
+                        <Route class="size-4" />
+                        Change Exit
                     </Link>
                 </li>
                 <li class="mx-0 border-b-1"></li>

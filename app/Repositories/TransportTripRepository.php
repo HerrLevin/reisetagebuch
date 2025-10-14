@@ -35,6 +35,19 @@ class TransportTripRepository
         return $query->first();
     }
 
+    public function getTripById(
+        string $tripId,
+        ?array $with = null
+    ): ?TransportTrip {
+        $query = TransportTrip::where('id', $tripId);
+
+        if ($with) {
+            $query->with($with);
+        }
+
+        return $query->first();
+    }
+
     public function getOrCreateTrip(
         string $mode,
         ?string $foreignId = null,

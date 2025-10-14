@@ -6,6 +6,8 @@ class StopDto
 {
     public string $stopId;
 
+    public ?string $tripStopId = null;
+
     public string $name;
 
     public float $latitude;
@@ -17,6 +19,13 @@ class StopDto
     public function setStopId(string $stopId): StopDto
     {
         $this->stopId = $stopId;
+
+        return $this;
+    }
+
+    public function setTripStopId(?string $tripStopId): StopDto
+    {
+        $this->tripStopId = $tripStopId;
 
         return $this;
     }
