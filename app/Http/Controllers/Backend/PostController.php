@@ -4,15 +4,20 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Backend;
 
+use App\Dto\MotisApi\TripDto;
 use App\Dto\PostPaginationDto;
 use App\Enums\Visibility;
+use App\Exceptions\OriginAfterDestinationException;
+use App\Exceptions\StationNotOnTripException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LocationPostRequest;
 use App\Http\Requests\PostRequest;
 use App\Http\Requests\TransportPostCreateRequest;
+use App\Http\Requests\TransportPostUpdateRequest;
 use App\Http\Resources\PostTypes\BasePost;
 use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
+use App\Hydrators\DbTripHydrator;
 use App\Jobs\PrefetchJob;
 use App\Jobs\TraewellingCrossCheckInJob;
 use App\Models\TransportTripStop;
@@ -165,5 +170,63 @@ class PostController extends Controller
         $this->authorize('delete', $post);
 
         $this->postRepository->delete($post);
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function editTransport(string $postId): TripDto
+    {
+        $post = $this->postRepository->getById($postId, Auth::user());
+        $this->authorize('update', $post);
+
+        if (! $post instanceof TransportPost) {
+            abort(422, 'Not a transport post');
+        }
+
+        $trip = $this->transportTripRepository->getTripById(
+            $post->trip->id,
+            ['stops', 'stops.location.identifiers']
+        );
+
+        // remove everything before $post->originStop
+        $filteredStops = collect();
+        $foundOrigin = false;
+        foreach ($trip->stops as $stop) {
+            if ($stop->id === $post->originStop->id) {
+                $foundOrigin = true;
+            }
+            if ($foundOrigin) {
+                $filteredStops->push($stop);
+            }
+        }
+
+        $hydrator = new DbTripHydrator;
+
+        return $hydrator->hydrateTrip($trip, $filteredStops);
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function updateTransport(string $postId, TransportPostUpdateRequest $request): BasePost|LocationPost|TransportPost
+    {
+        $post = $this->postRepository->getById($postId, Auth::user());
+        $this->authorize('update', $post);
+
+        if (! $post instanceof TransportPost) {
+            abort(422, 'Not a transport post');
+        }
+
+        try {
+            return $this->postRepository->updateTransportPost(
+                $post,
+                $request->stopId
+            );
+        } catch (OriginAfterDestinationException) {
+            abort(422, 'Origin stop must be before destination stop');
+        } catch (StationNotOnTripException) {
+            abort(422, 'Stop not on trip');
+        }
     }
 }

@@ -61,6 +61,7 @@ export type DeparturesDto = {
 
 export type StopDto = {
     stopId: string;
+    tripStopId: string | null;
     name: string;
     latitude: number;
     longitude: number;
@@ -82,6 +83,7 @@ export type StopTime = {
 export type StopPlace = {
     name: string;
     stopId: string;
+    tripStopId: string | null;
     latitude: number;
     longitude: number;
     arrival: string | null;

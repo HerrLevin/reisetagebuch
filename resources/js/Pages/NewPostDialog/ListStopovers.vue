@@ -3,7 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import StopoversListEntry from '@/Pages/NewPostDialog/Partials/StopoversListEntry.vue';
 import { getEmoji } from '@/Services/DepartureTypeService';
 import { StopPlace, TripDto } from '@/types';
-import { Head } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import { DateTime } from 'luxon';
 import { PropType, ref } from 'vue';
 
@@ -25,6 +25,10 @@ const props = defineProps({
         type: String,
         default: '',
     },
+    postId: {
+        type: String,
+        default: '',
+    },
 });
 const stopovers = ref([] as StopPlace[]);
 const filterTime = props.startTime ? DateTime.fromISO(props.startTime) : null;
@@ -41,6 +45,19 @@ stopovers.value = stopovers.value.filter((stopover) => {
         return luxonTime >= filterTime;
     }
 });
+
+function submit(stopover: StopPlace) {
+    if (props.postId && props.postId.length > 0) {
+        console.log(stopover);
+        router.put(route('posts.update.transport-post', props.postId), {
+            stopId: stopover.tripStopId,
+            postId: props.postId,
+        });
+        return;
+    }
+
+    redirectCreatePost(stopover);
+}
 
 function redirectCreatePost(stopover: StopPlace) {
     const params = {
@@ -85,7 +102,7 @@ function getTitle() {
                     :mode="trip?.legs[0].mode"
                     :short-name="trip?.legs[0].routeShortName"
                     :real-time="trip?.legs[0].realTime"
-                    @click="redirectCreatePost(stopover)"
+                    @click="submit(stopover)"
                 />
             </ul>
         </div>

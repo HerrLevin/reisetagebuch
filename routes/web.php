@@ -52,6 +52,8 @@ Route::middleware('auth')->group(callback: function () {
             Route::get('/geocode', [ApiLocationController::class, 'geocode'])->name('posts.create.geocode');
             Route::get('/create', [PostController::class, 'createTransport'])->name('posts.create.transport-post');
             Route::post('/create', [PostController::class, 'storeTransport'])->name('posts.create.transport-post.store');
+            Route::get('/{postId}/edit', [PostController::class, 'editTransport'])->name('posts.edit.transport-post');
+            Route::put('/{postId}', [PostController::class, 'updateTransport'])->name('posts.update.transport-post');
         });
         Route::prefix('/location')->group(callback: function () {
             Route::post('/create', [PostController::class, 'storeLocation'])->name('posts.create.post.store');

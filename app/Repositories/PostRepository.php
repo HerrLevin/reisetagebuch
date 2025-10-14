@@ -4,6 +4,8 @@ namespace App\Repositories;
 
 use App\Dto\PostPaginationDto;
 use App\Enums\Visibility;
+use App\Exceptions\OriginAfterDestinationException;
+use App\Exceptions\StationNotOnTripException;
 use App\Http\Resources\PostTypes\BasePost;
 use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
@@ -88,6 +90,46 @@ class PostRepository
         } catch (Throwable $e) {
             DB::rollBack();
             report($e);
+        }
+
+        return $this->postHydrator->modelToDto($post);
+    }
+
+    public function updateTransportPost(TransportPost $transportPost, string $stopId): TransportPost
+    {
+        try {
+            DB::beginTransaction();
+            /** @var Post $post */
+            $post = Post::where('id', $transportPost->id)->with('transportPost.transportTrip.stops')->firstOrFail();
+            $stop = TransportTripStop::where('id', $stopId)->firstOrFail();
+
+            $transportPost = $post->transportPost;
+
+            if ($transportPost->transport_trip_id !== $stop->transport_trip_id) {
+                throw new StationNotOnTripException;
+            }
+
+            foreach ($transportPost->transportTrip->stops as $singleStop) {
+                if ($singleStop->id === $transportPost->origin_stop_id) {
+                    // reached origin, all good
+                    break;
+                }
+                if ($singleStop->id === $stop->id) {
+                    // reached new stop before origin, not good
+                    throw new OriginAfterDestinationException;
+                }
+            }
+
+            $transportPost->destination_stop_id = $stop->id;
+
+            $transportPost->save();
+            DB::commit();
+
+            $post->load('transportPost.destination', 'transportPost.origin', 'transportPost.transportTrip', 'transportPost.originStop.location', 'transportPost.destinationStop.location');
+        } catch (Throwable $e) {
+            DB::rollBack();
+            report($e);
+            throw $e;
         }
 
         return $this->postHydrator->modelToDto($post);
