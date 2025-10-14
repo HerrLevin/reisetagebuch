@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Dto\AirportDto;
 use App\Models\Location;
 use App\Models\LocationIdentifier;
 use App\Models\LocationPost;
@@ -69,7 +70,7 @@ class LocationRepository
             ->get();
     }
 
-    public function updateOrCreateLocation($location): void
+    public function updateOrCreateOsmLocation($location): void
     {
         $name = $this->osmNameService->getName($location);
         if ($name === null) {
@@ -103,6 +104,90 @@ class LocationRepository
                 'value' => $value,
             ]);
         }
+    }
+
+    public function updateOrCreateAirport(AirportDto $airport): void
+    {
+        $identifier = LocationIdentifier::where([
+            ['type', '=', 'airport'],
+            ['identifier', '=', $airport->foreignIdentifier],
+            ['origin', '=', $airport->provider],
+        ])->with('location')->first();
+        $dbLocation = $identifier->location ?? null;
+
+        if ($dbLocation === null) {
+            $dbLocation = new Location;
+        }
+
+        $dbLocation->type = 'airport';
+
+        $this->setLocationData(
+            $dbLocation,
+            $airport->name,
+            $airport->latitude,
+            $airport->longitude,
+            $airport->foreignIdentifier,
+            'airport',
+            $airport->provider
+        );
+
+        if ($airport->iataCode) {
+            $dbLocation->identifiers()->updateOrCreate(
+                ['identifier' => $airport->iataCode, 'type' => 'iata', 'origin' => $airport->provider],
+                ['name' => $airport->name]
+            );
+        }
+        if ($airport->icaoCode) {
+            $dbLocation->identifiers()->updateOrCreate(
+                ['identifier' => $airport->icaoCode, 'type' => 'icao', 'origin' => $airport->provider],
+                ['name' => $airport->name]
+            );
+        }
+        if ($airport->gpsCode) {
+            $dbLocation->identifiers()->updateOrCreate(
+                ['identifier' => $airport->gpsCode, 'type' => 'gps', 'origin' => $airport->provider],
+                ['name' => $airport->name]
+            );
+        }
+        if (empty($airport->gpsCode) && empty($airport->icaoCode) && empty($airport->iataCode) && $airport->localCode) {
+            $dbLocation->identifiers()->updateOrCreate(
+                ['identifier' => $airport->localCode, 'type' => 'local', 'origin' => $airport->provider],
+                ['name' => $airport->name]
+            );
+        }
+
+        $dbLocation->save();
+    }
+
+    /**
+     * @return Collection<int, Location>
+     */
+    public function findAirportsByIdentifier(string $identifier): Collection
+    {
+        return Location::whereHas('identifiers', function ($query) use ($identifier) {
+            $query->where('identifier', $identifier)
+                ->where('origin', 'ourairports')
+                ->whereIn('type', ['iata', 'icao', 'gps']);
+        })
+            ->orderByRaw("array_position(array['iata', 'icao', 'gps'], type)")
+            ->limit(100)
+            ->get();
+    }
+
+    public function findAirportsByName(string $name, ?Point $locationBias = null): Collection
+    {
+        $locations = Location::where('type', 'airport')
+            ->whereLike('name', '%'.$name.'%', false);
+
+        if ($locationBias !== null) {
+            $locations->addSelect(ST::distanceSphere($locationBias, 'location')->as('distance'))
+                ->orderBy('distance');
+        }
+
+        return $locations
+            ->orderBy('name')
+            ->limit(100)
+            ->get();
     }
 
     public function createRequestLocation(Point $point): RequestLocation

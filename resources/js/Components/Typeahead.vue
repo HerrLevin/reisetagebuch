@@ -23,6 +23,10 @@ defineProps({
         type: Array as PropType<Suggestion[]>,
         default: () => [],
     },
+    placeholder: {
+        type: String,
+        default: '',
+    },
 });
 
 defineEmits(['submit', 'select', 'update:modelValue', 'focus']);
@@ -39,6 +43,7 @@ function blur() {
         <label class="input input-bordered w-full">
             <input
                 v-model="model"
+                :placeholder="placeholder"
                 type="text"
                 tabindex="0"
                 class="w-full"
@@ -46,7 +51,10 @@ function blur() {
                 :name="name"
                 @focusin="$emit('focus')"
                 @keydown="$emit('update:modelValue', model)"
-                @keydown.enter="$emit('submit')"
+                @keydown.enter="
+                    $emit('submit');
+                    blur();
+                "
             />
             <CircleX
                 v-if="model"
