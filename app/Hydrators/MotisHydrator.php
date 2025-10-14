@@ -135,7 +135,7 @@ class MotisHydrator
             ->setType(LocationType::tryFrom($data['type']))
             ->setTokens($data['tokens'])
             ->setName($data['name'])
-            ->setId($data['id'])
+            ->setIdentifier($data['id'])
             ->setLat((float) $data['lat'])
             ->setLon((float) $data['lon'])
             ->setLevel($data['level'] ?? null)

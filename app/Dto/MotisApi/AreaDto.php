@@ -2,6 +2,8 @@
 
 namespace App\Dto\MotisApi;
 
+use App\Models\LocationIdentifier;
+
 class AreaDto
 {
     public string $name;
@@ -13,6 +15,17 @@ class AreaDto
     public ?bool $unique = null;
 
     public ?bool $default = null;
+
+    public static function fromIdentifier(LocationIdentifier $identifier, bool $matched = false, bool $default = false): self
+    {
+        $dto = new self;
+        $dto->setName($identifier->identifier)
+            ->setAdminLevel(0)
+            ->setMatched($matched)
+            ->setDefault($default);
+
+        return $dto;
+    }
 
     public function setName(string $name): AreaDto
     {

@@ -1,35 +1,32 @@
 <script setup lang="ts">
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import AirportSearch from '@/Pages/NewPostDialog/Partials/AirportSearch.vue';
 import TransitousSearch from '@/Pages/NewPostDialog/Partials/TransitousSearch.vue';
 import TripDetailsForm from '@/Pages/Trips/Partials/TripDetailsForm.vue';
-import { TransportMode } from '@/types/enums';
 import { AutocompleteResponse } from '@/types/motis';
+import {
+    CreateTripForm,
+    FormStops,
+    ProviderKey,
+    Providers,
+    TripLocation,
+} from '@/types/TripCreation';
 import { Head, useForm } from '@inertiajs/vue3';
+import { PlaneTakeoff, TrainFront } from 'lucide-vue-next';
 import { DateTime } from 'luxon';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 
-export type CreateTripForm = {
-    startLocation: TripLocation | null;
-    endLocation: TripLocation | null;
-    departureTime: DateTime | null;
-    arrivalTime: DateTime | null;
-    transportMode: TransportMode | null;
-    lineName: string | null;
-    tripShortName: string | null;
-    stops: TripLocation[];
-};
+const provider = ref<ProviderKey>('transitous');
 
-export type TripLocation = {
-    order?: number;
-    name: string;
-    identifier: string;
-    latitude: number;
-    longitude: number;
-};
-
-type FormStops = {
-    order: number;
-    identifier: string;
+const providers: Providers = {
+    transitous: {
+        name: 'Transitous',
+        icon: TrainFront,
+    },
+    airports: {
+        name: 'Airports',
+        icon: PlaneTakeoff,
+    },
 };
 
 const model = ref<CreateTripForm>({
@@ -50,7 +47,9 @@ const form = useForm({
     tripShortName: '',
     displayName: '',
     origin: '',
+    originType: 'identifier',
     destination: '',
+    destinationType: 'identifier',
     departureTime: '',
     arrivalTime: '',
     stops: [] as FormStops[],
@@ -62,7 +61,8 @@ function selectLocation(
 ) {
     const location: TripLocation = {
         name: e.name,
-        identifier: e.id,
+        id: e.id,
+        identifier: e.identifier,
         latitude: e.lat,
         longitude: e.lon,
     };
@@ -126,8 +126,12 @@ function submit() {
     }
 
     form.mode = model.value.transportMode;
-    form.origin = model.value.startLocation.identifier;
-    form.destination = model.value.endLocation.identifier;
+    form.origin =
+        model.value.startLocation.id || model.value.startLocation.identifier;
+    form.originType = model.value.startLocation.id ? 'id' : 'identifier';
+    form.destination =
+        model.value.endLocation.id || model.value.endLocation.identifier;
+    form.destinationType = model.value.endLocation.id ? 'id' : 'identifier';
     form.departureTime = departure;
     form.arrivalTime = arrival;
     form.lineName = model.value.lineName || '';
@@ -137,7 +141,8 @@ function submit() {
     );
     form.stops = model.value.stops.map((stop, index) => ({
         order: index + 1,
-        identifier: stop.identifier,
+        identifier: stop.id || stop.identifier,
+        identifierType: stop.id ? 'id' : 'identifier',
     }));
 
     form.post(route('trips.store'), {
@@ -157,6 +162,30 @@ function submit() {
         },
     });
 }
+
+function blur() {
+    const activeElement = document.activeElement as HTMLElement;
+    if (activeElement) {
+        activeElement.blur();
+    }
+}
+
+watch(
+    () => provider.value,
+    () => {
+        // Reset model when provider changes
+        model.value = {
+            startLocation: null,
+            endLocation: null,
+            departureTime: DateTime.now(),
+            arrivalTime: DateTime.now().plus({ hours: 1 }),
+            transportMode: null,
+            lineName: '',
+            tripShortName: '',
+            stops: [],
+        };
+    },
+);
 </script>
 
 <template>
@@ -167,10 +196,47 @@ function submit() {
             <h2 class="text-xl leading-tight font-semibold">New Trip</h2>
         </template>
 
+        <div class="flex justify-end gap-4 px-6 pb-4">
+            <div class="dropdown">
+                <div
+                    tabindex="0"
+                    role="button"
+                    class="btn btn-outline btn-primary"
+                >
+                    <component
+                        :is="providers[provider].icon"
+                        class="inline size-4"
+                    />
+                    {{ providers[provider].name }}
+                </div>
+                <ul
+                    tabindex="-1"
+                    class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+                >
+                    <li v-for="(prov, key) in providers" :key="key">
+                        <a
+                            @click="
+                                provider = key;
+                                blur();
+                            "
+                        >
+                            <component :is="prov.icon" class="inline size-4" />
+                            {{ prov.name }}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
         <div class="card bg-base-100 min-w-full p-0 shadow-md">
             <div class="card-body">
                 <div class="grid grid-cols-1 gap-8">
                     <TransitousSearch
+                        v-if="provider === 'transitous'"
+                        @select="selectLocation($event, 'start')"
+                    />
+                    <AirportSearch
+                        v-else
                         @select="selectLocation($event, 'start')"
                     />
                 </div>
@@ -181,11 +247,18 @@ function submit() {
                 >
                     <TransitousSearch @select="selectLocation($event, stop)" />
                 </div>
-                <div>
+                <div v-if="provider === 'transitous'">
                     <a class="link" @click.prevent="addStop()">Add Stopover</a>
                 </div>
                 <div class="grid grid-cols-1 gap-8">
-                    <TransitousSearch @select="selectLocation($event, 'end')" />
+                    <TransitousSearch
+                        v-if="provider === 'transitous'"
+                        @select="selectLocation($event, 'end')"
+                    />
+                    <AirportSearch
+                        v-else
+                        @select="selectLocation($event, 'end')"
+                    />
                 </div>
             </div>
         </div>

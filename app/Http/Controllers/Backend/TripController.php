@@ -38,7 +38,14 @@ class TripController extends Controller
      */
     private function getOrCreateAndAddStopToTrip(TransportTrip $trip, array $stopover, int $key): TransportTripStop
     {
-        $origin = $this->locationRepository->getLocationByIdentifier($stopover['identifier'], 'node', 'motis');
+        if ($stopover['identifierType'] == 'id') {
+            $origin = $this->locationRepository->getLocationById($stopover['identifier']);
+            if (! $origin) {
+                throw new RecordNotFoundException('Location not found');
+            }
+        } else {
+            $origin = $this->locationRepository->getLocationByIdentifier($stopover['identifier'], 'node', 'motis');
+        }
         if (! $origin) {
             $location = $this->transitousRequestService->getLocationByIdentifier($stopover['identifier']);
             if (! $location) {
@@ -78,6 +85,7 @@ class TripController extends Controller
             // add origin at the start
             array_unshift($stopovers, [
                 'identifier' => $request->origin,
+                'identifierType' => $request->originType,
                 'arrivalTime' => null,
                 'departureTime' => $request->departureTime,
                 'order' => 0,
@@ -86,6 +94,7 @@ class TripController extends Controller
             // add destination at the end
             $stopovers[] = [
                 'identifier' => $request->destination,
+                'identifierType' => $request->destinationType,
                 'arrivalTime' => $request->arrivalTime,
                 'departureTime' => null,
                 'order' => count($stopovers) + 1,

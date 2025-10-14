@@ -65,8 +65,17 @@ class LocationController extends Controller
             }
         }
 
+        if ($request->provider === 'airport') {
+            return response()->json($this->locationController->geocodeAirport($request->input('query'), $point));
+        }
+
+        return $this->geocodeMotis($request->input('query'), $point);
+    }
+
+    private function geocodeMotis(string $query, ?Point $point): JsonResponse
+    {
         try {
-            $locations = $this->locationController->geocode($request->get('query'), $point);
+            $locations = $this->locationController->geocode($query, $point);
         } catch (ConnectionException $e) {
             return response()->json(['error' => 'Connection error'], 503);
         }
