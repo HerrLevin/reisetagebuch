@@ -22,29 +22,24 @@ export default defineConfig({
         }),
         VitePWA({
             registerType: 'autoUpdate',
-            includeAssets: ['favicon.ico', 'robots.txt'],
+            includeAssets: ['robots.txt'],
             manifest: {
                 name: 'Reisetagebuch',
                 short_name: 'Reisetagebuch',
-                theme_color: '#191e24',
-                background_color: '#191e24',
+                theme_color: '#47b3a5',
+                background_color: '#47b3a5',
                 display: 'standalone',
                 scope: '/',
                 start_url: '/home',
                 icons: [
                     {
-                        src: 'assets/pwa-192x192.png',
+                        src: '/favicon/web-app-manifest-192x192.png',
                         sizes: '192x192',
                         type: 'image/png',
+                        purpose: 'maskable',
                     },
                     {
-                        src: 'assets/pwa-512x512.png',
-                        sizes: '512x512',
-                        type: 'image/png',
-                        purpose: 'any',
-                    },
-                    {
-                        src: 'assets/pwa-512x512.png',
+                        src: '/favicon/web-app-manifest-512x512.png',
                         sizes: '512x512',
                         type: 'image/png',
                         purpose: 'maskable',
