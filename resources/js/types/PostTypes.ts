@@ -18,6 +18,8 @@ export type TransportPost = BasePost & {
     originStop: Stop;
     destinationStop: Stop;
     trip: Trip;
+    manualDepartureTime: string | null;
+    manualArrivalTime: string | null;
 };
 
 export type AllPosts = BasePost | LocationPost | TransportPost;

@@ -15,6 +15,7 @@ use App\Models\Post;
 use App\Models\TransportTrip;
 use App\Models\TransportTripStop;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
@@ -233,6 +234,32 @@ class PostRepository
 
         if ($visitingUser?->id !== $post->user_id && ! in_array($post->visibility, [Visibility::PUBLIC, Visibility::UNLISTED], true)) {
             abort(403);
+        }
+
+        return $this->postHydrator->modelToDto($post);
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function updateTransportTimes(TransportPost $transportPost, ?string $manualDepartureTime, ?string $manualArrivalTime): TransportPost
+    {
+        try {
+            DB::beginTransaction();
+            /** @var Post $post */
+            $post = Post::where('id', $transportPost->id)->with('transportPost')->firstOrFail();
+
+            $post->transportPost->manual_departure = $manualDepartureTime ? Carbon::parse($manualDepartureTime)->toIso8601ZuluString() : null;
+            $post->transportPost->manual_arrival = $manualArrivalTime ? Carbon::parse($manualArrivalTime)->toIso8601ZuluString() : null;
+            $post->transportPost->save();
+
+            DB::commit();
+
+            $post->load('transportPost.destination', 'transportPost.origin', 'transportPost.transportTrip', 'transportPost.originStop.location', 'transportPost.destinationStop.location');
+        } catch (Throwable $e) {
+            DB::rollBack();
+            report($e);
+            throw $e;
         }
 
         return $this->postHydrator->modelToDto($post);

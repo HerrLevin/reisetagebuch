@@ -15,6 +15,10 @@ class TransportPost extends BasePost
 
     public TripDto $trip;
 
+    public ?string $manualDepartureTime = null;
+
+    public ?string $manualArrivalTime = null;
+
     public function __construct(Post $post, UserDto $userDto)
     {
         parent::__construct($post, $userDto);
@@ -22,5 +26,7 @@ class TransportPost extends BasePost
         $this->originStop = new StopDto($asdf);
         $this->destinationStop = new StopDto($post->transportPost->destinationStop);
         $this->trip = new TripDto($post->transportPost->transportTrip);
+        $this->manualDepartureTime = $post->transportPost->manual_departure?->toIso8601String();
+        $this->manualArrivalTime = $post->transportPost->manual_arrival?->toIso8601String();
     }
 }

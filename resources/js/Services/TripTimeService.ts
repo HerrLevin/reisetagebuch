@@ -1,0 +1,59 @@
+import { Stop, TransportPost } from '@/types/PostTypes';
+import { DateTime, DateTimeMaybeValid } from 'luxon';
+
+export function calculateDelay(
+    plannedTime: DateTimeMaybeValid | null,
+    manualTime: string | null,
+    delay: number | null = null,
+): number | null {
+    if (manualTime && plannedTime) {
+        const delay =
+            new Date(manualTime).getTime() - plannedTime.toJSDate().getTime();
+        if (delay > 60000) {
+            return Math.floor(delay / 60000);
+        }
+        if (delay < -60000) {
+            return Math.floor(delay / 60000);
+        }
+        return null;
+    }
+
+    if (delay && Math.abs(delay) > 60) {
+        return Math.floor(delay / 60);
+    }
+    return null;
+}
+
+export function getDepartureDelay(post: TransportPost): number | null {
+    return calculateDelay(
+        getDepartureTime(post.originStop),
+        post?.manualDepartureTime,
+        post?.originStop.departureDelay || 0,
+    );
+}
+
+export function getArrivalDelay(post: TransportPost): number | null {
+    return calculateDelay(
+        getArrivalTime(post.destinationStop),
+        post?.manualArrivalTime,
+        post?.destinationStop.arrivalDelay || 0,
+    );
+}
+
+export function getArrivalTime(stop: Stop): DateTimeMaybeValid | null {
+    const time = stop.arrivalTime || stop.departureTime || null;
+    if (time) {
+        return DateTime.fromISO(time);
+    }
+
+    return null;
+}
+
+export function getDepartureTime(stop: Stop): DateTimeMaybeValid | null {
+    const time = stop.departureTime || stop.arrivalTime || null;
+    if (time) {
+        return DateTime.fromISO(time);
+    }
+
+    return null;
+}

@@ -2,7 +2,14 @@
 import { getOwnShareText, getShareText } from '@/Services/PostTextService';
 import { BasePost, isTransportPost } from '@/types/PostTypes';
 import { Link, useForm, usePage } from '@inertiajs/vue3';
-import { Ellipsis, Route, Share, SquarePen, Trash2 } from 'lucide-vue-next';
+import {
+    ClockPlus,
+    Ellipsis,
+    Route,
+    Share,
+    SquarePen,
+    Trash2,
+} from 'lucide-vue-next';
 import { PropType, useTemplateRef } from 'vue';
 
 const props = defineProps({
@@ -84,6 +91,12 @@ function blur() {
                     <Link :href="route('posts.edit', post.id)">
                         <SquarePen class="size-4" />
                         Edit
+                    </Link>
+                </li>
+                <li v-if="isTransportPost(post)">
+                    <Link :href="route('posts.edit.transport-times', post.id)">
+                        <ClockPlus class="size-4" />
+                        Change Times
                     </Link>
                 </li>
                 <li v-if="isTransportPost(post)">

@@ -6,6 +6,7 @@ use App\Http\Requests\LocationPostRequest;
 use App\Http\Requests\PostRequest;
 use App\Http\Requests\TransportPostCreateRequest;
 use App\Http\Requests\TransportPostUpdateRequest;
+use App\Http\Requests\TransportTimesUpdateRequest;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -131,6 +132,30 @@ class PostController extends Controller
             'trip' => $trip,
             'startTime' => $trip->startTime,
             'postId' => $postId,
+        ]);
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function editTimesTransport(string $postId): Response|ResponseFactory
+    {
+        $post = $this->postController->editTimesTransport($postId);
+
+        return inertia('NewPostDialog/EditTransportTimes', [
+            'post' => $post,
+        ]);
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function updateTimesTransport(string $postId, TransportTimesUpdateRequest $request): RedirectResponse
+    {
+        $post = $this->postController->updateTimesTransport($postId, $request);
+
+        return to_route('posts.show', [
+            'postId' => $post->id,
         ]);
     }
 

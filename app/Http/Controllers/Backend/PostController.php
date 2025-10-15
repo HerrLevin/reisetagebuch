@@ -14,6 +14,7 @@ use App\Http\Requests\LocationPostRequest;
 use App\Http\Requests\PostRequest;
 use App\Http\Requests\TransportPostCreateRequest;
 use App\Http\Requests\TransportPostUpdateRequest;
+use App\Http\Requests\TransportTimesUpdateRequest;
 use App\Http\Resources\PostTypes\BasePost;
 use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
@@ -204,6 +205,40 @@ class PostController extends Controller
         $hydrator = new DbTripHydrator;
 
         return $hydrator->hydrateTrip($trip, $filteredStops);
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function editTimesTransport(string $postId): TransportPost
+    {
+        $post = $this->postRepository->getById($postId, Auth::user());
+        $this->authorize('update', $post);
+
+        if (! $post instanceof TransportPost) {
+            abort(422, 'Not a transport post');
+        }
+
+        return $post;
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function updateTimesTransport(string $postId, TransportTimesUpdateRequest $request): TransportPost
+    {
+        $post = $this->postRepository->getById($postId, Auth::user());
+        $this->authorize('update', $post);
+
+        if (! $post instanceof TransportPost) {
+            abort(422, 'Not a transport post');
+        }
+
+        return $this->postRepository->updateTransportTimes(
+            $post,
+            $request->manualDepartureTime,
+            $request->manualArrivalTime
+        );
     }
 
     /**
