@@ -2,12 +2,13 @@
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import { CircleAlert } from 'lucide-vue-next';
+import { computed } from 'vue';
 
 defineProps<{
-    reisetagebuchVersion: string;
     laravelVersion: string;
     phpVersion: string;
 }>();
+const appVersion = computed(() => usePage().props.appVersion || '0.0.0');
 </script>
 
 <template>
@@ -90,10 +91,9 @@ defineProps<{
                 <footer
                     class="py-16 text-center text-sm text-black dark:text-white/70"
                 >
-                    v{{ reisetagebuchVersion }} (Laravel v{{
-                        laravelVersion
-                    }}
-                    PHP v{{ phpVersion }})
+                    {{ appVersion }} (Laravel v{{ laravelVersion }} PHP v{{
+                        phpVersion
+                    }})
                 </footer>
             </div>
         </div>
