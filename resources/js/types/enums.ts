@@ -26,4 +26,5 @@ export enum Visibility {
     PUBLIC = 'public',
     PRIVATE = 'private',
     UNLISTED = 'unlisted',
+    ONLY_AUTHENTICATED = 'only-authenticated',
 }

@@ -20,6 +20,10 @@ class PostPolicy
             return $user?->id === $post->user->id;
         }
 
+        if ($post->visibility === Visibility::ONLY_AUTHENTICATED) {
+            return $user !== null;
+        }
+
         return in_array($post->visibility, [Visibility::PUBLIC, Visibility::UNLISTED], true);
     }
 

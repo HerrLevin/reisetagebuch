@@ -1,5 +1,5 @@
 import { Visibility } from '@/types/enums';
-import { Earth, Lock, LucideProps, Moon } from 'lucide-vue-next';
+import { Earth, Lock, LucideProps, Moon, Users } from 'lucide-vue-next';
 import * as vue from 'vue';
 
 export interface VisibilityMapping {
@@ -25,6 +25,11 @@ const visibilityMappings: Record<Visibility, VisibilityMapping> = {
             'Hidden for others from dashboard and profile. Only visible to you or others who have the link.',
         label: 'Unlisted',
         icon: Moon,
+    },
+    [Visibility.ONLY_AUTHENTICATED]: {
+        description: 'Only visible to authenticated users',
+        label: 'Authenticated Only',
+        icon: Users,
     },
 };
 

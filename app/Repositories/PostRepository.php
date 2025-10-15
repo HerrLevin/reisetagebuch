@@ -180,7 +180,7 @@ class PostRepository
             'transportPost.originStop.location', 'transportPost.destinationStop.location', 'transportPost.transportTrip',
         ])
             ->where('user_id', '=', $user->id)
-            ->orWhere('visibility', Visibility::PUBLIC->value)
+            ->orWhereIn('visibility', [Visibility::PUBLIC->value, Visibility::ONLY_AUTHENTICATED->value])
             ->latest()
             ->cursorPaginate(50);
 
@@ -205,9 +205,12 @@ class PostRepository
         $posts = Post::with(['user', 'locationPost.location', 'locationPost.location.tags', 'transportPost', 'transportPost.origin', 'transportPost.destination'])
             ->where('user_id', $user);
 
-        if ($visitingUser?->id !== $user) {
+        if ($visitingUser && $visitingUser->id !== $user) {
             // not the owner, show only public posts
-            $posts->where('visibility', Visibility::PUBLIC->value);
+            $posts->whereIn('visibility', [Visibility::ONLY_AUTHENTICATED, Visibility::PUBLIC]);
+        } elseif (! $visitingUser) {
+            // not logged in, show only public posts
+            $posts->where('visibility', Visibility::PUBLIC);
         }
 
         $posts = $posts
@@ -232,7 +235,12 @@ class PostRepository
             ->where('id', $postId)
             ->firstOrFail();
 
-        if ($visitingUser?->id !== $post->user_id && ! in_array($post->visibility, [Visibility::PUBLIC, Visibility::UNLISTED], true)) {
+        $allowedVisibilities = [Visibility::PUBLIC, Visibility::UNLISTED];
+        if ($visitingUser !== null) {
+            $allowedVisibilities[] = Visibility::ONLY_AUTHENTICATED;
+        }
+
+        if ($visitingUser?->id !== $post->user_id && ! in_array($post->visibility, $allowedVisibilities, true)) {
             abort(403);
         }
 
