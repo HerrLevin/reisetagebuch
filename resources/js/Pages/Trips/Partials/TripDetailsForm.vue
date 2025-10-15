@@ -137,14 +137,14 @@ function selectArrivalTime(event: Event) {
             <div class="col col-span-2 md:col-span-1">
                 <label for="vehicleInput" class="font-bold">
                     Code
-                    <span class="font-light opacity-60">(e.g. ICE 123)</span>
+                    <span class="font-light opacity-60">(e.g. 15123)</span>
                 </label>
                 <input
                     id="vehicleInput"
                     v-model="model.tripShortName"
                     type="text"
                     class="input input-bordered w-full"
-                    placeholder="Code (e.g. ICE 123)"
+                    placeholder="Code (e.g. 15123)"
                 />
             </div>
             <div class="col col-span-2">
