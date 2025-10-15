@@ -103,7 +103,7 @@ class TripController extends Controller
             $trip = $this->transportTripRepository->getOrCreateTrip(
                 mode: $request->mode,
                 foreignId: $identifier,
-                provider: 'road-to-better',
+                provider: 'reisetagebuch',
                 lineName: $request->lineName,
                 routeLongName: $request->routeLongName,
                 tripShortName: $request->tripShortName,

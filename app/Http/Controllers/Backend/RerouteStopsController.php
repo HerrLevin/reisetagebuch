@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Backend;
 
 use App\Dto\MotisApi\TripDto;
+use App\Enums\TransportMode;
 use App\Exceptions\BrouterRouteCreationFailed;
 use App\Http\Controllers\Controller;
 use App\Models\TransportTrip;
@@ -95,24 +96,24 @@ class RerouteStopsController extends Controller
     private function getPathType(string $mode): ?string
     {
         $railModes = [
-            'RAIL',
-            'HIGHSPEED_RAIL',
-            'LONG_DISTANCE',
-            'NIGHT_RAIL',
-            'REGIONAL_FAST_RAIL',
-            'REGIONAL_RAIL',
-            'TRAM',
-            'SUBWAY',
-            'METRO',
-            'FUNICULAR',
+            TransportMode::RAIL,
+            TransportMode::HIGHSPEED_RAIL,
+            TransportMode::LONG_DISTANCE,
+            TransportMode::NIGHT_RAIL,
+            TransportMode::REGIONAL_FAST_RAIL,
+            TransportMode::REGIONAL_RAIL,
+            TransportMode::TRAM,
+            TransportMode::SUBWAY,
+            TransportMode::METRO,
+            TransportMode::FUNICULAR,
         ];
         $roadModes = [
-            'CAR',
-            'CAR_PARKING',
-            'ODM',
-            'FLEX',
-            'BUS',
-            'COACH',
+            TransportMode::CAR,
+            TransportMode::CAR_PARKING,
+            TransportMode::ODM,
+            TransportMode::FLEX,
+            TransportMode::BUS,
+            TransportMode::COACH,
         ];
 
         if (in_array($mode, $railModes, true)) {
