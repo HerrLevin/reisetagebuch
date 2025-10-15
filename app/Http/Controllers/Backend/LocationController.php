@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\Collection as DbCollection;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Collection;
 use Log;
+use Throwable;
 
 class LocationController extends Controller
 {
@@ -85,7 +86,14 @@ class LocationController extends Controller
 
         // Add transport post locations
         foreach ($transportPosts as $post) {
-            $postLocations = LocationHistoryEntryDto::fromTransportPost($post);
+            try {
+                $postLocations = LocationHistoryEntryDto::fromTransportPost($post);
+            } catch (Throwable $e) {
+                Log::error('Error processing transport post locations', [$post]);
+                report($e);
+
+                continue;
+            }
             $route = $this->mapController->fromTo($post->origin_stop_id, $post->destination_stop_id);
             $routes->push(new TripHistoryEntryDto($post, $route));
             foreach ($postLocations as $loc) {
