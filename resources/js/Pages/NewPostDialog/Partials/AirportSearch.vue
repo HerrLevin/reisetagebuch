@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Typeahead, { Suggestion } from '@/Components/Typeahead.vue';
-import { Area } from '@/types';
+import { LocationIdentifier } from '@/types';
 import { AutocompleteResponse } from '@/types/motis';
 import axios from 'axios';
 import { ref } from 'vue';
@@ -21,7 +21,7 @@ const props = defineProps({
     },
     placeholder: {
         type: String,
-        default: 'Search for a location',
+        default: 'Search for an airport',
     },
 });
 
@@ -43,20 +43,17 @@ function fetchSuggestions() {
         .get(url, {
             params: {
                 query: search.value,
+                provider: 'airport',
                 latitude: props.latitude,
                 longitude: props.longitude,
             },
         })
         .then((response) => {
-            if (!response.data) {
-                suggestions.value = [];
-                return;
-            }
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             suggestions.value = response.data.map((item: any) => ({
                 label: item.name,
                 value: item,
-                subLabel: getArea(item.areas || []),
+                subLabel: getAirportIdentifier(item.identifiers),
             }));
         })
         .catch((error) => {
@@ -65,32 +62,41 @@ function fetchSuggestions() {
 }
 const modelChange = debounce(() => fetchSuggestions(), 300);
 
-function getArea(areas: Array<Area>) {
-    if (areas.length === 0) {
-        return '';
+function getAirportIdentifier(areas: Array<LocationIdentifier>): null | string {
+    // find icao and iata codes
+    const icao = areas.find((a) => a.type === 'icao');
+    const iata = areas.find((a) => a.type === 'iata');
+
+    if (icao && iata) {
+        return `${iata.identifier} (${icao.identifier})`;
+    }
+    if (icao) {
+        return icao.identifier;
+    }
+    if (iata) {
+        return iata.identifier;
     }
 
-    const defaultArea: undefined | Area = areas.find(
-        (area: Area) => area.default,
-    );
-    const country: undefined | Area = areas.find(
-        (area: Area) => area.adminLevel === 2,
-    );
-
-    if (defaultArea) {
-        return country
-            ? `${defaultArea.name}, ${country.name}`
-            : defaultArea.name;
+    const gps = areas.find((a) => a.type === 'gps');
+    if (gps) {
+        return `GPS: ${gps.identifier}`;
     }
+
+    const local = areas.find((a) => a.type === 'local');
+    if (local) {
+        return `Local: ${local.identifier}`;
+    }
+
+    return null;
 }
 
-function getIdentifier(element: Suggestion | undefined) {
+function getIdentifier(element: Suggestion | undefined): string | undefined {
     if (element?.value && typeof element.value === 'string') {
         return element.value;
     }
     if (element?.value && typeof element.value === 'object') {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return (element.value as any).identifier;
+        return (element.value as any).id;
     }
 
     return undefined;
@@ -119,10 +125,10 @@ function submitTypeahead(element: Suggestion) {
 <template>
     <Typeahead
         v-model="search"
-        :placeholder="placeholder"
         class="input input-bordered w-full"
         name="departure-search"
         :required="false"
+        :placeholder="placeholder"
         :suggestions="suggestions"
         @submit="submitTypeahead($event)"
         @select="submitTypeahead($event)"

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { CreateTripForm } from '@/Pages/Trips/Create.vue';
 import { getEmoji } from '@/Services/DepartureTypeService';
 import { TransportMode } from '@/types/enums';
+import { CreateTripForm } from '@/types/TripCreation';
 import { DateTime } from 'luxon';
 
 const model = defineModel<CreateTripForm>({

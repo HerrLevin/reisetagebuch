@@ -79,7 +79,7 @@ class LocationControllerTest extends TestCase
             });
 
         $this->repository->expects($this->exactly(3))
-            ->method('updateOrCreateLocation')
+            ->method('updateOrCreateOsmLocation')
             ->willReturnOnConsecutiveCalls(
                 null,
                 $this->throwException(new \Exception('fail')),

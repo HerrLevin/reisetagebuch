@@ -147,7 +147,7 @@ class LocationController extends Controller
 
         foreach ($this->overpassRequestService->parseLocations($response) as $location) {
             try {
-                $this->locationRepository->updateOrCreateLocation($location);
+                $this->locationRepository->updateOrCreateOsmLocation($location);
             } catch (Exception $e) {
                 Log::error('Error processing location', [$location]);
                 report($e);
@@ -207,6 +207,25 @@ class LocationController extends Controller
     public function geocode(string $query, ?Point $point): array
     {
         return $this->transitousRequestService->geocode($query, null, LocationType::STOP, $point);
+    }
+
+    public function geocodeAirport(string $query, ?Point $point): array
+    {
+        $airports = [];
+        // if only uppercase letters, search for identifier
+        if (preg_match('/^[A-Z]{3,4}$/', $query)) {
+            foreach ($this->locationRepository->findAirportsByIdentifier($query) as $airport) {
+                $airports[] = GeocodeResponseEntry::fromLocation($airport);
+            }
+
+            return $airports;
+        }
+
+        foreach ($this->locationRepository->findAirportsByName($query, $point) as $airport) {
+            $airports[] = GeocodeResponseEntry::fromLocation($airport);
+        }
+
+        return $airports;
     }
 
     public function stopovers(string $tripId, string $startId, string $startTime): ?TripDto

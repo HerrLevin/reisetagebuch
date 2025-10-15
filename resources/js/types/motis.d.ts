@@ -1,3 +1,5 @@
+import { LocationIdentifier } from '@/types/index';
+
 export type Area = {
     name: string;
     adminLevel: number;
@@ -16,7 +18,8 @@ export type AutocompleteResponse = {
     type: AreaType;
     tokens: Array<Array<number, number>>;
     name: string;
-    id: string;
+    identifier: string;
+    id?: string | null;
     lat: number;
     lon: number;
     level?: number;
@@ -27,4 +30,5 @@ export type AutocompleteResponse = {
     tz?: string;
     areas?: Area[];
     score: number;
+    identifiers: LocationIdentifier[];
 };
