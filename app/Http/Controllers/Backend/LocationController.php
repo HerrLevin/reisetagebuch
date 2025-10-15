@@ -141,7 +141,7 @@ class LocationController extends Controller
         $response = $this->overpassRequestService->getElements();
 
         $requestLocation?->update([
-            'to_fetch' => count($response['elements'] ?? 0),
+            'to_fetch' => count($response['elements'] ?? []),
             'fetched' => 0,
         ]);
 
