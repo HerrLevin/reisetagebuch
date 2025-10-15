@@ -32,13 +32,13 @@ class LocationHistoryEntryDto
         $origin->name = $transportPost->originStop->location->name;
         $origin->latitude = $transportPost->originStop->location->location->getLatitude();
         $origin->longitude = $transportPost->originStop->location->location->getLongitude();
-        $origin->timestamp = $transportPost->originStop->departure_time->toIso8601String();
+        $origin->timestamp = ($transportPost->originStop->departure_time ?? $transportPost->originStop->arrival_time)->toIso8601String();
 
         $destination->id = $transportPost->destinationStop->location->id;
         $destination->name = $transportPost->destinationStop->location->name;
         $destination->latitude = $transportPost->destinationStop->location->location->getLatitude();
         $destination->longitude = $transportPost->destinationStop->location->location->getLongitude();
-        $destination->timestamp = $transportPost->destinationStop->arrival_time->toIso8601String();
+        $destination->timestamp = ($transportPost->destinationStop->arrival_time ?? $transportPost->destinationStop->departure_time)->toIso8601String();
 
         return [$origin, $destination];
     }

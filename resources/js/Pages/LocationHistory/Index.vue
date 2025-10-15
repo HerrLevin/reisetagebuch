@@ -2,6 +2,7 @@
 import LocationHistoryMap from '@/Components/Maps/LocationHistoryMap.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { LocationHistoryDto, TripHistoryEntryDto } from '@/types';
+import { ArrowLeft, ArrowRight } from 'lucide-vue-next';
 import { DateTime } from 'luxon';
 import { ref } from 'vue';
 
@@ -24,12 +25,44 @@ const selectedDate = ref<DateTime | null>();
 
 selectedDate.value = props.when ? DateTime.fromISO(props.when) : null;
 
+function countWaypoints() {
+    const waypoints = props.locations.filter(
+        (location) => location.name === null,
+    );
+
+    return waypoints.length;
+}
+
 function selectDate(newValue: string) {
     if (newValue) {
         window.location.href = route('location-history.index', {
             when: newValue,
         });
     }
+}
+
+function previousDay() {
+    if (selectedDate.value) {
+        const previous = selectedDate.value.minus({ days: 1 });
+        selectDate(previous.toISODate() || '');
+    } else {
+        const previous = DateTime.now().minus({ days: 1 });
+        selectDate(previous.toISODate() || '');
+    }
+}
+
+function nextDay() {
+    if (selectedDate.value) {
+        const next = selectedDate.value.plus({ days: 1 });
+        selectDate(next.toISODate() || '');
+    } else {
+        const next = DateTime.now().plus({ days: 1 });
+        selectDate(next.toISODate() || '');
+    }
+}
+
+function today() {
+    window.location.href = route('location-history.index');
 }
 </script>
 
@@ -58,12 +91,44 @@ function selectDate(newValue: string) {
                         Select a date and time to view the location history.
                     </p>
                 </div>
+                <div class="flex justify-between pt-4">
+                    <button class="btn btn-primary" @click="previousDay()">
+                        <ArrowLeft class="mr-1 inline size-4" />
+                        <span class="sr-only sm:not-sr-only">Previous</span>
+                    </button>
+                    <button class="btn btn-primary" @click="today()">
+                        Today
+                    </button>
+                    <button class="btn btn-primary" @click="nextDay()">
+                        <span class="sr-only sm:not-sr-only">Next</span>
+                        <ArrowRight class="ml-1 inline size-4" />
+                    </button>
+                </div>
             </div>
-            <LocationHistoryMap
-                v-if="locations.length > 0"
-                :locations="locations"
-                :trips="trips"
-            />
+            <template v-if="locations.length > 0 || trips.length > 0">
+                <LocationHistoryMap :locations="locations" :trips="trips" />
+                <div
+                    class="card bg-base-100 min-w-full p-8 text-center shadow-md"
+                >
+                    <div class="mt-4 text-sm text-gray-500">
+                        Showing location history for
+                        <strong>{{
+                            selectedDate
+                                ? selectedDate.toLocaleString(
+                                      DateTime.DATE_FULL,
+                                  )
+                                : 'all time'
+                        }}</strong
+                        >.
+                    </div>
+                    <div class="mt-4 text-sm text-gray-500">
+                        {{ locations.length - countWaypoints() }} location
+                        {{ locations.length === 1 ? 'entry' : 'entries' }},
+                        {{ trips.length }} trip
+                        {{ trips.length === 1 ? 'entry' : 'entries' }}.
+                    </div>
+                </div>
+            </template>
             <div
                 v-else
                 class="card bg-base-100 min-w-full p-8 text-center shadow-md"
