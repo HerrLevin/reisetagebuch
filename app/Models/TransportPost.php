@@ -16,6 +16,13 @@ class TransportPost extends Model
         'transport_trip_id',
         'origin_stop_id',
         'destination_stop_id',
+        'manual_departure',
+        'manual_arrival',
+    ];
+
+    protected $casts = [
+        'manual_departure' => 'datetime',
+        'manual_arrival' => 'datetime',
     ];
 
     public function origin(): BelongsTo

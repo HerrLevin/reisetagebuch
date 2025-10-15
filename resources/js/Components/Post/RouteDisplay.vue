@@ -1,21 +1,38 @@
 <script setup lang="ts">
+import Delay from '@/Components/Post/Partials/Delay.vue';
 import { getEmoji } from '@/Services/DepartureTypeService';
+import {
+    formatArrivalTime,
+    formatDepartureTime,
+} from '@/Services/TimeFormattingService';
+import { getArrivalDelay, getDepartureDelay } from '@/Services/TripTimeService';
 import { TransportPost } from '@/types/PostTypes';
 import type { PropType } from 'vue';
 
-defineProps({
+const props = defineProps({
     post: {
         type: Object as PropType<TransportPost>,
         required: true,
     },
 });
 
-function getTime(date: string): string {
-    const dateTime = new Date(date);
-    return dateTime.toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-    });
+const departureDelay = getDepartureDelay(props.post);
+const arrivalDelay = getArrivalDelay(props.post);
+
+function getFormattedDepartureTime(): string | null {
+    return formatDepartureTime(
+        props.post?.destinationStop,
+        props.post?.manualDepartureTime,
+        departureDelay || 0,
+    );
+}
+
+function getFormattedArrivalTime(): string | null {
+    return formatArrivalTime(
+        props.post?.originStop,
+        props.post?.manualArrivalTime,
+        arrivalDelay || 0,
+    );
 }
 </script>
 
@@ -40,8 +57,9 @@ function getTime(date: string): string {
         <div class="grid grid-cols-3 gap-0 pb-0">
             <div class="text-left">
                 <p class="text-muted-foreground text-sm font-medium">
-                    {{ getTime(post.originStop.departureTime!) }}
+                    {{ getFormattedDepartureTime() }}
                 </p>
+                <Delay :delay="departureDelay" />
             </div>
             <div class="self-end text-center">
                 <p class="text-muted-foreground text-sm font-medium">
@@ -50,8 +68,9 @@ function getTime(date: string): string {
             </div>
             <div class="text-right">
                 <p class="text-muted-foreground text-sm font-medium">
-                    {{ getTime(post.destinationStop.arrivalTime!) }}
+                    {{ getFormattedArrivalTime() }}
                 </p>
+                <Delay :delay="arrivalDelay" />
             </div>
         </div>
         <div class="flex w-full flex-col">
