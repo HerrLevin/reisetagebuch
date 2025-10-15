@@ -13,6 +13,12 @@ if [ ! -f /var/www/html/.env ]; then
   echo "APP_KEY=base64:$(openssl rand -base64 32)" > /var/www/html/.env
 fi
 
+# Load version from .app_version file and set as environment variable
+if [ -f /var/www/html/.app_version ]; then
+  export APP_VERSION=$(cat /var/www/html/.app_version)
+  echo "Application version: $APP_VERSION"
+fi
+
 # Set correct permissions
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 

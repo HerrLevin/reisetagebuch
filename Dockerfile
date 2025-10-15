@@ -17,6 +17,7 @@ ARG NGINX_LIB_DIR="/var/lib/nginx"
 # Install required system dependencies
 RUN apk add --no-cache \
     bash \
+    git \
     icu-dev \
     libpq-dev \
     libzip-dev \
@@ -50,6 +51,9 @@ COPY . .
 
 # Copy dependencies from builder stage
 COPY --from=builder /app/vendor ./vendor
+
+# Capture version information from git and save to file
+RUN chmod +x scripts/app_version.sh && ./scripts/app_version.sh
 
 # Build frontend assets
 RUN npm install
