@@ -19,8 +19,9 @@ const props = defineProps({
         required: true,
     },
     defaultVisibility: {
-        type: String as () => Visibility,
-        default: Visibility.PUBLIC,
+        type: String as () => Visibility | null,
+        default: null,
+        required: false,
     },
     subtitle: {
         type: String || null,
@@ -33,9 +34,26 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['cancel', 'selectVisibility', 'update:modelValue']);
-const selectedVisibility = ref(props.defaultVisibility);
+const selectedVisibility = ref(
+    props.defaultVisibility || fallbackRecentVisibility(),
+);
+
+function fallbackRecentVisibility() {
+    const visibility = localStorage.getItem('recentVisibility');
+    if (
+        visibility &&
+        Object.values(Visibility).includes(visibility as Visibility)
+    ) {
+        console.log(visibility as Visibility);
+        return visibility as Visibility;
+    }
+
+    console.log('no recent visibility found, defaulting to public');
+    return Visibility.PUBLIC;
+}
 
 function selectVisibility(visibility: Visibility) {
+    localStorage.setItem('recentVisibility', visibility);
     selectedVisibility.value = visibility;
     blur();
     emit('selectVisibility', visibility);
@@ -119,5 +137,3 @@ function blur() {
         </button>
     </div>
 </template>
-
-<style scoped></style>
