@@ -47,7 +47,6 @@ class HandleInertiaRequests extends Middleware
             ],
             'canRegister' => config('app.registration'),
             'canInvite' => config('app.invite.enabled') && $request->user() && $request->user()->can('create', Invite::class),
-            'appVersion' => config('app.version'),
         ];
     }
 }
