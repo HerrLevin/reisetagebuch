@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import AppFooter from '@/Components/AppFooter.vue';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import FlashMessages from '@/Components/FlashMessages.vue';
 import Dock from '@/Layouts/Partials/Dock.vue';
@@ -42,7 +41,6 @@ import { Link } from '@inertiajs/vue3';
                     <main class="mb-12 w-full pb-12 md:mb-0 md:pb-0">
                         <FlashMessages />
                         <slot />
-                        <AppFooter />
                     </main>
                 </div>
             </div>
