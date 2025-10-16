@@ -21,7 +21,7 @@ const arrivalDelay = getArrivalDelay(props.post);
 
 function getFormattedDepartureTime(): string | null {
     return formatDepartureTime(
-        props.post?.destinationStop,
+        props.post?.originStop,
         props.post?.manualDepartureTime,
         departureDelay || 0,
     );
@@ -29,7 +29,7 @@ function getFormattedDepartureTime(): string | null {
 
 function getFormattedArrivalTime(): string | null {
     return formatArrivalTime(
-        props.post?.originStop,
+        props.post?.destinationStop,
         props.post?.manualArrivalTime,
         arrivalDelay || 0,
     );
