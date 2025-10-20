@@ -9,7 +9,7 @@ import {
     LocationPost,
     TransportPost,
 } from '@/types/PostTypes';
-import { Head } from '@inertiajs/vue3';
+import { Head, usePage } from '@inertiajs/vue3';
 import axios from 'axios';
 import { GeometryCollection } from 'geojson';
 import { ArrowLeft } from 'lucide-vue-next';
@@ -97,6 +97,9 @@ if (props.post.body) {
                 :start-point="startPoint"
                 :end-point="endPoint"
                 :line-string="lineString"
+                :show-geo-position="
+                    usePage().props.auth.user?.id === post.user.id
+                "
             ></Map>
             <div class="p-4">
                 <ul class="list">

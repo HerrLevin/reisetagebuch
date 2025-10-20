@@ -3,6 +3,7 @@ import {
     MglCircleLayer,
     MglFullscreenControl,
     MglGeoJsonSource,
+    MglGeolocateControl,
     MglLineLayer,
     MglMap,
     MglNavigationControl,
@@ -32,6 +33,11 @@ const props = defineProps({
     lineString: {
         type: Object as PropType<GeometryCollection | null>,
         default: null,
+        required: false,
+    },
+    showGeoPosition: {
+        type: Boolean,
+        default: false,
         required: false,
     },
 });
@@ -163,6 +169,15 @@ watch(
             position="top-right"
             :show-zoom="true"
             :show-compass="true"
+        />
+        <mgl-geolocate-control
+            v-if="showGeoPosition"
+            position="top-right"
+            :fit-bounds-options="{
+                maxZoom: 16,
+            }"
+            :track-user-location="true"
+            :show-user-location="true"
         />
         <mgl-raster-source
             source-id="raster-source"
