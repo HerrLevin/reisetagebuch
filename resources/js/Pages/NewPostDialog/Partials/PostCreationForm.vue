@@ -34,22 +34,20 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['cancel', 'selectVisibility', 'update:modelValue']);
-const selectedVisibility = ref(
-    props.defaultVisibility || fallbackRecentVisibility(),
-);
+const selectedVisibility = ref(props.defaultVisibility || Visibility.PUBLIC);
 
-function fallbackRecentVisibility() {
+if (!props.defaultVisibility) {
+    recallStoredVisibility();
+}
+
+function recallStoredVisibility() {
     const visibility = localStorage.getItem('recentVisibility');
     if (
         visibility &&
         Object.values(Visibility).includes(visibility as Visibility)
     ) {
-        console.log(visibility as Visibility);
-        return visibility as Visibility;
+        selectVisibility(visibility as Visibility);
     }
-
-    console.log('no recent visibility found, defaulting to public');
-    return Visibility.PUBLIC;
 }
 
 function selectVisibility(visibility: Visibility) {
