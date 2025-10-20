@@ -13,8 +13,8 @@
     <link rel="shortcut icon" href="{{ asset('/favicon/favicon.ico')  }}" />
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('/favicon/apple-touch-icon.png') }}" />
     <meta name="apple-mobile-web-app-title" content="{{ config('app.name', 'Reisetagebuch') }}" />
-    <link rel="shortcut icon" sizes="512x512" href="{{ asset('/favicon/pwa-512x512.png') }}">
-    <link rel="shortcut icon" sizes="128x128" href="{{ asset('/favicon/pwa-192x192.png') }}">
+    <link rel="shortcut icon" sizes="512x512" href="{{ asset('/favicon/web-app-manifest-512x512.png') }}">
+    <link rel="shortcut icon" sizes="192x192" href="{{ asset('/favicon/web-app-manifest-192x192.png') }}">
     <link rel="manifest" href="{{ asset('/build/manifest.webmanifest') }}" />
     <meta name="name" content="{{ config('app.name', 'Reisetagebuch') }}">
 
