@@ -4,11 +4,12 @@ import LocationListEntry from '@/Pages/NewPostDialog/Partials/LocationListEntry.
 import { LocationService } from '@/Services/LocationService';
 import { LocationEntry, RequestLocationDto } from '@/types';
 import { Head, usePage } from '@inertiajs/vue3';
-import { ref, watch } from 'vue';
+import { Search } from 'lucide-vue-next';
+import { PropType, ref, watch } from 'vue';
 
 const props = defineProps({
     locations: {
-        type: Array<LocationEntry>,
+        type: Array as PropType<LocationEntry[]>,
         default: () => [] as LocationEntry[],
         required: false,
     },
@@ -53,8 +54,11 @@ function filterLocations() {
     if (search.value.length <= 0) {
         filteredLocations.value = props.locations;
     } else {
-        filteredLocations.value = props.locations.filter((location) =>
-            location.name.toLowerCase().includes(search.value.toLowerCase()),
+        filteredLocations.value = props.locations.filter(
+            (location) =>
+                location.name
+                    .toLowerCase()
+                    .includes(search.value.toLowerCase()),
         );
     }
 }
@@ -93,22 +97,7 @@ watch(search, () => {
             <!-- Search Bar -->
             <div class="w-full p-8">
                 <label class="input w-full">
-                    <svg
-                        class="h-[1em] opacity-50"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                    >
-                        <g
-                            stroke-linejoin="round"
-                            stroke-linecap="round"
-                            stroke-width="2.5"
-                            fill="none"
-                            stroke="currentColor"
-                        >
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <path d="m21 21-4.3-4.3"></path>
-                        </g>
-                    </svg>
+                    <Search class="size-4 opacity-50" />
                     <input
                         v-model="search"
                         type="search"
