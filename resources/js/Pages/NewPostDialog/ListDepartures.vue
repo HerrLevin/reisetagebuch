@@ -27,13 +27,21 @@ const props = defineProps({
         type: String as PropType<string | null>,
         default: '',
     },
+    requestLatitude: {
+        type: Number,
+        default: 0,
+    },
+    requestLongitude: {
+        type: Number,
+        default: 0,
+    },
 });
 
 const time = ref(null as DateTime | null);
 time.value = DateTime.fromISO(props.requestTime);
 
-const latitude = ref(0);
-const longitude = ref(0);
+const latitude = ref(props.requestLatitude);
+const longitude = ref(props.requestLongitude);
 onMounted(() => {
     LocationService.getPosition(!!usePage().props.auth.user)
         .then((position) => {
