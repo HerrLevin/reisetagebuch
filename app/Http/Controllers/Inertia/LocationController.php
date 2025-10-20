@@ -43,7 +43,7 @@ class LocationController extends Controller
         $locations = $this->locationController->nearby($point);
 
         return inertia('NewPostDialog/ListLocations', [
-            'locations' => $locations->map(fn ($location) => new LocationDto($location)),
+            'locations' => $locations->map(fn ($location) => new LocationDto($location))->toArray(),
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
         ]);
@@ -70,8 +70,8 @@ class LocationController extends Controller
             'filter' => $filter,
             'requestTime' => $time->toIso8601String(),
             'requestIdentifier' => $request->identifier,
-            'latitude' => $request->latitude,
-            'longitude' => $request->longitude,
+            'requestLatitude' => (float) $request->latitude,
+            'requestLongitude' => (float) $request->longitude,
         ]);
     }
 
