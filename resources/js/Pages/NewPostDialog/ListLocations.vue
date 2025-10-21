@@ -54,7 +54,7 @@ function filterLocations() {
     if (search.value.length <= 0) {
         filteredLocations.value = props.locations;
     } else {
-        filteredLocations.value = props.locations.filter(
+        filteredLocations.value = Object.values(props.locations).filter(
             (location) =>
                 location.name
                     .toLowerCase()
