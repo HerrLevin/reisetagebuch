@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { defineProps, ref } from 'vue';
 import { LocationEntry, LocationIdentifier } from '@/types';
+import { ExternalLink } from 'lucide-vue-next';
 
 const props = defineProps({
     location: {
@@ -37,6 +38,7 @@ function openOsmLink() {
 }
 
 function closeModal() {
+    console.log('closeModal');
     tagModal.value?.close();
 }
 
@@ -57,23 +59,14 @@ function openModal() {
     >
         <div ref="modalBox" class="modal-box p-0">
             <ul class="list">
-                <li class="text p-4 pb-2 tracking-wide opacity-60">
+                <li class="text p-4 pb-2 text-center tracking-wide opacity-60">
                     {{ location.name }}
-                </li>
-                <li
-                    v-if="osmIdentifier"
-                    class="text p-4 pb-2 tracking-wide opacity-60"
-                >
-                    <span class="text-xs opacity-60"></span>
-                    <span class="font-semibold">
-                        <a
-                            :href="getOsmLink(osmIdentifier)"
-                            target="_blank"
-                            @click.prevent="openOsmLink()"
-                        >
-                            Open in OSM
-                        </a>
-                    </span>
+                    <button
+                        class="btn btn-sm btn-circle btn-ghost absolute top-2 right-2"
+                        @click="closeModal()"
+                    >
+                        ✕
+                    </button>
                 </li>
 
                 <li
@@ -89,7 +82,18 @@ function openModal() {
             </ul>
 
             <div class="modal-action m-4">
-                <button class="btn" @click.prevent="closeModal()">Close</button>
+                <a
+                    v-if="osmIdentifier"
+                    :href="getOsmLink(osmIdentifier)"
+                    target="_blank"
+                    class="btn btn-outline"
+                    @click.prevent="openOsmLink()"
+                >
+                    Open in OSM<ExternalLink class="ml-2 inline size-4" />
+                </a>
+                <button class="btn btn-primary" @click.prevent="closeModal()">
+                    Close
+                </button>
             </div>
         </div>
 
