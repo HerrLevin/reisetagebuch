@@ -1,14 +1,7 @@
 <script setup lang="ts">
 import ThemeSelector from '@/Layouts/Partials/ThemeSelector.vue';
 import { Link, usePage } from '@inertiajs/vue3';
-import {
-    Bell,
-    Handshake,
-    History,
-    LogOut,
-    Menu,
-    Settings,
-} from 'lucide-vue-next';
+import { Handshake, History, LogOut, Menu, Settings } from 'lucide-vue-next';
 </script>
 
 <template>
@@ -54,14 +47,6 @@ import {
         </div>
         <div class="navbar-end">
             <ThemeSelector />
-            <button class="btn btn-ghost btn-circle">
-                <div class="indicator">
-                    <Bell class="size-5" />
-                    <span
-                        class="badge badge-xs badge-primary indicator-item"
-                    ></span>
-                </div>
-            </button>
         </div>
     </div>
 </template>
