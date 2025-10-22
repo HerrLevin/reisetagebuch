@@ -22,6 +22,10 @@ function connectTraewelling() {
     <Head title="Settings" />
 
     <AuthenticatedLayout>
+        <template #header>
+            <h2 class="text-xl leading-tight font-semibold">Settings</h2>
+        </template>
+
         <div class="min-w-full space-y-6">
             <div class="card bg-base-100 min-w-full p-8 shadow-md">
                 <UpdateDeviceSettingsForm :status="status" class="max-w-xl" />
