@@ -4,6 +4,9 @@ import ProfileWrapper from '@/Pages/Profile/ProfileWrapper.vue';
 import type { UserDto } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import type { PropType } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 defineProps({
     user: {
@@ -14,7 +17,7 @@ defineProps({
 </script>
 
 <template>
-    <Head title="Profile" />
+    <Head :title="t('profile.profile_of', { name: user.name })" />
 
     <ProfileWrapper :user="user">
         <div class="card bg-base-100 min-w-full shadow-md">

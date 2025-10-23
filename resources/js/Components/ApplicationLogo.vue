@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 defineProps({
     class: {
         type: String,
@@ -8,5 +11,5 @@ defineProps({
 </script>
 <template>
     <!-- eslint-disable-next-line -->
-    <img src="/assets/logo.webp" alt="Logo" :class />
+    <img src="/assets/logo.webp" :alt="t('app.logo')" :class />
 </template>

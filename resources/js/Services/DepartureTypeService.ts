@@ -1,4 +1,7 @@
+import i18n from '@/i18n';
 import { TransportMode } from '@/types/enums';
+
+const { t } = i18n.global;
 
 const TransportModeEmoji: Record<TransportMode, string> = {
     [TransportMode.TRANSIT]: '🚍',
@@ -24,22 +27,26 @@ const TransportModeEmoji: Record<TransportMode, string> = {
     [TransportMode.OTHER]: '🫥',
 };
 
+export function getName(mode: TransportMode): string {
+    return t(`transport_modes.${mode}`);
+}
+
 export function getEmoji(mode: TransportMode): string {
     return TransportModeEmoji[mode] ?? '🚏';
 }
 
 export const FilterGroups: Record<string, TransportMode[]> = {
-    'Long Distance': [
+    long_distance: [
         TransportMode.HIGHSPEED_RAIL,
         TransportMode.LONG_DISTANCE,
         TransportMode.NIGHT_RAIL,
     ],
-    Regional: [TransportMode.REGIONAL_FAST_RAIL, TransportMode.REGIONAL_RAIL],
-    Metro: [TransportMode.METRO],
-    Tram: [TransportMode.TRAM],
-    Subway: [TransportMode.SUBWAY],
-    Bus: [TransportMode.BUS, TransportMode.COACH, TransportMode.ODM],
-    Ferry: [TransportMode.FERRY],
+    regional: [TransportMode.REGIONAL_FAST_RAIL, TransportMode.REGIONAL_RAIL],
+    metro: [TransportMode.METRO],
+    tram: [TransportMode.TRAM],
+    subway: [TransportMode.SUBWAY],
+    bus: [TransportMode.BUS, TransportMode.COACH, TransportMode.ODM],
+    ferry: [TransportMode.FERRY],
 };
 
 export function getColor(mode: TransportMode): string {

@@ -29,7 +29,7 @@ defineProps<{
                             :href="route('dashboard')"
                             class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
                         >
-                            Dashboard
+                            {{ $t('pages.timeline.title') }}
                         </Link>
 
                         <template v-else>
@@ -37,7 +37,7 @@ defineProps<{
                                 :href="route('login')"
                                 class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
                             >
-                                Log in
+                                {{ $t('app.login') }}
                             </Link>
 
                             <Link
@@ -45,7 +45,7 @@ defineProps<{
                                 :href="route('register')"
                                 class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
                             >
-                                Register
+                                {{ $t('app.register') }}
                             </Link>
                         </template>
                     </nav>
@@ -69,18 +69,13 @@ defineProps<{
                                 <h2
                                     class="text-xl font-semibold text-black dark:text-white"
                                 >
-                                    Reisetagebuch
+                                    {{ $t('welcome.reisetagebuch.title') }}
                                 </h2>
 
                                 <p class="mt-4 text-sm/relaxed">
-                                    Reisetagebuch is a travel diary application
-                                    built with Laravel. It allows users to
-                                    document their travels, share experiences,
-                                    and connect with fellow travelers. The
-                                    application is designed to be self hosted,
-                                    providing users with full control over their
-                                    data and privacy. It's a crossover between
-                                    Träwelling and Swarm.
+                                    {{
+                                        $t('welcome.reisetagebuch.description')
+                                    }}
                                 </p>
                             </div>
                         </div>

@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { usePage } from '@inertiajs/vue3';
 import { onMounted, useTemplateRef } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const deleteModal = useTemplateRef('confirmLocationTrackingModal');
 
@@ -31,28 +34,26 @@ onMounted(() => {
     <dialog ref="confirmLocationTrackingModal" class="modal">
         <div class="modal-box">
             <h3 class="text-lg font-bold">
-                Do you want to track your location history with this device?
+                {{ t('history_checker.title') }}
             </h3>
             <p class="py-4">
-                This will allow you to see your location history on the map.
-                You'll be the only one who can see this information. You can
-                change this setting at any time in your account settings.
+                {{ t('history_checker.message') }}
             </p>
 
             <div class="modal-action">
                 <form method="dialog">
                     <button class="btn" @click.prevent="dontTrack()">
-                        Don't track
+                        {{ t('history_checker.decline') }}
                     </button>
                 </form>
 
                 <button class="btn btn-primary" @click.prevent="track()">
-                    Track location
+                    {{ t('history_checker.accept') }}
                 </button>
             </div>
         </div>
         <form method="dialog" class="modal-backdrop">
-            <button>close</button>
+            <button>{{ t('verbs.close') }}</button>
         </form>
     </dialog>
 </template>

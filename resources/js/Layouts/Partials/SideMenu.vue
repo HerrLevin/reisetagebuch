@@ -12,6 +12,9 @@ import {
     User,
 } from 'lucide-vue-next';
 import { onMounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const latitude = ref(0);
 const longitude = ref(0);
@@ -70,8 +73,7 @@ const defaultNewPostRoute = () => {
                 :class="{ 'menu-active': isDashboardRoute() }"
             >
                 <House class="size-5" />
-
-                Dashboard
+                {{ t('pages.timeline.title') }}
             </Link>
         </li>
         <template v-if="user">
@@ -85,7 +87,7 @@ const defaultNewPostRoute = () => {
                     "
                 >
                     <CirclePlus class="size-5" />
-                    <span class="dock-label">New Post</span>
+                    <span class="dock-label">{{ t('new_post.title') }}</span>
                 </Link>
                 <ul v-if="isPostsCreateRoute()">
                     <li>
@@ -99,7 +101,7 @@ const defaultNewPostRoute = () => {
                             :class="{ 'menu-active': isVenueRoute() }"
                         >
                             <MapPin class="size-5" />
-                            Locations
+                            {{ t('posts.locations') }}
                         </Link>
                     </li>
 
@@ -114,7 +116,7 @@ const defaultNewPostRoute = () => {
                             :class="{ 'menu-active': isDeparturesRoute() }"
                         >
                             <List class="size-5" />
-                            Departures
+                            {{ t('posts.departures') }}
                         </Link>
                     </li>
                     <li>
@@ -128,7 +130,7 @@ const defaultNewPostRoute = () => {
                             :class="{ 'menu-active': isTextRoute() }"
                         >
                             <SquarePen class="size-5" />
-                            Text
+                            {{ t('posts.text') }}
                         </Link>
                     </li>
                 </ul>
@@ -139,7 +141,7 @@ const defaultNewPostRoute = () => {
                     :class="{ 'menu-active': isTripRoute() }"
                 >
                     <Route class="size-5" />
-                    New Route
+                    {{ t('new_route.title') }}
                 </Link>
             </li>
             <li>
@@ -148,7 +150,7 @@ const defaultNewPostRoute = () => {
                     :class="{ 'menu-active': isProfileRoute() }"
                 >
                     <User class="size-5" />
-                    Profile
+                    {{ t('profile.title') }}
                 </Link>
             </li>
             <li>
@@ -157,11 +159,13 @@ const defaultNewPostRoute = () => {
                     :class="{ 'menu-active': isSettingsRoute() }"
                 >
                     <Cog class="size-5" />
-                    Settings
+                    {{ t('settings.title') }}
                 </Link>
             </li>
             <li class="border-base-300 mt-3 border-t-1">
-                <Link :href="route('logout')" method="post"> Log Out</Link>
+                <Link :href="route('logout')" method="post">
+                    {{ t('app.logout') }}
+                </Link>
             </li>
         </template>
     </ul>

@@ -1,6 +1,9 @@
+import i18n from '@/i18n';
 import { Visibility } from '@/types/enums';
 import { Earth, Lock, LucideProps, Moon, Users } from 'lucide-vue-next';
 import * as vue from 'vue';
+
+const { t } = i18n.global;
 
 export interface VisibilityMapping {
     description: string;
@@ -11,24 +14,23 @@ export interface VisibilityMapping {
 
 const visibilityMappings: Record<Visibility, VisibilityMapping> = {
     [Visibility.PUBLIC]: {
-        description: 'Anyone can see',
-        label: 'Public',
+        description: t('visibility.public_description'),
+        label: t('visibility.public'),
         icon: Earth,
     },
     [Visibility.PRIVATE]: {
-        description: 'Only visible to you',
-        label: 'Private',
+        description: t('visibility.private_description'),
+        label: t('visibility.private'),
         icon: Lock,
     },
     [Visibility.UNLISTED]: {
-        description:
-            'Hidden for others from dashboard and profile. Only visible to you or others who have the link.',
-        label: 'Unlisted',
+        description: t('visibility.unlisted_description'),
+        label: t('visibility.unlisted'),
         icon: Moon,
     },
     [Visibility.ONLY_AUTHENTICATED]: {
-        description: 'Only visible to authenticated users',
-        label: 'Authenticated Only',
+        description: t('visibility.authenticated_only_description'),
+        label: t('visibility.authenticated_only'),
         icon: Users,
     },
 };

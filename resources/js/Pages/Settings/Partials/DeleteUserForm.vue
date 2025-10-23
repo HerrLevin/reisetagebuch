@@ -4,6 +4,9 @@ import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { useForm } from '@inertiajs/vue3';
 import { ref, useTemplateRef } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const passwordInput = ref<HTMLInputElement | null>(null);
 
@@ -28,27 +31,25 @@ const deleteUser = () => {
 <template>
     <section class="space-y-6">
         <header>
-            <h2 class="text-lg font-medium">Delete Account</h2>
+            <h2 class="text-lg font-medium">
+                {{ t('settings.delete_account.title') }}
+            </h2>
 
             <p class="mt-1 text-sm opacity-65">
-                Once your account is deleted, all of its resources and data will
-                be permanently deleted. Before deleting your account, please
-                download any data or information that you wish to retain.
+                {{ t('settings.delete_account.warning') }}
             </p>
         </header>
 
         <button class="btn btn-error" @click="deleteModal?.showModal()">
-            Delete Account
+            {{ t('settings.delete_account.title') }}
         </button>
         <dialog ref="deleteModal" class="modal">
             <div class="modal-box">
                 <h3 class="text-lg font-bold">
-                    Are you sure you want to delete your account?
+                    {{ t('settings.delete_account.confirmation') }}
                 </h3>
                 <p class="py-4 opacity-65">
-                    Once your account is deleted, all of its resources and data
-                    will be permanently deleted. Please enter your password to
-                    confirm you would like to permanently delete your account.
+                    {{ t('settings.delete_account.enter_password') }}
                 </p>
 
                 <div class="mt-6">
@@ -65,7 +66,7 @@ const deleteUser = () => {
                         :error="form.errors.password"
                         type="password"
                         class="mt-1 block w-3/4"
-                        placeholder="Password"
+                        :placeholder="t('settings.delete_account.password')"
                         @keyup.enter="deleteUser"
                     />
 
@@ -73,7 +74,9 @@ const deleteUser = () => {
                 </div>
                 <div class="modal-action">
                     <form method="dialog">
-                        <button class="btn">Cancel</button>
+                        <button class="btn">
+                            {{ t('verbs.cancel') }}
+                        </button>
                     </form>
 
                     <button
@@ -82,12 +85,12 @@ const deleteUser = () => {
                         :disabled="form.processing"
                         @click="deleteUser"
                     >
-                        Delete Account
+                        {{ t('settings.delete_account.confirm') }}
                     </button>
                 </div>
             </div>
             <form method="dialog" class="modal-backdrop">
-                <button>close</button>
+                <button>{{ t('settings.delete_account.confirm') }}</button>
             </form>
         </dialog>
     </section>

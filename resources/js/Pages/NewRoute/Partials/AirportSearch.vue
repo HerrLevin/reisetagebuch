@@ -5,6 +5,9 @@ import { AutocompleteResponse } from '@/types/motis';
 import axios from 'axios';
 import { ref } from 'vue';
 import { debounce } from 'vue-debounce';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const props = defineProps({
     latitude: {
@@ -21,7 +24,7 @@ const props = defineProps({
     },
     placeholder: {
         type: String,
-        default: 'Search for an airport',
+        default: null,
     },
 });
 
@@ -128,7 +131,7 @@ function submitTypeahead(element: Suggestion) {
         class="input input-bordered w-full"
         name="departure-search"
         :required="false"
-        :placeholder="placeholder"
+        :placeholder="placeholder || t('new_route.airport_search.placeholder')"
         :suggestions="suggestions"
         @submit="submitTypeahead($event)"
         @select="submitTypeahead($event)"

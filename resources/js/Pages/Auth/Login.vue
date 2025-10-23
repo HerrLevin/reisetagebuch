@@ -4,6 +4,9 @@ import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
 import AuthLayout from '@/Layouts/AuthLayout.vue';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 defineProps<{
     canResetPassword?: boolean;
@@ -27,16 +30,18 @@ const submit = () => {
 
 <template>
     <AuthLayout>
-        <Head title="Log in" />
+        <Head :title="t('auth.login.title')" />
 
-        <h2 class="mb-2 text-center text-2xl font-semibold">Login</h2>
+        <h2 class="mb-2 text-center text-2xl font-semibold">
+            {{ t('auth.login.title') }}
+        </h2>
         <div v-if="status" class="text-success mb-4 text-sm font-medium">
             {{ status }}
         </div>
 
         <form @submit.prevent="submit">
             <div class="form-control w-full">
-                <InputLabel for="email" value="Email" />
+                <InputLabel for="email" :value="t('auth.login.email')" />
 
                 <TextInput
                     id="email"
@@ -53,7 +58,7 @@ const submit = () => {
             </div>
 
             <div class="form-control mt-4 w-full">
-                <InputLabel for="password" value="Password" />
+                <InputLabel for="password" :value="t('auth.login.password')" />
 
                 <TextInput
                     id="password"
@@ -76,7 +81,7 @@ const submit = () => {
                             type="checkbox"
                             class="checkbox"
                         />
-                        Remember me
+                        {{ t('auth.login.remember_me') }}
                     </label>
                 </fieldset>
 
@@ -85,7 +90,7 @@ const submit = () => {
                     :href="route('password.request')"
                     class="link"
                 >
-                    Forgot your password?
+                    {{ t('auth.login.forgot_password') }}
                 </Link>
             </div>
 
@@ -94,15 +99,17 @@ const submit = () => {
                 :class="{ 'opacity-25': form.processing }"
                 :disabled="form.processing"
             >
-                Log in
+                {{ t('auth.login.title') }}
             </button>
         </form>
         <div v-if="usePage().props.canRegister" class="mt-4 text-center">
-            Don't have an account yet?
-            <Link :href="route('register')" class="link"> Register </Link>
+            {{ t('auth.login.no_account') }}
+            <Link :href="route('register')" class="link">
+                {{ t('auth.register.title') }}
+            </Link>
         </div>
         <div v-else class="mt-4 text-center">
-            Registration is currently closed.
+            {{ t('auth.login.no_register') }}
         </div>
     </AuthLayout>
 </template>

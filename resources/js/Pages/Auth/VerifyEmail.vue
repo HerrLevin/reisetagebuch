@@ -2,6 +2,9 @@
 import AuthLayout from '@/Layouts/AuthLayout.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const props = defineProps<{
     status?: string;
@@ -20,20 +23,17 @@ const verificationLinkSent = computed(
 
 <template>
     <AuthLayout>
-        <Head title="Email Verification" />
+        <Head :title="t('auth.verify_email.title')" />
 
         <div class="mb-4 text-sm">
-            Thanks for signing up! Before getting started, could you verify your
-            email address by clicking on the link we just emailed to you? If you
-            didn't receive the email, we will gladly send you another.
+            {{ t('auth.verify_email.message') }}
         </div>
 
         <div
             v-if="verificationLinkSent"
             class="text-success mb-4 text-sm font-medium"
         >
-            A new verification link has been sent to the email address you
-            provided during registration.
+            {{ t('auth.verify_email.link_sent') }}
         </div>
 
         <form @submit.prevent="submit">
@@ -43,7 +43,7 @@ const verificationLinkSent = computed(
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
                 >
-                    Resend Verification Email
+                    {{ t('auth.verify_email.resend') }}
                 </button>
 
                 <Link
@@ -51,8 +51,9 @@ const verificationLinkSent = computed(
                     method="post"
                     as="button"
                     class="btn btn-link"
-                    >Log Out</Link
                 >
+                    {{ t('auth.verify_email.logout') }}
+                </Link>
             </div>
         </form>
     </AuthLayout>

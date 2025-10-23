@@ -62,8 +62,11 @@ export default {
                     There is a form error.
                 </span>
                 <span v-else>
-                    There are {{ Object.keys($page.props?.errors).length }} form
-                    errors.
+                    {{
+                        $t('errors.form_errors', {
+                            count: Object.keys($page.props?.errors).length,
+                        })
+                    }}
                 </span>
             </div>
             <div>

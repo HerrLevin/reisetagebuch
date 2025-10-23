@@ -11,6 +11,9 @@ import {
     User,
 } from 'lucide-vue-next';
 import { onMounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const latitude = ref(0);
 const longitude = ref(0);
@@ -113,7 +116,7 @@ const defaultNewPostRoute = () => {
                 as="button"
             >
                 <House class="size-[1.2em]" />
-                <span class="dock-label">Home</span>
+                <span class="dock-label">{{ t('app.home') }}</span>
             </Link>
             <template v-if="user">
                 <Link
@@ -127,7 +130,9 @@ const defaultNewPostRoute = () => {
                     :class="{ 'dock-active': isPostsCreateRoute() }"
                 >
                     <CirclePlus class="size-[1.2em]" />
-                    <span class="dock-label">New Post</span>
+                    <span class="dock-label">
+                        {{ t('new_post.title') }}
+                    </span>
                 </Link>
                 <Link
                     :href="route('trips.create')"
@@ -135,7 +140,7 @@ const defaultNewPostRoute = () => {
                     :class="{ 'dock-active': isTripsCreateRoute() }"
                 >
                     <Route class="size-[1.2em]" />
-                    <span class="dock-label">New Trip</span>
+                    <span class="dock-label">{{ t('new_route.title') }}</span>
                 </Link>
                 <Link
                     :href="route('profile.show', user.username)"
@@ -143,7 +148,7 @@ const defaultNewPostRoute = () => {
                     :class="{ 'dock-active': isProfileRoute() }"
                 >
                     <User class="size-[1.2em]" />
-                    <span class="dock-label">Profile</span>
+                    <span class="dock-label">{{ t('profile.title') }}</span>
                 </Link>
             </template>
         </div>

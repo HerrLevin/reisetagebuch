@@ -5,6 +5,9 @@ import { LocationHistoryDto, TripHistoryEntryDto } from '@/types';
 import { ArrowLeft, ArrowRight } from 'lucide-vue-next';
 import { DateTime } from 'luxon';
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const props = defineProps({
     locations: {
@@ -70,7 +73,7 @@ function today() {
     <AuthenticatedLayout>
         <template #header>
             <h2 class="text-xl leading-tight font-semibold">
-                Location History
+                {{ t('pages.location_history.title') }}
             </h2>
         </template>
 
@@ -78,7 +81,7 @@ function today() {
             <div class="card bg-base-100 min-w-full p-8 shadow-md">
                 <div class="mt-4">
                     <label for="when" class="block text-sm font-medium">
-                        Date for Location History
+                        {{ t('pages.location_history.date') }}
                     </label>
                     <input
                         id="when"
@@ -88,19 +91,23 @@ function today() {
                         @change="selectDate($event?.target?.value || '')"
                     />
                     <p class="mt-2 text-sm text-gray-500">
-                        Select a date and time to view the location history.
+                        {{ t('pages.location_history.date_help') }}
                     </p>
                 </div>
                 <div class="flex justify-between pt-4">
                     <button class="btn btn-primary" @click="previousDay()">
                         <ArrowLeft class="mr-1 inline size-4" />
-                        <span class="sr-only sm:not-sr-only">Previous</span>
+                        <span class="sr-only sm:not-sr-only">
+                            {{ t('pages.location_history.previous') }}
+                        </span>
                     </button>
                     <button class="btn btn-primary" @click="today()">
-                        Today
+                        {{ t('pages.location_history.today') }}
                     </button>
                     <button class="btn btn-primary" @click="nextDay()">
-                        <span class="sr-only sm:not-sr-only">Next</span>
+                        <span class="sr-only sm:not-sr-only">
+                            {{ t('pages.location_history.next') }}
+                        </span>
                         <ArrowRight class="ml-1 inline size-4" />
                     </button>
                 </div>
@@ -111,21 +118,40 @@ function today() {
                     class="card bg-base-100 min-w-full p-8 text-center shadow-md"
                 >
                     <div class="mt-4 text-sm text-gray-500">
-                        Showing location history for
+                        {{ t('pages.location_history.showing_for') }}
                         <strong>{{
                             selectedDate
                                 ? selectedDate.toLocaleString(
                                       DateTime.DATE_FULL,
                                   )
-                                : 'all time'
+                                : t('pages.location_history.all_time')
                         }}</strong
                         >.
                     </div>
                     <div class="mt-4 text-sm text-gray-500">
-                        {{ locations.length - countWaypoints() }} location
-                        {{ locations.length === 1 ? 'entry' : 'entries' }},
-                        {{ trips.length }} trip
-                        {{ trips.length === 1 ? 'entry' : 'entries' }}.
+                        {{
+                            t(
+                                'pages.location_history.waypoints',
+                                countWaypoints(),
+                                { count: locations.length - countWaypoints() },
+                            )
+                        }}
+                        <br />
+                        {{
+                            t(
+                                'pages.location_history.location_entries',
+                                locations.length - countWaypoints(),
+                                { count: locations.length - countWaypoints() },
+                            )
+                        }}
+                        <br />
+                        {{
+                            t(
+                                'pages.location_history.trip_entries',
+                                trips.length,
+                                { count: trips.length },
+                            )
+                        }}
                     </div>
                 </div>
             </template>
@@ -133,7 +159,7 @@ function today() {
                 v-else
                 class="card bg-base-100 min-w-full p-8 text-center shadow-md"
             >
-                No location history available for the selected date.<br />
+                {{ t('pages.location_history.no_history') }}<br />
                 <p class="mt-2">☹️</p>
             </div>
         </div>

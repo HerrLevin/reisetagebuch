@@ -4,6 +4,9 @@ import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
 import AuthLayout from '@/Layouts/AuthLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const form = useForm({
     password: '',
@@ -20,16 +23,15 @@ const submit = () => {
 
 <template>
     <AuthLayout>
-        <Head title="Confirm Password" />
+        <Head :title="t('auth.confirm_password_title')" />
 
         <div class="mb-4 text-sm">
-            This is a secure area of the application. Please confirm your
-            password before continuing.
+            {{ t('auth.confirm_password') }}
         </div>
 
         <form @submit.prevent="submit">
             <div>
-                <InputLabel for="password" value="Password" />
+                <InputLabel for="password" :value="t('auth.password')" />
                 <TextInput
                     id="password"
                     v-model="form.password"
@@ -49,7 +51,7 @@ const submit = () => {
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
                 >
-                    Confirm
+                    {{ t('verbs.confirm') }}
                 </button>
             </div>
         </form>

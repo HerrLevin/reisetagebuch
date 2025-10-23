@@ -6,6 +6,9 @@ import type { UserDto } from '@/types';
 import type { BasePost, LocationPost, TransportPost } from '@/types/PostTypes';
 import { Head, Link } from '@inertiajs/vue3';
 import type { PropType } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 defineProps({
     posts: {
@@ -30,7 +33,7 @@ defineProps({
 </script>
 
 <template>
-    <Head title="Profile" />
+    <Head :title="t('profile.profile_of', { name: user.name })" />
 
     <ProfileWrapper :user="user">
         <div class="card bg-base-100 min-w-full shadow-md">

@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { CircleX } from 'lucide-vue-next';
 import { PropType, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const model = defineModel<string>({ required: true });
 
@@ -91,7 +94,7 @@ function blur() {
             </li>
             <div v-if="!suggestions.length">
                 <span class="opacity-60">
-                    No suggestions available. Please type to search.
+                    {{ t('typeahead.no_suggestions') }}
                 </span>
             </div>
         </ul>
@@ -100,6 +103,6 @@ function blur() {
         <span v-for="(error, index) in errors" :key="index">{{ error }}</span>
     </div>
     <div v-if="loading" class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
+        <span class="visually-hidden">{{ t('verbs.loading') }}...</span>
     </div>
 </template>

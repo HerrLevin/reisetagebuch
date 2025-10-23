@@ -11,6 +11,9 @@ import { Link } from '@inertiajs/vue3';
 import { Clock, X } from 'lucide-vue-next';
 import { DateTime } from 'luxon';
 import { PropType, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const props = defineProps({
     filter: {
@@ -123,13 +126,13 @@ function submitTypeahead(identifier: string | null) {
                             class="btn btn-secondary w-full"
                             @click="selectedTime = DateTime.now()"
                         >
-                            Now
+                            {{ t('new_post.departures_filter.now') }}
                         </button>
                         <button
                             class="btn btn-secondary w-full"
                             @click="selectedTime = null"
                         >
-                            Clear
+                            {{ t('new_post.departures_filter.clear') }}
                         </button>
                     </div>
                     <Link
@@ -143,7 +146,7 @@ function submitTypeahead(identifier: string | null) {
                             })
                         "
                     >
-                        Apply
+                        {{ t('new_post.departures_filter.set_datetime') }}
                     </Link>
                 </div>
             </li>
@@ -184,7 +187,7 @@ function submitTypeahead(identifier: string | null) {
                 >
                     {{ getEmoji(mode[0]) }}
 
-                    {{ name }}
+                    {{ t(`transport_group.${name}`) }}
                 </Link>
             </li>
         </ul>

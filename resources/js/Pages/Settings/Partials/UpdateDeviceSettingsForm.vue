@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 defineProps<{
     status?: string;
@@ -38,11 +41,12 @@ watch(trackLocation, (newValue) => {
 <template>
     <section>
         <header>
-            <h2 class="text-lg font-medium">Device Settings</h2>
+            <h2 class="text-lg font-medium">
+                {{ t('settings.device_settings.title') }}
+            </h2>
 
             <p class="mt-1 text-sm opacity-65">
-                These settings are per-device and will be different on each of
-                your devices.
+                {{ t('settings.device_settings.description') }}
             </p>
         </header>
 
@@ -55,7 +59,7 @@ watch(trackLocation, (newValue) => {
                         type="checkbox"
                         class="toggle"
                     />
-                    Enable location history tracking
+                    {{ t('settings.device_settings.track_location_history') }}
                 </label>
             </div>
         </form>

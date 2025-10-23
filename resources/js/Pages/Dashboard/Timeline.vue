@@ -4,6 +4,9 @@ import Post from '@/Components/Post/Post.vue';
 import { BasePost, LocationPost, TransportPost } from '@/types/PostTypes';
 import { Link } from '@inertiajs/vue3';
 import type { PropType } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 defineProps({
     posts: {
@@ -16,7 +19,7 @@ defineProps({
 <template>
     <ul class="list">
         <li class="p-4 pb-2 text-xs tracking-wide opacity-60">
-            Your Dashboard
+            {{ t('pages.timeline.your_timeline') }}
         </li>
         <li v-for="post in posts" :key="post.id">
             <Link

@@ -4,6 +4,9 @@ import type { Invite } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { DateTime } from 'luxon';
 import { PropType } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 defineProps({
     invites: {
@@ -29,27 +32,29 @@ function copy(id: string): void {
         .writeText(registerRoute + '?invite=' + id)
         .then(() => {
             // show success message
-            alert('Invite code copied to clipboard');
+            alert(t('invites.copied_to_clipboard'));
         })
         .catch(() => {
             // show error message
-            alert('Failed to copy invite code');
+            alert(t('invites.copy_failed'));
         });
 }
 </script>
 <template>
-    <Head title="Invites" />
+    <Head :title="t('invites.title')" />
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl leading-tight font-semibold">Invites</h2>
+            <h2 class="text-xl leading-tight font-semibold">
+                {{ t('invites.title') }}
+            </h2>
         </template>
 
         <div class="card bg-base-100 flex min-w-full shadow-md">
             <div class="flex min-w-full justify-center py-5">
                 <form @submit.prevent="createForm.post('/invites')">
                     <button type="submit" class="btn btn-primary">
-                        Invite a new user
+                        {{ t('invites.create_invite') }}
                     </button>
                 </form>
             </div>
@@ -58,9 +63,9 @@ function copy(id: string): void {
                 <table class="table w-full">
                     <thead>
                         <tr>
-                            <th>Invite Code</th>
-                            <th>Created At</th>
-                            <th>Used At</th>
+                            <th>{{ t('invites.code') }}</th>
+                            <th>{{ t('invites.created_at') }}</th>
+                            <th>{{ t('invites.used_at') }}</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -77,7 +82,7 @@ function copy(id: string): void {
                             <td>{{ humanTimestamp(invite.usedAt) }}</td>
                             <td>
                                 <button class="btn" @click="copy(invite.id)">
-                                    Copy
+                                    {{ t('invites.copy') }}
                                 </button>
                             </td>
                             <td>
@@ -87,7 +92,7 @@ function copy(id: string): void {
                                     as="button"
                                     class="btn btn-error"
                                 >
-                                    Delete
+                                    {{ t('verbs.delete') }}
                                 </Link>
                             </td>
                         </tr>

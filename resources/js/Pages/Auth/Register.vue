@@ -4,6 +4,9 @@ import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
 import AuthLayout from '@/Layouts/AuthLayout.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const form = useForm({
     name: '',
@@ -38,11 +41,11 @@ const submit = () => {
 
 <template>
     <AuthLayout>
-        <Head title="Register" />
+        <Head :title="t('auth.register.title')" />
 
         <form @submit.prevent="submit">
             <div>
-                <InputLabel for="name" value="Name" />
+                <InputLabel for="name" :value="t('auth.register.name')" />
 
                 <TextInput
                     id="name"
@@ -59,7 +62,10 @@ const submit = () => {
             </div>
 
             <div>
-                <InputLabel for="username" value="Username" />
+                <InputLabel
+                    for="username"
+                    :value="t('auth.register.username')"
+                />
 
                 <TextInput
                     id="username"
@@ -76,7 +82,7 @@ const submit = () => {
             </div>
 
             <div class="mt-4">
-                <InputLabel for="email" value="Email" />
+                <InputLabel for="email" :value="t('auth.register.email')" />
 
                 <TextInput
                     id="email"
@@ -91,7 +97,10 @@ const submit = () => {
             </div>
 
             <div class="mt-4">
-                <InputLabel for="password" value="Password" />
+                <InputLabel
+                    for="password"
+                    :value="t('auth.register.password')"
+                />
 
                 <TextInput
                     id="password"
@@ -108,7 +117,7 @@ const submit = () => {
             <div class="mt-4">
                 <InputLabel
                     for="password_confirmation"
-                    value="Confirm Password"
+                    :value="t('auth.login.confirm_password')"
                 />
 
                 <TextInput
@@ -129,7 +138,7 @@ const submit = () => {
 
             <div class="mt-4 flex items-center justify-end">
                 <Link :href="route('login')" class="link">
-                    Already registered?
+                    {{ t('auth.register.have_account') }}
                 </Link>
 
                 <button
@@ -137,7 +146,7 @@ const submit = () => {
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
                 >
-                    Register
+                    {{ t('auth.register.title') }}
                 </button>
             </div>
         </form>

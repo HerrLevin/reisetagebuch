@@ -3,6 +3,9 @@ import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { Link, useForm, usePage } from '@inertiajs/vue3';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 defineProps<{
     mustVerifyEmail?: boolean;
@@ -21,10 +24,12 @@ const form = useForm({
 <template>
     <section>
         <header>
-            <h2 class="text-lg font-medium">Account Information</h2>
+            <h2 class="text-lg font-medium">
+                {{ t('settings.account_information.title') }}
+            </h2>
 
             <p class="mt-1 text-sm opacity-65">
-                Update your account's information and email address.
+                {{ t('settings.account_information.description') }}
             </p>
         </header>
 
@@ -33,7 +38,10 @@ const form = useForm({
             @submit.prevent="form.patch(route('account.update'))"
         >
             <div>
-                <InputLabel for="name" value="Name" />
+                <InputLabel
+                    for="name"
+                    :value="t('settings.account_information.name')"
+                />
 
                 <TextInput
                     id="name"
@@ -49,23 +57,29 @@ const form = useForm({
             </div>
 
             <div>
-                <InputLabel for="name" value="Username" />
+                <InputLabel
+                    for="username"
+                    :value="t('settings.account_information.username')"
+                />
 
                 <TextInput
-                    id="name"
+                    id="username"
                     v-model="form.username"
                     type="text"
                     class="mt-1 block w-full"
                     :error="form.errors.username"
                     required
-                    autocomplete="name"
+                    autocomplete="username"
                 />
 
                 <InputError class="mt-2" :message="form.errors.username" />
             </div>
 
             <div>
-                <InputLabel for="email" value="Email" />
+                <InputLabel
+                    for="email"
+                    :value="t('settings.account_information.email')"
+                />
 
                 <TextInput
                     id="email"
@@ -74,7 +88,7 @@ const form = useForm({
                     class="mt-1 block w-full"
                     :error="form.errors.email"
                     required
-                    autocomplete="username"
+                    autocomplete="email"
                 />
 
                 <InputError class="mt-2" :message="form.errors.email" />
@@ -82,14 +96,18 @@ const form = useForm({
 
             <div v-if="mustVerifyEmail && user.email_verified_at === null">
                 <p class="mt-2 text-sm">
-                    Your email address is unverified.
+                    {{ t('settings.account_information.email_not_verified') }}
                     <Link
                         :href="route('verification.send')"
                         method="post"
                         as="button"
                         class="link"
                     >
-                        Click here to re-send the verification email.
+                        {{
+                            t(
+                                'settings.account_information.resend_verification',
+                            )
+                        }}
                     </Link>
                 </p>
 
@@ -97,13 +115,15 @@ const form = useForm({
                     v-show="status === 'verification-link-sent'"
                     class="text-success mt-2 text-sm font-medium"
                 >
-                    A new verification link has been sent to your email address.
+                    {{
+                        t('settings.account_information.verification_link_sent')
+                    }}
                 </div>
             </div>
 
             <div class="flex items-center gap-4">
                 <button class="btn btn-primary" :disabled="form.processing">
-                    Save
+                    {{ t('verbs.save') }}
                 </button>
 
                 <Transition
@@ -116,7 +136,7 @@ const form = useForm({
                         v-if="form.recentlySuccessful"
                         class="text-sm opacity-65"
                     >
-                        Saved.
+                        {{ t('verbs.saved') }}
                     </p>
                 </Transition>
             </div>

@@ -3,9 +3,12 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import UpdateAccountSettingsForm from '@/Pages/Settings/Partials/UpdateAccountSettingsForm.vue';
 import UpdateDeviceSettingsForm from '@/Pages/Settings/Partials/UpdateDeviceSettingsForm.vue';
 import { Head, Link } from '@inertiajs/vue3';
+import { useI18n } from 'vue-i18n';
 import DeleteUserForm from './Partials/DeleteUserForm.vue';
 import UpdateAccountInformationForm from './Partials/UpdateAccountInformationForm.vue';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm.vue';
+
+const { t } = useI18n();
 
 const props = defineProps<{
     mustVerifyEmail?: boolean;
@@ -23,7 +26,9 @@ function connectTraewelling() {
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl leading-tight font-semibold">Settings</h2>
+            <h2 class="text-xl leading-tight font-semibold">
+                {{ t('settings.title') }}
+            </h2>
         </template>
 
         <div class="min-w-full space-y-6">
@@ -50,13 +55,15 @@ function connectTraewelling() {
                     v-if="props.traewellingConnected"
                     class="flex items-center gap-2"
                 >
-                    <span class="text-success"> Connected to Traewelling </span>
+                    <span class="text-success">
+                        {{ t('settings.connected_to_traewelling') }}
+                    </span>
                     <Link
                         :href="route('traewelling.disconnect')"
                         class="btn btn-error btn-sm ml-4"
                         type="button"
                     >
-                        Disconnect
+                        {{ t('settings.disconnect_traewelling') }}
                     </Link>
                 </div>
                 <button
@@ -65,7 +72,7 @@ function connectTraewelling() {
                     type="button"
                     @click="connectTraewelling()"
                 >
-                    Connect Traewelling Account
+                    {{ t('settings.connect_traewelling') }}
                 </button>
             </div>
             <div class="card bg-base-100 min-w-full p-8 shadow-md">

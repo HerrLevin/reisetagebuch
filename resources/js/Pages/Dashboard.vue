@@ -4,6 +4,9 @@ import Timeline from '@/Pages/Dashboard/Timeline.vue';
 import { BasePost, LocationPost, TransportPost } from '@/types/PostTypes';
 import { Head } from '@inertiajs/vue3';
 import type { PropType } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 defineProps({
     posts: {
@@ -14,11 +17,13 @@ defineProps({
 </script>
 
 <template>
-    <Head title="Dashboard" />
+    <Head :title="t('pages.timeline.title')" />
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl leading-tight font-semibold">Dashboard</h2>
+            <h2 class="text-xl leading-tight font-semibold">
+                {{ t('pages.timeline.title') }}
+            </h2>
         </template>
 
         <div class="card bg-base-100 min-w-full p-0 shadow-md">
