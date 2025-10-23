@@ -16,6 +16,9 @@ import {
     StyleSpecification,
 } from 'maplibre-gl';
 import { PropType, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const props = defineProps({
     user: {
@@ -42,7 +45,7 @@ const geoJson = ref(undefined as GeometryCollection | undefined);
 fetch('/profile/' + props.user.username + '/map-data')
     .then((response) => {
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            throw new Error(t('errors.network_nok'));
         }
         return response.json();
     })
@@ -159,5 +162,3 @@ fetch('/profile/' + props.user.username + '/map-data')
         </mgl-geo-json-source>
     </mgl-map>
 </template>
-
-<style scoped></style>

@@ -2,6 +2,9 @@
 import { defineProps, ref } from 'vue';
 import { LocationEntry, LocationIdentifier } from '@/types';
 import { ExternalLink } from 'lucide-vue-next';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const props = defineProps({
     location: {
@@ -38,7 +41,6 @@ function openOsmLink() {
 }
 
 function closeModal() {
-    console.log('closeModal');
     tagModal.value?.close();
 }
 
@@ -89,10 +91,11 @@ function openModal() {
                     class="btn btn-outline"
                     @click.prevent="openOsmLink()"
                 >
-                    Open in OSM<ExternalLink class="ml-2 inline size-4" />
+                    {{ t('location.open_osm') }}
+                    <ExternalLink class="ml-2 inline size-4" />
                 </a>
                 <button class="btn btn-primary" @click.prevent="closeModal()">
-                    Close
+                    {{ t('verbs.close') }}
                 </button>
             </div>
         </div>
@@ -102,7 +105,7 @@ function openModal() {
             class="modal-backdrop"
             @click.prevent="closeModal()"
         >
-            <button>close</button>
+            <button>{{ t('verbs.close') }}</button>
         </form>
     </dialog>
 </template>

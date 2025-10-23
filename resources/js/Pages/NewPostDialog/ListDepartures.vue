@@ -8,6 +8,9 @@ import { TransportMode } from '@/types/enums';
 import { Head, usePage } from '@inertiajs/vue3';
 import { DateTime } from 'luxon';
 import { onMounted, PropType, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const props = defineProps({
     departures: {
@@ -60,7 +63,9 @@ showStartButton.value = route().current('posts.create.start');
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl leading-tight font-semibold">New Post</h2>
+            <h2 class="text-xl leading-tight font-semibold">
+                {{ t('new_post.title') }}
+            </h2>
         </template>
         <DeparturesFilter
             :latitude="latitude"
@@ -73,13 +78,15 @@ showStartButton.value = route().current('posts.create.start');
             <!-- Results -->
             <ul class="list">
                 <li class="p-4 pb-2 text-xs tracking-wide opacity-60">
-                    {{ departures?.stop.name }} departures at
                     {{
-                        time
-                            ? time?.hasSame(DateTime.now(), 'day')
-                                ? time.toLocaleString(DateTime.TIME_SIMPLE)
-                                : time.toLocaleString(DateTime.DATETIME_MED)
-                            : 'unknown'
+                        t('new_post.departures_at_stop', {
+                            location: departures?.stop.name || 'unknown',
+                            time: time
+                                ? time?.hasSame(DateTime.now(), 'day')
+                                    ? time.toLocaleString(DateTime.TIME_SIMPLE)
+                                    : time.toLocaleString(DateTime.DATETIME_MED)
+                                : 'unknown',
+                        })
                     }}
                 </li>
                 <DeparturesListEntry

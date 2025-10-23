@@ -1,4 +1,6 @@
+import i18n from '@/i18n';
 import { LocationEntry, LocationTag } from '@/types';
+const { t } = i18n.global;
 
 const osmCategoryToEmoji: Record<string, Record<string, string>> = {
     amenity: {
@@ -213,7 +215,10 @@ export function getName(location: LocationEntry): string {
             (tag) => tag.key === 'railway:track_ref',
         );
         if (platformName) {
-            return `Platform ${platformName.value} (${location.name})`;
+            return t('name_service.platform', {
+                name: platformName.value,
+                location: location.name,
+            });
         }
     }
 

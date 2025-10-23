@@ -4,6 +4,9 @@ import type { UserDto } from '@/types';
 import { usePage } from '@inertiajs/vue3';
 import { EllipsisVertical } from 'lucide-vue-next';
 import { PropType } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const authUser = usePage().props.auth.user ?? null;
 defineProps({
@@ -23,7 +26,7 @@ defineProps({
                 <img
                     v-if="user.avatar?.length"
                     :src="user.avatar"
-                    alt="Avatar"
+                    :alt="t('posts.profile_picture_alt', { name: user.name })"
                 />
             </div>
         </div>

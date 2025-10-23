@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { usePage, WhenVisible } from '@inertiajs/vue3';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const props = defineProps({
     only: {
@@ -35,5 +38,5 @@ function cursor(cursor: string | unknown) {
             <span class="loading loading-infinity loading-md"></span>
         </div>
     </WhenVisible>
-    <div v-else class="p-4 pb-8 text-center">You've reached the end!</div>
+    <div v-else class="p-4 pb-8 text-center">{{ t('app.scroll_end') }}</div>
 </template>

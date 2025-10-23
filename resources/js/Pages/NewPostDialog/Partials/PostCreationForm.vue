@@ -6,6 +6,9 @@ import {
 } from '@/Services/VisibilityMapping';
 import { Visibility } from '@/types/enums';
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const model = defineModel({ default: '', type: String });
 
@@ -29,7 +32,7 @@ const props = defineProps({
     },
     confirmButtonText: {
         type: String,
-        default: 'Post',
+        default: null,
     },
 });
 
@@ -122,16 +125,16 @@ function blur() {
         <textarea
             v-model="model"
             class="textarea textarea-ghost transparent-input w-full"
-            placeholder="Statustext"
+            :placeholder="t('new_post.body_placeholder')"
         ></textarea>
     </div>
     <div class="flex w-full justify-end gap-4 p-8"></div>
     <div class="flex w-full justify-end gap-4 px-8 py-4">
         <button class="btn btn-secondary" @click.prevent="$emit('cancel')">
-            Cancel
+            {{ t('verbs.cancel') }}
         </button>
         <button class="btn btn-primary" type="submit">
-            {{ confirmButtonText }}
+            {{ confirmButtonText || t('verbs.confirm') }}
         </button>
     </div>
 </template>

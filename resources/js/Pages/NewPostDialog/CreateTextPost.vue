@@ -4,6 +4,9 @@ import PostCreationForm from '@/Pages/NewPostDialog/Partials/PostCreationForm.vu
 import { Visibility } from '@/types/enums';
 import { Head, router } from '@inertiajs/vue3';
 import { reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 function goBack() {
     window.history.back();
@@ -20,18 +23,20 @@ function submitForm() {
 </script>
 
 <template>
-    <Head title="Create Post" />
+    <Head :title="t('new_post.title')" />
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl leading-tight font-semibold">New Post</h2>
+            <h2 class="text-xl leading-tight font-semibold">
+                {{ t('new_post.title') }}
+            </h2>
         </template>
 
         <div class="card bg-base-100 min-w-full shadow-md">
             <form @submit.prevent="submitForm">
                 <PostCreationForm
                     v-model="form.body"
-                    name="New Post"
+                    :name="t('new_post.title')"
                     emoji="✍"
                     @cancel="goBack"
                     @select-visibility="

@@ -1,0 +1,323 @@
+{
+    "welcome": {
+        "reisetagebuch": {
+            "title": "Reisetagebuch",
+            "description": "Reisetagebuch is a travel diary application built with Laravel. It allows users to document their travels, share experiences, and connect with fellow travelers. The application is designed to be self hosted, providing users with full control over their data and privacy. It's a crossover between Träwelling and Swarm."
+        }
+    },
+    "trip_details": {
+        "departure": "Departure",
+        "time": "Time",
+        "arrival": "Arrival",
+        "line": "Line",
+        "line_placeholder": "Line Name (e.g., U2, RE3)",
+        "line_example": "e.g., U2, RE3",
+        "code": "Code",
+        "code_placeholder": "Code (e.g., 12345, RE15123)",
+        "code_example": "e.g., 12345",
+        "transport_mode": "Transport Mode",
+        "select_transport_mode": "Select Transport Mode"
+    },
+    "pages": {
+        "timeline": {
+            "title": "Timeline",
+            "your_timeline": "Your Timeline"
+        },
+        "location_history": {
+            "title": "Location History",
+            "no_history": " No location history available for the selected date.",
+            "date": "Date for Location History",
+            "date_help": "Select a date and time to view the location history for that day.",
+            "previous": "Previous",
+            "next": "Next",
+            "today": "Today",
+            "showing_for": "Showing location history for:",
+            "all_time": "All Time",
+            "location_entries": "Pne location entry | {count} location entries",
+            "trip_entries": "One trip entry | {count} trip entries",
+            "waypoints": "One waypoint | {count} waypoints"
+        }
+    },
+    "auth": {
+        "confirm_password_title": "Confirm Password",
+        "confirm_password": "This is a secure area of the application. Please confirm your password before continuing.",
+        "password": "Password",
+        "forgot_password": {
+            "title": "Forgot Password",
+            "message": "Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.",
+            "email": "Email",
+            "confirm": "Email Password Reset Link"
+        },
+        "reset_password": {
+            "title": "Reset Password",
+            "email": "Email",
+            "password": "Password",
+            "confirm_password": "Confirm Password"
+        },
+        "verify_email": {
+            "title": "Email Verification",
+            "message": "Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn't receive the email, we will gladly send you another.",
+            "link_sent": "A new verification link has been sent to the email address you provided during registration.",
+            "resend": "Resend Verification Email",
+            "request_another": "Click here to request another",
+            "logout": "Log out"
+        },
+        "login": {
+            "title": "Log in",
+            "email": "Email",
+            "remember_me": "Remember me",
+            "forgot_password": "Forgot your password?",
+            "no_register": "Registration is currently closed.",
+            "no_account": "Don't have an account yet?",
+            "password": "Password"
+        },
+        "register": {
+            "title": "Register",
+            "name": "Name",
+            "username": "Username",
+            "email": "Email",
+            "password": "Password",
+            "confirm_password": "Confirm Password",
+            "have_account": "Already have an account?"
+        }
+    },
+    "app": {
+        "invite_users": "Invite Users",
+        "location_history": "Location History",
+        "home": "Home",
+        "logout": "Log out",
+        "login": "Log in",
+        "register": "Register",
+        "logo": "Logo",
+        "scroll_end": "You've reached the end!"
+    },
+    "new_post": {
+        "title": "New Post",
+        "body_placeholder": "What's on your mind?",
+        "select_exit": "Select Exit",
+        "locations": {
+            "filter_placeholder": "Filter locations",
+            "fetching_osm": "Fetching locations from OpenStreetMap...",
+            "nearby": "Nearby Locations"
+        },
+        "departures_filter": {
+            "now": "Now",
+            "clear": "Clear",
+            "set_datetime": "Zeit setzen"
+        },
+        "departures_at_stop": "Departures at {location} from {time} "
+    },
+    "edit_transport_times": {
+        "title": "Edit Transport Times",
+        "arrival_before_departure_error": "Arrival time cannot be before departure time.",
+        "departure": "Departure",
+        "time": "Time",
+        "arrival": "Arrival",
+        "clear_departure": "Clear Departure",
+        "clear_arrival": "Clear Arrival",
+        "depart_now": "Depart Now",
+        "arrive_now": "Arrive Now",
+        "save_times": "Save Times"
+    },
+    "location": {
+        "open_osm": "Open in OpenStreetMap"
+    },
+    "transitous_search": {
+        "search_placeholder": "Search for a station"
+    },
+    "new_route": {
+        "title": "New Route",
+        "add_stop": "Add Stopover",
+        "route_details": "Route Details",
+        "create_route": "Create Route",
+        "airport_search": {
+            "placeholder": "Search for an airport by name, IATA or ICAO code"
+        },
+        "airports": "Airports",
+        "alerts": {
+            "both_locations_required": "Please select both start and end locations.",
+            "both_times_required": "Please provide both departure and arrival times.",
+            "transport_mode_required": "Please select a transport mode.",
+            "invalid_date_format": "Invalid date format.",
+            "arrival_before_departure": "Arrival time cannot be before departure time."
+        }
+    },
+    "profile": {
+        "title": "Profile",
+        "profile_of": "Profile of {name}",
+        "joined_at": "Joined at {date}",
+        "edit_profile": "Edit Profile",
+        "edit_my_profile": "Edit My Profile",
+        "display_name": "Display Name",
+        "bio": "Bio",
+        "website": "Website",
+        "profile_picture": "Profile Picture",
+        "max_size": "Maximum size: 2MB",
+        "header_image": "Header Image",
+        "menu": {
+            "posts": "Posts",
+            "map": "Map"
+        },
+        "stats": {
+            "friends": "Friend | Friends",
+            "locations": "Location | Locations",
+            "trips": "Trip | Trips",
+            "posts": "Post | Posts"
+        }
+    },
+    "settings": {
+        "title": "Settings",
+        "connect_traewelling": "Connect Träwelling Account",
+        "connected_to_traewelling": "Connected to Träwelling",
+        "disconnect_traewelling": "Disconnect Träwelling",
+        "delete_account": {
+            "title": "Delete Account",
+            "warning": "Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.",
+            "are_you_sure": "Are you sure you want to delete your account?",
+            "enter_password": "Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.",
+            "password": "Password",
+            "confirm": "Confirm Delete Account"
+        },
+        "account_information": {
+            "title": "Account Information",
+            "description": "Update your account's information and email address.",
+            "name": "Name",
+            "username": "Username",
+            "email": "Email",
+            "email_not_verified": "Your email address is unverified.",
+            "resend_verification": "Click here to re-send the verification email.",
+            "verification_link_sent": "A new verification link has been sent to your email address."
+        },
+        "account_settings": {
+            "title": "Account Settings",
+            "default_new_post": "Default New Post Type",
+            "departure_radius": "Departure Search Radius (meters)",
+            "radius_default": "Default ({meters} meters)",
+            "radius_meters": "{meters} meters",
+            "departures": "Departures",
+            "locations": "Locations",
+            "text": "Text"
+        },
+        "device_settings": {
+            "title": "Device Settings",
+            "description": "These settings are per-device and will be different on each of your devices.",
+            "track_location_history": "Enable location history tracking"
+        },
+        "password": {
+            "title": "Update Password",
+            "description": "Ensure your account is using a long, random password to stay secure.",
+            "current_password": "Current Password",
+            "new_password": "New Password",
+            "confirm_password": "Confirm Password"
+        }
+    },
+    "errors": {
+        "network_nok": "Network response was not ok",
+        "form_error_count": "There are {0} form errors."
+    },
+    "share": {
+        "post_title": "Share Post",
+        "post_copied": "Post link copied to clipboard!",
+        "messages": {
+            "from_to": "from {from} to {to}",
+            "at": "at {location}!",
+            "personal_share": "Check out my post {baseText}",
+            "general_share": "Check out {username}'s post {baseText}"
+        }
+    },
+    "verbs": {
+        "share": "Share",
+        "edit": "Edit",
+        "delete": "Delete",
+        "cancel": "Cancel",
+        "close": "Close",
+        "confirm": "Confirm",
+        "loading": "Loading",
+        "save": "Save",
+        "saved": "Saved"
+    },
+    "posts": {
+        "title": "Posts",
+        "locations": "Locations",
+        "departures": "Departures",
+        "text": "Text",
+        "edit": {
+            "change_times": "Change Times",
+            "change_exit": "Change Exit"
+        },
+        "delete": {
+            "question": "Are you sure you want to delete your post?"
+        },
+        "profile_picture_alt": "Profile picture of {name}",
+        "name_post": "{name}'s post",
+        "name_location_post": "{name}'s post at {location}",
+        "name_transport_post": "{name}'s post from {from} to {to}"
+    },
+    "typeahead": {
+        "no_suggestions": "No suggestions available. Please type to search."
+    },
+    "history_checker": {
+        "title": "Do you want to track your location history with this device?",
+        "message": "This will allow you to see your location history on the map. You'll be the only one who can see this information. You can change this setting at any time in your account settings.",
+        "decline": "Don't track",
+        "accept": "Track location"
+    },
+    "edit_post": {
+        "title": "Edit Post"
+    },
+    "invites": {
+        "title": "Invite Users",
+        "create_invite": "Create Invitation Link",
+        "copied_to_clipboard": "Invitation link copied to clipboard!",
+        "copy_failed": "Failed to copy invitation link to clipboard. Please copy it manually.",
+        "code": "Invitation Code",
+        "created_at": "Created At",
+        "used_at": "Used At",
+        "copy": "Copy"
+    },
+    "name_service": {
+        "platform": "Platform {name} ({location})"
+    },
+    "visibility": {
+        "public": "Public",
+        "public_description": "Visible to everyone",
+        "private": "Private",
+        "private_description": "Only visible to you",
+        "unlisted": "Unlisted",
+        "unlisted_description": "Hidden for others from dashboard and profile. Only visible to you or others who have the link.",
+        "authenticated_only": "Authenticated Only",
+        "authenticated_only_description": "Only visible to authenticated users"
+    },
+    "transport_modes": {
+        "TRANSIT": "Transit",
+        "WALK": "Walk",
+        "BIKE": "Bike",
+        "RENTAL": "Rental",
+        "CAR": "Car",
+        "CAR_PARKING": "Car Parking",
+        "ODM": "ODM",
+        "TRAM": "Tram",
+        "SUBWAY": "Subway",
+        "FERRY": "Ferry",
+        "AIRPLANE": "Airplane",
+        "METRO": "Metro",
+        "BUS": "Bus",
+        "COACH": "Coach",
+        "RAIL": "Rail",
+        "HIGHSPEED_RAIL": "Highspeed Rail",
+        "LONG_DISTANCE": "Long Distance",
+        "NIGHT_RAIL": "Night Rail",
+        "REGIONAL_FAST_RAIL": "Regional Fast Rail",
+        "REGIONAL_RAIL": "Regional Rail",
+        "OTHER": "Other"
+    },
+    "transport_group": {
+        "long_distance": "Long Distance",
+        "regional": "Regional",
+        "metro": "Metro",
+        "tram": "Tram",
+        "bus": "Bus",
+        "ferry": "Ferry",
+        "subway": "Subway"
+    }
+}

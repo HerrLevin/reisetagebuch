@@ -44,6 +44,7 @@
         "luxon": "^3.6.1",
         "maplibre-gl": "^5.4.0",
         "vite-plugin-pwa": "^1.0.0",
-        "vue-debounce": "^5.0.1"
+        "vue-debounce": "^5.0.1",
+        "vue-i18n": "^11.1.12"
     }
 }

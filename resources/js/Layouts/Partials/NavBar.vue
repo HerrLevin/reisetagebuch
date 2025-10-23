@@ -2,6 +2,9 @@
 import ThemeSelector from '@/Layouts/Partials/ThemeSelector.vue';
 import { Link, usePage } from '@inertiajs/vue3';
 import { Handshake, History, LogOut, Menu, Settings } from 'lucide-vue-next';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 </script>
 
 <template>
@@ -21,22 +24,25 @@ import { Handshake, History, LogOut, Menu, Settings } from 'lucide-vue-next';
                 >
                     <li>
                         <Link :href="route('account.edit')">
-                            <Settings class="size-4" /> Settings
+                            <Settings class="size-4" />
+                            {{ t('settings.title') }}
                         </Link>
                     </li>
                     <li v-if="usePage()?.props?.canInvite">
                         <Link :href="route('invites.index')">
-                            <Handshake class="size-4" /> Invite Users
+                            <Handshake class="size-4" />
+                            {{ t('app.invite_users') }}
                         </Link>
                     </li>
                     <li>
                         <Link :href="route('location-history.index')">
-                            <History class="size-4" /> Location History
+                            <History class="size-4" />
+                            {{ t('app.location_history') }}
                         </Link>
                     </li>
                     <li>
                         <Link :href="route('logout')" method="post" as="button">
-                            <LogOut class="size-4" /> Log Out
+                            <LogOut class="size-4" /> {{ t('app.logout') }}
                         </Link>
                     </li>
                 </ul>

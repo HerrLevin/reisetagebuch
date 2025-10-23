@@ -1,22 +1,35 @@
+import i18n from '@/i18n';
 import { AllPosts, isLocationPost, isTransportPost } from '@/types/PostTypes';
 import { DateTime } from 'luxon';
 
+const { t } = i18n.global;
+
 export function getBaseText(post: AllPosts): string {
     if (isLocationPost(post)) {
-        return `at ${post.location.name}!`;
+        return t('share.messages.at', {
+            location: post.location.name,
+        });
     } else if (isTransportPost(post)) {
-        return `from ${post.originStop.location.name} to ${post.originStop.location.name}`;
+        return t('share.messages.from_to', {
+            from: post.originStop.location.name,
+            to: post.destinationStop.location.name,
+        });
     }
 
     return '';
 }
 
 export function getShareText(post: AllPosts): string {
-    return `Check out ${post.user.username}'s post ${getBaseText(post)}`;
+    return t('share.messages.general_share', {
+        username: post.user.username,
+        baseText: getBaseText(post),
+    });
 }
 
 export function getOwnShareText(post: AllPosts): string {
-    return `Check out my post ${getBaseText(post)}`;
+    return t('share.messages.personal_share', {
+        baseText: getBaseText(post),
+    });
 }
 
 export function prettyDates(post: AllPosts): string {

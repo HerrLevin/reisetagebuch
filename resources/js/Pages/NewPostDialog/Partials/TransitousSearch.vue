@@ -5,6 +5,9 @@ import { AutocompleteResponse } from '@/types/motis';
 import axios from 'axios';
 import { ref } from 'vue';
 import { debounce } from 'vue-debounce';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const props = defineProps({
     latitude: {
@@ -21,7 +24,7 @@ const props = defineProps({
     },
     placeholder: {
         type: String,
-        default: 'Search for a location',
+        default: null,
     },
 });
 
@@ -119,7 +122,7 @@ function submitTypeahead(element: Suggestion) {
 <template>
     <Typeahead
         v-model="search"
-        :placeholder="placeholder"
+        :placeholder="placeholder || t('transitous_search.search_placeholder')"
         class="input input-bordered w-full"
         name="departure-search"
         :required="false"

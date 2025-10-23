@@ -13,6 +13,9 @@ import {
 import { Link } from '@inertiajs/vue3';
 import { DateTime } from 'luxon';
 import { PropType } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const props = defineProps({
     post: {
@@ -37,7 +40,7 @@ if (date.diffNow('days').days < -1) {
             <img
                 v-if="post.user.avatar"
                 :src="post.user.avatar"
-                :alt="`Profile picture of ${post.user.name}`"
+                :alt="t('posts.profile_picture_alt', { name: post.user.name })"
             />
         </div>
     </div>

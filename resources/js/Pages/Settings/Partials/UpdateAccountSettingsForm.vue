@@ -3,6 +3,9 @@ import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import SelectInput from '@/Components/SelectInput.vue';
 import { useForm, usePage } from '@inertiajs/vue3';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 defineProps<{
     status?: string;
@@ -19,7 +22,9 @@ const form = useForm({
 <template>
     <section>
         <header>
-            <h2 class="text-lg font-medium">Account Settings</h2>
+            <h2 class="text-lg font-medium">
+                {{ t('settings.account_settings.title') }}
+            </h2>
 
             <p class="mt-1 text-sm opacity-65"></p>
         </header>
@@ -29,7 +34,10 @@ const form = useForm({
             @submit.prevent="form.patch(route('account.settings.update'))"
         >
             <div>
-                <InputLabel for="defaultNewPostView" value="Default New Post" />
+                <InputLabel
+                    for="defaultNewPostView"
+                    :value="t('settings.account_settings.default_new_post')"
+                />
 
                 <SelectInput
                     id="defaultNewPostView"
@@ -37,9 +45,18 @@ const form = useForm({
                     class="mt-1 block w-full"
                     :error="form.errors.defaultNewPostView"
                     :options="[
-                        { value: 'location', label: 'Location' },
-                        { value: 'departures', label: 'Departures' },
-                        { value: 'text', label: 'Text' },
+                        {
+                            value: 'location',
+                            label: t('settings.account_settings.locations'),
+                        },
+                        {
+                            value: 'departures',
+                            label: t('settings.account_settings.departures'),
+                        },
+                        {
+                            value: 'text',
+                            label: t('settings.account_settings.text'),
+                        },
                     ]"
                 />
 
@@ -50,7 +67,10 @@ const form = useForm({
             </div>
 
             <div>
-                <InputLabel for="motisRadius" value="Departure Radius" />
+                <InputLabel
+                    for="motisRadius"
+                    :value="t('settings.account_settings.departure_radius')"
+                />
 
                 <SelectInput
                     id="motisRadius"
@@ -58,20 +78,62 @@ const form = useForm({
                     class="mt-1 block w-full"
                     :error="form.errors.motisRadius"
                     :options="[
-                        { value: null, label: 'Default (500 meters)' },
-                        { value: 50, label: '50 meters' },
-                        { value: 100, label: '100 meters' },
-                        { value: 200, label: '200 meters' },
-                        { value: 300, label: '300 meters' },
-                        { value: 400, label: '400 meters' },
-                        { value: 500, label: '500 meters' },
+                        {
+                            value: null,
+                            label: t(
+                                'settings.account_settings.radius_default',
+                                { meters: 500 },
+                            ),
+                        },
+                        {
+                            value: 50,
+                            label: t(
+                                'settings.account_settings.radius_meters',
+                                { meters: 50 },
+                            ),
+                        },
+                        {
+                            value: 100,
+                            label: t(
+                                'settings.account_settings.radius_meters',
+                                { meters: 100 },
+                            ),
+                        },
+                        {
+                            value: 200,
+                            label: t(
+                                'settings.account_settings.radius_meters',
+                                { meters: 200 },
+                            ),
+                        },
+                        {
+                            value: 300,
+                            label: t(
+                                'settings.account_settings.radius_meters',
+                                { meters: 300 },
+                            ),
+                        },
+                        {
+                            value: 400,
+                            label: t(
+                                'settings.account_settings.radius_meters',
+                                { meters: 400 },
+                            ),
+                        },
+                        {
+                            value: 500,
+                            label: t(
+                                'settings.account_settings.radius_meters',
+                                { meters: 500 },
+                            ),
+                        },
                     ]"
                 ></SelectInput>
             </div>
 
             <div class="flex items-center gap-4">
                 <button class="btn btn-primary" :disabled="form.processing">
-                    Save
+                    {{ t('verbs.save') }}
                 </button>
 
                 <Transition
@@ -84,7 +146,7 @@ const form = useForm({
                         v-if="form.recentlySuccessful"
                         class="text-sm opacity-65"
                     >
-                        Saved.
+                        {{ t('verbs.saved') }}
                     </p>
                 </Transition>
             </div>

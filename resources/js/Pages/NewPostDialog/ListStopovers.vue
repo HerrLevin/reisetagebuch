@@ -6,6 +6,9 @@ import { StopPlace, TripDto } from '@/types';
 import { Head, router } from '@inertiajs/vue3';
 import { DateTime } from 'luxon';
 import { PropType, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const props = defineProps({
     trip: {
@@ -87,7 +90,9 @@ function getTitle() {
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl leading-tight font-semibold">New Post</h2>
+            <h2 class="text-xl leading-tight font-semibold">
+                {{ t('new_post.select_exit') }}
+            </h2>
         </template>
         <div class="card bg-base-100 min-w-full shadow-md">
             <!-- Results -->

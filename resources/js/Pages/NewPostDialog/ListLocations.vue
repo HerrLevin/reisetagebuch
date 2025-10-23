@@ -6,6 +6,9 @@ import { LocationEntry, RequestLocationDto } from '@/types';
 import { Head, usePage } from '@inertiajs/vue3';
 import { Search } from 'lucide-vue-next';
 import { PropType, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const props = defineProps({
     locations: {
@@ -87,11 +90,13 @@ watch(search, () => {
 </script>
 
 <template>
-    <Head title="Locations nearby" />
+    <Head :title="t('new_post.title')" />
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl leading-tight font-semibold">New Post</h2>
+            <h2 class="text-xl leading-tight font-semibold">
+                {{ t('new_post.title') }}
+            </h2>
         </template>
         <div class="card bg-base-100 min-w-full shadow-md">
             <!-- Search Bar -->
@@ -102,7 +107,9 @@ watch(search, () => {
                         v-model="search"
                         type="search"
                         class="grow"
-                        placeholder="Search"
+                        :placeholder="
+                            t('new_post.locations.filter_placeholder')
+                        "
                         autofocus
                     />
                     <!--                    <kbd class="kbd kbd-sm">⌘</kbd>-->
@@ -132,11 +139,11 @@ watch(search, () => {
                         `"
                         aria-valuenow="0"
                         role="progressbar"
-                    ></div>
-                    Fetching locations from OSM...
+                    />
+                    {{ t('new_post.locations.fetching_osm') }}
                 </li>
                 <li class="p-4 pb-2 text-xs tracking-wide opacity-60">
-                    Locations nearby
+                    {{ t('new_post.locations.nearby') }}
                 </li>
 
                 <LocationListEntry

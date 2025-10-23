@@ -4,6 +4,9 @@ import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const passwordInput = ref<HTMLInputElement | null>(null);
 const currentPasswordInput = ref<HTMLInputElement | null>(null);
@@ -37,17 +40,21 @@ const updatePassword = () => {
 <template>
     <section>
         <header>
-            <h2 class="text-lg font-medium">Update Password</h2>
+            <h2 class="text-lg font-medium">
+                {{ t('settings.password.title') }}
+            </h2>
 
             <p class="mt-1 text-sm opacity-65">
-                Ensure your account is using a long, random password to stay
-                secure.
+                {{ t('settings.password.description') }}
             </p>
         </header>
 
         <form class="mt-6 space-y-6" @submit.prevent="updatePassword">
             <div>
-                <InputLabel for="current_password" value="Current Password" />
+                <InputLabel
+                    for="current_password"
+                    :value="t('settings.password.current_password')"
+                />
 
                 <TextInput
                     id="current_password"
@@ -66,7 +73,10 @@ const updatePassword = () => {
             </div>
 
             <div>
-                <InputLabel for="password" value="New Password" />
+                <InputLabel
+                    for="password"
+                    :value="t('settings.password.new_password')"
+                />
 
                 <TextInput
                     id="password"
@@ -84,7 +94,7 @@ const updatePassword = () => {
             <div>
                 <InputLabel
                     for="password_confirmation"
-                    value="Confirm Password"
+                    :value="t('settings.password.confirm_password')"
                 />
 
                 <TextInput
@@ -104,7 +114,7 @@ const updatePassword = () => {
 
             <div class="flex items-center gap-4">
                 <button class="btn btn-primary" :disabled="form.processing">
-                    Save
+                    {{ t('verbs.save') }}
                 </button>
 
                 <Transition
@@ -117,7 +127,7 @@ const updatePassword = () => {
                         v-if="form.recentlySuccessful"
                         class="text-sm opacity-65"
                     >
-                        Saved.
+                        {{ t('verbs.saved') }}
                     </p>
                 </Transition>
             </div>

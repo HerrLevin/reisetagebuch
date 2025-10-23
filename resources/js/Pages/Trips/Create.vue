@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import AirportSearch from '@/Pages/NewPostDialog/Partials/AirportSearch.vue';
 import TransitousSearch from '@/Pages/NewPostDialog/Partials/TransitousSearch.vue';
+import AirportSearch from '@/Pages/NewRoute/Partials/AirportSearch.vue';
 import TripDetailsForm from '@/Pages/Trips/Partials/TripDetailsForm.vue';
 import { AutocompleteResponse } from '@/types/motis';
 import {
@@ -15,6 +15,9 @@ import { Head, useForm } from '@inertiajs/vue3';
 import { PlaneTakeoff, TrainFront } from 'lucide-vue-next';
 import { DateTime } from 'luxon';
 import { ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const provider = ref<ProviderKey>('transitous');
 
@@ -24,7 +27,7 @@ const providers: Providers = {
         icon: TrainFront,
     },
     airports: {
-        name: 'Airports',
+        name: t('new_route.airports'),
         icon: PlaneTakeoff,
     },
 };
@@ -101,27 +104,27 @@ function addStop() {
 
 function submit() {
     if (!model.value.startLocation || !model.value.endLocation) {
-        alert('Please select both start and end locations.');
+        alert(t('new_route.alerts.both_locations_required'));
         return;
     }
     if (!model.value.departureTime || !model.value.arrivalTime) {
-        alert('Please select both departure and arrival times.');
+        alert(t('new_route.alerts.both_times_required'));
         return;
     }
     if (!model.value.transportMode) {
-        alert('Please select a transport mode.');
+        alert(t('new_route.alerts.transport_mode_required'));
         return;
     }
 
     const departure = model.value.departureTime.toISO();
     const arrival = model.value.arrivalTime.toISO();
     if (!departure || !arrival) {
-        alert('Invalid date format.');
+        alert(t('new_route.alerts.invalid_date_time'));
         return;
     }
 
     if (model.value.arrivalTime <= model.value.departureTime) {
-        alert('Arrival time must be after departure time.');
+        alert(t('new_route.alerts.arrival_before_departure'));
         return;
     }
 
@@ -189,11 +192,13 @@ watch(
 </script>
 
 <template>
-    <Head title="New Trip" />
+    <Head :title="t('new_route.title')" />
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl leading-tight font-semibold">New Trip</h2>
+            <h2 class="text-xl leading-tight font-semibold">
+                {{ t('new_route.title') }}
+            </h2>
         </template>
 
         <div class="flex justify-end gap-4 px-6 pb-4">
@@ -248,7 +253,9 @@ watch(
                     <TransitousSearch @select="selectLocation($event, stop)" />
                 </div>
                 <div v-if="provider === 'transitous'">
-                    <a class="link" @click.prevent="addStop()">Add Stopover</a>
+                    <a class="link" @click.prevent="addStop()">
+                        {{ t('new_route.add_stop') }}
+                    </a>
                 </div>
                 <div class="grid grid-cols-1 gap-8">
                     <TransitousSearch
@@ -264,12 +271,16 @@ watch(
         </div>
         <div class="card bg-base-100 mt-4 min-w-full p-0 shadow-md">
             <div class="card-body">
-                <div class="card-title">Trip Details</div>
+                <div class="card-title">
+                    {{ t('new_route.route_details') }}
+                </div>
                 <TripDetailsForm v-model="model" />
             </div>
         </div>
         <div class="mt-4 flex justify-end">
-            <button class="btn btn-primary" @click="submit">Create Trip</button>
+            <button class="btn btn-primary" @click="submit">
+                {{ t('new_route.create_route') }}
+            </button>
         </div>
     </AuthenticatedLayout>
 </template>

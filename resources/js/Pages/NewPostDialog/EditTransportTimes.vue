@@ -6,6 +6,9 @@ import { Head, router } from '@inertiajs/vue3';
 import { CircleX, PlaneLanding, PlaneTakeoff } from 'lucide-vue-next';
 import { DateTime } from 'luxon';
 import { PropType, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const props = defineProps({
     post: {
@@ -31,7 +34,7 @@ function submit() {
         manualArrival.value &&
         manualArrival.value < manualDeparture.value
     ) {
-        alert('Arrival time cannot be before departure time.');
+        alert(t('edit_transport_times.arrival_before_departure_error'));
         return;
     }
     router.put(route('posts.update.transport-times', props.post?.id), {
@@ -45,7 +48,7 @@ function submit() {
 }
 
 const subtitle = `${getBaseText(props.post)} (${prettyDates(props.post)})`;
-const title = `Edit Transport Times`;
+const title = t('edit_transport_times.title');
 const fullTitle = `${title} · ${subtitle}`;
 
 function goBack() {
@@ -130,9 +133,9 @@ function selectArrivalTime(event: Event) {
                 <form>
                     <div class="grid grid-cols-4 gap-4">
                         <div class="col col-span-2 md:col-span-1">
-                            <label for="departureDate" class="font-bold"
-                                >Departure</label
-                            >
+                            <label for="departureDate" class="font-bold">
+                                {{ t('edit_transport_times.departure') }}
+                            </label>
                             <input
                                 id="departureDate"
                                 type="date"
@@ -144,11 +147,11 @@ function selectArrivalTime(event: Event) {
                         <div class="col col-span-2 md:col-span-1">
                             <div class="flex justify-between opacity-60">
                                 <label for="departureTime" class="font-bold">
-                                    Time
+                                    {{ t('edit_transport_times.time') }}
                                 </label>
-                                <span class="text-sm">{{
-                                    manualDeparture?.zoneName
-                                }}</span>
+                                <span class="text-sm">
+                                    {{ manualDeparture?.zoneName }}
+                                </span>
                             </div>
                             <input
                                 id="departureTime"
@@ -164,7 +167,7 @@ function selectArrivalTime(event: Event) {
                                 @click.prevent="manualDeparture = null"
                             >
                                 <CircleX class="size-5" />
-                                Clear Departure
+                                {{ t('edit_transport_times.clear_departure') }}
                             </button>
                         </div>
                         <div class="col col-span-2 content-end md:col-span-1">
@@ -175,13 +178,13 @@ function selectArrivalTime(event: Event) {
                                 "
                             >
                                 <PlaneTakeoff class="size-5" />
-                                Depart Now
+                                {{ t('edit_transport_times.depart_now') }}
                             </button>
                         </div>
                         <div class="col col-span-2 md:col-span-1">
-                            <label for="arrivalDate" class="font-bold"
-                                >Arrival</label
-                            >
+                            <label for="arrivalDate" class="font-bold">
+                                {{ t('edit_transport_times.arrival') }}
+                            </label>
                             <input
                                 id="arrivalDate"
                                 type="date"
@@ -193,7 +196,7 @@ function selectArrivalTime(event: Event) {
                         <div class="col col-span-2 md:col-span-1">
                             <div class="flex justify-between opacity-60">
                                 <label for="departureTime" class="font-bold">
-                                    Time
+                                    {{ t('edit_transport_times.time') }}
                                 </label>
                                 <span class="text-sm">
                                     {{ manualArrival?.zoneName }}
@@ -214,7 +217,7 @@ function selectArrivalTime(event: Event) {
                                 @click.prevent="manualArrival = null"
                             >
                                 <CircleX class="size-5" />
-                                Clear Arrival
+                                {{ t('edit_transport_times.clear_arrival') }}
                             </button>
                         </div>
                         <div class="col col-span-2 content-end md:col-span-1">
@@ -223,7 +226,7 @@ function selectArrivalTime(event: Event) {
                                 @click.prevent="manualArrival = DateTime.now()"
                             >
                                 <PlaneLanding class="size-5" />
-                                Arrive Now
+                                {{ t('edit_transport_times.arrive_now') }}
                             </button>
                         </div>
                     </div>
@@ -232,14 +235,14 @@ function selectArrivalTime(event: Event) {
                             class="btn btn-secondary"
                             @click.prevent="goBack()"
                         >
-                            Cancel
+                            {{ t('verbs.cancel') }}
                         </button>
                         <button
                             class="btn btn-primary"
                             type="submit"
                             @click.prevent="submit()"
                         >
-                            Save Times
+                            {{ t('edit_transport_times.save_times') }}
                         </button>
                     </div>
                 </form>

@@ -11,6 +11,8 @@ import {
     Trash2,
 } from 'lucide-vue-next';
 import { PropType, useTemplateRef } from 'vue';
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
 
 const props = defineProps({
     post: {
@@ -45,7 +47,7 @@ function sharePost(): void {
     blur();
 
     const shareData = {
-        title: 'Post',
+        title: t('share.post_title'),
         text: isSameUser()
             ? getOwnShareText(props.post)
             : getShareText(props.post),
@@ -59,7 +61,7 @@ function sharePost(): void {
         navigator.clipboard
             .writeText(shareData.url)
             .then(() => {
-                alert('Post link copied to clipboard');
+                alert(t('share.post_copied'));
             })
             .catch();
     }
@@ -82,7 +84,7 @@ function blur() {
             <li>
                 <a @click.prevent="sharePost()">
                     <Share class="size-4" />
-                    Share
+                    {{ t('verbs.share') }}
                 </a>
             </li>
             <template v-if="isSameUser()">
@@ -90,19 +92,19 @@ function blur() {
                 <li>
                     <Link :href="route('posts.edit', post.id)">
                         <SquarePen class="size-4" />
-                        Edit
+                        {{ t('verbs.edit') }}
                     </Link>
                 </li>
                 <li v-if="isTransportPost(post)">
                     <Link :href="route('posts.edit.transport-times', post.id)">
                         <ClockPlus class="size-4" />
-                        Change Times
+                        {{ t('posts.edit.change_times') }}
                     </Link>
                 </li>
                 <li v-if="isTransportPost(post)">
                     <Link :href="route('posts.edit.transport-post', post.id)">
                         <Route class="size-4" />
-                        Change Exit
+                        {{ t('posts.edit.change_exit') }}
                     </Link>
                 </li>
                 <li class="mx-0 border-b-1"></li>
@@ -114,7 +116,9 @@ function blur() {
                         "
                     >
                         <Trash2 class="size-4" />
-                        <span class="text-red-500">Delete</span>
+                        <span class="text-red-500">
+                            {{ t('verbs.delete') }}
+                        </span>
                     </a>
                 </li>
             </template>
@@ -123,13 +127,13 @@ function blur() {
     <dialog ref="deleteModal" class="modal">
         <div class="modal-box">
             <h3 class="text-lg font-bold">
-                Are you sure you want to delete your post?
+                {{ t('posts.delete.question') }}
             </h3>
 
             <div class="modal-action">
                 <form method="dialog">
                     <button class="btn" @click.prevent="deleteModal?.close()">
-                        Cancel
+                        {{ t('verbs.cancel') }}
                     </button>
                 </form>
 
@@ -139,12 +143,12 @@ function blur() {
                     :disabled="form.processing"
                     @click.prevent="deletePost()"
                 >
-                    Delete Post
+                    {{ t('verbs.delete') }}
                 </button>
             </div>
         </div>
         <form method="dialog" class="modal-backdrop">
-            <button>close</button>
+            <button>{{ t('verbs.close') }}</button>
         </form>
     </dialog>
 </template>

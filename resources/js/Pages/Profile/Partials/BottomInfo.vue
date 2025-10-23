@@ -3,6 +3,9 @@ import type { UserDto } from '@/types';
 import { Calendar, Link } from 'lucide-vue-next';
 import { DateTime } from 'luxon';
 import { PropType } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 defineProps({
     user: {
@@ -27,7 +30,11 @@ function getDateString(date: string): string {
             <div class="flex items-center gap-1">
                 <Calendar class="h-4 w-4" />
                 <span class="truncate text-sm">
-                    Joined {{ getDateString(user.createdAt) }}
+                    {{
+                        t('profile.joined_at', {
+                            date: getDateString(user.createdAt),
+                        })
+                    }}
                 </span>
             </div>
         </div>

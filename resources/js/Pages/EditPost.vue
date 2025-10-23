@@ -6,6 +6,9 @@ import { Visibility } from '@/types/enums';
 import { BasePost, LocationPost, TransportPost } from '@/types/PostTypes';
 import { Head, router } from '@inertiajs/vue3';
 import { PropType, reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const props = defineProps({
     post: {
@@ -36,7 +39,7 @@ form.body = props.post.body || '';
 form.visibility = props.post.visibility;
 
 const subtitle = `${getBaseText(props.post)} (${prettyDates(props.post)})`;
-const title = `Edit Post`;
+const title = t('edit_post.title');
 const fullTitle = `${title} · ${subtitle}`;
 </script>
 
@@ -56,7 +59,7 @@ const fullTitle = `${title} · ${subtitle}`;
                     :subtitle="subtitle"
                     emoji="✍"
                     :default-visibility="form.visibility"
-                    confirm-button-text="Save"
+                    :confirm-button-text="t('verbs.save')"
                     @cancel="goBack"
                     @select-visibility="(vis) => (form.visibility = vis)"
                 />

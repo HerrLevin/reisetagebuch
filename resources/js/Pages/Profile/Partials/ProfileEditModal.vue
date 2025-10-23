@@ -6,6 +6,9 @@ import TextInput from '@/Components/TextInput.vue';
 import { UserDto } from '@/types';
 import { router, useForm, usePage } from '@inertiajs/vue3';
 import { PropType, ref, useTemplateRef } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const authUser = usePage().props.auth.user;
 
@@ -84,16 +87,20 @@ const headerUpload = (event: Event) => {
         type="button"
         @click="openModal()"
     >
-        <div class="flex items-center">Edit Profile</div>
+        <span class="flex items-center">
+            {{ t('profile.edit_profile') }}
+        </span>
     </button>
     <dialog ref="editModal" class="modal">
         <div class="modal-box">
-            <h3 class="text-lg font-bold">Edit my profile</h3>
+            <h3 class="text-lg font-bold">
+                {{ t('profile.edit_my_profile') }}
+            </h3>
 
             <div class="mt-6">
                 <InputLabel
                     for="displayname"
-                    value="Displayname"
+                    :value="t('profile.display_name')"
                     class="sr-only"
                 />
 
@@ -103,7 +110,7 @@ const headerUpload = (event: Event) => {
                     v-model="form.name"
                     :error="form.errors.name"
                     class="mt-1 block w-3/4"
-                    placeholder="Displayname"
+                    :placeholder="t('profile.display_name')"
                     @keydown.enter="submit"
                 />
 
@@ -111,7 +118,11 @@ const headerUpload = (event: Event) => {
             </div>
 
             <div class="mt-6">
-                <InputLabel for="bio" value="Bio" class="sr-only" />
+                <InputLabel
+                    for="bio"
+                    :value="t('profile.bio')"
+                    class="sr-only"
+                />
 
                 <TextArea
                     id="bio"
@@ -119,14 +130,18 @@ const headerUpload = (event: Event) => {
                     v-model="form.bio"
                     :error="form.errors.bio"
                     class="mt-1 block w-3/4"
-                    placeholder="Bio"
+                    :placeholder="t('profile.bio')"
                 />
 
                 <InputError :message="form.errors.bio" class="mt-2" />
             </div>
 
             <div class="mt-6">
-                <InputLabel for="website" value="Website" class="sr-only" />
+                <InputLabel
+                    for="website"
+                    :value="t('profile.bio')"
+                    class="sr-only"
+                />
 
                 <TextInput
                     id="website"
@@ -134,7 +149,7 @@ const headerUpload = (event: Event) => {
                     v-model="form.website"
                     :error="form.errors.website"
                     class="mt-1 block w-3/4"
-                    placeholder="Website"
+                    :placeholder="t('profile.bio')"
                     @keydown.enter="submit"
                 />
 
@@ -142,7 +157,9 @@ const headerUpload = (event: Event) => {
             </div>
             <div class="mt-6">
                 <fieldset class="fieldset">
-                    <legend class="fieldset-legend">Profile Picture</legend>
+                    <legend class="fieldset-legend">
+                        {{ t('profile.profile_picture') }}
+                    </legend>
                     <input
                         type="file"
                         class="file-input w-full"
@@ -150,13 +167,17 @@ const headerUpload = (event: Event) => {
                         :value="avatarInput"
                         @input="avatarUpload"
                     />
-                    <label class="label">Max size 2MB</label>
+                    <label class="label">
+                        {{ t('profile.max_size') }}
+                    </label>
                     <InputError :message="form.errors.avatar" class="mt-2" />
                 </fieldset>
             </div>
             <div class="">
                 <fieldset class="fieldset">
-                    <legend class="fieldset-legend">Header Picture</legend>
+                    <legend class="fieldset-legend">
+                        {{ t('profile.header_image') }}
+                    </legend>
                     <input
                         type="file"
                         class="file-input w-full"
@@ -164,13 +185,17 @@ const headerUpload = (event: Event) => {
                         :value="headerInput"
                         @input="headerUpload"
                     />
-                    <label class="label">Max size 2MB</label>
+                    <label class="label">
+                        {{ t('profile.max_size') }}
+                    </label>
                     <InputError :message="form.errors.header" class="mt-2" />
                 </fieldset>
             </div>
             <div class="modal-action">
                 <form method="dialog">
-                    <button class="btn">Cancel</button>
+                    <button class="btn">
+                        {{ t('verbs.cancel') }}
+                    </button>
                 </form>
 
                 <button
@@ -179,14 +204,14 @@ const headerUpload = (event: Event) => {
                     :disabled="form.processing"
                     @click.prevent="submit"
                 >
-                    Save
+                    {{ t('verbs.save') }}
                 </button>
             </div>
         </div>
         <form method="dialog" class="modal-backdrop">
-            <button>close</button>
+            <button>
+                {{ t('verbs.close') }}
+            </button>
         </form>
     </dialog>
 </template>
-
-<style scoped></style>

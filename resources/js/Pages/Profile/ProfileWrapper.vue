@@ -9,6 +9,9 @@ import Statistics from '@/Pages/Profile/Partials/Statistics.vue';
 import type { UserDto } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import type { PropType } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 defineProps({
     user: {
@@ -23,7 +26,9 @@ defineProps({
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl leading-tight font-semibold">Profile</h2>
+            <h2 class="text-xl leading-tight font-semibold">
+                {{ t('profile.profile_of', { name: user.name }) }}
+            </h2>
         </template>
         <Banner :src="user.header || ''" />
 

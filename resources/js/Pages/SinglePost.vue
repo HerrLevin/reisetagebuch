@@ -15,6 +15,9 @@ import { GeometryCollection } from 'geojson';
 import { ArrowLeft } from 'lucide-vue-next';
 import { LngLat } from 'maplibre-gl';
 import { PropType, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const props = defineProps({
     post: {
@@ -62,11 +65,19 @@ if (isLocationPost(props.post)) {
     startPoint.value = null;
     endPoint.value = null;
 }
-let head = `${props.post.user.name}'s post`;
+const heading = t('posts.name_post', { name: props.post.user.name });
+let head = heading;
 if (isLocationPost(props.post)) {
-    head = `${props.post.user.name}'s post at ${props.post.location.name}`;
+    head = t('posts.name_location_post', {
+        name: props.post.user.name,
+        location: props.post.location.name,
+    });
 } else if (isTransportPost(props.post)) {
-    head = `${props.post.user.name}'s travel from ${props.post.originStop.location.name} to ${props.post.destinationStop.location.name}`;
+    head = t('posts.name_transport_post', {
+        name: props.post.user.name,
+        from: props.post.originStop.location.name,
+        to: props.post.destinationStop.location.name,
+    });
 }
 if (props.post.body) {
     head += `: ${props.post.body}`;
@@ -78,7 +89,9 @@ if (props.post.body) {
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl leading-tight font-semibold">Dashboard</h2>
+            <h2 class="text-xl leading-tight font-semibold">
+                {{ heading }}
+            </h2>
         </template>
 
         <div class="card bg-base-100 min-w-full shadow-md">
@@ -90,7 +103,6 @@ if (props.post.body) {
                 >
                     <ArrowLeft class="size-6" />
                 </button>
-                <p>Post</p>
             </div>
             <Map
                 v-if="startPoint"
