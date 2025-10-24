@@ -1,1 +1,323 @@
-{}
+{
+    "welcome": {
+        "reisetagebuch": {
+            "title": "Reisetagebuch",
+            "description": "Reisetagebuch ist eine mit Laravel entwickelte Reise-Tagebuch-Anwendung. Sie ermöglicht es Nutzenden, ihre Reisen zu dokumentieren, Erfahrungen auszutauschen und sich mit anderen Reisenden zu vernetzen. Die Anwendung ist für den Selbsthosting-Betrieb konzipiert und bietet Nutzerenden vollständige Kontrolle über ihre Daten und Privatsphäre. Sie ist eine Mischung aus Träwelling und Swarm."
+        }
+    },
+    "trip_details": {
+        "departure": "Abfahrt",
+        "time": "Uhrzeit",
+        "arrival": "Ankunft",
+        "line": "Linie",
+        "line_placeholder": "Linienname (bspw. U2, RE3)",
+        "line_example": "bspw. U2, RE3",
+        "code": "Kennzeichnung",
+        "code_placeholder": "Kennzeichnung (bspw. 12345, RE15123)",
+        "code_example": "bspw. 12345",
+        "transport_mode": "Transportart",
+        "select_transport_mode": "Wähle die Transportart aus"
+    },
+    "pages": {
+        "timeline": {
+            "title": "Timeline",
+            "your_timeline": "Deine Timeline"
+        },
+        "location_history": {
+            "title": "Standortverlauf",
+            "no_history": " Kein Standortverlauf für den ausgewählten Tag verfügbar.",
+            "date": "Datum für den Standortverlauf",
+            "date_help": "Wähle ein Datum, um den Standortverlauf für diesen Tag anzuzeigen.",
+            "previous": "Vorheriger",
+            "next": "Nächster",
+            "today": "Heute",
+            "showing_for": "Zeige Standortverlauf für:",
+            "all_time": "Gesamter Zeitraum",
+            "location_entries": "Ein Ortseintrag | {count} Ortseinträge",
+            "trip_entries": "Ein Tripeintrag | {count} Tripeinträge",
+            "waypoints": "Ein Wegpunkt | {count} Wegpunkte"
+        }
+    },
+    "auth": {
+        "confirm_password_title": "Passwort bestätigen",
+        "confirm_password": "Dies ist ein sicherer Bereich der Anwendung. Bitte bestätige dein Passwort, bevor du fortfahren kannst.",
+        "password": "Passwort",
+        "forgot_password": {
+            "title": "Passwort vergessen",
+            "message": "Passwort vergessen? Kein Problem. Teile uns einfach deine E-Mail-Adresse mit und wir senden dir einen Link, mit dem zu dein Passwort zurücksetzen kannst.",
+            "email": "E-Mail",
+            "confirm": "Passwort-Zurücksetzen-Link senden"
+        },
+        "reset_password": {
+            "title": "Passwort Zurücksetzen",
+            "email": "E-Mail",
+            "password": "Passwort",
+            "confirm_password": "Passwort bestätigen"
+        },
+        "verify_email": {
+            "title": "E-Mail Bestätigung",
+            "message": "Vielen Dank für die Anmeldung! Bevor du loslegen kannst, bestätige bitte deine E-Mail-Adresse, indem du auf den Link klickst, den wir dir gerade per E-Mail geschickt haben. Falls du die E-Mail nicht erhalten hast, senden wir dir gerne eine neue.",
+            "link_sent": "Ein neuer Bestätigungslink wurde an die E-Mail-Adresse gesendet, die du uns während der Registrierung mitgeteilt hast.",
+            "resend": "Bestätigungs-E-Mail erneut senden",
+            "request_another": "Klicke hier, um eine neue anzufordern",
+            "logout": "Abmelden"
+        },
+        "login": {
+            "title": "Anmelden",
+            "email": "E-Mail",
+            "remember_me": "Angemeldet bleiben",
+            "forgot_password": "Passwort vergessen?",
+            "no_register": "Die Registrierung ist derzeit geschlossen.",
+            "no_account": "Hast du noch keinen Account?",
+            "password": "Passwort"
+        },
+        "register": {
+            "title": "Registrieren",
+            "name": "Name",
+            "username": "Nutzername",
+            "email": "E-Mail",
+            "password": "Passwort",
+            "confirm_password": "Passwort bestätigen",
+            "have_account": "Hast du bereits einen Account?"
+        }
+    },
+    "app": {
+        "invite_users": "Nutzer:innen einladen",
+        "location_history": "Standortverlauf",
+        "home": "Zuhause",
+        "logout": "Abmelden",
+        "login": "Anmelden",
+        "register": "Registrieren",
+        "logo": "Logo",
+        "scroll_end": "Du hast das Ende erreicht!"
+    },
+    "new_post": {
+        "title": "Neuer Beitrag",
+        "body_placeholder": "Was denkst du gerade?",
+        "select_exit": "Ausstieg auswählen",
+        "locations": {
+            "filter_placeholder": "Orte filtern",
+            "fetching_osm": "Orte aus OpenStreetMap abrufen…",
+            "nearby": "Orte in der Nähe"
+        },
+        "departures_filter": {
+            "now": "Jetzt",
+            "clear": "Leeren",
+            "set_datetime": "Zeit setzen"
+        },
+        "departures_at_stop": "Abfahrten von {location} ab {time} "
+    },
+    "edit_transport_times": {
+        "title": "Beförderungszeiten bearbeiten",
+        "arrival_before_departure_error": "Abfahrtszeit kann nicht vor der Ankunftszeit liegen.",
+        "departure": "Abfahrt",
+        "time": "Zeit",
+        "arrival": "Ankunft",
+        "clear_departure": "Abfahrt löschen",
+        "clear_arrival": "Ankunft löschen",
+        "depart_now": "Jetzt abfahren",
+        "arrive_now": "Jetzt ankommen",
+        "save_times": "Zeiten speichern"
+    },
+    "location": {
+        "open_osm": "In OpenStreetMap öffnen"
+    },
+    "transitous_search": {
+        "search_placeholder": "Nach einer Haltestelle suchen"
+    },
+    "new_route": {
+        "title": "Neue Route",
+        "add_stop": "Zwischenhalt hinzufügen",
+        "route_details": "Routendetails",
+        "create_route": "Route erstellen",
+        "airport_search": {
+            "placeholder": "Suche nach einem Flughafen anhand des Namens, des IATA- oder ICAO-Codes"
+        },
+        "airports": "Flughäfen",
+        "alerts": {
+            "both_locations_required": "Bitte wähle sowohl den Start- als auch Zielort aus.",
+            "both_times_required": "Bitte gebe sowohl Abfahrts- als auch Ankunftszeit an.",
+            "transport_mode_required": "Bitte wähle eine Transportart aus.",
+            "invalid_date_format": "Ungültiges Datumsformat.",
+            "arrival_before_departure": "Ankunfszeit kann nicht vor Abfahrtszeit sein."
+        }
+    },
+    "profile": {
+        "title": "Profil",
+        "profile_of": "Profil von {name}",
+        "joined_at": "Am {date} beigetreten",
+        "edit_profile": "Profil bearbeiten",
+        "edit_my_profile": "Mein Profil bearbeiten",
+        "display_name": "Anzeigename",
+        "bio": "Biographie",
+        "website": "Webseite",
+        "profile_picture": "Profilbild",
+        "max_size": "Maximale Dateigröße: 2 MB",
+        "header_image": "Kopfzeilenbild",
+        "menu": {
+            "posts": "Beiträge",
+            "map": "Karte"
+        },
+        "stats": {
+            "friends": "Freund | Freunde",
+            "locations": "Ort | Orte",
+            "trips": "Trip | Trips",
+            "posts": "Beitrag | Beiträge"
+        }
+    },
+    "settings": {
+        "title": "Einstellungen",
+        "connect_traewelling": "Träwelling-Account verbinden",
+        "connected_to_traewelling": "Mit Träwelling verbunden",
+        "disconnect_traewelling": "Träwelling-Verbindung trennen",
+        "delete_account": {
+            "title": "Account löschen",
+            "warning": "Sobald dein Konto gelöscht ist, werden alle darin enthaltenen Ressourcen und Daten dauerhaft gelöscht. Bevor du dein Konto löschst, lade bitte alle Daten und Informationen herunter, die du behalten möchtest.",
+            "are_you_sure": "Bist du Sicher, dass du dein Konto löschen willst?",
+            "enter_password": "Sobald dein Konto gelöscht ist, werden alle darin enthaltenen Ressourcen und Daten dauerhaft gelöscht. Bitte gib dein Passwort ein, um zu bestätigen, dass du dein Konto dauerhaft löschen möchtest.",
+            "password": "Passwort",
+            "confirm": "Kontolöschung bestätigen"
+        },
+        "account_information": {
+            "title": "Kontoinformationen",
+            "description": "Aktualisiere die Informationen und E-Mail-Adresse deines Accounts.",
+            "name": "Name",
+            "username": "Nutzername",
+            "email": "E-Mail",
+            "email_not_verified": "Deine E-Mail-Adresse ist nicht bestätigt.",
+            "resend_verification": "Klicke hier, um die Bestätigungs-E-Mail erneut zu senden.",
+            "verification_link_sent": "Ein neuer Bestätigungslink wurde an deine E-Mail-Adresse gesendet."
+        },
+        "account_settings": {
+            "title": "Kontoeinstellungen",
+            "default_new_post": "Standardwert für neuen Beitragstyp",
+            "departure_radius": "Radius Abfahrtssuche (Meter)",
+            "radius_default": "Standard ({meters} Meter)",
+            "radius_meters": "{meters} Meter",
+            "departures": "Abfahrten",
+            "locations": "Orte",
+            "text": "Text"
+        },
+        "device_settings": {
+            "title": "Geräteeinstellungen",
+            "description": "Diese Einstellungen sind gerätespezifisch und unterscheiden sich auf jedem deiner Geräte.",
+            "track_location_history": "Standortverlaufsverfolgung aktivieren"
+        },
+        "password": {
+            "title": "Passwort aktualisieren",
+            "description": "Vergewissere dich, dass dein Konto ein langes, zufälliges Passwort verwendet, um sicher zu bleiben.",
+            "current_password": "Aktuelles Passwort",
+            "new_password": "Neues Passwort",
+            "confirm_password": "Passwort bestätigen"
+        }
+    },
+    "errors": {
+        "network_nok": "Die Netzwerkantwort war nicht in Ordnung",
+        "form_error_count": "Es gibt {0} Formularfehler."
+    },
+    "share": {
+        "post_title": "Beitrag teilen",
+        "post_copied": "Beitragslink wurde in die Zwischenablage kopiert!",
+        "messages": {
+            "from_to": "von {from} nach {to}",
+            "at": "bei {location}!",
+            "personal_share": "Schau dir meinen Beitrag an {baseText}",
+            "general_share": "Schau dir {username}'s Beitrag an {baseText}"
+        }
+    },
+    "verbs": {
+        "share": "Teilen",
+        "edit": "Bearbeiten",
+        "delete": "Löschen",
+        "cancel": "Abbrechen",
+        "close": "Schließen",
+        "confirm": "Bestätigen",
+        "loading": "Laden",
+        "save": "Speichern",
+        "saved": "Gespeichert"
+    },
+    "posts": {
+        "title": "Beiträge",
+        "locations": "Orte",
+        "departures": "Abfahrten",
+        "text": "Text",
+        "edit": {
+            "change_times": "Zeiten bearbeiten",
+            "change_exit": "Ausstieg bearbeiten"
+        },
+        "delete": {
+            "question": "Bist du dir sicher, dass du deinen Beitrag löschen willst?"
+        },
+        "profile_picture_alt": "Profilbild von {name}",
+        "name_post": "Beitrag von {name}",
+        "name_location_post": "Beitrag von {name} bei {location}",
+        "name_transport_post": "Beitrag von {name} von {from} nach {to}"
+    },
+    "typeahead": {
+        "no_suggestions": "Keine Vorschläge verfügbar. Bitte tippe um zu suchen."
+    },
+    "history_checker": {
+        "title": "Möchtest du deinen Standortverlauf mit diesem Gerät aufzeichnen?",
+        "message": "Dadurch kannst du deinen Standortverlauf auf der Karte sehen. Nur du kannst diese Informationen sehen. Du kannst diese Einstellung jederzeit in deinen Kontoeinstellungen ändern.",
+        "decline": "Nicht aufzeichnen",
+        "accept": "Standortverlauf aufzeichnen"
+    },
+    "edit_post": {
+        "title": "Beitrag bearbeiten"
+    },
+    "invites": {
+        "title": "Nutzer:innen einladen",
+        "create_invite": "Einladungslink erstellen",
+        "copied_to_clipboard": "Einladungslink wurde in die Zwischenablage kopiert!",
+        "copy_failed": "Kopieren des Einladungslinks in die Zwischenablage gescheitert. Bitte kopiere ihn manuell.",
+        "code": "Einladungscode",
+        "created_at": "Erstellt am",
+        "used_at": "Genutzt am",
+        "copy": "Kopieren"
+    },
+    "name_service": {
+        "platform": "Gleis {name} ({location})"
+    },
+    "visibility": {
+        "public": "Öffentlich",
+        "public_description": "Sichtbar für alle",
+        "private": "Privat",
+        "private_description": "Nur sichtbar für dich",
+        "unlisted": "Ungelistet",
+        "unlisted_description": "Für andere von der Timeline und deinem Profil ausgeblendet. Nur sichtbar für dich oder andere, die den Link haben.",
+        "authenticated_only": "Nur für angemeldete",
+        "authenticated_only_description": "Nur sichtbar für angemeldete Nutzer:innen"
+    },
+    "transport_modes": {
+        "TRANSIT": "ÖPNV",
+        "WALK": "Laufen",
+        "BIKE": "Fahrrad",
+        "RENTAL": "Mietrad",
+        "CAR": "Auto",
+        "CAR_PARKING": "Parken",
+        "ODM": "On-Demand",
+        "TRAM": "Straßenbahn",
+        "SUBWAY": "U-Bahn",
+        "FERRY": "Fähre",
+        "AIRPLANE": "Flugzeug",
+        "METRO": "S-Bahn",
+        "BUS": "Bus",
+        "COACH": "Reisebus",
+        "RAIL": "Schiene",
+        "HIGHSPEED_RAIL": "Hochgeschwindigkeitszug",
+        "LONG_DISTANCE": "Fernverkehrszug",
+        "NIGHT_RAIL": "Nachtzug",
+        "REGIONAL_FAST_RAIL": "Regionalexpress",
+        "REGIONAL_RAIL": "Regionalbahn",
+        "OTHER": "Andere"
+    },
+    "transport_group": {
+        "long_distance": "Fernverkehr",
+        "regional": "Regional",
+        "metro": "S-Bahn",
+        "tram": "Straßenbahn",
+        "bus": "Bus",
+        "ferry": "Fähre",
+        "subway": "U-Bahn"
+    }
+}
