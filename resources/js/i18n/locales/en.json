@@ -16,7 +16,9 @@
         "code_placeholder": "Code (e.g., 12345, RE15123)",
         "code_example": "e.g., 12345",
         "transport_mode": "Transport Mode",
-        "select_transport_mode": "Select Transport Mode"
+        "select_transport_mode": "Select Transport Mode",
+        "route_color": "Color",
+        "route_text_color": "Text Color"
     },
     "pages": {
         "timeline": {
@@ -25,7 +27,7 @@
         },
         "location_history": {
             "title": "Location History",
-            "no_history": " No location history available for the selected date.",
+            "no_history": "No location history available for the selected date.",
             "date": "Date for Location History",
             "date_help": "Select a date and time to view the location history for that day.",
             "previous": "Previous",
@@ -33,7 +35,7 @@
             "today": "Today",
             "showing_for": "Showing location history for:",
             "all_time": "All Time",
-            "location_entries": "Pne location entry | {count} location entries",
+            "location_entries": "One location entry | {count} location entries",
             "trip_entries": "One trip entry | {count} trip entries",
             "waypoints": "One waypoint | {count} waypoints"
         }
@@ -103,9 +105,9 @@
         "departures_filter": {
             "now": "Now",
             "clear": "Clear",
-            "set_datetime": "Zeit setzen"
+            "set_datetime": "Set Time"
         },
-        "departures_at_stop": "Departures at {location} from {time} "
+        "departures_at_stop": "Departures at {location} from {time}"
     },
     "edit_transport_times": {
         "title": "Edit Transport Times",
@@ -284,7 +286,7 @@
         "private": "Private",
         "private_description": "Only visible to you",
         "unlisted": "Unlisted",
-        "unlisted_description": "Hidden for others from dashboard and profile. Only visible to you or others who have the link.",
+        "unlisted_description": "Hidden for others from timeline and profile. Only visible to you or others who have the link.",
         "authenticated_only": "Authenticated Only",
         "authenticated_only_description": "Only visible to authenticated users"
     },
@@ -295,7 +297,7 @@
         "RENTAL": "Rental",
         "CAR": "Car",
         "CAR_PARKING": "Car Parking",
-        "ODM": "ODM",
+        "ODM": "On Demand",
         "TRAM": "Tram",
         "SUBWAY": "Subway",
         "FERRY": "Ferry",

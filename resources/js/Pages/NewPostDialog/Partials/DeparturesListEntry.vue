@@ -15,10 +15,6 @@ const props = defineProps({
         type: Boolean,
         default: true,
     },
-    data: {
-        type: Object,
-        default: () => ({}),
-    },
     stop: {
         type: Object as PropType<StopDto>,
         default: () => ({}),
@@ -39,6 +35,22 @@ const linkData = ref({
     startId: props.stopTime.place.stopId,
     startTime: timeService.plannedTime?.toISO(),
 });
+
+function getRouteTextColor(stopTime: StopTime) {
+    if (stopTime.routeTextColor) {
+        return '#' + stopTime.routeTextColor;
+    }
+
+    return '#FFFFFF';
+}
+
+function getRouteColor(stopTime: StopTime) {
+    if (stopTime.routeColor) {
+        return '#' + stopTime.routeColor;
+    }
+
+    return getColor(stopTime.mode);
+}
 </script>
 
 <template>
@@ -53,8 +65,8 @@ const linkData = ref({
         </div>
         <div class="col col-span-2 text-center">
             <div
-                class="badge min-w-[3em] text-white"
-                :style="`background-color: ${getColor(stopTime.mode)}`"
+                class="badge min-w-[3em]"
+                :style="`background-color: ${getRouteColor(stopTime)}; color: ${getRouteTextColor(stopTime)}`"
             >
                 {{ stopTime.routeShortName }}
             </div>
