@@ -63,7 +63,7 @@ function getFormattedArrivalTime(): string | null {
             </div>
             <div class="self-end text-center">
                 <p class="text-muted-foreground text-sm font-medium">
-                    {{ post.trip.lineName }}
+                    {{ post.trip.displayName || post.trip.lineName }}
                 </p>
             </div>
             <div class="text-right">

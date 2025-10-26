@@ -56,7 +56,7 @@ const linkData = ref({
                 class="badge min-w-[3em] text-white"
                 :style="`background-color: ${getColor(stopTime.mode)}`"
             >
-                {{ stopTime.routeShortName }}
+                {{ stopTime.displayName || stopTime.routeShortName }}
             </div>
         </div>
         <div class="col col-span-6">

@@ -24,7 +24,16 @@ class StopTimeDto
 
     public ?string $tripShortName;
 
+    public ?string $displayName;
+
     public string $source;
+
+    public function setDisplayName(?string $displayName): StopTimeDto
+    {
+        $this->displayName = $displayName;
+
+        return $this;
+    }
 
     public function setPlace(StopPlaceDto $place): StopTimeDto
     {

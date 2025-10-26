@@ -39,6 +39,7 @@ class MotisHydrator
             ->setAgencyId($data['agencyId'] ?? null)
             ->setTripId($data['tripId'])
             ->setRouteShortName($data['routeShortName'])
+            ->setDisplayName($data['displayName'] ?? null)
             ->setRouteLongName($data['routeLongName'] ?? null)
             ->setTripShortName($data['tripShortName'] ?? null)
             ->setSource($data['source']);
