@@ -77,6 +77,8 @@ export type StopTime = {
     agencyId: string | null;
     tripId: string;
     routeShortName: string;
+    routeColor: string | null;
+    routeTextColor: string | null;
     source: string;
 };
 

@@ -56,6 +56,8 @@ class TransportTripRepository
         ?string $routeLongName = null,
         ?string $tripShortName = null,
         ?string $displayName = null,
+        ?string $routeColor = null,
+        ?string $routeTextColor = null,
         ?User $user = null
     ): TransportTrip {
         $trip = $this->getTripByIdentifier($foreignId, $provider);
@@ -73,6 +75,8 @@ class TransportTripRepository
         $trip->trip_short_name = $tripShortName;
         $trip->display_name = $displayName;
         $trip->user_id = $user?->id;
+        $trip->route_color = $routeColor;
+        $trip->route_text_color = $routeTextColor;
         $trip->save();
 
         return $trip;

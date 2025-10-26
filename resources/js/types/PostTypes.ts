@@ -38,6 +38,11 @@ export type Trip = {
     id: string;
     mode: TransportMode;
     lineName: string;
+    displayName: string;
+    routeLongName: string | null;
+    tripShortName: string | null;
+    routeColor: string | null;
+    routeTextColor: string | null;
 };
 
 export const isLocationPost = (post: BasePost): post is LocationPost => {

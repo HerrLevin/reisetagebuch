@@ -79,6 +79,8 @@ class DbTripHydrator
             ->setRouteLongName($trip->route_long_name ?? '')
             ->setTripShortName($trip->trip_short_name ?? '')
             ->setDisplayName($trip->display_name ?? '')
+            ->setRouteColor($trip->route_color)
+            ->setRouteTextColor($trip->route_text_color)
             ->setSource($trip->provider)
             ->setIntermediateStops($stops);
 

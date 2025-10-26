@@ -42,6 +42,24 @@ class LegDto
 
     public ?string $displayName = null;
 
+    public ?string $routeColor = null;
+
+    public ?string $routeTextColor = null;
+
+    public function setRouteColor(?string $routeColor): LegDto
+    {
+        $this->routeColor = $routeColor;
+
+        return $this;
+    }
+
+    public function setRouteTextColor(?string $routeTextColor): LegDto
+    {
+        $this->routeTextColor = $routeTextColor;
+
+        return $this;
+    }
+
     public string $source;
 
     /**
