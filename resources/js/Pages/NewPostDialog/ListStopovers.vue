@@ -71,7 +71,9 @@ function redirectCreatePost(stopover: StopPlace) {
         stopTime: stopover.scheduledDeparture || stopover.scheduledArrival,
         stopName: stopover.name,
         stopMode: props.trip?.legs[0].mode,
-        lineName: props.trip?.legs[0].routeShortName,
+        lineName:
+            props.trip?.legs[0].displayName ||
+            props.trip?.legs[0].routeShortName,
     };
     window.location.href = route('posts.create.transport-post', params);
 }
@@ -80,7 +82,12 @@ function getTitle() {
     let title = props.trip?.legs[0].mode
         ? getEmoji(props.trip?.legs[0].mode)
         : '';
-    title = title + ' ' + (props.trip?.legs[0].routeShortName ?? '');
+    title =
+        title +
+        ' ' +
+        ((props.trip?.legs[0].displayName ||
+            props.trip?.legs[0].routeShortName) ??
+            '');
     return title + ' ➜ ' + props.trip?.legs[0].headSign;
 }
 </script>

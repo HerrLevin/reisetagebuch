@@ -68,7 +68,7 @@ function getRouteColor(stopTime: StopTime) {
                 class="badge min-w-[3em]"
                 :style="`background-color: ${getRouteColor(stopTime)}; color: ${getRouteTextColor(stopTime)}`"
             >
-                {{ stopTime.routeShortName }}
+                {{ stopTime.displayName || stopTime.routeShortName }}
             </div>
         </div>
         <div class="col col-span-6">

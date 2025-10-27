@@ -83,7 +83,7 @@ function getRouteColor(trip: Trip) {
                     class="badge min-w-[3em] text-sm font-medium"
                     :style="`background-color: ${getRouteColor(post.trip)}; color: ${getRouteTextColor(post.trip)}`"
                 >
-                    {{ post.trip.lineName }}
+                    {{ post.trip.displayName || post.trip.lineName }}
                 </div>
             </div>
             <div class="text-right">

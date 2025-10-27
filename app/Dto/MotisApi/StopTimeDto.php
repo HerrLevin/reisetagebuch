@@ -28,6 +28,8 @@ class StopTimeDto
 
     public ?string $routeTextColor = null;
 
+    public ?string $displayName;
+
     public string $source;
 
     public function setRouteColor(?string $routeColor): StopTimeDto
@@ -40,6 +42,13 @@ class StopTimeDto
     public function setRouteTextColor(?string $routeTextColor): StopTimeDto
     {
         $this->routeTextColor = $routeTextColor;
+
+        return $this;
+    }
+
+    public function setDisplayName(?string $displayName): StopTimeDto
+    {
+        $this->displayName = $displayName;
 
         return $this;
     }
