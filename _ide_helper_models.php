@@ -355,6 +355,7 @@ namespace App\Models{
  * @property string|null $user_id
  * @property string|null $route_color
  * @property string|null $route_text_color
+ * @property \Illuminate\Support\Carbon|null $last_refreshed_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\TransportTripStop> $stops
  * @property-read int|null $stops_count
  * @property-read \App\Models\User|null $user
@@ -365,6 +366,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereDisplayName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereForeignTripId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereLastRefreshedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereLineName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereMode($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereProvider($value)

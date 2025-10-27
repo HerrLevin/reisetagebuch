@@ -236,6 +236,40 @@ class LocationController extends Controller
         return $airports;
     }
 
+    public function updateStopoverTimes(string $foreignTripId): void
+    {
+        Log::debug('Update stopover times for trip '.$foreignTripId);
+        $trip = $this->transportTripRepository->getTripByIdentifier(
+            foreignId: $foreignTripId,
+            with: ['stops', 'stops.location.identifiers']
+        );
+
+        if ($trip === null) {
+            return;
+        }
+        $trip->last_refreshed_at = Carbon::now();
+        $trip->save();
+
+        $dto = $this->transitousRequestService->getStopTimes($foreignTripId);
+
+        $stopovers = [$dto->legs[0]->from, ...$dto->legs[0]->intermediateStops, $dto->legs[0]->to];
+        /** @var TransportTripStop[] $stopModels */
+        $order = 0;
+        /** @var StopPlaceDto $stopover */
+        foreach ($stopovers as $stopover) {
+            $stop = $trip->stops->firstWhere('stop_sequence', $order);
+            if ($stop) {
+                Log::debug('Updating stopover '.$stopover->name.' for trip '.$foreignTripId);
+                $stop->arrival_time = $stopover->scheduledArrival;
+                $stop->departure_time = $stopover->scheduledDeparture;
+                $stop->arrival_delay = $stopover->scheduledArrival?->diffInSeconds($stopover->arrival);
+                $stop->departure_delay = $stopover->scheduledDeparture?->diffInSeconds($stopover->departure);
+                $stop->save();
+            }
+            $order++;
+        }
+    }
+
     public function stopovers(string $tripId, string $startId, string $startTime): ?TripDto
     {
         $trip = $this->transportTripRepository->getTripByIdentifier(
