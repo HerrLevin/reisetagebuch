@@ -42,6 +42,8 @@ class MotisHydrator
             ->setDisplayName($data['displayName'] ?? null)
             ->setRouteLongName($data['routeLongName'] ?? null)
             ->setTripShortName($data['tripShortName'] ?? null)
+            ->setRouteColor($data['routeColor'] ?? null)
+            ->setRouteTextColor($data['routeTextColor'] ?? null)
             ->setSource($data['source']);
 
     }
@@ -107,6 +109,8 @@ class MotisHydrator
             ->setRouteLongName($data['routeLongName'] ?? null)
             ->setTripShortName($shortName)
             ->setDisplayName($data['displayName'] ?? null)
+            ->setRouteColor($data['routeColor'] ?? null)
+            ->setRouteTextColor($data['routeTextColor'] ?? null)
             ->setSource($data['source'])
             ->setIntermediateStops($intermediateStops);
 

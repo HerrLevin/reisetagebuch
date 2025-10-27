@@ -12,6 +12,8 @@ export type CreateTripForm = {
     lineName: string | null;
     tripShortName: string | null;
     stops: TripLocation[];
+    routeColor: string | null;
+    routeTextColor: string | null;
 };
 
 export type TripLocation = {

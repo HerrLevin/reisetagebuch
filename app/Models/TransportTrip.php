@@ -19,6 +19,8 @@ class TransportTrip extends Model
         'route_long_name',
         'trip_short_name',
         'display_name',
+        'route_color',
+        'route_text_color',
     ];
 
     protected $casts = [

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import Delay from '@/Components/Post/Partials/Delay.vue';
-import { getEmoji } from '@/Services/DepartureTypeService';
+import { getColor, getEmoji } from '@/Services/DepartureTypeService';
 import {
     formatArrivalTime,
     formatDepartureTime,
 } from '@/Services/TimeFormattingService';
 import { getArrivalDelay, getDepartureDelay } from '@/Services/TripTimeService';
-import { TransportPost } from '@/types/PostTypes';
+import { TransportPost, Trip } from '@/types/PostTypes';
 import type { PropType } from 'vue';
 
 const props = defineProps({
@@ -34,6 +34,22 @@ function getFormattedArrivalTime(): string | null {
         arrivalDelay || 0,
     );
 }
+
+function getRouteTextColor(trip: Trip) {
+    if (trip.routeTextColor && trip.routeTextColor.length > 2) {
+        return '#' + trip.routeTextColor;
+    }
+
+    return '#FFFFFF';
+}
+
+function getRouteColor(trip: Trip) {
+    if (trip.routeColor && trip.routeColor.length > 2) {
+        return '#' + trip.routeColor;
+    }
+
+    return getColor(trip.mode);
+}
 </script>
 
 <template>
@@ -54,7 +70,7 @@ function getFormattedArrivalTime(): string | null {
                 </div>
             </div>
         </div>
-        <div class="grid grid-cols-3 gap-0 pb-0">
+        <div class="grid grid-cols-3 gap-0 pb-1">
             <div class="text-left">
                 <p class="text-muted-foreground text-sm font-medium">
                     {{ getFormattedDepartureTime() }}
@@ -62,9 +78,13 @@ function getFormattedArrivalTime(): string | null {
                 <Delay :delay="departureDelay" />
             </div>
             <div class="self-end text-center">
-                <p class="text-muted-foreground text-sm font-medium">
+                <div
+                    v-show="post.trip.lineName"
+                    class="badge min-w-[3em] text-sm font-medium"
+                    :style="`background-color: ${getRouteColor(post.trip)}; color: ${getRouteTextColor(post.trip)}`"
+                >
                     {{ post.trip.displayName || post.trip.lineName }}
-                </p>
+                </div>
             </div>
             <div class="text-right">
                 <p class="text-muted-foreground text-sm font-medium">

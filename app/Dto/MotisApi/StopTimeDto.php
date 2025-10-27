@@ -12,25 +12,43 @@ class StopTimeDto
 
     public string $headSign;
 
-    public ?string $agencyName;
+    public ?string $agencyName = null;
 
-    public ?string $agencyId;
+    public ?string $agencyId = null;
 
     public string $tripId;
 
     public string $routeShortName;
 
-    public ?string $routeLongName;
+    public ?string $routeLongName = null;
 
-    public ?string $tripShortName;
+    public ?string $tripShortName = null;
 
-    public ?string $displayName;
+    public ?string $routeColor = null;
+
+    public ?string $routeTextColor = null;
+
+    public ?string $displayName = null;
 
     public string $source;
 
     public function setDisplayName(?string $displayName): StopTimeDto
     {
         $this->displayName = $displayName;
+
+        return $this;
+    }
+
+    public function setRouteColor(?string $routeColor): StopTimeDto
+    {
+        $this->routeColor = $routeColor;
+
+        return $this;
+    }
+
+    public function setRouteTextColor(?string $routeTextColor): StopTimeDto
+    {
+        $this->routeTextColor = $routeTextColor;
 
         return $this;
     }

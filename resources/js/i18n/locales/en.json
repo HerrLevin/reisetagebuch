@@ -16,7 +16,9 @@
         "code_placeholder": "Code (e.g., 12345, RE15123)",
         "code_example": "e.g., 12345",
         "transport_mode": "Transport Mode",
-        "select_transport_mode": "Select Transport Mode"
+        "select_transport_mode": "Select Transport Mode",
+        "route_color": "Color",
+        "route_text_color": "Text Color"
     },
     "pages": {
         "timeline": {

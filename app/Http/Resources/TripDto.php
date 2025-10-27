@@ -18,6 +18,10 @@ class TripDto
 
     public ?string $displayName = null;
 
+    public ?string $routeColor = null;
+
+    public ?string $routeTextColor = null;
+
     public function __construct(TransportTrip $trip)
     {
         $this->id = $trip->id;
@@ -26,5 +30,7 @@ class TripDto
         $this->routeLongName = $trip->route_long_name;
         $this->tripShortName = $trip->trip_short_name;
         $this->displayName = $trip->display_name;
+        $this->routeColor = $trip->route_color;
+        $this->routeTextColor = $trip->route_text_color;
     }
 }

@@ -259,7 +259,9 @@ class LocationController extends Controller
             $dto->legs[0]->routeShortName,
             $dto->legs[0]->routeLongName,
             $dto->legs[0]->tripShortName,
-            $dto->legs[0]->displayName
+            $dto->legs[0]->displayName,
+            $dto->legs[0]->routeColor,
+            $dto->legs[0]->routeTextColor
         );
 
         // create stopovers
