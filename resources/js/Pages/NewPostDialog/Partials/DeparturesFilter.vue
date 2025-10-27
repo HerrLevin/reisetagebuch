@@ -143,6 +143,7 @@ function submitTypeahead(identifier: string | null) {
                                 longitude: longitude,
                                 when: selectedTime?.toISO(),
                                 identifier: location?.stopId,
+                                filter: filter.join(','),
                             })
                         "
                     >
@@ -181,6 +182,7 @@ function submitTypeahead(identifier: string | null) {
                             longitude: longitude,
                             filter: mode.join(','),
                             identifier: location?.stopId,
+                            when: selectedTime?.toISO(),
                         })
                     "
                     :style="`background-color: ${getColor(mode[0])}`"
