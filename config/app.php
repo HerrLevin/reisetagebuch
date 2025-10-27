@@ -50,4 +50,8 @@ return [
         'enabled' => env('APP_INVITE_ENABLED', false),
         'whitelist' => env('APP_INVITE_WHITELIST', '') ? explode(',', env('APP_INVITE_WHITELIST')) : [],
     ],
+
+    'transit' => [
+        'refresh_interval' => env('APP_TRANSIT_REFRESH_INTERVAL', 5),
+    ],
 ];

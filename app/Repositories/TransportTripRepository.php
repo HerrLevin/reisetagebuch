@@ -15,9 +15,47 @@ use Clickbar\Magellan\Data\Geometries\Geometry;
 use Clickbar\Magellan\Data\Geometries\LineString;
 use Clickbar\Magellan\Database\PostgisFunctions\ST;
 use Illuminate\Database\Eloquent\Collection;
+use Log;
 
 class TransportTripRepository
 {
+    public function getActiveTrips(?string $provider = null): array
+    {
+        $stops = TransportTripStop::with('transportTrip')
+            ->where(function ($query) {
+                $query->where('arrival_time', '>', Carbon::now()->subHours(12))
+                    ->Where('arrival_time', '<', Carbon::now());
+            })
+            ->whereNotNull('arrival_time')
+            ->get();
+        Log::debug('Foobar', ['stops' => $stops->count()]);
+
+        $ids = [];
+        /**
+         * @var TransportTripStop $stop
+         */
+        foreach ($stops as $stop) {
+            if ($provider !== null && $stop->transportTrip->provider !== $provider) {
+                continue;
+            }
+            if ($stop->transportTrip->last_refreshed_at === null ||
+                $stop->transportTrip->last_refreshed_at > Carbon::now()->subMinutes(config('app.transit.refresh_interval'))) {
+                continue;
+            }
+
+            if (in_array((string) $stop->transportTrip->foreign_trip_id, $ids, true)) {
+                continue;
+            }
+
+            if ($stop->arrival_time->addMinutes($stop->arrival_delay ?? 30)->isAfter(now())) {
+                $ids[] = (string) $stop->transportTrip->foreign_trip_id;
+            }
+        }
+
+        return array_values($ids);
+
+    }
+
     public function getTripByIdentifier(
         ?string $foreignId = null,
         ?string $provider = null,
@@ -77,6 +115,7 @@ class TransportTripRepository
         $trip->user_id = $user?->id;
         $trip->route_color = $routeColor;
         $trip->route_text_color = $routeTextColor;
+        $trip->last_refreshed_at = now();
         $trip->save();
 
         return $trip;

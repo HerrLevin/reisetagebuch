@@ -21,11 +21,13 @@ class TransportTrip extends Model
         'display_name',
         'route_color',
         'route_text_color',
+        'last_refreshed_at',
     ];
 
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'last_refreshed_at' => 'datetime',
     ];
 
     public function stops(): HasMany
