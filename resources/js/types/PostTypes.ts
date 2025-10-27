@@ -38,7 +38,7 @@ export type Trip = {
     id: string;
     mode: TransportMode;
     lineName: string;
-    displayName: string;
+    displayName: string | null;
     routeLongName: string | null;
     tripShortName: string | null;
     routeColor: string | null;

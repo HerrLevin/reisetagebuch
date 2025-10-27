@@ -50,6 +50,7 @@ export type LegDto = {
     agencyId: string | null;
     tripId: string;
     routeShortName: string;
+    displayName: string | null;
     source: string;
     intermediateStops: StopPlace[];
 };
@@ -76,6 +77,7 @@ export type StopTime = {
     agencyName: string | null;
     agencyId: string | null;
     tripId: string;
+    displayName: string | null;
     routeShortName: string;
     routeColor: string | null;
     routeTextColor: string | null;

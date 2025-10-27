@@ -317,6 +317,8 @@ namespace App\Models{
  * @property string $transport_trip_id
  * @property string $origin_stop_id
  * @property string $destination_stop_id
+ * @property \Illuminate\Support\Carbon|null $manual_departure
+ * @property \Illuminate\Support\Carbon|null $manual_arrival
  * @property-read \App\Models\Location|null $destination
  * @property-read \App\Models\TransportTripStop $destinationStop
  * @property-read \App\Models\Location|null $origin
@@ -328,6 +330,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost whereDestinationStopId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost whereManualArrival($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost whereManualDeparture($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost whereOriginStopId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost wherePostId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost whereTransportTripId($value)
@@ -349,6 +353,8 @@ namespace App\Models{
  * @property string|null $trip_short_name
  * @property string|null $display_name
  * @property string|null $user_id
+ * @property string|null $route_color
+ * @property string|null $route_text_color
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\TransportTripStop> $stops
  * @property-read int|null $stops_count
  * @property-read \App\Models\User|null $user
@@ -362,7 +368,9 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereLineName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereMode($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereProvider($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereRouteColor($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereRouteLongName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereRouteTextColor($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereTripShortName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereUserId($value)
