@@ -40,6 +40,11 @@ const props = defineProps({
         default: false,
         required: false,
     },
+    lineColor: {
+        type: String,
+        default: '#FF0000',
+        required: false,
+    },
 });
 
 const style = {
@@ -202,7 +207,7 @@ watch(
                     visibility: 'visible',
                 }"
                 :paint="{
-                    'line-color': '#FF0000',
+                    'line-color': lineColor,
                     'line-width': 4,
                     'line-opacity': 0.8,
                 }"

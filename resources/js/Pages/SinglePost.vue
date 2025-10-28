@@ -2,6 +2,7 @@
 import Map from '@/Components/Map.vue';
 import Post from '@/Components/Post/Post.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { getColor } from '@/Services/DepartureTypeService';
 import {
     BasePost,
     isLocationPost,
@@ -111,6 +112,11 @@ if (props.post.body) {
                 :line-string="lineString"
                 :show-geo-position="
                     usePage().props.auth.user?.id === post.user.id
+                "
+                :line-color="
+                    isTransportPost(post)
+                        ? post.trip.routeColor || getColor(post.trip.mode)
+                        : undefined
                 "
             ></Map>
             <div class="p-4">
