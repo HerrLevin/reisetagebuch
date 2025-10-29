@@ -9,16 +9,13 @@ export function calculateDelay(
     if (manualTime && plannedTime) {
         const delay =
             new Date(manualTime).getTime() - plannedTime.toJSDate().getTime();
-        if (delay > 60000) {
-            return Math.floor(delay / 60000);
-        }
         if (delay < -60000) {
             return Math.floor(delay / 60000);
         }
-        return null;
+        return Math.floor(delay / 60000);
     }
 
-    if (delay && Math.abs(delay) > 60) {
+    if (delay !== null) {
         return Math.floor(delay / 60);
     }
     return null;
@@ -28,7 +25,7 @@ export function getDepartureDelay(post: TransportPost): number | null {
     return calculateDelay(
         getDepartureTime(post.originStop),
         post?.manualDepartureTime,
-        post?.originStop.departureDelay || 0,
+        post?.originStop.departureDelay,
     );
 }
 
@@ -36,7 +33,7 @@ export function getArrivalDelay(post: TransportPost): number | null {
     return calculateDelay(
         getArrivalTime(post.destinationStop),
         post?.manualArrivalTime,
-        post?.destinationStop.arrivalDelay || 0,
+        post?.destinationStop.arrivalDelay,
     );
 }
 

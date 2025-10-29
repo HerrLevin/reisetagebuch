@@ -14,15 +14,14 @@ const absDelay = Math.abs(props.delay || 0);
 </script>
 
 <template>
-    <p
-        v-if="delay !== null"
-        class="text-sm font-medium"
-        :class="{
-            'text-green-500': absDelay < 2,
-            'text-yellow-500': absDelay < 5 && absDelay >= 2,
-            'text-red-500': absDelay >= 5,
-        }"
-    >
-        {{ formatDelay(delay) }}
+    <p v-if="delay !== null" class="text-xs font-medium">
+        (<span
+            :class="{
+                'text-green-500': absDelay < 2,
+                'text-yellow-500': absDelay < 5 && absDelay >= 2,
+                'text-red-500': absDelay >= 5,
+            }"
+            >{{ formatDelay(delay) }}</span
+        >)
     </p>
 </template>

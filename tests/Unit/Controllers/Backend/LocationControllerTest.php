@@ -233,6 +233,7 @@ class LocationControllerTest extends TestCase
             ->setRouteShortName('Route 42')
             ->setFrom($this->createStopPlaceDto())
             ->setIntermediateStops([])
+            ->setRealTime(false)
             ->setTo($this->createStopPlaceDto());
 
         $trip = new TripDto()->setLegs([$leg]);

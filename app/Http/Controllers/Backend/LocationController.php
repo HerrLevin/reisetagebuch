@@ -298,6 +298,8 @@ class LocationController extends Controller
             $dto->legs[0]->routeTextColor
         );
 
+        $realtime = $dto->legs[0]->realTime;
+
         // create stopovers
         $stopovers = [$dto->legs[0]->from, ...$dto->legs[0]->intermediateStops, $dto->legs[0]->to];
         /** @var StopPlaceDto[] $stops */
@@ -322,8 +324,8 @@ class LocationController extends Controller
                 $order,
                 $stopover->scheduledArrival,
                 $stopover->scheduledDeparture,
-                $stopover->scheduledArrival?->diffInSeconds($stopover->arrival),
-                $stopover->scheduledDeparture?->diffInSeconds($stopover->departure),
+                $realtime ? $stopover->scheduledArrival?->diffInSeconds($stopover->arrival) : null,
+                $realtime ? $stopover->scheduledDeparture?->diffInSeconds($stopover->departure) : null,
                 false,
                 null // todo: get route segment between stops
             );
