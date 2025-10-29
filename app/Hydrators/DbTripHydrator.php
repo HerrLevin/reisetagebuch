@@ -19,6 +19,7 @@ class DbTripHydrator
             ->setTripStopId($stop->id)
             ->setLatitude((float) $stop->location->latitude)
             ->setLongitude((float) $stop->location->longitude)
+            ->setCancelled($stop->cancelled)
             ->setArrival($stop->arrival_delay ? $stop->arrival_time?->addSeconds($stop->arrival_delay) : $stop->arrival_time)
             ->setDeparture($stop->departure_delay ? $stop->departure_time?->addSeconds($stop->departure_delay) : $stop->departure_time)
             ->setScheduledArrival($stop->arrival_time)
@@ -63,8 +64,8 @@ class DbTripHydrator
 
         return new LegDto()
             ->setDuration(0)
-            ->setStartTime($origin->departure)
-            ->setEndTime($destination->arrival)
+            ->setStartTime($origin->scheduledDeparture)
+            ->setEndTime($destination->scheduledArrival)
             ->setRealTime(false)
             ->setScheduledStartTime($origin->scheduledDeparture)
             ->setScheduledEndTime($destination->scheduledArrival)

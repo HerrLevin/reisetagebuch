@@ -148,6 +148,23 @@ class TransportTripRepository
         return $stop;
     }
 
+    public function updateStopTimes(
+        TransportTripStop $stop,
+        ?Carbon $arrivalTime = null,
+        ?Carbon $departureTime = null,
+        ?int $arrivalDelay = null,
+        ?int $departureDelay = null,
+        bool $cancelled = false
+    ): void {
+        $stop->arrival_time = $arrivalTime;
+        $stop->departure_time = $departureTime;
+        $stop->arrival_delay = $arrivalDelay;
+        $stop->departure_delay = $departureDelay;
+        $stop->cancelled = $cancelled;
+
+        $stop->save();
+    }
+
     public function createRouteSegment(
         Location $fromLocation,
         Location $toLocation,
