@@ -252,6 +252,12 @@ class LocationController extends Controller
 
         $dto = $this->transitousRequestService->getStopTimes($foreignTripId);
 
+        if (! $dto->legs[0]->realTime) {
+            Log::debug('No real-time data for trip '.$foreignTripId);
+
+            return;
+        }
+
         $stopovers = [$dto->legs[0]->from, ...$dto->legs[0]->intermediateStops, $dto->legs[0]->to];
         /** @var TransportTripStop[] $stopModels */
         $order = 0;
@@ -260,11 +266,14 @@ class LocationController extends Controller
             $stop = $trip->stops->firstWhere('stop_sequence', $order);
             if ($stop) {
                 Log::debug('Updating stopover '.$stopover->name.' for trip '.$foreignTripId);
-                $stop->arrival_time = $stopover->scheduledArrival;
-                $stop->departure_time = $stopover->scheduledDeparture;
-                $stop->arrival_delay = $stopover->scheduledArrival?->diffInSeconds($stopover->arrival);
-                $stop->departure_delay = $stopover->scheduledDeparture?->diffInSeconds($stopover->departure);
-                $stop->save();
+                $this->transportTripRepository->updateStopTimes(
+                    $stop,
+                    $stopover->scheduledArrival,
+                    $stopover->scheduledDeparture,
+                    $stopover->scheduledArrival?->diffInSeconds($stopover->arrival) ?? $stop->arrival_delay,
+                    $stopover->scheduledDeparture?->diffInSeconds($stopover->departure) ?? $stop->departure_delay,
+                    $stopover->cancelled ?? false
+                );
             }
             $order++;
         }
@@ -326,7 +335,7 @@ class LocationController extends Controller
                 $stopover->scheduledDeparture,
                 $realtime ? $stopover->scheduledArrival?->diffInSeconds($stopover->arrival) : null,
                 $realtime ? $stopover->scheduledDeparture?->diffInSeconds($stopover->departure) : null,
-                false,
+                $stopover->cancelled ?? false,
                 null // todo: get route segment between stops
             );
 
