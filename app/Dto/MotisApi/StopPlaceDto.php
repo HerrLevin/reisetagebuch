@@ -14,6 +14,15 @@ class StopPlaceDto extends StopDto
 
     public ?Carbon $scheduledDeparture;
 
+    public ?bool $cancelled = null;
+
+    public function setCancelled(?bool $cancelled = null): StopPlaceDto
+    {
+        $this->cancelled = $cancelled;
+
+        return $this;
+    }
+
     public function setArrival(?Carbon $arrival): StopPlaceDto
     {
         $this->arrival = $arrival;

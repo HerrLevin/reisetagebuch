@@ -16,7 +16,8 @@ abstract class TestCase extends BaseTestCase
         float $latitude = 48.8566,
         float $longitude = 2.3522,
         ?Carbon $arrival = null,
-        ?Carbon $departure = null
+        ?Carbon $departure = null,
+        bool $cancelled = false
     ): StopPlaceDto {
         $departure = $departure ?? Carbon::now();
         $arrival = $arrival ?? Carbon::now()->addMinutes(5);
@@ -26,6 +27,7 @@ abstract class TestCase extends BaseTestCase
             ->setName($name)
             ->setLatitude($latitude)
             ->setLongitude($longitude)
+            ->setCancelled($cancelled)
             ->setDeparture($departure)
             ->setScheduledDeparture($departure)
             ->setScheduledArrival($arrival)
