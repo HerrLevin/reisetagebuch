@@ -49,6 +49,7 @@ namespace App\Models{
  * @property-read int|null $identifiers_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\LocationTag> $tags
  * @property-read int|null $tags_count
+ * @method static \Database\Factories\LocationFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Location newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Location newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Location query()
@@ -73,6 +74,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Location $location
+ * @method static \Database\Factories\LocationIdentifierFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|LocationIdentifier newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|LocationIdentifier newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|LocationIdentifier query()
@@ -272,6 +274,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $token_expires_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Database\Factories\SocialAccountFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SocialAccount newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SocialAccount newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SocialAccount query()
@@ -324,6 +327,7 @@ namespace App\Models{
  * @property-read \App\Models\Location|null $origin
  * @property-read \App\Models\TransportTripStop $originStop
  * @property-read \App\Models\TransportTrip $transportTrip
+ * @method static \Database\Factories\TransportPostFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost query()
@@ -359,6 +363,7 @@ namespace App\Models{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\TransportTripStop> $stops
  * @property-read int|null $stops_count
  * @property-read \App\Models\User|null $user
+ * @method static \Database\Factories\TransportTripFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip query()
@@ -397,6 +402,7 @@ namespace App\Models{
  * @property-read \App\Models\Location $location
  * @property-read \App\Models\RouteSegment|null $routeSegment
  * @property-read \App\Models\TransportTrip $transportTrip
+ * @method static \Database\Factories\TransportTripStopFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTripStop newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTripStop newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTripStop query()

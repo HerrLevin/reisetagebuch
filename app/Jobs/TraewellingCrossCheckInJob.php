@@ -30,9 +30,12 @@ class TraewellingCrossCheckInJob implements ShouldQueue
 
     private string $accessToken;
 
-    public function __construct(string $postId)
+    private ?Client $client;
+
+    public function __construct(string $postId, ?Client $client = null)
     {
         $this->postId = $postId;
+        $this->client = $client;
     }
 
     /**
@@ -314,6 +317,9 @@ class TraewellingCrossCheckInJob implements ShouldQueue
 
     private function getClient(): Client
     {
+        if ($this->client) {
+            return $this->client;
+        }
         $baseUrl = config('services.traewelling.base_uri').'/api/v1/';
 
         return new Client([
@@ -335,7 +341,7 @@ class TraewellingCrossCheckInJob implements ShouldQueue
         LocationIdentifier $trwlDestination,
         bool $force = false,
         ?string $tripId = null,
-    ): mixed {
+    ): ?array {
         $client = $this->getClient();
         $body = [
             'body' => $post->body,
