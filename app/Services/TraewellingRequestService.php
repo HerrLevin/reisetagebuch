@@ -122,4 +122,16 @@ class TraewellingRequestService
             Log::error('Error deleting post in Traewelling', ['exception' => $e->getMessage(), 'traewellingPostId' => $traewellingPostId]);
         }
     }
+
+    public function updatePost(int $traewellingPostId, string $userId, array $data): void
+    {
+        $this->getAccessToken($userId);
+        $client = $this->getClient();
+        try {
+            $response = $client->put('status/'.$traewellingPostId, ['json' => $data]);
+            Log::debug('Updated post', ['response' => $response->getBody()->getContents()]);
+        } catch (GuzzleException $e) {
+            Log::error('Error updating post in Traewelling', ['exception' => $e->getMessage(), 'traewellingPostId' => $traewellingPostId]);
+        }
+    }
 }

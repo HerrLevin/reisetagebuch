@@ -20,6 +20,7 @@ use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
 use App\Hydrators\DbTripHydrator;
 use App\Jobs\DeletePostInTraewellingJob;
+use App\Jobs\EditTraewellingPostJob;
 use App\Jobs\PrefetchJob;
 use App\Jobs\TraewellingCrossCheckInJob;
 use App\Models\TransportTripStop;
@@ -155,11 +156,17 @@ class PostController extends Controller
         $post = $this->postRepository->getById($postId, Auth::user());
         $this->authorize('update', $post);
 
-        return $this->postRepository->updateBasePost(
+        $post = $this->postRepository->updateBasePost(
             $post,
             Visibility::from($request->input('visibility')),
             $request->input('body'),
         );
+
+        if ($post instanceof TransportPost) {
+            EditTraewellingPostJob::dispatch($post);
+        }
+
+        return $post;
     }
 
     /**
@@ -239,11 +246,15 @@ class PostController extends Controller
             abort(422, 'Not a transport post');
         }
 
-        return $this->postRepository->updateTransportTimes(
+        $post = $this->postRepository->updateTransportTimes(
             $post,
             $request->manualDepartureTime,
             $request->manualArrivalTime
         );
+
+        EditTraewellingPostJob::dispatch($post);
+
+        return $post;
     }
 
     /**
