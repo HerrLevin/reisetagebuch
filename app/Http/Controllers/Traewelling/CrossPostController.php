@@ -22,22 +22,34 @@ class CrossPostController extends Controller
 {
     private TraewellingRequestService $traewellingRequestService;
 
+    private ?string $traewellingId = null;
+
     public function __construct(?TraewellingRequestService $traewellingRequestService = null)
     {
         $this->traewellingRequestService = $traewellingRequestService ?? new TraewellingRequestService;
     }
 
-    public function crossCheckIn(string $postId): ?bool
+    private function getPost(string $postId): ?Post
     {
         $post = Post::with([
             'transportPost.originStop.location.identifiers',
             'transportPost.destinationStop.location.identifiers',
             'transportPost.transportTrip',
         ])->find($postId);
-        $hasTrwlMeta = $post?->metaInfos->where('key', 'traewelling_trip_id')->count() > 0;
+        $this->traewellingId = $post?->metaInfos->where('key', 'traewelling_trip_id')->first()?->value ?? null;
         $isTrwlUser = SocialAccount::whereUserId($post?->user->id)->whereProvider('traewelling')->exists();
 
-        if (! $isTrwlUser || $hasTrwlMeta) {
+        if (! $isTrwlUser) {
+            return null;
+        }
+
+        return $post;
+    }
+
+    public function crossCheckIn(string $postId): ?bool
+    {
+        $post = $this->getPost($postId);
+        if (! $post || $this->traewellingId) {
             Log::debug('Skipping Traewelling check-in for post '.$postId);
 
             return null;
@@ -63,6 +75,25 @@ class CrossPostController extends Controller
         Log::debug('Created Traewelling check-in for post '.$postId.' with trwl-id '.$trwlId, ['response' => $data, 'meta' => $meta]);
 
         return true;
+    }
+
+    public function updatePost(string $postId): void
+    {
+        $post = $this->getPost($postId);
+        if (! $post || ! $this->traewellingId) {
+            Log::debug('Skipping Traewelling post update for post '.$postId, ['traewellingId' => $this->traewellingId]);
+
+            return;
+        }
+
+        $payload = [
+            'body' => $post->body,
+            'visibility' => $post->visibility->getTraewellingVisibility(),
+            'manualDeparture' => $post->transportPost->manual_departure?->toIso8601String(),
+            'manualArrival' => $post->transportPost->manual_arrival?->toIso8601String(),
+        ];
+
+        $this->traewellingRequestService->updatePost($this->traewellingId, $post->user_id, $payload);
     }
 
     private function getTrwlStationIdentifier(Location $location): ?LocationIdentifier
