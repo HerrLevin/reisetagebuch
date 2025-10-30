@@ -86,14 +86,43 @@ class CrossPostController extends Controller
             return;
         }
 
-        $payload = [
+        $payload = $this->getUpdatePayload($post);
+
+        $this->traewellingRequestService->updatePost($this->traewellingId, $post->user_id, $payload);
+    }
+
+    public function changeExit(string $postId): void
+    {
+        $post = $this->getPost($postId);
+        if (! $post || ! $this->traewellingId) {
+            Log::debug('Skipping Traewelling exit change for post '.$postId, ['traewellingId' => $this->traewellingId]);
+
+            return;
+        }
+        $this->traewellingRequestService->getAccessToken($post->user_id);
+        $payload = $this->getUpdatePayload($post);
+
+        $destinationStop = $post->transportPost->destinationStop;
+        $trwlDestinationIdentifier = $this->getTrwlStationIdentifier($destinationStop->location);
+        if (! $trwlDestinationIdentifier) {
+            Log::debug('Destination not found for exit change of post '.$postId);
+
+            return;
+        }
+        $payload['destinationId'] = $trwlDestinationIdentifier->identifier;
+        $payload['destinationArrivalPlanned'] = $destinationStop->arrival_time?->toIso8601String();
+
+        $this->traewellingRequestService->updatePost($this->traewellingId, $post->user_id, $payload);
+    }
+
+    public function getUpdatePayload(Post $post): array
+    {
+        return [
             'body' => $post->body,
             'visibility' => $post->visibility->getTraewellingVisibility(),
             'manualDeparture' => $post->transportPost->manual_departure?->toIso8601String(),
             'manualArrival' => $post->transportPost->manual_arrival?->toIso8601String(),
         ];
-
-        $this->traewellingRequestService->updatePost($this->traewellingId, $post->user_id, $payload);
     }
 
     private function getTrwlStationIdentifier(Location $location): ?LocationIdentifier

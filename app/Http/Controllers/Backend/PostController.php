@@ -19,10 +19,11 @@ use App\Http\Resources\PostTypes\BasePost;
 use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
 use App\Hydrators\DbTripHydrator;
-use App\Jobs\DeletePostInTraewellingJob;
-use App\Jobs\EditTraewellingPostJob;
 use App\Jobs\PrefetchJob;
+use App\Jobs\TraewellingChangeExitJob;
 use App\Jobs\TraewellingCrossCheckInJob;
+use App\Jobs\TraewellingDeletePostJob;
+use App\Jobs\TraewellingEditPostJob;
 use App\Models\TransportTripStop;
 use App\Models\User;
 use App\Repositories\LocationRepository;
@@ -163,7 +164,7 @@ class PostController extends Controller
         );
 
         if ($post instanceof TransportPost) {
-            EditTraewellingPostJob::dispatch($post);
+            TraewellingEditPostJob::dispatch($post);
         }
 
         return $post;
@@ -179,7 +180,7 @@ class PostController extends Controller
         $this->authorize('delete', $post);
 
         if ($post instanceof TransportPost) {
-            DeletePostInTraewellingJob::dispatch($post);
+            TraewellingDeletePostJob::dispatch($post);
         }
 
         $this->postRepository->delete($post);
@@ -252,7 +253,7 @@ class PostController extends Controller
             $request->manualArrivalTime
         );
 
-        EditTraewellingPostJob::dispatch($post);
+        TraewellingEditPostJob::dispatch($post);
 
         return $post;
     }
@@ -270,7 +271,7 @@ class PostController extends Controller
         }
 
         try {
-            return $this->postRepository->updateTransportPost(
+            $post = $this->postRepository->updateTransportPost(
                 $post,
                 $request->stopId
             );
@@ -279,5 +280,9 @@ class PostController extends Controller
         } catch (StationNotOnTripException) {
             abort(422, 'Stop not on trip');
         }
+
+        TraewellingChangeExitJob::dispatch($post);
+
+        return $post;
     }
 }
