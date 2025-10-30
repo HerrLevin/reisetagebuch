@@ -19,6 +19,7 @@ use App\Http\Resources\PostTypes\BasePost;
 use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
 use App\Hydrators\DbTripHydrator;
+use App\Jobs\DeletePostInTraewellingJob;
 use App\Jobs\PrefetchJob;
 use App\Jobs\TraewellingCrossCheckInJob;
 use App\Models\TransportTripStop;
@@ -169,6 +170,10 @@ class PostController extends Controller
         $post = $this->postRepository->getById($postId, Auth::user());
 
         $this->authorize('delete', $post);
+
+        if ($post instanceof TransportPost) {
+            DeletePostInTraewellingJob::dispatch($post);
+        }
 
         $this->postRepository->delete($post);
     }

@@ -115,7 +115,7 @@ class CrossPostControllerTest extends TestCase
         // Mock Guzzle Client
         $mockResponse = Mockery::mock(ResponseInterface::class);
         $mockResponse->shouldReceive('getBody->getContents')->andReturn(json_encode([
-            'status' => ['id' => 'trwl_trip_id'],
+            'data' => ['status' => ['id' => 'trwl_trip_id']],
         ]));
         $stationMockResponse = Mockery::mock(ResponseInterface::class);
         $stationMockResponse->shouldReceive('getBody->getContents')->andReturn(json_encode([
@@ -182,7 +182,7 @@ class CrossPostControllerTest extends TestCase
         ]));
         $mockResponseCheckin = Mockery::mock(ResponseInterface::class);
         $mockResponseCheckin->shouldReceive('getBody->getContents')->andReturn(json_encode([
-            'status' => ['id' => 'trwl_trip_id'],
+            'data' => ['status' => ['id' => 'trwl_trip_id']],
         ]));
         $mockClient = Mockery::mock(Client::class);
         $mockClient->shouldReceive('post')
@@ -352,7 +352,7 @@ class CrossPostControllerTest extends TestCase
         // Mock Guzzle Client
         $mockResponse = Mockery::mock(ResponseInterface::class);
         $mockResponse->shouldReceive('getBody->getContents')->andReturn(json_encode([
-            'status' => ['id' => 'trwl_trip_id'],
+            'data' => ['status' => ['id' => 'trwl_trip_id']],
         ]));
         $mockClient = Mockery::mock(Client::class);
         $mockClient->shouldReceive('post')->andReturn($mockResponse);
@@ -405,7 +405,7 @@ class CrossPostControllerTest extends TestCase
         // Mock Guzzle Client
         $mockResponse = Mockery::mock(ResponseInterface::class);
         $mockResponse->shouldReceive('getBody->getContents')->andReturn(json_encode([
-            'status' => ['id' => 'trwl_trip_id'],
+            'data' => ['status' => ['id' => 'trwl_trip_id']],
         ]));
 
         $stationMockResponse = Mockery::mock(ResponseInterface::class);
@@ -455,7 +455,7 @@ class CrossPostControllerTest extends TestCase
         $mockClient = Mockery::mock(Client::class);
         $mockResponse = Mockery::mock(ResponseInterface::class);
         $mockResponse->shouldReceive('getBody->getContents')->andReturn(json_encode([
-            'status' => ['id' => 'trwl_trip_id'],
+            'data' => ['status' => ['id' => 'trwl_trip_id']],
         ]));
         $mockClient->shouldReceive('post')
             ->once()
@@ -522,7 +522,7 @@ class CrossPostControllerTest extends TestCase
         // Mock Guzzle Client for checkin
         $mockResponse = Mockery::mock(ResponseInterface::class);
         $mockResponse->shouldReceive('getBody->getContents')->andReturn(json_encode([
-            'status' => ['id' => 'trwl_trip_id'],
+            'data' => ['status' => ['id' => 'trwl_trip_id']],
         ]));
         $mockClient = Mockery::mock(Client::class);
         $mockClient->shouldReceive('post')->andReturn($mockResponse);

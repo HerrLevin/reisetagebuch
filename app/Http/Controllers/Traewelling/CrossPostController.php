@@ -53,12 +53,14 @@ class CrossPostController extends Controller
             return false;
         }
 
+        $trwlId = $data['data']['status']['id'] ?? '';
+
         $meta = new PostMetaInfo;
         $meta->post_id = $post->id;
         $meta->key = 'traewelling_trip_id';
-        $meta->value = $data['status']['id'] ?? '';
+        $meta->value = $trwlId;
         $meta->save();
-        Log::debug('Created Traewelling check-in for post '.$postId, ['response' => $data, 'meta' => $meta]);
+        Log::debug('Created Traewelling check-in for post '.$postId.' with trwl-id '.$trwlId, ['response' => $data, 'meta' => $meta]);
 
         return true;
     }
@@ -107,7 +109,7 @@ class CrossPostController extends Controller
      */
     private function crosspostManualTrip(Post $post): ?array
     {
-        $this->traewellingRequestService->getAccessToken($post);
+        $this->traewellingRequestService->getAccessToken($post->user->id);
         $originStop = $post->transportPost->originStop;
         $destinationStop = $post->transportPost->destinationStop;
 
@@ -228,7 +230,7 @@ class CrossPostController extends Controller
      */
     private function crosspostTransitous(Post $post): ?array
     {
-        $this->traewellingRequestService->getAccessToken($post);
+        $this->traewellingRequestService->getAccessToken($post->user->id);
 
         $originStop = $post->transportPost->originStop;
         $destinationStop = $post->transportPost->destinationStop;
