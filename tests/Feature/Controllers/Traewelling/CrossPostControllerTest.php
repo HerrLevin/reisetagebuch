@@ -1,8 +1,8 @@
 <?php
 
-namespace Feature\Jobs;
+namespace Feature\Controllers\Traewelling;
 
-use App\Jobs\TraewellingCrossCheckInJob;
+use App\Http\Controllers\Traewelling\CrossPostController;
 use App\Models\Location;
 use App\Models\LocationIdentifier;
 use App\Models\Post;
@@ -21,7 +21,7 @@ use Mockery;
 use Psr\Http\Message\ResponseInterface;
 use Tests\TestCase;
 
-class TraewellingCrossCheckInJobTest extends TestCase
+class CrossPostControllerTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -41,9 +41,9 @@ class TraewellingCrossCheckInJobTest extends TestCase
         $service = Mockery::mock(TraewellingRequestService::class)->makePartial();
         $service->shouldNotReceive('getAccessToken');
 
-        $job = new TraewellingCrossCheckInJob($post->id, $service);
+        $job = new CrossPostController($service);
 
-        $job->handle();
+        $job->crossCheckIn($post->id);
         Log::shouldHaveReceived('debug')->withArgs(function ($msg) {
             return str_contains($msg, 'Skipping Traewelling check-in');
         });
@@ -63,9 +63,9 @@ class TraewellingCrossCheckInJobTest extends TestCase
         $service = Mockery::mock(TraewellingRequestService::class)->makePartial();
         $service->shouldNotReceive('getAccessToken');
 
-        $job = new TraewellingCrossCheckInJob($post->id, $service);
+        $job = new CrossPostController($service);
 
-        $job->handle();
+        $job->crossCheckIn($post->id);
         Log::shouldHaveReceived('debug')->withArgs(function ($msg) {
             return str_contains($msg, 'Skipping Traewelling check-in');
         });
@@ -90,9 +90,9 @@ class TraewellingCrossCheckInJobTest extends TestCase
         $service = Mockery::mock(TraewellingRequestService::class)->makePartial();
         $service->shouldNotReceive('getAccessToken');
 
-        $job = new TraewellingCrossCheckInJob($post->id, $service);
+        $job = new CrossPostController($service);
 
-        $job->handle();
+        $job->crossCheckIn($post->id);
         Log::shouldHaveReceived('error')->withArgs(function ($msg) {
             return str_contains($msg, 'Unknown trip provider');
         });
@@ -144,8 +144,8 @@ class TraewellingCrossCheckInJobTest extends TestCase
             ->twice()
             ->andReturn($stationMockResponse);
 
-        $job = new TraewellingCrossCheckInJob($post->id, new TraewellingRequestService($mockClient));
-        $job->handle();
+        $job = new CrossPostController(new TraewellingRequestService($mockClient));
+        $job->crossCheckIn($post->id);
 
         $this->assertDatabaseHas('post_meta_infos', [
             'post_id' => $post->id,
@@ -222,8 +222,8 @@ class TraewellingCrossCheckInJobTest extends TestCase
             ->once()
             ->andReturn($stationMockResponse);
 
-        $job = new TraewellingCrossCheckInJob($post->id, new TraewellingRequestService($mockClient));
-        $job->handle();
+        $job = new CrossPostController(new TraewellingRequestService($mockClient));
+        $job->crossCheckIn($post->id);
 
         $this->assertDatabaseHas('post_meta_infos', [
             'post_id' => $post->id,
@@ -268,10 +268,10 @@ class TraewellingCrossCheckInJobTest extends TestCase
                 $mock->shouldReceive('getStatusCode')->andReturn(404);
             })));
 
-        $job = new TraewellingCrossCheckInJob($post->id, new TraewellingRequestService($mockClient));
+        $job = new CrossPostController(new TraewellingRequestService($mockClient));
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Origin or destination not found');
-        $job->handle();
+        $job->crossCheckIn($post->id);
         $this->assertDatabaseMissing('post_meta_infos', [
             'post_id' => $post->id,
             'key' => 'traewelling_trip_id',
@@ -309,10 +309,10 @@ class TraewellingCrossCheckInJobTest extends TestCase
                 $mock->shouldReceive('getStatusCode')->andReturn(404);
             })));
 
-        $job = new TraewellingCrossCheckInJob($post->id, new TraewellingRequestService($mockClient));
+        $job = new CrossPostController(new TraewellingRequestService($mockClient));
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Origin or destination departure board not found');
-        $job->handle();
+        $job->crossCheckIn($post->id);
         $this->assertDatabaseMissing('post_meta_infos', [
             'post_id' => $post->id,
             'key' => 'traewelling_trip_id',
@@ -359,8 +359,8 @@ class TraewellingCrossCheckInJobTest extends TestCase
         $mockClient->shouldReceive('get')
             ->never();
 
-        $job = new TraewellingCrossCheckInJob($post->id, new TraewellingRequestService($mockClient));
-        $job->handle();
+        $job = new CrossPostController(new TraewellingRequestService($mockClient));
+        $job->crossCheckIn($post->id);
 
         $this->assertDatabaseHas('post_meta_infos', [
             'post_id' => $post->id,
@@ -424,8 +424,8 @@ class TraewellingCrossCheckInJobTest extends TestCase
             ->andReturn($stationMockResponse);
         $mockClient->shouldReceive('post')->andReturn($mockResponse);
 
-        $job = new TraewellingCrossCheckInJob($post->id, new TraewellingRequestService($mockClient));
-        $job->handle();
+        $job = new CrossPostController(new TraewellingRequestService($mockClient));
+        $job->crossCheckIn($post->id);
 
         $this->assertDatabaseHas('post_meta_infos', [
             'post_id' => $post->id,
@@ -480,8 +480,8 @@ class TraewellingCrossCheckInJobTest extends TestCase
             ->twice()
             ->andReturn($stationMockResponse);
 
-        $job = new TraewellingCrossCheckInJob($post->id, new TraewellingRequestService($mockClient));
-        $job->handle();
+        $job = new CrossPostController(new TraewellingRequestService($mockClient));
+        $job->crossCheckIn($post->id);
 
         $this->assertDatabaseHas('post_meta_infos', [
             'post_id' => $post->id,
@@ -541,8 +541,8 @@ class TraewellingCrossCheckInJobTest extends TestCase
             ->twice()
             ->andReturn($stationMockResponse);
 
-        $job = new TraewellingCrossCheckInJob($post->id, new TraewellingRequestService($mockClient));
-        $job->handle();
+        $job = new CrossPostController(new TraewellingRequestService($mockClient));
+        $job->crossCheckIn($post->id);
 
         $this->assertDatabaseHas('post_meta_infos', [
             'post_id' => $post->id,
