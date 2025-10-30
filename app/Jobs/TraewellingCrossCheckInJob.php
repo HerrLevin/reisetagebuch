@@ -9,17 +9,14 @@ use App\Models\Post;
 use App\Models\PostMetaInfo;
 use App\Models\SocialAccount;
 use App\Models\TransportTripStop;
+use App\Services\TraewellingRequestService;
 use Carbon\Carbon;
-use Clickbar\Magellan\Data\Geometries\Point;
 use Exception;
-use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use Laravel\Socialite\Facades\Socialite;
-use Laravel\Socialite\Two\Token;
 use Throwable;
 
 class TraewellingCrossCheckInJob implements ShouldQueue
@@ -28,14 +25,12 @@ class TraewellingCrossCheckInJob implements ShouldQueue
 
     private string $postId;
 
-    private string $accessToken;
+    private TraewellingRequestService $traewellingRequestService;
 
-    private ?Client $client;
-
-    public function __construct(string $postId, ?Client $client = null)
+    public function __construct(string $postId, ?TraewellingRequestService $traewellingRequestService = null)
     {
         $this->postId = $postId;
-        $this->client = $client;
+        $this->traewellingRequestService = $traewellingRequestService ?? new TraewellingRequestService;
     }
 
     /**
@@ -72,29 +67,6 @@ class TraewellingCrossCheckInJob implements ShouldQueue
         Log::debug('Created Traewelling check-in for post '.$this->postId, ['response' => $data, 'meta' => $meta]);
     }
 
-    private function getTrwlStationFromLocation(Point $point): ?array
-    {
-        $client = $this->getClient();
-        try {
-            $response = $client->get('trains/station/nearby', [
-                'query' => [
-                    'latitude' => $point->getY(),
-                    'longitude' => $point->getX(),
-                ],
-            ]);
-        } catch (GuzzleException $e) {
-            Log::error('Error fetching nearby station from Traewelling', ['exception' => $e->getMessage(), 'point' => $point]);
-
-            return null;
-        }
-
-        $data = json_decode($response->getBody()->getContents(), true);
-        $location = $data['data'] ?? null;
-        Log::debug('Station nearby response', ['response' => $data, 'point' => $point, 'location' => $location]);
-
-        return $location;
-    }
-
     private function getTrwlStationIdentifier(Location $location): ?LocationIdentifier
     {
         Log::debug('Getting TRWL-id for location '.$location->name, ['location_id' => $location->id]);
@@ -107,7 +79,7 @@ class TraewellingCrossCheckInJob implements ShouldQueue
 
         $stationMotisIdentifier = $location->identifiers->firstWhere('origin', 'motis') ?? null;
         if ($stationMotisIdentifier !== null) {
-            $trwlStation = $this->getTrwlStationFromIdentifier($stationMotisIdentifier);
+            $trwlStation = $this->traewellingRequestService->getTrwlStationFromIdentifier($stationMotisIdentifier, $this);
             if ($trwlStation !== null) {
                 Log::debug('Found TRWL-id from MOTIS identifier for location '.$location->name, ['identifier' => $trwlStation]);
 
@@ -118,7 +90,7 @@ class TraewellingCrossCheckInJob implements ShouldQueue
             }
         }
 
-        $trwlStation = $this->getTrwlStationFromLocation($location->location);
+        $trwlStation = $this->traewellingRequestService->getTrwlStationFromLocation($location->location, $this);
         if ($trwlStation !== null) {
             Log::debug('Found TRWL-id from location for location '.$location->name, ['identifier' => $trwlStation]);
 
@@ -139,7 +111,7 @@ class TraewellingCrossCheckInJob implements ShouldQueue
      */
     private function crosspostManualTrip(Post $post): ?array
     {
-        $this->getAccessToken($post);
+        $this->traewellingRequestService->getAccessToken($post);
         $originStop = $post->transportPost->originStop;
         $destinationStop = $post->transportPost->destinationStop;
 
@@ -251,10 +223,7 @@ class TraewellingCrossCheckInJob implements ShouldQueue
 
         Log::debug('Traewelling API create trip request', ['body' => $requestBody]);
 
-        $client = $this->getClient();
-        $response = $client->post('trains/trip', ['json' => $requestBody]);
-
-        return json_decode($response->getBody()->getContents(), true);
+        return $this->traewellingRequestService->createTrip($requestBody);
     }
 
     /**
@@ -263,7 +232,7 @@ class TraewellingCrossCheckInJob implements ShouldQueue
      */
     private function crosspostTransitous(Post $post): ?array
     {
-        $this->getAccessToken($post);
+        $this->traewellingRequestService->getAccessToken($post);
 
         $originStop = $post->transportPost->originStop;
         $destinationStop = $post->transportPost->destinationStop;
@@ -283,54 +252,6 @@ class TraewellingCrossCheckInJob implements ShouldQueue
         return $data;
     }
 
-    private function getTrwlStationFromIdentifier(LocationIdentifier $identifier): ?array
-    {
-        $client = $this->getClient();
-        $response = $client->get('stations', [
-            'query' => [
-                'identifier' => $identifier->identifier,
-                'identifier_provider' => 'transitous',
-            ],
-        ]);
-
-        $data = json_decode($response->getBody()->getContents(), true);
-
-        return $data['data'][0] ?? null;
-    }
-
-    public function getAccessToken(Post $post): void
-    {
-        $account = SocialAccount::whereUserId($post->user->id)->whereProvider('traewelling')->first();
-
-        // if traewelling token is expired, refresh it
-        if ($account && $account->token_expires_at && $account->token_expires_at->isPast()) {
-            /** @var Token $tokens */
-            $tokens = Socialite::driver('traewelling')->refreshToken($account->refresh_token);
-            $account->update([
-                'access_token' => $tokens->token,
-                'refresh_token' => $tokens->refreshToken,
-                'token_expires_at' => now()->addSeconds($tokens->expiresIn),
-            ]);
-        }
-        $this->accessToken = $account?->access_token ?? '';
-    }
-
-    private function getClient(): Client
-    {
-        if ($this->client) {
-            return $this->client;
-        }
-        $baseUrl = config('services.traewelling.base_uri').'/api/v1/';
-
-        return new Client([
-            'base_uri' => $baseUrl,
-            'headers' => [
-                'Authorization' => 'Bearer '.$this->accessToken,
-                'Accept' => 'application/json',
-            ],
-        ]);
-    }
-
     /**
      * @throws GuzzleException
      * @throws Throwable
@@ -342,7 +263,6 @@ class TraewellingCrossCheckInJob implements ShouldQueue
         bool $force = false,
         ?string $tripId = null,
     ): ?array {
-        $client = $this->getClient();
         $body = [
             'body' => $post->body,
             'start' => $trwlOrigin->identifier,
@@ -359,7 +279,8 @@ class TraewellingCrossCheckInJob implements ShouldQueue
                 'post_id' => $post->id,
                 'body' => $body,
             ]);
-            $response = $client->post('trains/checkin', ['json' => $body]);
+
+            return $this->traewellingRequestService->checkin($body);
         } catch (Throwable $e) {
             if ($e->getCode() === 409 && ! $force) {
                 return $this->checkin($post, $trwlOrigin, $trwlDestination, true, $tripId);
@@ -367,8 +288,6 @@ class TraewellingCrossCheckInJob implements ShouldQueue
                 throw $e;
             }
         }
-
-        return json_decode($response->getBody()->getContents(), true);
     }
 
     private function getJourneyNumber(Post $post): ?int

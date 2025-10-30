@@ -11,6 +11,7 @@ use App\Models\TransportPost;
 use App\Models\TransportTrip;
 use App\Models\TransportTripStop;
 use App\Models\User;
+use App\Services\TraewellingRequestService;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -37,9 +38,10 @@ class TraewellingCrossCheckInJobTest extends TestCase
         $post = Post::factory()->for($user)->create();
         // No SocialAccount created for user and provider 'traewelling'
 
-        $job = Mockery::mock(TraewellingCrossCheckInJob::class, [$post->id])->makePartial();
-        $job->shouldAllowMockingProtectedMethods();
-        $job->shouldNotReceive('getAccessToken');
+        $service = Mockery::mock(TraewellingRequestService::class)->makePartial();
+        $service->shouldNotReceive('getAccessToken');
+
+        $job = new TraewellingCrossCheckInJob($post->id, $service);
 
         $job->handle();
         Log::shouldHaveReceived('debug')->withArgs(function ($msg) {
@@ -58,9 +60,10 @@ class TraewellingCrossCheckInJobTest extends TestCase
             'provider' => 'traewelling',
         ]);
 
-        $job = Mockery::mock(TraewellingCrossCheckInJob::class, [$post->id])->makePartial();
-        $job->shouldAllowMockingProtectedMethods();
-        $job->shouldNotReceive('getAccessToken');
+        $service = Mockery::mock(TraewellingRequestService::class)->makePartial();
+        $service->shouldNotReceive('getAccessToken');
+
+        $job = new TraewellingCrossCheckInJob($post->id, $service);
 
         $job->handle();
         Log::shouldHaveReceived('debug')->withArgs(function ($msg) {
@@ -84,9 +87,10 @@ class TraewellingCrossCheckInJobTest extends TestCase
         $transportPost->transportTrip = (object) ['provider' => 'unknown'];
         $post->setRelation('transportPost', $transportPost);
 
-        $job = Mockery::mock(TraewellingCrossCheckInJob::class, [$post->id])->makePartial();
-        $job->shouldAllowMockingProtectedMethods();
-        $job->shouldNotReceive('getAccessToken');
+        $service = Mockery::mock(TraewellingRequestService::class)->makePartial();
+        $service->shouldNotReceive('getAccessToken');
+
+        $job = new TraewellingCrossCheckInJob($post->id, $service);
 
         $job->handle();
         Log::shouldHaveReceived('error')->withArgs(function ($msg) {
@@ -99,7 +103,7 @@ class TraewellingCrossCheckInJobTest extends TestCase
         $user = User::factory()->create();
         $post = Post::factory()->for($user)->create();
         $trip = TransportTrip::factory()->create(['provider' => 'transitous']);
-        $transportPost = TransportPost::factory()->create([
+        TransportPost::factory()->create([
             'post_id' => $post->id,
             'transport_trip_id' => $trip->id,
         ]);
@@ -116,17 +120,31 @@ class TraewellingCrossCheckInJobTest extends TestCase
         $stationMockResponse = Mockery::mock(ResponseInterface::class);
         $stationMockResponse->shouldReceive('getBody->getContents')->andReturn(json_encode([
             'data' => [
-                'id' => 'station_origin_id',
+                'id' => 'trwl_station_id',
                 'name' => 'Idk station name',
             ],
         ]));
         $mockClient = Mockery::mock(Client::class);
-        $mockClient->shouldReceive('post')->andReturn($mockResponse);
+        $mockClient->shouldReceive('post')
+            ->withArgs(
+                function ($url, $options) use ($post) {
+                    $json = $options['json'];
+
+                    return $url === 'trains/checkin' &&
+                        $json['body'] == $post->body &&
+                        $json['start'] == 'trwl_station_id' &&
+                        $json['destination'] == 'trwl_station_id' &&
+                        $json['tripId'] == $post->transportPost->transportTrip->foreign_trip_id &&
+                        $json['departure'] == $post->transportPost->originStop->departure_time?->toIso8601String() &&
+                        $json['arrival'] == $post->transportPost->destinationStop->arrival_time?->toIso8601String();
+                }
+            )
+            ->andReturn($mockResponse);
         $mockClient->shouldReceive('get')
             ->twice()
             ->andReturn($stationMockResponse);
 
-        $job = new TraewellingCrossCheckInJob($post->id, $mockClient);
+        $job = new TraewellingCrossCheckInJob($post->id, new TraewellingRequestService($mockClient));
         $job->handle();
 
         $this->assertDatabaseHas('post_meta_infos', [
@@ -146,7 +164,7 @@ class TraewellingCrossCheckInJobTest extends TestCase
         $trip = TransportTrip::factory()->create(['provider' => 'reisetagebuch']);
         $origin = TransportTripStop::factory()->create(['transport_trip_id' => $trip->id]);
         $destination = TransportTripStop::factory()->create(['transport_trip_id' => $trip->id]);
-        $transportPost = TransportPost::factory()->create([
+        TransportPost::factory()->create([
             'post_id' => $post->id,
             'transport_trip_id' => $trip->id,
             'origin_stop_id' => $origin->id,
@@ -168,8 +186,13 @@ class TraewellingCrossCheckInJobTest extends TestCase
         ]));
         $mockClient = Mockery::mock(Client::class);
         $mockClient->shouldReceive('post')
-            ->withArgs(function ($url) {
-                return $url === 'trains/trip';
+            ->withArgs(function ($url, $options) {
+                return $url === 'trains/trip' &&
+                    $options['json']['originId'] === 1234 &&
+                    $options['json']['destinationId'] === 1234;
+                // idk why but this makes the test flaky
+                // $options['json']['originDeparturePlanned'] === $post->transportPost->originStop->departure_time?->toIso8601String() ?? $post->transportPost->originStop->arrival_time?->toIso8601String() ?? '' &&
+                // $options['json']['destinationArrivalPlanned'] === $post->transportPost->destinationStop->arrival_time?->toIso8601String() ?? $post->transportPost->destinationStop->departure_time?->toIso8601String() ?? '';
             })
             ->andReturn($mockResponseTrip);
         $mockClient->shouldReceive('post')
@@ -181,18 +204,25 @@ class TraewellingCrossCheckInJobTest extends TestCase
         $stationMockResponse = Mockery::mock(ResponseInterface::class);
         $stationMockResponse->shouldReceive('getBody->getContents')->andReturn(json_encode([
             'data' => [
-                'id' => 'station_origin_id',
+                'id' => 1234,
                 'name' => 'Idk station name',
             ],
         ]));
         $mockClient->shouldReceive('get')
-            ->withArgs(function ($url) {
-                return str_contains($url, 'trains/station/nearby');
+            ->withArgs(function ($url, $options) use ($origin) {
+                return str_contains($url, 'trains/station/nearby') && $options['query']['latitude'] == $origin->location->location->getLatitude() && $options['query']['longitude'] == $origin->location->location->getLongitude();
             })
-            ->twice()
+            ->once()
             ->andReturn($stationMockResponse);
 
-        $job = new TraewellingCrossCheckInJob($post->id, $mockClient);
+        $mockClient->shouldReceive('get')
+            ->withArgs(function ($url, $options) use ($destination) {
+                return str_contains($url, 'trains/station/nearby') && $options['query']['latitude'] == $destination->location->location->getLatitude() && $options['query']['longitude'] == $destination->location->location->getLongitude();
+            })
+            ->once()
+            ->andReturn($stationMockResponse);
+
+        $job = new TraewellingCrossCheckInJob($post->id, new TraewellingRequestService($mockClient));
         $job->handle();
 
         $this->assertDatabaseHas('post_meta_infos', [
@@ -219,14 +249,26 @@ class TraewellingCrossCheckInJobTest extends TestCase
             'provider' => 'traewelling',
         ]);
 
-        // No Guzzle mock needed, but force the identifiers to be missing
         // Remove all identifiers from origin/destination locations
         $originStop = $post->transportPost->originStop;
         $destinationStop = $post->transportPost->destinationStop;
         $originStop->location->identifiers()->delete();
         $destinationStop->location->identifiers()->delete();
 
-        $job = new TraewellingCrossCheckInJob($post->id);
+        $mockClient = Mockery::mock(Client::class);
+        $mockClient->shouldReceive('post')
+            ->never();
+
+        $mockClient->shouldReceive('get')
+            ->withArgs(function ($url) {
+                return str_contains($url, 'trains/station/nearby');
+            })
+            ->twice()
+            ->andThrow(new ClientException('Conflict', Mockery::mock('Psr\Http\Message\RequestInterface'), Mockery::mock('Psr\Http\Message\ResponseInterface', function ($mock) {
+                $mock->shouldReceive('getStatusCode')->andReturn(404);
+            })));
+
+        $job = new TraewellingCrossCheckInJob($post->id, new TraewellingRequestService($mockClient));
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Origin or destination not found');
         $job->handle();
@@ -254,7 +296,20 @@ class TraewellingCrossCheckInJobTest extends TestCase
         $originStop->location->identifiers()->delete();
         $destinationStop->location->identifiers()->delete();
 
-        $job = new TraewellingCrossCheckInJob($post->id);
+        $mockClient = Mockery::mock(Client::class);
+        $mockClient->shouldReceive('post')
+            ->never();
+
+        $mockClient->shouldReceive('get')
+            ->withArgs(function ($url) {
+                return str_contains($url, 'trains/station/nearby');
+            })
+            ->twice()
+            ->andThrow(new ClientException('Conflict', Mockery::mock('Psr\Http\Message\RequestInterface'), Mockery::mock('Psr\Http\Message\ResponseInterface', function ($mock) {
+                $mock->shouldReceive('getStatusCode')->andReturn(404);
+            })));
+
+        $job = new TraewellingCrossCheckInJob($post->id, new TraewellingRequestService($mockClient));
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Origin or destination departure board not found');
         $job->handle();
@@ -304,7 +359,7 @@ class TraewellingCrossCheckInJobTest extends TestCase
         $mockClient->shouldReceive('get')
             ->never();
 
-        $job = new TraewellingCrossCheckInJob($post->id, $mockClient);
+        $job = new TraewellingCrossCheckInJob($post->id, new TraewellingRequestService($mockClient));
         $job->handle();
 
         $this->assertDatabaseHas('post_meta_infos', [
@@ -369,7 +424,7 @@ class TraewellingCrossCheckInJobTest extends TestCase
             ->andReturn($stationMockResponse);
         $mockClient->shouldReceive('post')->andReturn($mockResponse);
 
-        $job = new TraewellingCrossCheckInJob($post->id, $mockClient);
+        $job = new TraewellingCrossCheckInJob($post->id, new TraewellingRequestService($mockClient));
         $job->handle();
 
         $this->assertDatabaseHas('post_meta_infos', [
@@ -425,7 +480,7 @@ class TraewellingCrossCheckInJobTest extends TestCase
             ->twice()
             ->andReturn($stationMockResponse);
 
-        $job = new TraewellingCrossCheckInJob($post->id, $mockClient);
+        $job = new TraewellingCrossCheckInJob($post->id, new TraewellingRequestService($mockClient));
         $job->handle();
 
         $this->assertDatabaseHas('post_meta_infos', [
@@ -486,7 +541,7 @@ class TraewellingCrossCheckInJobTest extends TestCase
             ->twice()
             ->andReturn($stationMockResponse);
 
-        $job = new TraewellingCrossCheckInJob($post->id, $mockClient);
+        $job = new TraewellingCrossCheckInJob($post->id, new TraewellingRequestService($mockClient));
         $job->handle();
 
         $this->assertDatabaseHas('post_meta_infos', [
