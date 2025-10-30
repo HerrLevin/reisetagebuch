@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\LocationIdentifier;
-use App\Models\Post;
 use App\Models\SocialAccount;
 use Clickbar\Magellan\Data\Geometries\Point;
 use GuzzleHttp\Client;
@@ -39,9 +38,9 @@ class TraewellingRequestService
         ]);
     }
 
-    public function getAccessToken(Post $post): void
+    public function getAccessToken(string $userId): void
     {
-        $account = SocialAccount::whereUserId($post->user->id)->whereProvider('traewelling')->first();
+        $account = SocialAccount::whereUserId($userId)->whereProvider('traewelling')->first();
 
         // if traewelling token is expired, refresh it
         if ($account && $account->token_expires_at && $account->token_expires_at->isPast()) {
@@ -110,5 +109,17 @@ class TraewellingRequestService
         $response = $client->post('trains/trip', ['json' => $data]);
 
         return json_decode($response->getBody()->getContents(), true);
+    }
+
+    public function deletePost(int $traewellingPostId, string $userId): void
+    {
+        $this->getAccessToken($userId);
+        $client = $this->getClient();
+        try {
+            $response = $client->delete('status/'.$traewellingPostId);
+            Log::debug('Deleted post', ['response' => $response->getBody()->getContents()]);
+        } catch (GuzzleException $e) {
+            Log::error('Error deleting post in Traewelling', ['exception' => $e->getMessage(), 'traewellingPostId' => $traewellingPostId]);
+        }
     }
 }
