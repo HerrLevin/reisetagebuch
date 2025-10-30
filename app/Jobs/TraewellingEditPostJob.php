@@ -7,7 +7,7 @@ use App\Http\Resources\PostTypes\TransportPost;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
-class EditTraewellingPostJob implements ShouldQueue
+class TraewellingEditPostJob implements ShouldQueue
 {
     use Queueable;
 
