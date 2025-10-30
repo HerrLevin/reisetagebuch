@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import TimeDisplay from '@/Pages/NewPostDialog/Partials/TimeDisplay.vue';
 import { getColor, getEmoji } from '@/Services/DepartureTypeService';
+import {
+    getDepartureLineName,
+    getDepartureTripNumber,
+} from '@/Services/LineNameFormattingService';
 import MotisTimeService from '@/Services/MotisTimeService';
 import { StopDto, StopTime } from '@/types';
 import { Link } from '@inertiajs/vue3';
@@ -65,10 +69,13 @@ function getRouteColor(stopTime: StopTime) {
         </div>
         <div class="col col-span-2 text-center">
             <div
-                class="badge min-w-[3em]"
+                class="badge min-w-[3em] px-[0.5]"
                 :style="`background-color: ${getRouteColor(stopTime)}; color: ${getRouteTextColor(stopTime)}`"
             >
-                {{ stopTime.displayName || stopTime.routeShortName }}
+                {{ getDepartureLineName(stopTime) }}
+            </div>
+            <div class="mt-0.5 text-xs font-medium">
+                {{ getDepartureTripNumber(stopTime) }}
             </div>
         </div>
         <div class="col col-span-6">

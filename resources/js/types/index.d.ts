@@ -79,6 +79,7 @@ export type StopTime = {
     tripId: string;
     displayName: string | null;
     routeShortName: string;
+    tripShortName: string | null;
     routeColor: string | null;
     routeTextColor: string | null;
     source: string;

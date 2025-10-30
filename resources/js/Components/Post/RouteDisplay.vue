@@ -2,6 +2,10 @@
 import Delay from '@/Components/Post/Partials/Delay.vue';
 import { getColor, getEmoji } from '@/Services/DepartureTypeService';
 import {
+    getPostLineName,
+    getPostTripNumber,
+} from '@/Services/LineNameFormattingService';
+import {
     formatArrivalTime,
     formatDepartureTime,
 } from '@/Services/TimeFormattingService';
@@ -80,10 +84,10 @@ function getRouteColor(trip: Trip) {
             <div class="self-end text-center">
                 <div
                     v-show="post.trip.lineName"
-                    class="badge min-w-[3em] text-sm font-medium"
+                    class="badge min-w-[3em] px-[0.5] text-sm font-medium"
                     :style="`background-color: ${getRouteColor(post.trip)}; color: ${getRouteTextColor(post.trip)}`"
                 >
-                    {{ post.trip.displayName || post.trip.lineName }}
+                    {{ getPostLineName(post) }}
                 </div>
             </div>
             <div class="text-right">
@@ -94,9 +98,12 @@ function getRouteColor(trip: Trip) {
             </div>
         </div>
         <div class="flex w-full flex-col">
-            <div class="divider divider-dashed mt-0">
-                {{ getEmoji(post.trip.mode!) }}
+            <div class="divider divider-dashed mt-0 mb-0">
+                <div>{{ getEmoji(post.trip.mode!) }}</div>
             </div>
+        </div>
+        <div class="flex w-full flex-col text-center text-xs font-medium">
+            {{ getPostTripNumber(post) }}
         </div>
     </div>
 </template>
