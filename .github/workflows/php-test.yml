@@ -27,7 +27,7 @@ jobs:
                 php-version: '8.4'
                 extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_pgsql, bcmath, soap, intl, gd, exif, iconv
                 coverage: none
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v6
               with:
                 node-version: 22
 
