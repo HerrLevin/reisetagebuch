@@ -15,7 +15,7 @@ class HashTag extends Model
 
     protected $fillable = [
         'user_id',
-        'value'
+        'value',
     ];
 
     public function user(): BelongsTo
@@ -23,8 +23,8 @@ class HashTag extends Model
         return $this->belongsTo(User::class);
     }
 
-
-    public function posts(): BelongsToMany {
+    public function posts(): BelongsToMany
+    {
         return $this->belongsToMany(Post::class, 'posts_hash_tags_map')
             ->withPivot(['default'])
             ->using(PostsHashTagsMap::class);

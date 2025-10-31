@@ -95,6 +95,7 @@
         "title": "Neuer Beitrag",
         "body_placeholder": "Was denkst du gerade?",
         "select_exit": "Ausstieg auswählen",
+        "tags_placeholder": "Füge Tags hinzu",
         "locations": {
             "filter_placeholder": "Orte filtern",
             "fetching_osm": "Orte aus OpenStreetMap abrufen…",
