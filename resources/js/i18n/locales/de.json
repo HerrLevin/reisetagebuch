@@ -289,18 +289,20 @@
         "authenticated_only_description": "Nur sichtbar für angemeldete Nutzer:innen"
     },
     "transport_modes": {
-        "TRANSIT": "ÖPNV",
         "WALK": "Laufen",
         "BIKE": "Fahrrad",
         "RENTAL": "Mietrad",
         "CAR": "Auto",
         "CAR_PARKING": "Parken",
+        "CAR_DROPOFF": "Auto absetzen",
         "ODM": "On-Demand",
+        "FLEX": "Flex",
+        "TRANSIT": "ÖPNV",
         "TRAM": "Straßenbahn",
         "SUBWAY": "U-Bahn",
         "FERRY": "Fähre",
         "AIRPLANE": "Flugzeug",
-        "METRO": "S-Bahn",
+        "SUBURBAN": "S-Bahn",
         "BUS": "Bus",
         "COACH": "Reisebus",
         "RAIL": "Schiene",
@@ -309,7 +311,12 @@
         "NIGHT_RAIL": "Nachtzug",
         "REGIONAL_FAST_RAIL": "Regionalexpress",
         "REGIONAL_RAIL": "Regionalbahn",
-        "OTHER": "Andere"
+        "CABLE_CAR": "Seilbahn",
+        "FUNICULAR": "Standseilbahn",
+        "AERIAL_LIFT": "Luftseilbahn",
+        "OTHER": "Andere",
+        "AREAL_LIFT": "Luftlift",
+        "METRO": "Metro"
     },
     "transport_group": {
         "long_distance": "Fernverkehr",

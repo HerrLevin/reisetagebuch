@@ -30,7 +30,7 @@ const TransportModeEmoji: Record<TransportMode, string> = {
     [TransportMode.CABLE_CAR]: '🚠',
     [TransportMode.FUNICULAR]: '🚞',
     [TransportMode.AERIAL_LIFT]: '🚡',
-    [TransportMode.AREAL_LIFT]: '🚡',
+    [TransportMode.AREAL_LIFT]: '↕️',
     [TransportMode.OTHER]: '🫥',
 };
 
