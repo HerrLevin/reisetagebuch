@@ -21,7 +21,7 @@ jobs:
           # defaults: # see https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#defaults
           steps: |
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - uses: shivammathur/setup-php@v2
               with:
                 php-version: '8.4'
