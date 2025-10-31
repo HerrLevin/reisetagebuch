@@ -149,7 +149,7 @@ const headerUpload = (event: Event) => {
                     v-model="form.website"
                     :error="form.errors.website"
                     class="mt-1 block w-3/4"
-                    :placeholder="t('profile.bio')"
+                    :placeholder="t('profile.website')"
                     @keydown.enter="submit"
                 />
 
