@@ -187,6 +187,28 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property string $id
+ * @property string $post_id
+ * @property string $hash_tag_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\HashTag $hashTag
+ * @property-read \App\Models\Post $post
+ * @method static \Database\Factories\PostsHashTagsMapFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PostsHashTagsMap newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PostsHashTagsMap newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PostsHashTagsMap query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PostsHashTagsMap whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PostsHashTagsMap whereHashTagId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PostsHashTagsMap whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PostsHashTagsMap wherePostId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PostsHashTagsMap whereUpdatedAt($value)
+ */
+	class PostsHashTagsMap extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property string $id
  * @property string $user_id
  * @property string|null $avatar
  * @property string|null $bio

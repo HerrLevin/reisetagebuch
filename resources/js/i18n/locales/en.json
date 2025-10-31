@@ -97,6 +97,7 @@
         "title": "New Post",
         "body_placeholder": "What's on your mind?",
         "select_exit": "Select Exit",
+        "tags_placeholder": "Add tags",
         "locations": {
             "filter_placeholder": "Filter locations",
             "fetching_osm": "Fetching locations from OpenStreetMap...",
