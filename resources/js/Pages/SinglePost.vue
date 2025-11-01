@@ -3,6 +3,7 @@ import Map from '@/Components/Map.vue';
 import Post from '@/Components/Post/Post.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { getColor } from '@/Services/DepartureTypeService';
+import { getArrivalTime, getDepartureTime } from '@/Services/TripTimeService';
 import {
     BasePost,
     isLocationPost,
@@ -15,7 +16,7 @@ import axios from 'axios';
 import { GeometryCollection } from 'geojson';
 import { ArrowLeft } from 'lucide-vue-next';
 import { LngLat } from 'maplibre-gl';
-import { PropType, ref } from 'vue';
+import { computed, onMounted, onUnmounted, PropType, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -83,6 +84,47 @@ if (isLocationPost(props.post)) {
 if (props.post.body) {
     head += `: ${props.post.body}`;
 }
+
+const currentTime = ref(Date.now());
+let intervalId: number | null = null;
+
+onMounted(() => {
+    intervalId = window.setInterval(() => {
+        currentTime.value = Date.now();
+    }, 1000);
+});
+
+onUnmounted(() => {
+    if (intervalId) {
+        clearInterval(intervalId);
+    }
+});
+
+const progress = computed(() => {
+    if (!isTransportPost(props.post)) return 0;
+
+    const transportPost = props.post as TransportPost;
+    const departureTime =
+        transportPost.manualDepartureTime ||
+        getDepartureTime(transportPost.originStop)?.toISO();
+    const arrivalTime =
+        transportPost.manualArrivalTime ||
+        getArrivalTime(transportPost.destinationStop)?.toISO();
+
+    if (!departureTime || !arrivalTime) return 0;
+
+    const departure = new Date(departureTime).getTime();
+    const arrival = new Date(arrivalTime).getTime();
+    const now = currentTime.value;
+
+    if (now < departure) return 0;
+    if (now > arrival) return 100;
+
+    const totalDuration = arrival - departure;
+    const elapsed = now - departure;
+
+    return Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
+});
 </script>
 
 <template>
@@ -118,6 +160,7 @@ if (props.post.body) {
                         ? post.trip.routeColor || getColor(post.trip.mode)
                         : undefined
                 "
+                :progress="progress"
             ></Map>
             <div class="p-4">
                 <ul class="list">

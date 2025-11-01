@@ -17,7 +17,7 @@ import {
     LngLatBoundsLike,
     StyleSpecification,
 } from 'maplibre-gl';
-import { PropType, ref, watch } from 'vue';
+import { computed, PropType, ref, watch } from 'vue';
 
 const props = defineProps({
     startPoint: {
@@ -44,6 +44,12 @@ const props = defineProps({
         type: String,
         default: '#FF0000',
         required: false,
+    },
+    progress: {
+        type: Number,
+        default: 0,
+        required: false,
+        validator: (value: number) => value >= 0 && value <= 100,
     },
 });
 
@@ -97,6 +103,46 @@ if (props.endPoint) {
     geoJsonA.value.features.push(
         getPointFeature(props.endPoint.lng, props.endPoint.lat),
     );
+}
+
+function interpolatePointOnLine(
+    coordinates: number[][],
+    percentage: number,
+): [number, number] | null {
+    if (!coordinates || coordinates.length < 2) return null;
+
+    let totalDistance = 0;
+    const distances: number[] = [0];
+
+    for (let i = 1; i < coordinates.length; i++) {
+        const [lng1, lat1] = coordinates[i - 1];
+        const [lng2, lat2] = coordinates[i];
+        const distance = Math.sqrt(
+            Math.pow(lng2 - lng1, 2) + Math.pow(lat2 - lat1, 2),
+        );
+        totalDistance += distance;
+        distances.push(totalDistance);
+    }
+
+    const targetDistance = (percentage / 100) * totalDistance;
+
+    for (let i = 1; i < coordinates.length; i++) {
+        if (distances[i] >= targetDistance) {
+            const segmentDistance = distances[i] - distances[i - 1];
+            const segmentProgress =
+                (targetDistance - distances[i - 1]) / segmentDistance;
+
+            const [lng1, lat1] = coordinates[i - 1];
+            const [lng2, lat2] = coordinates[i];
+
+            const lng = lng1 + (lng2 - lng1) * segmentProgress;
+            const lat = lat1 + (lat2 - lat1) * segmentProgress;
+
+            return [lng, lat];
+        }
+    }
+
+    return coordinates[coordinates.length - 1] as [number, number];
 }
 
 // watch props.lineString to update geoJsonSource
@@ -154,6 +200,43 @@ watch(
     },
     { immediate: true },
 );
+
+const animatedPointSource = computed(() => {
+    if (!geoJsonSource.value || !geoJsonSource.value.features.length) {
+        return null;
+    }
+
+    const feature = geoJsonSource.value.features[0];
+    let coordinates: number[][] = [];
+
+    if (feature.geometry.type === 'LineString') {
+        coordinates = feature.geometry.coordinates as number[][];
+    } else if (feature.geometry.type === 'GeometryCollection') {
+        const lineString = feature.geometry.geometries.find(
+            (g) => g.type === 'LineString',
+        );
+        if (lineString && lineString.type === 'LineString') {
+            coordinates = lineString.coordinates as number[][];
+        }
+    }
+
+    const point = interpolatePointOnLine(coordinates, props.progress);
+    if (!point) return null;
+
+    return {
+        type: 'FeatureCollection',
+        features: [
+            {
+                type: 'Feature',
+                properties: {},
+                geometry: {
+                    type: 'Point',
+                    coordinates: point,
+                },
+            },
+        ],
+    } as FeatureCollection;
+});
 </script>
 
 <template>
@@ -221,6 +304,23 @@ watch(
                     'circle-color': '#007cbf',
                     'circle-stroke-color': '#fff',
                     'circle-stroke-width': 2,
+                }"
+            >
+            </mgl-circle-layer>
+        </mgl-geo-json-source>
+        <mgl-geo-json-source
+            v-if="animatedPointSource"
+            source-id="animated-point"
+            :data="animatedPointSource"
+        >
+            <mgl-circle-layer
+                layer-id="animated-point"
+                :paint="{
+                    'circle-radius': 8,
+                    'circle-color': '#FF6B00',
+                    'circle-stroke-color': '#fff',
+                    'circle-stroke-width': 3,
+                    'circle-opacity': 0.9,
                 }"
             >
             </mgl-circle-layer>
