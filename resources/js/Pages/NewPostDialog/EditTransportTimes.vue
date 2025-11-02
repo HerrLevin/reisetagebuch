@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { getBaseText, prettyDates } from '@/Services/PostTextService';
+import { getDepartureDelay } from '@/Services/TripTimeService';
 import { TransportPost } from '@/types/PostTypes';
 import { Head, router } from '@inertiajs/vue3';
 import { CircleX, PlaneLanding, PlaneTakeoff } from 'lucide-vue-next';
@@ -12,7 +13,7 @@ const { t } = useI18n();
 
 const props = defineProps({
     post: {
-        type: Object as PropType<TransportPost> | null,
+        type: Object as PropType<TransportPost>,
         required: true,
     },
 });
@@ -55,6 +56,18 @@ function goBack() {
     window.history.back();
 }
 
+function departNow() {
+    manualDeparture.value = DateTime.now().set({ second: 0, millisecond: 0 });
+    const post = props.post;
+    post.manualDepartureTime = manualDeparture.value.toISO();
+    const delay = getDepartureDelay(props.post);
+    if (delay && delay > 1 && post?.destinationStop?.arrivalTime) {
+        manualArrival.value = DateTime.fromISO(
+            post.destinationStop.arrivalTime,
+        ).plus({ minutes: delay });
+    }
+}
+
 function selectDepartureDate(event: Event) {
     const target = event.target as HTMLInputElement;
 
@@ -78,6 +91,7 @@ function selectDepartureTime(event: Event) {
         manualDeparture.value = manualDeparture.value.set({
             hour: hours,
             minute: minutes,
+            second: 0,
         });
     } else {
         manualDeparture.value = DateTime.fromISO(target.value);
@@ -107,6 +121,7 @@ function selectArrivalTime(event: Event) {
         manualArrival.value = manualArrival.value.set({
             hour: hours,
             minute: minutes,
+            second: 1,
         });
     } else {
         manualArrival.value = DateTime.fromISO(target.value);
@@ -173,9 +188,7 @@ function selectArrivalTime(event: Event) {
                         <div class="col col-span-2 content-end md:col-span-1">
                             <button
                                 class="btn btn-primary w-full"
-                                @click.prevent="
-                                    manualDeparture = DateTime.now()
-                                "
+                                @click.prevent="departNow()"
                             >
                                 <PlaneTakeoff class="size-5" />
                                 {{ t('edit_transport_times.depart_now') }}
@@ -223,7 +236,12 @@ function selectArrivalTime(event: Event) {
                         <div class="col col-span-2 content-end md:col-span-1">
                             <button
                                 class="btn btn-primary w-full"
-                                @click.prevent="manualArrival = DateTime.now()"
+                                @click.prevent="
+                                    manualArrival = DateTime.now().set({
+                                        second: 1,
+                                        millisecond: 0,
+                                    })
+                                "
                             >
                                 <PlaneLanding class="size-5" />
                                 {{ t('edit_transport_times.arrive_now') }}
