@@ -57,6 +57,9 @@ if (date.diffNow('days').days < -1) {
                 />
                 {{ relativeCreatedAt }}
             </span>
+            <span v-if="isTransportPost(post)" class="text-xs opacity-60">
+                · {{ DateTime.fromISO(post.published_at).toLocaleString() }}
+            </span>
         </div>
         <p
             v-if="post.body"

@@ -16,6 +16,8 @@ class BasePost
 
     public Visibility $visibility;
 
+    public string $published_at;
+
     public string $created_at;
 
     public string $updated_at;
@@ -26,6 +28,7 @@ class BasePost
         $this->body = $post->body;
         $this->user = $userDto;
         $this->visibility = $post->visibility;
+        $this->published_at = $post->published_at->toIso8601String();
         $this->created_at = $post->created_at->toIso8601String();
         $this->updated_at = $post->updated_at->toIso8601String();
     }

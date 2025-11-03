@@ -145,12 +145,18 @@ class PostRepository
         ?string $body = null
     ): BasePost|LocationPost|TransportPost {
         try {
+            $publishedAt = Carbon::now();
+            if ($publishedAt < $originStop->departure_time) {
+                $publishedAt = $originStop->departure_time->subMinutes(10);
+            }
+
             DB::beginTransaction();
             /** @var Post $post */
             $post = Post::create([
                 'user_id' => $user->id,
                 'body' => $body,
                 'visibility' => $visibility,
+                'published_at' => $publishedAt,
             ]);
 
             // create transport post
@@ -158,9 +164,6 @@ class PostRepository
                 'transport_trip_id' => $transportTrip->id,
                 'origin_stop_id' => $originStop->id,
                 'destination_stop_id' => $destinationStop->id,
-                'departure' => now(),
-                'arrival' => now(),
-                'mode' => 'lol',
             ]);
             DB::commit();
 
@@ -181,7 +184,7 @@ class PostRepository
         ])
             ->where('user_id', '=', $user->id)
             ->orWhereIn('visibility', [Visibility::PUBLIC->value, Visibility::ONLY_AUTHENTICATED->value])
-            ->latest()
+            ->orderByDesc('published_at')
             ->cursorPaginate(50);
 
         $mapped = $posts->map(function (Post $post) {
@@ -214,7 +217,7 @@ class PostRepository
         }
 
         $posts = $posts
-            ->latest()
+            ->orderByDesc('published_at')
             ->cursorPaginate(50);
 
         $mapped = $posts->map(function (Post $post) {
