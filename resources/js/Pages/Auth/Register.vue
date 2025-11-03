@@ -117,7 +117,7 @@ const submit = () => {
             <div class="mt-4">
                 <InputLabel
                     for="password_confirmation"
-                    :value="t('auth.login.confirm_password')"
+                    :value="t('auth.register.confirm_password')"
                 />
 
                 <TextInput

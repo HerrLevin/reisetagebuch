@@ -14,7 +14,12 @@ class Post extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $fillable = ['user_id', 'body', 'published_at', 'visibility'];
+    protected $fillable = [
+        'user_id',
+        'body',
+        'published_at',
+        'visibility',
+    ];
 
     protected $casts = [
         'published_at' => 'datetime',

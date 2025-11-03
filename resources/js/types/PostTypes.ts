@@ -6,6 +6,7 @@ export type BasePost = {
     body: string;
     user: UserDto;
     visibility: Visibility;
+    published_at: string;
     created_at: string;
     updated_at: string;
 };

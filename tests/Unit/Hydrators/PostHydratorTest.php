@@ -45,6 +45,7 @@ class PostHydratorTest extends TestCase
                 'body' => 'This is a test post',
                 'created_at' => Carbon::parse('2023-01-01 00:00:00'),
                 'updated_at' => Carbon::parse('2023-01-01 00:00:01'),
+                'published_at' => Carbon::parse('2023-01-01 00:00:02'),
                 'transportPost' => $transportPost,
                 'locationPost' => $locationPost,
                 'visibility' => Visibility::PUBLIC,
@@ -74,6 +75,7 @@ class PostHydratorTest extends TestCase
         $this->assertEquals('This is a test post', $dto->body);
         $this->assertEquals('2023-01-01T00:00:00+00:00', $dto->created_at);
         $this->assertEquals('2023-01-01T00:00:01+00:00', $dto->updated_at);
+        $this->assertEquals('2023-01-01T00:00:02+00:00', $dto->published_at);
         $this->assertEquals($userHydrator->modelToDto($post->user), $dto->user);
     }
 

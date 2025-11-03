@@ -138,7 +138,7 @@ namespace App\Models{
  * @property string $id
  * @property string $user_id
  * @property string|null $body
- * @property \Illuminate\Support\Carbon|null $published_at
+ * @property \Illuminate\Support\Carbon $published_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \App\Enums\Visibility $visibility
