@@ -161,7 +161,8 @@ class OverpassRequestService
      */
     public function parseLocations(array $response): Generator
     {
-        foreach ($response['elements'] as $element) {
+        $elements = $response['elements'] ?? [];
+        foreach ($elements as $element) {
             if (in_array($element['type'], ['node', 'way', 'relation'])) {
                 yield new OverpassLocation(
                     osmId: $element['id'],
