@@ -15,6 +15,32 @@ namespace App\Models{
 /**
  * @property string $id
  * @property string $user_id
+ * @property string $value
+ * @property int $relevance
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\PostsHashTagsMap|null $pivot
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Post> $posts
+ * @property-read int|null $posts_count
+ * @property-read \App\Models\User $user
+ * @method static \Database\Factories\HashTagFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|HashTag newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|HashTag newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|HashTag query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|HashTag whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|HashTag whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|HashTag whereRelevance($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|HashTag whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|HashTag whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|HashTag whereValue($value)
+ */
+	class HashTag extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property string $id
+ * @property string $user_id
  * @property string|null $used_by
  * @property \Illuminate\Support\Carbon|null $expires_at
  * @property \Illuminate\Support\Carbon|null $used_at
@@ -142,6 +168,9 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \App\Enums\Visibility $visibility
+ * @property-read \App\Models\PostsHashTagsMap|null $pivot
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\HashTag> $hashTags
+ * @property-read int|null $hash_tags_count
  * @property-read \App\Models\LocationPost|null $locationPost
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PostMetaInfo> $metaInfos
  * @property-read int|null $meta_infos_count
@@ -182,6 +211,28 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PostMetaInfo whereValue($value)
  */
 	class PostMetaInfo extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property string $id
+ * @property string $post_id
+ * @property string $hash_tag_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\HashTag $hashTag
+ * @property-read \App\Models\Post $post
+ * @method static \Database\Factories\PostsHashTagsMapFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PostsHashTagsMap newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PostsHashTagsMap newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PostsHashTagsMap query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PostsHashTagsMap whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PostsHashTagsMap whereHashTagId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PostsHashTagsMap whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PostsHashTagsMap wherePostId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PostsHashTagsMap whereUpdatedAt($value)
+ */
+	class PostsHashTagsMap extends \Eloquent {}
 }
 
 namespace App\Models{

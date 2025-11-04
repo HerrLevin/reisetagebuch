@@ -9,6 +9,7 @@ export type BasePost = {
     published_at: string;
     created_at: string;
     updated_at: string;
+    hashTags: string[];
 };
 
 export type LocationPost = BasePost & {

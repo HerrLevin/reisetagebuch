@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Inertia;
 
-use App\Http\Requests\LocationPostRequest;
-use App\Http\Requests\PostRequest;
-use App\Http\Requests\TransportPostCreateRequest;
+use App\Http\Requests\BasePostRequest;
+use App\Http\Requests\LocationBasePostRequest;
+use App\Http\Requests\TransportBasePostCreateRequest;
 use App\Http\Requests\TransportPostUpdateRequest;
 use App\Http\Requests\TransportTimesUpdateRequest;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -48,7 +48,7 @@ class PostController extends Controller
         return Inertia::render('NewPostDialog/CreateTextPost');
     }
 
-    public function storeTransport(TransportPostCreateRequest $request): RedirectResponse
+    public function storeTransport(TransportBasePostCreateRequest $request): RedirectResponse
     {
         $post = $this->postController->storeMotisTransport($request);
 
@@ -57,7 +57,7 @@ class PostController extends Controller
         ]);
     }
 
-    public function storeText(PostRequest $request): RedirectResponse
+    public function storeText(BasePostRequest $request): RedirectResponse
     {
         $post = $this->postController->storeText($request);
 
@@ -66,7 +66,7 @@ class PostController extends Controller
         ]);
     }
 
-    public function storeLocation(LocationPostRequest $request): RedirectResponse
+    public function storeLocation(LocationBasePostRequest $request): RedirectResponse
     {
         $post = $this->postController->storeLocation($request);
 
@@ -112,7 +112,7 @@ class PostController extends Controller
     /**
      * @throws AuthorizationException
      */
-    public function update(string $postId, PostRequest $request): RedirectResponse
+    public function update(string $postId, BasePostRequest $request): RedirectResponse
     {
         $post = $this->postController->updatePost($postId, $request);
 

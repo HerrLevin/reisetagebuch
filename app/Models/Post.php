@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
@@ -44,5 +45,12 @@ class Post extends Model
     public function metaInfos(): HasMany
     {
         return $this->hasMany(PostMetaInfo::class);
+    }
+
+    public function hashTags(): BelongsToMany
+    {
+        return $this->belongsToMany(HashTag::class, 'posts_hash_tags_maps')
+            ->withPivot('hash_tag_id', 'post_id')
+            ->using(PostsHashTagsMap::class);
     }
 }

@@ -22,6 +22,9 @@ class BasePost
 
     public string $updated_at;
 
+    /** @var string[] */
+    public array $hashTags = [];
+
     public function __construct(Post $post, UserDto $userDto)
     {
         $this->id = $post->id;
@@ -31,5 +34,6 @@ class BasePost
         $this->published_at = $post->published_at->toIso8601String();
         $this->created_at = $post->created_at->toIso8601String();
         $this->updated_at = $post->updated_at->toIso8601String();
+        $this->hashTags = $post->hashTags?->map(fn ($hashTag) => $hashTag->value)->toArray() ?? [];
     }
 }

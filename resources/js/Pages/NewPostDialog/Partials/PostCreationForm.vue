@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import TagsInput from '@/Pages/NewPostDialog/Partials/TagsInput.vue';
 import {
     getDescription,
     getIcon,
@@ -34,9 +35,18 @@ const props = defineProps({
         type: String,
         default: null,
     },
+    tags: {
+        type: Array as () => string[],
+        default: () => [],
+    },
 });
 
-const emit = defineEmits(['cancel', 'selectVisibility', 'update:modelValue']);
+const emit = defineEmits([
+    'cancel',
+    'selectVisibility',
+    'update:modelValue',
+    'update:tags',
+]);
 const selectedVisibility = ref(props.defaultVisibility || Visibility.PUBLIC);
 
 if (!props.defaultVisibility) {
@@ -62,6 +72,9 @@ function selectVisibility(visibility: Visibility) {
 
 function blur() {
     (document.activeElement as HTMLElement)?.blur();
+}
+function updateTags(tags: string[]) {
+    emit('update:tags', tags);
 }
 </script>
 
@@ -127,6 +140,7 @@ function blur() {
             class="textarea textarea-ghost transparent-input w-full"
             :placeholder="t('new_post.body_placeholder')"
         ></textarea>
+        <TagsInput :tags="tags" @update:tags="updateTags"></TagsInput>
     </div>
     <div class="flex w-full justify-end gap-4 p-8"></div>
     <div class="flex w-full justify-end gap-4 px-8 py-4">

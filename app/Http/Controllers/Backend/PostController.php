@@ -10,9 +10,9 @@ use App\Enums\Visibility;
 use App\Exceptions\OriginAfterDestinationException;
 use App\Exceptions\StationNotOnTripException;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\LocationPostRequest;
-use App\Http\Requests\PostRequest;
-use App\Http\Requests\TransportPostCreateRequest;
+use App\Http\Requests\BasePostRequest;
+use App\Http\Requests\LocationBasePostRequest;
+use App\Http\Requests\TransportBasePostCreateRequest;
 use App\Http\Requests\TransportPostUpdateRequest;
 use App\Http\Requests\TransportTimesUpdateRequest;
 use App\Http\Resources\PostTypes\BasePost;
@@ -50,7 +50,7 @@ class PostController extends Controller
         $this->transportTripRepository = $transportTripRepository;
     }
 
-    public function storeLocation(LocationPostRequest $request): BasePost|LocationPost|TransportPost
+    public function storeLocation(LocationBasePostRequest $request): BasePost|LocationPost|TransportPost
     {
         $location = $this->locationRepository->getLocationById($request->input('location'));
 
@@ -58,20 +58,22 @@ class PostController extends Controller
             $request->user(),
             $location,
             Visibility::from($request->input('visibility')),
-            $request->input('body')
+            $request->input('body'),
+            $request->input('tags', [])
         );
     }
 
-    public function storeText(PostRequest $request): BasePost
+    public function storeText(BasePostRequest $request): BasePost
     {
         return $this->postRepository->storeText(
             $request->user(),
             Visibility::from($request->input('visibility')),
             $request->input('body'),
+            $request->input('tags', [])
         );
     }
 
-    public function storeMotisTransport(TransportPostCreateRequest $request): BasePost|LocationPost|TransportPost
+    public function storeMotisTransport(TransportBasePostCreateRequest $request): BasePost|LocationPost|TransportPost
     {
         $trip = $this->transportTripRepository->getTripByIdentifier(
             $request->tripId,
@@ -107,7 +109,8 @@ class PostController extends Controller
             $startStopover,
             $stopStopover,
             Visibility::from($request->input('visibility')),
-            $request->body
+            $request->body,
+            $request->input('tags', [])
         );
 
         TraewellingCrossCheckInJob::dispatch($post->id);
@@ -152,7 +155,7 @@ class PostController extends Controller
     /**
      * @throws AuthorizationException
      */
-    public function updatePost(string $postId, PostRequest $request): BasePost
+    public function updatePost(string $postId, BasePostRequest $request): BasePost
     {
         $post = $this->postRepository->getById($postId, Auth::user());
         $this->authorize('update', $post);
@@ -161,6 +164,7 @@ class PostController extends Controller
             $post,
             Visibility::from($request->input('visibility')),
             $request->input('body'),
+            $request->input('tags', [])
         );
 
         if ($post instanceof TransportPost) {

@@ -23,6 +23,7 @@ const form = reactive({
     body: '',
     location: id,
     visibility: Visibility.PUBLIC,
+    tags: [] as string[],
 });
 
 function submitForm() {
@@ -50,6 +51,7 @@ function submitForm() {
                     @select-visibility="
                         (visibility) => (form.visibility = visibility)
                     "
+                    @update:tags="(tags) => (form.tags = tags)"
                 />
             </form>
         </div>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import HashTags from '@/Components/Post/HashTags.vue';
 import Interactions from '@/Components/Post/Interactions.vue';
 import LocationDisplay from '@/Components/Post/LocationDisplay.vue';
 import RouteDisplay from '@/Components/Post/RouteDisplay.vue';
@@ -75,6 +76,7 @@ if (date.diffNow('days').days < -1) {
             v-else-if="isTransportPost(post)"
             :post="post as TransportPost"
         />
+        <HashTags :hash-tags="post.hashTags" />
         <Interactions :post />
     </div>
 </template>
