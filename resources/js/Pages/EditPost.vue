@@ -25,6 +25,7 @@ const form = reactive({
     id: '',
     body: '' as string | undefined,
     visibility: Visibility.PUBLIC,
+    tags: [] as string[],
 });
 
 function submitForm() {
@@ -37,6 +38,7 @@ function submitForm() {
 form.id = props.post.id;
 form.body = props.post.body || '';
 form.visibility = props.post.visibility;
+form.tags = props.post.hashTags || [];
 
 const subtitle = `${getBaseText(props.post)} (${prettyDates(props.post)})`;
 const title = t('edit_post.title');
@@ -60,8 +62,10 @@ const fullTitle = `${title} · ${subtitle}`;
                     emoji="✍"
                     :default-visibility="form.visibility"
                     :confirm-button-text="t('verbs.save')"
+                    :tags="form.tags"
                     @cancel="goBack"
                     @select-visibility="(vis) => (form.visibility = vis)"
+                    @update:tags="(tags) => (form.tags = tags)"
                 />
             </form>
         </div>

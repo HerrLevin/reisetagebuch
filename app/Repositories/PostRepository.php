@@ -23,12 +23,15 @@ class PostRepository
 {
     private PostHydrator $postHydrator;
 
-    public function __construct(?PostHydrator $postHydrator = null)
+    private HashTagRepository $hashTagRepository;
+
+    public function __construct(?PostHydrator $postHydrator = null, ?HashTagRepository $hashTagRepository = null)
     {
         $this->postHydrator = $postHydrator ?? new PostHydrator;
+        $this->hashTagRepository = $hashTagRepository ?? new HashTagRepository;
     }
 
-    public function storeLocation(User $user, Location $location, Visibility $visibility, ?string $body = null): BasePost|LocationPost|TransportPost
+    public function storeLocation(User $user, Location $location, Visibility $visibility, ?string $body = null, array $hashTagIds = []): BasePost|LocationPost|TransportPost
     {
         try {
             DB::beginTransaction();
@@ -42,9 +45,14 @@ class PostRepository
             $post->locationPost()->create([
                 'location_id' => $location->id,
             ]);
+
+            if (! empty($hashTagIds)) {
+                $this->hashTagRepository->syncHashTagsByValue($post, $hashTagIds);
+            }
+
             DB::commit();
 
-            $post->load('locationPost');
+            $post->load('locationPost', 'hashTags');
         } catch (Throwable $e) {
             DB::rollBack();
             report($e);
@@ -53,7 +61,7 @@ class PostRepository
         return $this->postHydrator->modelToDto($post);
     }
 
-    public function storeText(User $user, Visibility $visibility, string $body): BasePost|LocationPost|TransportPost
+    public function storeText(User $user, Visibility $visibility, string $body, array $tags = []): BasePost|LocationPost|TransportPost
     {
         try {
             DB::beginTransaction();
@@ -63,8 +71,14 @@ class PostRepository
                 'body' => $body,
                 'visibility' => $visibility,
             ]);
+
+            if (! empty($tags)) {
+                $this->hashTagRepository->syncHashTagsByValue($post, $tags);
+            }
+
             DB::commit();
 
+            $post->load('hashTags');
         } catch (Throwable $e) {
             DB::rollBack();
             report($e);
@@ -73,7 +87,7 @@ class PostRepository
         return $this->postHydrator->modelToDto($post);
     }
 
-    public function updateBasePost(BasePost $basePost, ?Visibility $visibility, ?string $body): BasePost|LocationPost|TransportPost
+    public function updateBasePost(BasePost $basePost, ?Visibility $visibility, ?string $body, array $hashTagIds = []): BasePost|LocationPost|TransportPost
     {
         try {
             DB::beginTransaction();
@@ -85,9 +99,14 @@ class PostRepository
                 $post->visibility = $visibility;
             }
             $post->save();
+
+            if (! empty($hashTagIds)) {
+                $this->hashTagRepository->syncHashTagsByValue($post, $hashTagIds);
+            }
+
             DB::commit();
 
-            $post->load('locationPost', 'transportPost');
+            $post->load('locationPost', 'transportPost', 'hashTags');
         } catch (Throwable $e) {
             DB::rollBack();
             report($e);
@@ -142,7 +161,8 @@ class PostRepository
         TransportTripStop $originStop,
         TransportTripStop $destinationStop,
         Visibility $visibility,
-        ?string $body = null
+        ?string $body = null,
+        array $hashTagIds = []
     ): BasePost|LocationPost|TransportPost {
         try {
             DB::beginTransaction();
@@ -162,9 +182,14 @@ class PostRepository
                 'arrival' => now(),
                 'mode' => 'lol',
             ]);
+
+            if (! empty($hashTagIds)) {
+                $this->hashTagRepository->syncHashTagsByValue($post, $hashTagIds);
+            }
+
             DB::commit();
 
-            $post->load('transportPost');
+            $post->load('transportPost', 'hashTags');
         } catch (Throwable $e) {
             DB::rollBack();
             report($e);
@@ -177,7 +202,7 @@ class PostRepository
     {
         $posts = Post::with([
             'user', 'locationPost.location', 'locationPost.location.tags', 'transportPost', 'transportPost.origin', 'transportPost.destination',
-            'transportPost.originStop.location', 'transportPost.destinationStop.location', 'transportPost.transportTrip',
+            'transportPost.originStop.location', 'transportPost.destinationStop.location', 'transportPost.transportTrip', 'hashTags',
         ])
             ->where('user_id', '=', $user->id)
             ->orWhereIn('visibility', [Visibility::PUBLIC->value, Visibility::ONLY_AUTHENTICATED->value])
@@ -202,7 +227,7 @@ class PostRepository
             $user = $user->id;
         }
 
-        $posts = Post::with(['user', 'locationPost.location', 'locationPost.location.tags', 'transportPost', 'transportPost.origin', 'transportPost.destination'])
+        $posts = Post::with(['user', 'locationPost.location', 'locationPost.location.tags', 'transportPost', 'transportPost.origin', 'transportPost.destination', 'hashTags'])
             ->where('user_id', $user);
 
         if ($visitingUser && $visitingUser->id !== $user) {
@@ -231,7 +256,7 @@ class PostRepository
 
     public function getById(string $postId, ?User $visitingUser = null): BasePost|LocationPost|TransportPost
     {
-        $post = Post::with(['user', 'locationPost.location', 'locationPost.location.tags', 'transportPost', 'transportPost.origin', 'transportPost.destination'])
+        $post = Post::with(['user', 'locationPost.location', 'locationPost.location.tags', 'transportPost', 'transportPost.origin', 'transportPost.destination', 'hashTags'])
             ->where('id', $postId)
             ->firstOrFail();
 

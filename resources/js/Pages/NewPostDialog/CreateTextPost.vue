@@ -15,6 +15,7 @@ function goBack() {
 const form = reactive({
     body: '',
     visibility: Visibility.PUBLIC,
+    tags: [] as string[],
 });
 
 function submitForm() {
@@ -42,6 +43,7 @@ function submitForm() {
                     @select-visibility="
                         (visibility) => (form.visibility = visibility)
                     "
+                    @update:tags="(tags) => (form.tags = tags)"
                 />
             </form>
         </div>

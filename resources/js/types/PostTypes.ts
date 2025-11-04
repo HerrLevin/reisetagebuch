@@ -8,6 +8,7 @@ export type BasePost = {
     visibility: Visibility;
     created_at: string;
     updated_at: string;
+    hashTags: string[];
 };
 
 export type LocationPost = BasePost & {
