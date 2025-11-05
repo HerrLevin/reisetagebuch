@@ -43,6 +43,7 @@ Route::middleware('auth')->group(callback: function () {
         Route::get('/create', [PostController::class, 'create'])->name('posts.create.post');
         Route::post('/create', [PostController::class, 'storeText'])->name('posts.create.text-post.store');
         Route::get('/new', [PostController::class, 'createText'])->name('posts.create.text');
+        Route::post('/mass-edit', [PostController::class, 'massEdit'])->name('posts.mass-edit');
         Route::delete('/{postId}', [PostController::class, 'destroy'])->name('posts.destroy');
         Route::patch('/{postId}', [PostController::class, 'update'])->name('posts.update');
         Route::get('/{postId}/edit', [PostController::class, 'edit'])->name('posts.edit');

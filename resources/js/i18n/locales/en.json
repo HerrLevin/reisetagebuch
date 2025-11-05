@@ -228,6 +228,10 @@
             "general_share": "Check out {username}'s post {baseText}"
         }
     },
+    "common": {
+        "cancel": "Cancel",
+        "saving": "Saving..."
+    },
     "verbs": {
         "share": "Share",
         "edit": "Edit",
@@ -265,6 +269,23 @@
             "filtered_results": "Filtered Results",
             "all_posts": "All Posts",
             "no_results": "No posts found matching your filters"
+        },
+        "mass_edit": {
+            "title": "Mass Edit Posts",
+            "select_posts": "Select Posts",
+            "selected": "selected",
+            "selected_count": "{count} post selected | {count} posts selected",
+            "edit": "Edit Selected",
+            "visibility": "Visibility",
+            "travel_reason": "Travel Reason",
+            "tags": "Tags",
+            "tags_placeholder": "Add tags to all selected posts",
+            "apply": "Apply Changes",
+            "no_change": "No change",
+            "too_many_tags": "You have selected too many tags (maximum is {max}).",
+            "too_many_tags_detail": "If you apply these changes, only the first {max} tags will be saved per post.",
+            "change_tags_warning": "Changing tags will overwrite existing tags on all selected posts.",
+            "change_tags": "Change Tags"
         },
         "profile_picture_alt": "Profile picture of {name}",
         "name_post": "{name}'s post",

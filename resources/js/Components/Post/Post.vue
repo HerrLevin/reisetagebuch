@@ -49,7 +49,7 @@ if (date.diffNow('days').days < -1) {
             />
         </div>
     </div>
-    <div>
+    <div class="list-col-grow">
         <div class="mb-1 text-xs">
             <Link
                 :href="route('profile.show', post.user.username)"
