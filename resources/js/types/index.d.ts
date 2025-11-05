@@ -9,6 +9,15 @@ export interface User {
     email: string;
     email_verified_at?: string;
     settings: Settings | null;
+    profile: UserProfile | null;
+}
+
+export interface UserProfile {
+    avatar: string | null;
+    header: string | null;
+    bio: string | null;
+    website: string | null;
+    created_at: string;
 }
 
 export interface Settings {
