@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Enums\PostMetaInfo\MetaInfoKey;
 use App\Http\Resources\PostTypes\TransportPost;
 use App\Models\Post;
 use App\Services\TraewellingRequestService;
@@ -20,7 +21,7 @@ class TraewellingDeletePostJob implements ShouldQueue
     public function __construct(TransportPost $transportPost)
     {
         $post = Post::find($transportPost->id);
-        $traewellingPostId = $post->metaInfos->where('key', 'traewelling_trip_id')->first()?->value;
+        $traewellingPostId = $post->metaInfos->where('key', MetaInfoKey::TRAEWELLING_TRIP_ID)->first()?->value;
         $this->traewellingPostId = (int) $traewellingPostId;
         $this->userId = $post->user_id;
     }

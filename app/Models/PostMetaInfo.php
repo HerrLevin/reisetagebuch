@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PostMetaInfo\MetaInfoKey;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -18,6 +19,7 @@ class PostMetaInfo extends Model
 
     protected $casts = [
         'post_id' => 'integer',
+        'key' => MetaInfoKey::class,
     ];
 
     public function post(): BelongsTo

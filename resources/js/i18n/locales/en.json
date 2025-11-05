@@ -291,6 +291,20 @@
         "authenticated_only": "Authenticated Only",
         "authenticated_only_description": "Only visible to authenticated users"
     },
+    "travel_reason": {
+        "leisure": "Leisure",
+        "leisure_description": "Traveling for leisure or vacation",
+        "business": "Business",
+        "business_description": "Traveling for work or business purposes",
+        "commute": "Commute",
+        "commute_description": "Traveling to and from work or school",
+        "other": "Other",
+        "other_description": "Other reasons for travel",
+        "errand": "Errand",
+        "errand_description": "Traveling for personal errands or tasks",
+        "crew": "Crew",
+        "crew_description": "Traveling as part of a crew or staff"
+    },
     "transport_modes": {
         "WALK": "Walk",
         "BIKE": "Bike",

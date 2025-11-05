@@ -3,6 +3,8 @@
 namespace App\Repositories;
 
 use App\Dto\PostPaginationDto;
+use App\Enums\PostMetaInfo\MetaInfoKey;
+use App\Enums\PostMetaInfo\TravelReason;
 use App\Enums\Visibility;
 use App\Exceptions\OriginAfterDestinationException;
 use App\Exceptions\StationNotOnTripException;
@@ -25,14 +27,23 @@ class PostRepository
 
     private HashTagRepository $hashTagRepository;
 
-    public function __construct(?PostHydrator $postHydrator = null, ?HashTagRepository $hashTagRepository = null)
+    private PostMetaInfoRepository $postMetaInfoRepository;
+
+    public function __construct(?PostHydrator $postHydrator = null, ?HashTagRepository $hashTagRepository = null, ?PostMetaInfoRepository $postMetaInfoRepository = null)
     {
         $this->postHydrator = $postHydrator ?? new PostHydrator;
         $this->hashTagRepository = $hashTagRepository ?? new HashTagRepository;
+        $this->postMetaInfoRepository = $postMetaInfoRepository ?? new PostMetaInfoRepository;
     }
 
-    public function storeLocation(User $user, Location $location, Visibility $visibility, ?string $body = null, array $hashTagIds = []): BasePost|LocationPost|TransportPost
-    {
+    public function storeLocation(
+        User $user,
+        Location $location,
+        Visibility $visibility,
+        ?string $body = null,
+        array $hashTagIds = [],
+        TravelReason $travelReason = TravelReason::LEISURE
+    ): BasePost|LocationPost|TransportPost {
         try {
             DB::beginTransaction();
             /** @var Post $post */
@@ -49,6 +60,7 @@ class PostRepository
             if (! empty($hashTagIds)) {
                 $this->hashTagRepository->syncHashTagsByValue($post, $hashTagIds);
             }
+            $this->postMetaInfoRepository->updateOrCreateMetaInfo($post, MetaInfoKey::TRAVEL_REASON, $travelReason->value);
 
             DB::commit();
 
@@ -61,8 +73,12 @@ class PostRepository
         return $this->postHydrator->modelToDto($post);
     }
 
-    public function storeText(User $user, Visibility $visibility, string $body, array $tags = []): BasePost|LocationPost|TransportPost
-    {
+    public function storeText(
+        User $user,
+        Visibility $visibility,
+        string $body,
+        array $tags = []
+    ): BasePost|LocationPost|TransportPost {
         try {
             DB::beginTransaction();
             /** @var Post $post */
@@ -87,8 +103,13 @@ class PostRepository
         return $this->postHydrator->modelToDto($post);
     }
 
-    public function updateBasePost(BasePost $basePost, ?Visibility $visibility, ?string $body, array $hashTagIds = []): BasePost|LocationPost|TransportPost
-    {
+    public function updateBasePost(
+        BasePost $basePost,
+        ?Visibility $visibility,
+        ?string $body = null,
+        array $hashTags = [],
+        ?TravelReason $travelReason = null
+    ): BasePost|LocationPost|TransportPost {
         try {
             DB::beginTransaction();
             /** @var Post $post */
@@ -100,8 +121,12 @@ class PostRepository
             }
             $post->save();
 
-            if (! empty($hashTagIds)) {
-                $this->hashTagRepository->syncHashTagsByValue($post, $hashTagIds);
+            if (! empty($hashTags)) {
+                $this->hashTagRepository->syncHashTagsByValue($post, $hashTags);
+            }
+
+            if ($travelReason !== null) {
+                $this->postMetaInfoRepository->updateOrCreateMetaInfo($post, MetaInfoKey::TRAVEL_REASON, $travelReason->value);
             }
 
             DB::commit();
@@ -115,7 +140,7 @@ class PostRepository
         return $this->postHydrator->modelToDto($post);
     }
 
-    public function updateTransportPost(TransportPost $transportPost, string $stopId): TransportPost
+    public function updateTransportPost(TransportPost $transportPost, string $stopId, TravelReason $travelReason): TransportPost
     {
         try {
             DB::beginTransaction();
@@ -143,6 +168,7 @@ class PostRepository
             $transportPost->destination_stop_id = $stop->id;
 
             $transportPost->save();
+            $this->postMetaInfoRepository->updateOrCreateMetaInfo($post, MetaInfoKey::TRAVEL_REASON, $travelReason->value);
             DB::commit();
 
             $post->load('transportPost.destination', 'transportPost.origin', 'transportPost.transportTrip', 'transportPost.originStop.location', 'transportPost.destinationStop.location');
@@ -162,7 +188,8 @@ class PostRepository
         TransportTripStop $destinationStop,
         Visibility $visibility,
         ?string $body = null,
-        array $hashTagIds = []
+        array $hashTagIds = [],
+        TravelReason $travelReason = TravelReason::LEISURE
     ): BasePost|LocationPost|TransportPost {
         try {
             $publishedAt = Carbon::now();
@@ -189,6 +216,8 @@ class PostRepository
             if (! empty($hashTagIds)) {
                 $this->hashTagRepository->syncHashTagsByValue($post, $hashTagIds);
             }
+
+            $this->postMetaInfoRepository->updateOrCreateMetaInfo($post, MetaInfoKey::TRAVEL_REASON, $travelReason->value);
 
             DB::commit();
 

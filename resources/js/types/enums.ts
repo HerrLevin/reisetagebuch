@@ -35,3 +35,12 @@ export enum Visibility {
     UNLISTED = 'unlisted',
     ONLY_AUTHENTICATED = 'only-authenticated',
 }
+
+export enum TravelReason {
+    COMMUTE = 'commute',
+    BUSINESS = 'business',
+    LEISURE = 'leisure',
+    CREW = 'crew',
+    ERRAND = 'errand',
+    OTHER = 'other',
+}

@@ -2,6 +2,7 @@
 
 namespace Feature\Controllers\Traewelling;
 
+use App\Enums\PostMetaInfo\MetaInfoKey;
 use App\Http\Controllers\Traewelling\CrossPostController;
 use App\Models\Location;
 use App\Models\LocationIdentifier;
@@ -53,7 +54,7 @@ class CrossPostControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $post = Post::factory()->for($user)->create();
-        $post->metaInfos()->create(['key' => 'traewelling_trip_id', 'value' => '123']);
+        $post->metaInfos()->create(['key' => MetaInfoKey::TRAEWELLING_TRIP_ID, 'value' => '123']);
         // Create SocialAccount for user and provider 'traewelling'
         SocialAccount::factory()->create([
             'user_id' => $user->id,
@@ -149,7 +150,7 @@ class CrossPostControllerTest extends TestCase
 
         $this->assertDatabaseHas('post_meta_infos', [
             'post_id' => $post->id,
-            'key' => 'traewelling_trip_id',
+            'key' => MetaInfoKey::TRAEWELLING_TRIP_ID,
             'value' => 'trwl_trip_id',
         ]);
         Log::shouldHaveReceived('debug')->withArgs(function ($msg) {
@@ -227,7 +228,7 @@ class CrossPostControllerTest extends TestCase
 
         $this->assertDatabaseHas('post_meta_infos', [
             'post_id' => $post->id,
-            'key' => 'traewelling_trip_id',
+            'key' => MetaInfoKey::TRAEWELLING_TRIP_ID,
             'value' => 'trwl_trip_id',
         ]);
         Log::shouldHaveReceived('debug')->withArgs(function ($msg) {
@@ -274,7 +275,7 @@ class CrossPostControllerTest extends TestCase
         $job->crossCheckIn($post->id);
         $this->assertDatabaseMissing('post_meta_infos', [
             'post_id' => $post->id,
-            'key' => 'traewelling_trip_id',
+            'key' => MetaInfoKey::TRAEWELLING_TRIP_ID,
         ]);
     }
 
@@ -315,7 +316,7 @@ class CrossPostControllerTest extends TestCase
         $job->crossCheckIn($post->id);
         $this->assertDatabaseMissing('post_meta_infos', [
             'post_id' => $post->id,
-            'key' => 'traewelling_trip_id',
+            'key' => MetaInfoKey::TRAEWELLING_TRIP_ID,
         ]);
     }
 
@@ -364,7 +365,7 @@ class CrossPostControllerTest extends TestCase
 
         $this->assertDatabaseHas('post_meta_infos', [
             'post_id' => $post->id,
-            'key' => 'traewelling_trip_id',
+            'key' => MetaInfoKey::TRAEWELLING_TRIP_ID,
             'value' => 'trwl_trip_id',
         ]);
         Log::shouldHaveReceived('debug')->withArgs(function ($msg) {
@@ -429,7 +430,7 @@ class CrossPostControllerTest extends TestCase
 
         $this->assertDatabaseHas('post_meta_infos', [
             'post_id' => $post->id,
-            'key' => 'traewelling_trip_id',
+            'key' => MetaInfoKey::TRAEWELLING_TRIP_ID,
             'value' => 'trwl_trip_id',
         ]);
         Log::shouldHaveReceived('debug')->withArgs(function ($msg) {
@@ -485,7 +486,7 @@ class CrossPostControllerTest extends TestCase
 
         $this->assertDatabaseHas('post_meta_infos', [
             'post_id' => $post->id,
-            'key' => 'traewelling_trip_id',
+            'key' => MetaInfoKey::TRAEWELLING_TRIP_ID,
             'value' => 'trwl_trip_id',
         ]);
         Log::shouldHaveReceived('debug')->withArgs(function ($msg) {
@@ -546,7 +547,7 @@ class CrossPostControllerTest extends TestCase
 
         $this->assertDatabaseHas('post_meta_infos', [
             'post_id' => $post->id,
-            'key' => 'traewelling_trip_id',
+            'key' => MetaInfoKey::TRAEWELLING_TRIP_ID,
             'value' => 'trwl_trip_id',
         ]);
         $this->assertDatabaseHas('social_accounts', [

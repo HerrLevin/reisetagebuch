@@ -3,6 +3,10 @@ import HashTags from '@/Components/Post/HashTags.vue';
 import Interactions from '@/Components/Post/Interactions.vue';
 import LocationDisplay from '@/Components/Post/LocationDisplay.vue';
 import RouteDisplay from '@/Components/Post/RouteDisplay.vue';
+import {
+    getTravelReasonIcon,
+    getTravelReasonLabel,
+} from '@/Services/TravelReasonMapping';
 import { getIcon } from '@/Services/VisibilityMapping';
 import {
     BasePost,
@@ -46,10 +50,40 @@ if (date.diffNow('days').days < -1) {
         </div>
     </div>
     <div>
-        <div class="mb-1 text-xs opacity-60">
-            <Link :href="route('profile.show', post.user.username)">
+        <div class="mb-1 text-xs">
+            <Link
+                :href="route('profile.show', post.user.username)"
+                class="opacity-60"
+            >
                 {{ post.user.name }}
             </Link>
+            <div
+                v-if="
+                    (isLocationPost(post) || isTransportPost(post)) &&
+                    post.travelReason
+                "
+                class="inline text-xs"
+            >
+                ·
+                <div class="dropdown dropdown-hover">
+                    <component
+                        :is="getTravelReasonIcon(post.travelReason)"
+                        class="iconSize inline opacity-60"
+                        role="button"
+                        tabindex="0"
+                    />
+                    <div
+                        tabindex="-1"
+                        class="card card-sm dropdown-content bg-base-100 rounded-box z-1 w-64 shadow-sm"
+                    >
+                        <div tabindex="-1" class="card-body">
+                            <h3 class="card-title">
+                                {{ getTravelReasonLabel(post.travelReason) }}
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
             ·
             <span class="text-xs opacity-60">
                 <component

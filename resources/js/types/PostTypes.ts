@@ -1,4 +1,4 @@
-import { TransportMode, Visibility } from '@/types/enums';
+import { TransportMode, TravelReason, Visibility } from '@/types/enums';
 import { LocationEntry, UserDto } from '@/types/index';
 
 export type BasePost = {
@@ -14,6 +14,7 @@ export type BasePost = {
 
 export type LocationPost = BasePost & {
     location: LocationEntry;
+    travelReason: TravelReason | null;
 };
 
 export type TransportPost = BasePost & {
@@ -22,6 +23,7 @@ export type TransportPost = BasePost & {
     trip: Trip;
     manualDepartureTime: string | null;
     manualArrivalTime: string | null;
+    travelReason: TravelReason | null;
 };
 
 export type AllPosts = BasePost | LocationPost | TransportPost;

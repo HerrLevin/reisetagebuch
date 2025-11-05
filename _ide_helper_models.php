@@ -195,7 +195,7 @@ namespace App\Models{
 /**
  * @property string $id
  * @property int $post_id
- * @property string $key
+ * @property \App\Enums\PostMetaInfo\MetaInfoKey $key
  * @property string|null $value
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at

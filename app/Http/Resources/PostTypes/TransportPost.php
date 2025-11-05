@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources\PostTypes;
 
+use App\Enums\PostMetaInfo\MetaInfoKey;
+use App\Enums\PostMetaInfo\TravelReason;
 use App\Http\Resources\StopDto;
 use App\Http\Resources\TripDto;
 use App\Http\Resources\UserDto;
@@ -19,6 +21,8 @@ class TransportPost extends BasePost
 
     public ?string $manualArrivalTime = null;
 
+    public ?TravelReason $travelReason;
+
     public function __construct(Post $post, UserDto $userDto)
     {
         parent::__construct($post, $userDto);
@@ -28,5 +32,6 @@ class TransportPost extends BasePost
         $this->trip = new TripDto($post->transportPost->transportTrip);
         $this->manualDepartureTime = $post->transportPost->manual_departure?->toIso8601String();
         $this->manualArrivalTime = $post->transportPost->manual_arrival?->toIso8601String();
+        $this->travelReason = TravelReason::tryFrom($post->metaInfos->where('key', MetaInfoKey::TRAVEL_REASON)->first()?->value);
     }
 }
