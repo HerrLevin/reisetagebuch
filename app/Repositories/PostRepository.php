@@ -52,7 +52,7 @@ class PostRepository
 
             DB::commit();
 
-            $post->load('locationPost', 'hashTags');
+            $post->refresh()->load('locationPost', 'hashTags');
         } catch (Throwable $e) {
             DB::rollBack();
             report($e);
