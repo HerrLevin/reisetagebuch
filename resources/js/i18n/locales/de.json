@@ -226,6 +226,10 @@
             "general_share": "Schau dir {username}'s Beitrag an {baseText}"
         }
     },
+    "common": {
+        "cancel": "Abbrechen",
+        "saving": "Speichern..."
+    },
     "verbs": {
         "share": "Teilen",
         "edit": "Bearbeiten",
@@ -248,6 +252,23 @@
         },
         "delete": {
             "question": "Bist du dir sicher, dass du deinen Beitrag löschen willst?"
+        },
+        "mass_edit": {
+            "title": "Mehrere Beiträge bearbeiten",
+            "select_posts": "Beiträge auswählen",
+            "selected": "ausgewählt",
+            "selected_count": "{count} Beitrag ausgewählt | {count} Beiträge ausgewählt",
+            "edit": "Ausgewählte bearbeiten",
+            "visibility": "Sichtbarkeit",
+            "travel_reason": "Reisegrund",
+            "tags": "Tags",
+            "tags_placeholder": "Tags zu allen ausgewählten Beiträgen hinzufügen",
+            "apply": "Änderungen anwenden",
+            "no_change": "Keine Änderung",
+            "too_many_tags": "Du hast zu viele Tags ausgewählt (maximal {max}).",
+            "too_many_tags_detail": "Wenn du diese Änderungen speicherst, werden nur die ersten {max} Tags angewendet.",
+            "change_tags_warning": "Das Ändern der Tags für mehrere Beiträge überschreibt die vorhandenen Tags für alle ausgewählten Beiträge.",
+            "change_tags": "Tags ändern"
         },
         "filter": {
             "title": "Beiträge filtern",
@@ -303,6 +324,20 @@
         "unlisted_description": "Für andere von der Timeline und deinem Profil ausgeblendet. Nur sichtbar für dich oder andere, die den Link haben.",
         "only_authenticated": "Nur für angemeldete",
         "only_authenticated_description": "Nur sichtbar für angemeldete Nutzer:innen"
+    },
+    "travel_reason": {
+        "leisure": "Freizeit",
+        "leisure_description": "Reisen zur Entspannung oder im Urlaub",
+        "business": "Geschäftlich",
+        "business_description": "Reisen für Arbeit oder geschäftliche Zwecke",
+        "commute": "Pendeln",
+        "commute_description": "Reisen zur und von der Arbeit oder Schule",
+        "other": "Andere",
+        "other_description": "Andere Reisegründe",
+        "errand": "Besorgung",
+        "errand_description": "Reisen für persönliche Besorgungen oder Aufgaben",
+        "crew": "Dienstreise",
+        "crew_description": "Reisen als Teil einer Crew oder des Personals"
     },
     "transport_modes": {
         "WALK": "Laufen",

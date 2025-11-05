@@ -14,6 +14,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\BasePostRequest;
 use App\Http\Requests\FilterPostsRequest;
 use App\Http\Requests\LocationBasePostRequest;
+use App\Http\Requests\MassEditPostRequest;
 use App\Http\Requests\TransportBasePostCreateRequest;
 use App\Http\Requests\TransportPostUpdateRequest;
 use App\Http\Requests\TransportTimesUpdateRequest;
@@ -313,5 +314,33 @@ class PostController extends Controller
             $request->input('travelReason'),
             $request->input('tags')
         );
+    }
+
+    public function massEdit(MassEditPostRequest $request): array
+    {
+        $visibility = $request->input('visibility') !== null ? Visibility::tryFrom($request->input('visibility')) : null;
+        $travelReason = $request->input('travelReason') !== null ? TravelReason::tryFrom($request->input('travelReason')) : null;
+        $tags = $request->input('tags');
+        $addTags = $request->boolean('addTags', false);
+
+        $updated = $this->postRepository->massEdit(
+            $request->user(),
+            $request->input('postIds'),
+            $visibility,
+            $travelReason,
+            $tags,
+            $addTags
+        );
+
+        foreach ($updated as $post) {
+            if ($post instanceof TransportPost) {
+                TraewellingEditPostJob::dispatch($post);
+            }
+        }
+
+        return [
+            'success' => true,
+            'updatedCount' => count($updated),
+        ];
     }
 }

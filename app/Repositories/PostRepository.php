@@ -18,6 +18,7 @@ use App\Models\TransportTrip;
 use App\Models\TransportTripStop;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
@@ -400,5 +401,62 @@ class PostRepository
             previousCursor: $posts->previousCursor()?->encode(),
             items: $mapped,
         );
+    }
+
+    /**
+     * @return Collection<int,BasePost|LocationPost|TransportPost>
+     *
+     * @throws Throwable
+     */
+    public function massEdit(
+        User $user,
+        array $postIds,
+        ?Visibility $visibility = null,
+        ?TravelReason $travelReason = null,
+        ?array $tags = null,
+        bool $addTags = false
+    ): Collection {
+        try {
+            DB::beginTransaction();
+
+            $posts = Post::whereIn('id', $postIds)
+                ->where('user_id', $user->id)
+                ->get();
+
+            if ($posts->isEmpty()) {
+                return collect();
+            }
+
+            foreach ($posts as $post) {
+                if ($visibility !== null) {
+                    $post->visibility = $visibility;
+                    $post->save();
+                }
+
+                if ($travelReason !== null && ($post->locationPost !== null || $post->transportPost !== null)) {
+                    $this->postMetaInfoRepository->updateOrCreateMetaInfo($post, MetaInfoKey::TRAVEL_REASON, $travelReason->value);
+                }
+
+                if ($tags !== null) {
+                    if ($addTags) {
+                        $existingTags = $post->hashTags->pluck('value')->toArray();
+                        $mergedTags = array_unique(array_merge($existingTags, $tags));
+                        $this->hashTagRepository->syncHashTagsByValue($post, $mergedTags);
+                    } else {
+                        $this->hashTagRepository->syncHashTagsByValue($post, $tags);
+                    }
+                }
+            }
+
+            DB::commit();
+
+            return $posts->map(function (Post $post) {
+                return $this->postHydrator->modelToDto($post);
+            });
+        } catch (Throwable $e) {
+            DB::rollBack();
+            report($e);
+            throw $e;
+        }
     }
 }

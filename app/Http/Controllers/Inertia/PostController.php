@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Inertia;
 use App\Http\Requests\BasePostRequest;
 use App\Http\Requests\FilterPostsRequest;
 use App\Http\Requests\LocationBasePostRequest;
+use App\Http\Requests\MassEditPostRequest;
 use App\Http\Requests\TransportBasePostCreateRequest;
 use App\Http\Requests\TransportPostUpdateRequest;
 use App\Http\Requests\TransportTimesUpdateRequest;
@@ -180,7 +181,7 @@ class PostController extends Controller
         $userTags = $user->hashTags()->orderBy('relevance', 'desc')->pluck('value')->toArray();
 
         return Inertia::render('Posts/Filter', [
-            'posts' => Inertia::merge($posts->items),
+            'posts' => $posts->previousCursor ? Inertia::merge($posts->items) : $posts->items,
             'nextCursor' => $posts->nextCursor,
             'previousCursor' => $posts->previousCursor,
             'filters' => [
@@ -192,5 +193,12 @@ class PostController extends Controller
             ],
             'availableTags' => $userTags,
         ]);
+    }
+
+    public function massEdit(MassEditPostRequest $request): RedirectResponse
+    {
+        $this->postController->massEdit($request);
+
+        return to_route('posts.filter');
     }
 }

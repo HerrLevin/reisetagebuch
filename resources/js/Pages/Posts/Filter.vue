@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import InfiniteScroller from '@/Components/InfiniteScroller.vue';
+import MassEdit from '@/Components/Post/MassEdit.vue';
 import Post from '@/Components/Post/Post.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { getTravelReasonLabel } from '@/Services/TravelReasonMapping';
@@ -7,7 +8,7 @@ import { getVisibilityLabel } from '@/Services/VisibilityMapping';
 import { TravelReason, Visibility } from '@/types/enums';
 import { AllPosts } from '@/types/PostTypes';
 import { Head, router } from '@inertiajs/vue3';
-import { PropType, reactive, watch } from 'vue';
+import { PropType, reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -122,6 +123,55 @@ watch(
     },
     { deep: true },
 );
+
+// mass edit logic
+
+const selectionMode = ref(false);
+const selectedPosts = ref<Array<AllPosts>>([]);
+const showMassEditModal = ref(false);
+
+function goToPost(postId: string) {
+    if (selectionMode.value) {
+        const post = props.posts.find((p) => p.id === postId);
+        if (post) {
+            togglePostSelection(post);
+        }
+    } else {
+        router.visit(route('posts.show', postId));
+    }
+}
+
+const toggleSelectionMode = () => {
+    selectionMode.value = !selectionMode.value;
+    if (!selectionMode.value) {
+        selectedPosts.value = [];
+    }
+};
+
+const togglePostSelection = (post: AllPosts) => {
+    const index = selectedPosts.value.findIndex((p) => p.id === post.id);
+    if (index > -1) {
+        selectedPosts.value.splice(index, 1);
+    } else {
+        selectedPosts.value.push(post);
+    }
+};
+
+const isPostSelected = (post: AllPosts) => {
+    return selectedPosts.value.some((p) => p.id === post.id);
+};
+
+const openMassEdit = () => {
+    if (selectedPosts.value.length > 0) {
+        showMassEditModal.value = true;
+    }
+};
+
+const handleMassEditUpdated = () => {
+    selectionMode.value = false;
+    selectedPosts.value = [];
+    router.reload({ only: ['posts'] });
+};
 </script>
 
 <template>
@@ -284,23 +334,63 @@ watch(
             <!-- Posts List -->
             <div class="lg:col-span-3">
                 <div class="card bg-base-100 shadow-md">
+                    <div class="flex items-center justify-between p-4 pb-2">
+                        <span v-if="hasActiveFilters()">
+                            {{ t('posts.filter.filtered_results') }}
+                        </span>
+                        <span v-else>
+                            {{ t('posts.filter.all_posts') }}
+                        </span>
+
+                        <div class="flex gap-2">
+                            <button
+                                v-if="!selectionMode"
+                                class="btn btn-sm btn-ghost"
+                                @click="toggleSelectionMode"
+                            >
+                                {{ t('posts.mass_edit.select_posts') }}
+                            </button>
+                            <template v-else>
+                                <span class="self-center text-xs opacity-60">
+                                    {{ selectedPosts.length }}
+                                    {{ t('posts.mass_edit.selected') }}
+                                </span>
+                                <button
+                                    class="btn btn-sm btn-primary"
+                                    :disabled="selectedPosts.length === 0"
+                                    @click="openMassEdit"
+                                >
+                                    {{ t('posts.mass_edit.edit') }}
+                                </button>
+                                <button
+                                    class="btn btn-sm btn-ghost"
+                                    @click="toggleSelectionMode"
+                                >
+                                    {{ t('common.cancel') }}
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+
                     <ul class="list">
-                        <li class="p-4 pb-2 text-xs tracking-wide opacity-60">
-                            <span v-if="hasActiveFilters()">
-                                {{ t('posts.filter.filtered_results') }}
-                            </span>
-                            <span v-else>
-                                {{ t('posts.filter.all_posts') }}
-                            </span>
-                        </li>
                         <li
                             v-for="post in posts"
                             :key="post.id"
                             class="list-row hover-list-entry cursor-pointer"
-                            @click="
-                                $inertia.visit(route('posts.show', post.id))
-                            "
+                            :class="{
+                                'bg-primary/10':
+                                    selectionMode && isPostSelected(post),
+                            }"
+                            @click="goToPost(post.id)"
                         >
+                            <div v-if="selectionMode">
+                                <input
+                                    type="checkbox"
+                                    class="checkbox checkbox-primary"
+                                    :checked="isPostSelected(post)"
+                                    @click.stop="togglePostSelection(post)"
+                                />
+                            </div>
                             <Post :post="post"></Post>
                         </li>
                         <li v-if="posts.length === 0" class="p-8 text-center">
@@ -310,6 +400,13 @@ watch(
                         </li>
                         <InfiniteScroller :only="['posts']" />
                     </ul>
+
+                    <MassEdit
+                        :selected-posts="selectedPosts"
+                        :show="showMassEditModal"
+                        @close="showMassEditModal = false"
+                        @updated="handleMassEditUpdated"
+                    />
                 </div>
             </div>
         </div>

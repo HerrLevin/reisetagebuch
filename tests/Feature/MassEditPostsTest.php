@@ -1,0 +1,116 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Enums\PostMetaInfo\TravelReason;
+use App\Enums\Visibility;
+use App\Models\Post;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class MassEditPostsTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_user_can_mass_edit_visibility(): void
+    {
+        $user = User::factory()->create();
+        $posts = Post::factory()->count(3)->create([
+            'user_id' => $user->id,
+            'visibility' => Visibility::PRIVATE,
+        ]);
+
+        $response = $this->actingAs($user)->post(route('posts.mass-edit'), [
+            'postIds' => $posts->pluck('id')->toArray(),
+            'visibility' => Visibility::PUBLIC->value,
+        ]);
+
+        $response->assertRedirect(route('posts.filter'));
+
+        foreach ($posts as $post) {
+            $this->assertEquals(Visibility::PUBLIC, $post->fresh()->visibility);
+        }
+    }
+
+    public function test_user_can_mass_edit_travel_reason(): void
+    {
+        $user = User::factory()->create();
+        $posts = Post::factory()->count(2)->create([
+            'user_id' => $user->id,
+        ]);
+
+        $response = $this->actingAs($user)->post(route('posts.mass-edit'), [
+            'postIds' => $posts->pluck('id')->toArray(),
+            'travelReason' => TravelReason::BUSINESS->value,
+        ]);
+
+        $response->assertRedirect(route('posts.filter'));
+    }
+
+    public function test_user_can_mass_edit_tags(): void
+    {
+        $user = User::factory()->create();
+        $posts = Post::factory()->count(2)->create([
+            'user_id' => $user->id,
+        ]);
+
+        $response = $this->actingAs($user)->post(route('posts.mass-edit'), [
+            'postIds' => $posts->pluck('id')->toArray(),
+            'tags' => ['vacation', 'summer'],
+            'addTags' => false,
+        ]);
+
+        $response->assertRedirect(route('posts.filter'));
+
+        foreach ($posts as $post) {
+            $tags = $post->fresh()->hashTags->pluck('value')->toArray();
+            $this->assertContains('vacation', $tags);
+            $this->assertContains('summer', $tags);
+        }
+    }
+
+    public function test_user_cannot_mass_edit_other_users_posts(): void
+    {
+        $user = User::factory()->create();
+        $otherUser = User::factory()->create();
+        $posts = Post::factory()->count(2)->create([
+            'user_id' => $otherUser->id,
+            'visibility' => Visibility::PRIVATE,
+        ]);
+
+        $response = $this->actingAs($user)->post(route('posts.mass-edit'), [
+            'postIds' => $posts->pluck('id')->toArray(),
+            'visibility' => Visibility::PUBLIC->value,
+        ]);
+
+        $response->assertRedirect(route('posts.filter'));
+
+        foreach ($posts as $post) {
+            $this->assertEquals(Visibility::PRIVATE, $post->fresh()->visibility);
+        }
+    }
+
+    public function test_mass_edit_requires_post_ids(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post(route('posts.mass-edit'), [
+            'visibility' => Visibility::PUBLIC->value,
+        ]);
+
+        $response->assertSessionHasErrors('postIds');
+    }
+
+    public function test_mass_edit_validates_post_ids_exist(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post(route('posts.mass-edit'), [
+            'postIds' => ['00000000-0000-0000-0000-000000000000'],
+            'visibility' => Visibility::PUBLIC->value,
+        ]);
+
+        $response->assertSessionHasErrors('postIds.0');
+    }
+}
