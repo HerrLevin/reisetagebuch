@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Hydrators;
 
+use App\Enums\PostMetaInfo\MetaInfoKey;
+use App\Enums\PostMetaInfo\TravelReason;
 use App\Enums\Visibility;
 use App\Http\Resources\UserDto;
 use App\Hydrators\PostHydrator;
@@ -50,6 +52,7 @@ class PostHydratorTest extends TestCase
                 'locationPost' => $locationPost,
                 'visibility' => Visibility::PUBLIC,
                 'user' => new User,
+                'metaInfos' => new Collection([['key' => MetaInfoKey::TRAVEL_REASON, 'value', TravelReason::LEISURE]]),
                 default => null,
             };
         });

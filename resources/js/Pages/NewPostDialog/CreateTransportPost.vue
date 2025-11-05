@@ -2,7 +2,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PostCreationForm from '@/Pages/NewPostDialog/Partials/PostCreationForm.vue';
 import { getEmoji } from '@/Services/DepartureTypeService';
-import { TransportMode, Visibility } from '@/types/enums';
+import { TransportMode, TravelReason, Visibility } from '@/types/enums';
 import { Head, router } from '@inertiajs/vue3';
 import { reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -41,6 +41,7 @@ const form = reactive({
     stopTime: stopTime,
     visibility: Visibility.PUBLIC,
     tags: [] as string[],
+    travelReason: TravelReason.LEISURE,
 });
 
 function submitForm() {
@@ -64,7 +65,11 @@ function submitForm() {
                     v-model="form.body"
                     :name="title"
                     :emoji="emoji"
+                    :show-travel-reason="true"
                     @cancel="goBack"
+                    @select-travel-reason="
+                        (travelReason) => (form.travelReason = travelReason)
+                    "
                     @select-visibility="
                         (visibility) => (form.visibility = visibility)
                     "

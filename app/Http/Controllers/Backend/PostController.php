@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Backend;
 
 use App\Dto\MotisApi\TripDto;
 use App\Dto\PostPaginationDto;
+use App\Enums\PostMetaInfo\TravelReason;
 use App\Enums\Visibility;
 use App\Exceptions\OriginAfterDestinationException;
 use App\Exceptions\StationNotOnTripException;
@@ -59,7 +60,8 @@ class PostController extends Controller
             $location,
             Visibility::from($request->input('visibility')),
             $request->input('body'),
-            $request->input('tags', [])
+            $request->input('tags', []),
+            TravelReason::from($request->input('travelReason'))
         );
     }
 
@@ -110,7 +112,8 @@ class PostController extends Controller
             $stopStopover,
             Visibility::from($request->input('visibility')),
             $request->body,
-            $request->input('tags', [])
+            $request->input('tags', []),
+            TravelReason::from($request->input('travelReason'))
         );
 
         TraewellingCrossCheckInJob::dispatch($post->id);
@@ -160,11 +163,17 @@ class PostController extends Controller
         $post = $this->postRepository->getById($postId, Auth::user());
         $this->authorize('update', $post);
 
+        $reason = null;
+        if ($post instanceof LocationPost || $post instanceof TransportPost) {
+            $reason = TravelReason::from($request->input('travelReason'));
+        }
+
         $post = $this->postRepository->updateBasePost(
             $post,
             Visibility::from($request->input('visibility')),
             $request->input('body'),
-            $request->input('tags', [])
+            $request->input('tags', []),
+            $reason
         );
 
         if ($post instanceof TransportPost) {
@@ -277,7 +286,8 @@ class PostController extends Controller
         try {
             $post = $this->postRepository->updateTransportPost(
                 $post,
-                $request->stopId
+                $request->stopId,
+                TravelReason::from($request->input('travelReason'))
             );
         } catch (OriginAfterDestinationException) {
             abort(422, 'Origin stop must be before destination stop');

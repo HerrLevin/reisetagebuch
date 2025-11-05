@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers\Traewelling;
 
+use App\Enums\PostMetaInfo\MetaInfoKey;
+use App\Enums\PostMetaInfo\TravelReason;
 use App\Enums\TransportMode;
 use App\Http\Controllers\Controller;
 use App\Models\Location;
 use App\Models\LocationIdentifier;
 use App\Models\Post;
-use App\Models\PostMetaInfo;
 use App\Models\SocialAccount;
 use App\Models\TransportTripStop;
+use App\Repositories\PostMetaInfoRepository;
 use App\Services\TraewellingRequestService;
 use Carbon\Carbon;
 use Exception;
@@ -22,11 +24,14 @@ class CrossPostController extends Controller
 {
     private TraewellingRequestService $traewellingRequestService;
 
+    private PostMetaInfoRepository $postMetaInfoRepository;
+
     private ?string $traewellingId = null;
 
-    public function __construct(?TraewellingRequestService $traewellingRequestService = null)
+    public function __construct(?TraewellingRequestService $traewellingRequestService = null, ?PostMetaInfoRepository $postMetaInfoRepository = null)
     {
         $this->traewellingRequestService = $traewellingRequestService ?? new TraewellingRequestService;
+        $this->postMetaInfoRepository = $postMetaInfoRepository ?? new PostMetaInfoRepository;
     }
 
     private function getPost(string $postId): ?Post
@@ -36,7 +41,7 @@ class CrossPostController extends Controller
             'transportPost.destinationStop.location.identifiers',
             'transportPost.transportTrip',
         ])->find($postId);
-        $this->traewellingId = $post?->metaInfos->where('key', 'traewelling_trip_id')->first()?->value ?? null;
+        $this->traewellingId = $post?->metaInfos->where('key', MetaInfoKey::TRAEWELLING_TRIP_ID)->first()?->value ?? null;
         $isTrwlUser = SocialAccount::whereUserId($post?->user->id)->whereProvider('traewelling')->exists();
 
         if (! $isTrwlUser) {
@@ -67,11 +72,7 @@ class CrossPostController extends Controller
 
         $trwlId = $data['data']['status']['id'] ?? '';
 
-        $meta = new PostMetaInfo;
-        $meta->post_id = $post->id;
-        $meta->key = 'traewelling_trip_id';
-        $meta->value = $trwlId;
-        $meta->save();
+        $meta = $this->postMetaInfoRepository->updateOrCreateMetaInfo($post, MetaInfoKey::TRAEWELLING_TRIP_ID, $trwlId);
         Log::debug('Created Traewelling check-in for post '.$postId.' with trwl-id '.$trwlId, ['response' => $data, 'meta' => $meta]);
 
         return true;
@@ -117,11 +118,16 @@ class CrossPostController extends Controller
 
     public function getUpdatePayload(Post $post): array
     {
+        $reason = $this->postMetaInfoRepository->getMetaInfoValue($post, MetaInfoKey::TRAVEL_REASON);
+        Log::debug($reason);
+        $reason = TravelReason::tryFrom($reason) ?? TravelReason::LEISURE;
+
         return [
             'body' => $post->body,
             'visibility' => $post->visibility->getTraewellingVisibility(),
             'manualDeparture' => $post->transportPost->manual_departure?->toIso8601String(),
             'manualArrival' => $post->transportPost->manual_arrival?->toIso8601String(),
+            'business' => $reason->getTraewellingReasonIdentifier(),
         ];
     }
 
@@ -321,6 +327,8 @@ class CrossPostController extends Controller
         bool $force = false,
         ?string $tripId = null,
     ): ?array {
+        $reason = $this->postMetaInfoRepository->getMetaInfoValue($post, MetaInfoKey::TRAVEL_REASON);
+        $reason = TravelReason::tryFrom($reason) ?? TravelReason::LEISURE;
         $body = [
             'body' => $post->body,
             'start' => $trwlOrigin->identifier,
@@ -331,6 +339,7 @@ class CrossPostController extends Controller
             'lineName' => $this->getLineName($post),
             'visibility' => $post->visibility->getTraewellingVisibility(),
             'force' => $force,
+            'business' => $reason->getTraewellingReasonIdentifier(),
         ];
         try {
             Log::debug('Traewelling API checkin request', [

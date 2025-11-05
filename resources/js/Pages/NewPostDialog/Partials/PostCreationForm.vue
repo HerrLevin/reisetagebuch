@@ -1,11 +1,16 @@
 <script setup lang="ts">
 import TagsInput from '@/Pages/NewPostDialog/Partials/TagsInput.vue';
 import {
+    getTravelReasonDescription,
+    getTravelReasonIcon,
+    getTravelReasonLabel,
+} from '@/Services/TravelReasonMapping';
+import {
     getDescription,
     getIcon,
     getLabel,
 } from '@/Services/VisibilityMapping';
-import { Visibility } from '@/types/enums';
+import { TravelReason, Visibility } from '@/types/enums';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -39,18 +44,32 @@ const props = defineProps({
         type: Array as () => string[],
         default: () => [],
     },
+    travelReason: {
+        type: String as () => TravelReason,
+        default: TravelReason.LEISURE,
+    },
+    showTravelReason: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const emit = defineEmits([
     'cancel',
     'selectVisibility',
+    'selectTravelReason',
     'update:modelValue',
     'update:tags',
 ]);
 const selectedVisibility = ref(props.defaultVisibility || Visibility.PUBLIC);
+const selectedTravelReason = ref(props.travelReason || TravelReason.LEISURE);
 
 if (!props.defaultVisibility) {
     recallStoredVisibility();
+}
+
+if (!props.travelReason) {
+    recallStoredTravelReason();
 }
 
 function recallStoredVisibility() {
@@ -63,11 +82,28 @@ function recallStoredVisibility() {
     }
 }
 
+function recallStoredTravelReason() {
+    const travelReason = localStorage.getItem('recentTravelReason');
+    if (
+        travelReason &&
+        Object.values(TravelReason).includes(travelReason as TravelReason)
+    ) {
+        selectTravelReason(travelReason as TravelReason);
+    }
+}
+
 function selectVisibility(visibility: Visibility) {
     localStorage.setItem('recentVisibility', visibility);
     selectedVisibility.value = visibility;
     blur();
     emit('selectVisibility', visibility);
+}
+
+function selectTravelReason(travelReason: TravelReason) {
+    localStorage.setItem('recentTravelReason', travelReason);
+    selectedTravelReason.value = travelReason;
+    blur();
+    emit('selectTravelReason', travelReason);
 }
 
 function blur() {
@@ -90,7 +126,7 @@ function updateTags(tags: string[]) {
         {{ subtitle }}
     </div>
     <div class="bg-base-200 w-full">
-        <div class="dropdown px-4 py-2">
+        <div class="dropdown py-2 ps-4">
             <div
                 tabindex="0"
                 role="button"
@@ -111,6 +147,8 @@ function updateTags(tags: string[]) {
                         <a
                             :class="{
                                 'bg-primary': option == selectedVisibility,
+                                'text-neutral-content':
+                                    option == selectedVisibility,
                             }"
                             @click.prevent="selectVisibility(option)"
                         >
@@ -127,6 +165,60 @@ function updateTags(tags: string[]) {
                                     </div>
                                     <div class="text-sm opacity-70">
                                         {{ getDescription(option) }}
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                </template>
+            </ul>
+        </div>
+        <div
+            v-show="showTravelReason"
+            class="dropdown dropdown-center py-2 ps-2"
+        >
+            <div
+                tabindex="0"
+                role="button"
+                class="btn btn-outline btn-primary btn-sm"
+            >
+                <component
+                    :is="getTravelReasonIcon(selectedTravelReason)"
+                    v-if="getTravelReasonIcon(selectedTravelReason)"
+                    class="inline size-4"
+                />
+                <span class="ml-2">
+                    {{ getTravelReasonLabel(selectedTravelReason) }}
+                </span>
+            </div>
+            <ul
+                tabindex="-1"
+                class="menu dropdown-content bg-base-100 rounded-box z-1 w-72 p-2 shadow-sm"
+            >
+                <template v-for="option in TravelReason" :key="option.value">
+                    <li class="min-w-full">
+                        <a
+                            :class="{
+                                'bg-primary': option === selectedTravelReason,
+                                'text-neutral-content':
+                                    option === selectedTravelReason,
+                            }"
+                            @click.prevent="selectTravelReason(option)"
+                        >
+                            <div class="grid grid-cols-12 gap-4">
+                                <div class="col">
+                                    <component
+                                        :is="getTravelReasonIcon(option)"
+                                        v-if="getTravelReasonIcon(option)"
+                                        class="inline size-4"
+                                    />
+                                </div>
+                                <div class="col-span-11">
+                                    <div class="font-bold">
+                                        {{ getTravelReasonLabel(option) }}
+                                    </div>
+                                    <div class="text-sm opacity-70">
+                                        {{ getTravelReasonDescription(option) }}
                                     </div>
                                 </div>
                             </div>
