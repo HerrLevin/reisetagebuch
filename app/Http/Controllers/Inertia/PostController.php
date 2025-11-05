@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Inertia;
 
 use App\Http\Requests\BasePostRequest;
+use App\Http\Requests\FilterPostsRequest;
 use App\Http\Requests\LocationBasePostRequest;
 use App\Http\Requests\TransportBasePostCreateRequest;
 use App\Http\Requests\TransportPostUpdateRequest;
@@ -168,6 +169,28 @@ class PostController extends Controller
 
         return to_route('posts.show', [
             'postId' => $post->id,
+        ]);
+    }
+
+    public function filter(FilterPostsRequest $request): Response|ResponseFactory
+    {
+        $user = Auth::user();
+        $posts = $this->postController->filter($request);
+
+        $userTags = $user->hashTags()->orderBy('relevance', 'desc')->pluck('value')->toArray();
+
+        return Inertia::render('Posts/Filter', [
+            'posts' => Inertia::merge($posts->items),
+            'nextCursor' => $posts->nextCursor,
+            'previousCursor' => $posts->previousCursor,
+            'filters' => [
+                'dateFrom' => $request->input('dateFrom'),
+                'dateTo' => $request->input('dateTo'),
+                'visibility' => $request->input('visibility', []),
+                'travelReason' => $request->input('travelReason', []),
+                'tags' => $request->input('tags', []),
+            ],
+            'availableTags' => $userTags,
         ]);
     }
 }

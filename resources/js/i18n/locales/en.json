@@ -251,6 +251,21 @@
         "delete": {
             "question": "Are you sure you want to delete your post?"
         },
+        "filter": {
+            "title": "Filter Posts",
+            "filters": "Filters",
+            "clear_all": "Clear All",
+            "date_range": "Date Range",
+            "from": "From",
+            "to": "To",
+            "visibility": "Visibility",
+            "travel_reason": "Travel Reason",
+            "tags": "Tags",
+            "apply_filters": "Apply Filters",
+            "filtered_results": "Filtered Results",
+            "all_posts": "All Posts",
+            "no_results": "No posts found matching your filters"
+        },
         "profile_picture_alt": "Profile picture of {name}",
         "name_post": "{name}'s post",
         "name_location_post": "{name}'s post at {location}",
@@ -288,8 +303,8 @@
         "private_description": "Only visible to you",
         "unlisted": "Unlisted",
         "unlisted_description": "Hidden for others from timeline and profile. Only visible to you or others who have the link.",
-        "authenticated_only": "Authenticated Only",
-        "authenticated_only_description": "Only visible to authenticated users"
+        "only_authenticated": "Authenticated Only",
+        "only_authenticated_description": "Only visible to authenticated users"
     },
     "travel_reason": {
         "leisure": "Leisure",

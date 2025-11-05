@@ -485,6 +485,8 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \App\Enums\DefaultNewPostView $default_new_post_view
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\HashTag> $hashTags
+ * @property-read int|null $hash_tags_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Invite> $invites
  * @property-read int|null $invites_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\TimestampedUserWaypoint> $locationHistory

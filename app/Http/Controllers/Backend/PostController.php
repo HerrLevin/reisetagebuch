@@ -12,6 +12,7 @@ use App\Exceptions\OriginAfterDestinationException;
 use App\Exceptions\StationNotOnTripException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BasePostRequest;
+use App\Http\Requests\FilterPostsRequest;
 use App\Http\Requests\LocationBasePostRequest;
 use App\Http\Requests\TransportBasePostCreateRequest;
 use App\Http\Requests\TransportPostUpdateRequest;
@@ -298,5 +299,19 @@ class PostController extends Controller
         TraewellingChangeExitJob::dispatch($post);
 
         return $post;
+    }
+
+    public function filter(FilterPostsRequest $request): PostPaginationDto
+    {
+        $user = Auth::user();
+
+        return $this->postRepository->getFilteredPosts(
+            $user,
+            $request->input('dateFrom'),
+            $request->input('dateTo'),
+            $request->input('visibility'),
+            $request->input('travelReason'),
+            $request->input('tags')
+        );
     }
 }

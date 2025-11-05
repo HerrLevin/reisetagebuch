@@ -39,6 +39,7 @@ Route::middleware('auth')->group(callback: function () {
     });
 
     Route::prefix('posts')->group(callback: function () {
+        Route::get('/filter', [PostController::class, 'filter'])->name('posts.filter');
         Route::get('/create', [PostController::class, 'create'])->name('posts.create.post');
         Route::post('/create', [PostController::class, 'storeText'])->name('posts.create.text-post.store');
         Route::get('/new', [PostController::class, 'createText'])->name('posts.create.text');

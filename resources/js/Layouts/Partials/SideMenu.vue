@@ -3,6 +3,7 @@ import { LocationService } from '@/Services/LocationService';
 import { Link, usePage } from '@inertiajs/vue3';
 import {
     CirclePlus,
+    Filter,
     House,
     List,
     MapPin,
@@ -35,6 +36,9 @@ const isDashboardRoute = () => {
 };
 const isTripRoute = () => {
     return route().current('trips.create');
+};
+const isFilterRoute = () => {
+    return route().current('posts.filter');
 };
 </script>
 
@@ -114,6 +118,16 @@ const isTripRoute = () => {
                 >
                     <Route class="size-5" />
                     {{ t('new_route.title') }}
+                </Link>
+            </li>
+            <li>
+                <Link
+                    :href="route('posts.filter')"
+                    :class="{ 'btn-active': isFilterRoute() }"
+                    class="btn btn-ghost"
+                >
+                    <Filter class="size-5" />
+                    {{ t('posts.filter.title') }}
                 </Link>
             </li>
         </template>

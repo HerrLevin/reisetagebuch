@@ -7,7 +7,7 @@ import {
     getTravelReasonIcon,
     getTravelReasonLabel,
 } from '@/Services/TravelReasonMapping';
-import { getIcon } from '@/Services/VisibilityMapping';
+import { getVisibilityIcon } from '@/Services/VisibilityMapping';
 import {
     BasePost,
     isLocationPost,
@@ -87,7 +87,7 @@ if (date.diffNow('days').days < -1) {
             ·
             <span class="text-xs opacity-60">
                 <component
-                    :is="getIcon(post.visibility)"
+                    :is="getVisibilityIcon(post.visibility)"
                     class="iconSize inline"
                 />
                 {{ relativeCreatedAt }}

@@ -3,12 +3,12 @@ import { LocationService } from '@/Services/LocationService';
 import { Link, usePage } from '@inertiajs/vue3';
 import {
     CirclePlus,
+    Filter,
     House,
     List,
     MapPin,
     Route,
     SquarePen,
-    User,
 } from 'lucide-vue-next';
 import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -51,8 +51,8 @@ const isDeparturesRoute = () => {
 const isTextRoute = () => {
     return route().current('posts.create.text');
 };
-const isProfileRoute = () => {
-    return route().current('profile.show', user?.username ?? '');
+const isFilterRoute = () => {
+    return route().current('posts.filter');
 };
 
 const defaultNewPostRoute = () => {
@@ -143,12 +143,14 @@ const defaultNewPostRoute = () => {
                     <span class="dock-label">{{ t('new_route.title') }}</span>
                 </Link>
                 <Link
-                    :href="route('profile.show', user.username)"
+                    :href="route('posts.filter')"
                     as="button"
-                    :class="{ 'dock-active': isProfileRoute() }"
+                    :class="{ 'dock-active': isFilterRoute() }"
                 >
-                    <User class="size-[1.2em]" />
-                    <span class="dock-label">{{ t('profile.title') }}</span>
+                    <Filter class="size-[1.2em]" />
+                    <span class="dock-label">{{
+                        t('posts.filter.title')
+                    }}</span>
                 </Link>
             </template>
         </div>
