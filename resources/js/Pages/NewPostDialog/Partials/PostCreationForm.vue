@@ -6,9 +6,9 @@ import {
     getTravelReasonLabel,
 } from '@/Services/TravelReasonMapping';
 import {
-    getDescription,
-    getIcon,
-    getLabel,
+    getVisibilityDescription,
+    getVisibilityIcon,
+    getVisibilityLabel,
 } from '@/Services/VisibilityMapping';
 import { TravelReason, Visibility } from '@/types/enums';
 import { ref } from 'vue';
@@ -133,10 +133,12 @@ function updateTags(tags: string[]) {
                 class="btn btn-outline btn-primary btn-sm"
             >
                 <component
-                    :is="getIcon(selectedVisibility)"
+                    :is="getVisibilityIcon(selectedVisibility)"
                     class="inline size-4"
                 />
-                <span class="ml-2">{{ getLabel(selectedVisibility) }}</span>
+                <span class="ml-2">
+                    {{ getVisibilityLabel(selectedVisibility) }}
+                </span>
             </div>
             <ul
                 tabindex="-1"
@@ -155,16 +157,16 @@ function updateTags(tags: string[]) {
                             <div class="grid grid-cols-12 gap-4">
                                 <div class="col">
                                     <component
-                                        :is="getIcon(option)"
+                                        :is="getVisibilityIcon(option)"
                                         class="inline size-4"
                                     />
                                 </div>
                                 <div class="col-span-11">
                                     <div class="font-bold">
-                                        {{ getLabel(option) }}
+                                        {{ getVisibilityLabel(option) }}
                                     </div>
                                     <div class="text-sm opacity-70">
-                                        {{ getDescription(option) }}
+                                        {{ getVisibilityDescription(option) }}
                                     </div>
                                 </div>
                             </div>

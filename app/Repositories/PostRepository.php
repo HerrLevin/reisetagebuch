@@ -338,4 +338,67 @@ class PostRepository
             ->delete();
         DB::commit();
     }
+
+    public function getFilteredPosts(
+        User $user,
+        ?string $dateFrom = null,
+        ?string $dateTo = null,
+        ?array $visibilities = null,
+        ?array $travelReasons = null,
+        ?array $tags = null
+    ): PostPaginationDto {
+        $query = Post::with([
+            'user',
+            'locationPost.location',
+            'locationPost.location.tags',
+            'transportPost',
+            'transportPost.origin',
+            'transportPost.destination',
+            'transportPost.originStop.location',
+            'transportPost.destinationStop.location',
+            'transportPost.transportTrip',
+            'hashTags',
+        ])
+            ->where('user_id', $user->id);
+
+        if ($dateFrom) {
+            $query->where('published_at', '>=', Carbon::parse($dateFrom)->startOfDay());
+        }
+
+        if ($dateTo) {
+            $query->where('published_at', '<=', Carbon::parse($dateTo)->endOfDay());
+        }
+
+        if (! empty($visibilities)) {
+            $query->whereIn('visibility', $visibilities);
+        }
+
+        if (! empty($travelReasons)) {
+            $query->whereHas('metaInfos', function ($q) use ($travelReasons) {
+                $q->where('key', MetaInfoKey::TRAVEL_REASON)
+                    ->whereIn('value', $travelReasons);
+            });
+        }
+
+        if (! empty($tags)) {
+            $query->whereHas('hashTags', function ($q) use ($tags) {
+                $q->whereIn('value', $tags);
+            });
+        }
+
+        $posts = $query
+            ->orderByDesc('published_at')
+            ->cursorPaginate(50);
+
+        $mapped = $posts->map(function (Post $post) {
+            return $this->postHydrator->modelToDto($post);
+        });
+
+        return new PostPaginationDto(
+            perPage: $posts->perPage(),
+            nextCursor: $posts->nextCursor()?->encode(),
+            previousCursor: $posts->previousCursor()?->encode(),
+            items: $mapped,
+        );
+    }
 }

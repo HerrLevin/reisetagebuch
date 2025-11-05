@@ -29,23 +29,23 @@ const visibilityMappings: Record<Visibility, VisibilityMapping> = {
         icon: Moon,
     },
     [Visibility.ONLY_AUTHENTICATED]: {
-        description: t('visibility.authenticated_only_description'),
-        label: t('visibility.authenticated_only'),
+        description: t('visibility.only_authenticated_description'),
+        label: t('visibility.only_authenticated'),
         icon: Users,
     },
 };
 
-export function getIcon(
+export function getVisibilityIcon(
     visibility: Visibility,
     // eslint-disable-next-line
 ): vue.FunctionalComponent<LucideProps, {}, any, {}> {
     return visibilityMappings[visibility].icon;
 }
 
-export function getDescription(visibility: Visibility): string {
+export function getVisibilityDescription(visibility: Visibility): string {
     return visibilityMappings[visibility].description;
 }
 
-export function getLabel(visibility: Visibility): string {
+export function getVisibilityLabel(visibility: Visibility): string {
     return visibilityMappings[visibility].label;
 }

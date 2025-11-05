@@ -249,6 +249,21 @@
         "delete": {
             "question": "Bist du dir sicher, dass du deinen Beitrag löschen willst?"
         },
+        "filter": {
+            "title": "Beiträge filtern",
+            "filters": "Filter",
+            "clear_all": "Alle löschen",
+            "date_range": "Zeitspanne",
+            "from": "Von",
+            "to": "Bis",
+            "visibility": "Sichtbarkeit",
+            "travel_reason": "Reisegrund",
+            "tags": "Tags",
+            "apply_filters": "Filter anwenden",
+            "filtered_results": "Gefilterte Ergebnisse",
+            "all_posts": "Alle Beiträge",
+            "no_results": "Keine Beiträge entsprechen deinen Filtern"
+        },
         "profile_picture_alt": "Profilbild von {name}",
         "name_post": "Beitrag von {name}",
         "name_location_post": "Beitrag von {name} bei {location}",
@@ -286,8 +301,8 @@
         "private_description": "Nur sichtbar für dich",
         "unlisted": "Ungelistet",
         "unlisted_description": "Für andere von der Timeline und deinem Profil ausgeblendet. Nur sichtbar für dich oder andere, die den Link haben.",
-        "authenticated_only": "Nur für angemeldete",
-        "authenticated_only_description": "Nur sichtbar für angemeldete Nutzer:innen"
+        "only_authenticated": "Nur für angemeldete",
+        "only_authenticated_description": "Nur sichtbar für angemeldete Nutzer:innen"
     },
     "transport_modes": {
         "WALK": "Laufen",

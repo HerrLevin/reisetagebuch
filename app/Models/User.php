@@ -82,4 +82,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(TransportTrip::class);
     }
+
+    public function hashTags(): HasMany
+    {
+        return $this->hasMany(HashTag::class);
+    }
 }
