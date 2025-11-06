@@ -93,6 +93,7 @@ Route::get('profile/{username}/map-data', [UserController::class, 'mapData'])->n
 
 Route::prefix('map')->group(function () {
     Route::get('/linestring/{from}/{to}', [MapController::class, 'getLineStringBetween'])->name('posts.get.linestring');
+    Route::get('/stopovers/{from}/{to}', [MapController::class, 'getStopsBetween'])->name('posts.get.linestring');
 });
 
 Route::middleware('cache.headers:public;max_age=2628000;etag')->get('/files/{path}', function ($path) {

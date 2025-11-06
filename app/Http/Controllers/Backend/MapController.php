@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\TransportTripStop;
 use App\Repositories\TransportTripRepository;
 use Clickbar\Magellan\Data\Geometries\LineString;
+use Clickbar\Magellan\Data\Geometries\MultiPoint;
+use Illuminate\Support\Collection;
 
 class MapController extends Controller
 {
@@ -16,16 +18,42 @@ class MapController extends Controller
         $this->transportTripRepository = $transportTripRepository;
     }
 
-    public function fromTo(string $fromStopId, string $toStopId): ?LineString
+    public function stopsFromTo(string $fromStopId, string $toStopId): Collection
     {
         $start = $this->transportTripRepository->getStopById($fromStopId);
         $end = $this->transportTripRepository->getStopById($toStopId);
 
         if (! $start || ! $end) {
+            return collect();
+        }
+
+        return $this->transportTripRepository->getStopsBetween($start, $end);
+    }
+
+    public function stopPointGeometryFromTo(string $fromStopId, string $toStopId): ?MultiPoint
+    {
+        $stops = $this->stopsFromTo($fromStopId, $toStopId);
+
+        if ($stops->isEmpty()) {
             return null;
         }
 
-        $stops = $this->transportTripRepository->getStopsBetween($start, $end);
+        $points = [];
+        foreach ($stops as $stop) {
+            /** @var TransportTripStop $stop */
+            $points[] = $stop->location->location;
+        }
+
+        return MultiPoint::make($points);
+    }
+
+    public function fromTo(string $fromStopId, string $toStopId): ?LineString
+    {
+        $stops = $this->stopsFromTo($fromStopId, $toStopId);
+
+        if ($stops->isEmpty()) {
+            return null;
+        }
 
         // todo: there HAS to be a better way to do this with PostGIS
         $points = [];
