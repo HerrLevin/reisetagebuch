@@ -2,7 +2,7 @@
 import Map from '@/Components/Map.vue';
 import Post from '@/Components/Post/Post.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { getColor } from '@/Services/DepartureTypeService';
+import { getColorForPost } from '@/Services/DepartureTypeService';
 import { getArrivalTime, getDepartureTime } from '@/Services/TripTimeService';
 import {
     BasePost,
@@ -34,6 +34,7 @@ const goBack = () => {
 const startPoint = ref(null as LngLat | null);
 const endPoint = ref(null as LngLat | null);
 const lineString = ref(null as GeometryCollection | null);
+const stopovers = ref(null as GeometryCollection | null);
 
 if (isLocationPost(props.post)) {
     startPoint.value = new LngLat(
@@ -62,6 +63,20 @@ if (isLocationPost(props.post)) {
         })
         .catch(() => {
             lineString.value = null;
+        });
+
+    axios
+        .get(
+            '/map/stopovers/' +
+                props.post.originStop.id +
+                '/' +
+                props.post.destinationStop.id,
+        )
+        .then((response) => {
+            stopovers.value = response.data;
+        })
+        .catch(() => {
+            stopovers.value = null;
         });
 } else {
     startPoint.value = null;
@@ -152,13 +167,12 @@ const progress = computed(() => {
                 :start-point="startPoint"
                 :end-point="endPoint"
                 :line-string="lineString"
+                :stop-overs="stopovers"
                 :show-geo-position="
                     usePage().props.auth.user?.id === post.user.id
                 "
                 :line-color="
-                    isTransportPost(post)
-                        ? post.trip.routeColor || getColor(post.trip.mode)
-                        : undefined
+                    isTransportPost(post) ? getColorForPost(post) : undefined
                 "
                 :progress="progress"
             ></Map>

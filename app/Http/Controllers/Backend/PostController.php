@@ -285,11 +285,13 @@ class PostController extends Controller
             abort(422, 'Not a transport post');
         }
 
+        $reason = $request->input('reason') !== null ? TravelReason::tryFrom($request->input('reason')) : null;
+
         try {
             $post = $this->postRepository->updateTransportPost(
                 $post,
                 $request->stopId,
-                TravelReason::from($request->input('travelReason'))
+                $reason ?? $post->travelReason ?? TravelReason::LEISURE
             );
         } catch (OriginAfterDestinationException) {
             abort(422, 'Origin stop must be before destination stop');

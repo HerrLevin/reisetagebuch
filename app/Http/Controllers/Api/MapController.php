@@ -25,4 +25,11 @@ class MapController extends Controller
 
         return response()->json($linestring);
     }
+
+    public function getStopsBetween(string $from, string $to): JsonResponse
+    {
+        $stops = $this->locationController->stopPointGeometryFromTo($from, $to);
+
+        return response()->json($stops);
+    }
 }

@@ -10,7 +10,12 @@ import {
     MglRasterLayer,
     MglRasterSource,
 } from '@indoorequal/vue-maplibre-gl';
-import type { Feature, FeatureCollection, GeometryCollection } from 'geojson';
+import type {
+    Feature,
+    FeatureCollection,
+    GeometryCollection,
+    MultiPoint,
+} from 'geojson';
 import {
     LngLat,
     LngLatBounds,
@@ -35,6 +40,11 @@ const props = defineProps({
         default: null,
         required: false,
     },
+    stopOvers: {
+        type: Object as PropType<MultiPoint | null>,
+        default: null,
+        required: false,
+    },
     showGeoPosition: {
         type: Boolean,
         default: false,
@@ -42,7 +52,7 @@ const props = defineProps({
     },
     lineColor: {
         type: String,
-        default: '#FF0000',
+        default: '#007cbf',
         required: false,
     },
     progress: {
@@ -75,6 +85,7 @@ if (props.startPoint && props.endPoint) {
     bounds.value = undefined;
 }
 const geoJsonSource = ref(null as FeatureCollection | null);
+const stopOverSource = ref(null as FeatureCollection | null);
 const geoJsonA = ref({
     type: 'FeatureCollection',
     features: [],
@@ -145,6 +156,72 @@ function interpolatePointOnLine(
     return coordinates[coordinates.length - 1] as [number, number];
 }
 
+function fallbackLinestring() {
+    if (props.startPoint && props.endPoint) {
+        const coordinates = [];
+
+        coordinates.push([props.startPoint.lng, props.startPoint.lat]);
+        if (props.endPoint) {
+            coordinates.push([props.endPoint.lng, props.endPoint.lat]);
+        }
+
+        if (props.stopOvers) {
+            for (const coord of props.stopOvers.coordinates) {
+                coordinates.splice(
+                    coordinates.length - 1,
+                    0,
+                    coord as number[],
+                );
+            }
+        }
+
+        geoJsonSource.value = {
+            type: 'FeatureCollection',
+            features: [
+                {
+                    type: 'Feature',
+                    properties: {},
+                    geometry: {
+                        type: 'LineString',
+                        coordinates: coordinates,
+                    },
+                },
+            ],
+        } as FeatureCollection;
+    } else {
+        geoJsonSource.value = null;
+    }
+}
+
+watch(
+    () => props.stopOvers,
+    (newStopOvers) => {
+        if (newStopOvers) {
+            // remove first and last point (start and end)
+            newStopOvers.coordinates = newStopOvers.coordinates.slice(
+                1,
+                newStopOvers.coordinates.length - 1,
+            );
+            stopOverSource.value = {
+                type: 'FeatureCollection',
+                features: [
+                    {
+                        type: 'Feature',
+                        properties: {},
+                        geometry: newStopOvers,
+                    },
+                ],
+            };
+            if (!props.lineString) {
+                fallbackLinestring();
+            }
+        } else {
+            stopOverSource.value = null;
+        }
+    },
+    { immediate: true },
+);
+
 // watch props.lineString to update geoJsonSource
 watch(
     () => props.lineString,
@@ -161,27 +238,15 @@ watch(
                 ],
             };
         } else {
-            geoJsonSource.value = {
-                type: 'FeatureCollection',
-                features: [
-                    {
-                        type: 'Feature',
-                        properties: {},
-                        geometry: {
-                            type: 'LineString',
-                            coordinates: [
-                                [props.startPoint.lng, props.startPoint.lat],
-                                ...(props.endPoint
-                                    ? [[props.endPoint.lng, props.endPoint.lat]]
-                                    : []),
-                            ],
-                        },
-                    },
-                ],
-            } as FeatureCollection;
+            fallbackLinestring();
         }
 
         const mapBounds = new LngLatBounds();
+        if (!geoJsonSource.value) {
+            bounds.value = undefined;
+            return;
+        }
+
         for (const feature of geoJsonSource.value.features || []) {
             if (feature.geometry.type === 'Point') {
                 mapBounds.extend(
@@ -202,7 +267,11 @@ watch(
 );
 
 const animatedPointSource = computed(() => {
-    if (!geoJsonSource.value || !geoJsonSource.value.features.length) {
+    if (
+        !geoJsonSource.value ||
+        !geoJsonSource.value.features.length ||
+        props.progress >= 100
+    ) {
         return null;
     }
 
@@ -255,7 +324,7 @@ const animatedPointSource = computed(() => {
         <mgl-fullscreen-control />
         <mgl-navigation-control
             position="top-right"
-            :show-zoom="true"
+            :show-zoom="false"
             :show-compass="true"
         />
         <mgl-geolocate-control
@@ -301,8 +370,24 @@ const animatedPointSource = computed(() => {
                 layer-id="points"
                 :paint="{
                     'circle-radius': 6,
-                    'circle-color': '#007cbf',
+                    'circle-color': lineColor,
                     'circle-stroke-color': '#fff',
+                    'circle-stroke-width': 2,
+                }"
+            >
+            </mgl-circle-layer>
+        </mgl-geo-json-source>
+        <mgl-geo-json-source
+            v-if="stopOverSource"
+            source-id="stops"
+            :data="stopOverSource"
+        >
+            <mgl-circle-layer
+                layer-id="stopsResource"
+                :paint="{
+                    'circle-radius': 2,
+                    'circle-color': '#fff',
+                    'circle-stroke-color': lineColor,
                     'circle-stroke-width': 2,
                 }"
             >
@@ -317,7 +402,7 @@ const animatedPointSource = computed(() => {
                 layer-id="animated-point"
                 :paint="{
                     'circle-radius': 8,
-                    'circle-color': '#FF6B00',
+                    'circle-color': '#007cbf',
                     'circle-stroke-color': '#fff',
                     'circle-stroke-width': 3,
                     'circle-opacity': 0.9,

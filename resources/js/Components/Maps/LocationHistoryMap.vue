@@ -128,7 +128,7 @@ bounds.value = mapBounds;
         <mgl-fullscreen-control />
         <mgl-navigation-control
             position="top-right"
-            :show-zoom="true"
+            :show-zoom="false"
             :show-compass="true"
         />
         <mgl-raster-source
@@ -162,7 +162,7 @@ bounds.value = mapBounds;
                 layer-id="points"
                 :paint="{
                     'circle-radius': 4,
-                    'circle-color': '#fc14d1',
+                    'circle-color': '#29ff45',
                 }"
             />
         </mgl-geo-json-source>
@@ -181,9 +181,9 @@ bounds.value = mapBounds;
                     visibility: 'visible',
                 }"
                 :paint="{
-                    'line-color': '#FF0000',
+                    'line-color': '#f700ff',
                     'line-width': 4,
-                    'line-opacity': 0.8,
+                    'line-opacity': 0.3,
                 }"
             />
         </mgl-geo-json-source>

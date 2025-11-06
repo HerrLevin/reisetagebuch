@@ -1,5 +1,6 @@
 import i18n from '@/i18n';
 import { TransportMode } from '@/types/enums';
+import { TransportPost } from '@/types/PostTypes';
 
 const { t } = i18n.global;
 
@@ -66,6 +67,16 @@ export const FilterGroups: Record<string, TransportMode[]> = {
     ],
     ferry: [TransportMode.FERRY],
 };
+
+export function getColorForPost(post: TransportPost): string {
+    if (
+        post.trip.routeColor !== null &&
+        (post.trip.routeColor.length == 3 || post.trip.routeColor.length == 6)
+    ) {
+        return `#${post.trip.routeColor}`;
+    }
+    return getColor(post.trip.mode);
+}
 
 export function getColor(mode: TransportMode): string {
     switch (mode) {
