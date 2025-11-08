@@ -50,3 +50,6 @@ jobs:
 
       - name: Run tests
         run: vendor/bin/sail test --parallel
+
+      - name: Run optimizer
+        run: vendor/bin/sail artisan optimize
