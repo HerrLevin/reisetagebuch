@@ -46,7 +46,7 @@ const props = defineProps({
     },
     travelReason: {
         type: String as () => TravelReason,
-        default: TravelReason.LEISURE,
+        default: null,
     },
     showTravelReason: {
         type: Boolean,
