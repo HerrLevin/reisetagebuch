@@ -53,9 +53,11 @@ class AccountController extends Controller
 
     public function destroy(Request $request): RedirectResponse
     {
-        $this->accountBackend->destroy($request);
+        if ($this->accountBackend->destroy($request)) {
+            return Redirect::to('/');
+        }
 
-        return Redirect::to('/');
+        return Redirect::route('account.edit')->with('error', 'errors.failed_delete_account');
     }
 
     public function disconnectTraewelling(Request $request): RedirectResponse

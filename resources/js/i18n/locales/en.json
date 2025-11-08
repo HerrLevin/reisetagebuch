@@ -71,7 +71,8 @@
             "forgot_password": "Forgot your password?",
             "no_register": "Registration is currently closed.",
             "no_account": "Don't have an account yet?",
-            "password": "Password"
+            "password": "Password",
+            "confirm_password": "Confirm Password"
         },
         "register": {
             "title": "Register",
@@ -179,7 +180,8 @@
             "are_you_sure": "Are you sure you want to delete your account?",
             "enter_password": "Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.",
             "password": "Password",
-            "confirm": "Confirm Delete Account"
+            "confirm": "Confirm Delete Account",
+            "confirmation": "Really delete account?"
         },
         "account_information": {
             "title": "Account Information",
@@ -216,7 +218,8 @@
     },
     "errors": {
         "network_nok": "Network response was not ok",
-        "form_error_count": "There are {0} form errors."
+        "form_error_count": "There are {0} form errors.",
+        "failed_delete_account": "Failed to delete account. Please try again."
     },
     "share": {
         "post_title": "Share Post",

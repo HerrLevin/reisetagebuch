@@ -69,7 +69,8 @@
             "forgot_password": "Passwort vergessen?",
             "no_register": "Die Registrierung ist derzeit geschlossen.",
             "no_account": "Hast du noch keinen Account?",
-            "password": "Passwort"
+            "password": "Passwort",
+            "confirm_password": "Passwort bestätigen"
         },
         "register": {
             "title": "Registrieren",
@@ -177,7 +178,8 @@
             "are_you_sure": "Bist du Sicher, dass du dein Konto löschen willst?",
             "enter_password": "Sobald dein Konto gelöscht ist, werden alle darin enthaltenen Ressourcen und Daten dauerhaft gelöscht. Bitte gib dein Passwort ein, um zu bestätigen, dass du dein Konto dauerhaft löschen möchtest.",
             "password": "Passwort",
-            "confirm": "Kontolöschung bestätigen"
+            "confirm": "Kontolöschung bestätigen",
+            "confirmation": "Account wirklich löschen?"
         },
         "account_information": {
             "title": "Kontoinformationen",
@@ -214,7 +216,8 @@
     },
     "errors": {
         "network_nok": "Die Netzwerkantwort war nicht in Ordnung",
-        "form_error_count": "Es gibt {0} Formularfehler."
+        "form_error_count": "Es gibt {0} Formularfehler.",
+        "failed_delete_account": "Fehler beim Löschen des Accounts. Bitte versuche es später erneut."
     },
     "share": {
         "post_title": "Beitrag teilen",
