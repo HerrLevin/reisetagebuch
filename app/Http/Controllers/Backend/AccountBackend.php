@@ -7,10 +7,11 @@ namespace App\Http\Controllers\Backend;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Http\Requests\SettingsUpdateRequest;
-use App\Models\TransportTrip;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class AccountBackend extends Controller
 {
@@ -38,27 +39,25 @@ class AccountBackend extends Controller
         $user->save();
     }
 
-    public function destroy(Request $request): void
+    public function destroy(Request $request): bool
     {
         $request->validate([
             'password' => ['required', 'current_password'],
         ]);
 
         $user = $request->user();
+        try {
 
-        Auth::logout();
+            User::whereId($user->id)->delete();
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
 
-        /** @var User $user */
-        foreach ($user->trips()->get() as $trip) {
-            /** @var TransportTrip $trip */
-            $trip->stops()->delete();
-            $trip->delete();
+            return true;
+        } catch (Throwable $e) {
+            Log::error($e);
+
+            return false;
         }
-        $user->posts()->delete();
-        $user->profile()->delete();
-        $user->delete();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
     }
 }

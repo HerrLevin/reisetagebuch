@@ -27,6 +27,15 @@ class Post extends Model
         'visibility' => Visibility::class,
     ];
 
+    protected static function booted(): void
+    {
+        static::deleting(function (Post $post) {
+            $post->locationPost()->delete();
+            $post->transportPost()->delete();
+            $post->metaInfos()->delete();
+        });
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

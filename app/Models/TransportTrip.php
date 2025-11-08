@@ -23,6 +23,7 @@ class TransportTrip extends Model
         'route_color',
         'route_text_color',
         'last_refreshed_at',
+        'user_id',
     ];
 
     protected $casts = [
@@ -30,6 +31,13 @@ class TransportTrip extends Model
         'updated_at' => 'datetime',
         'last_refreshed_at' => 'datetime',
     ];
+
+    protected static function booted(): void
+    {
+        static::deleting(function (TransportTrip $trip) {
+            TransportTripStop::whereTransportTripId($trip->id)->delete();
+        });
+    }
 
     public function stops(): HasMany
     {

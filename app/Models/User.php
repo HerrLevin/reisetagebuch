@@ -80,7 +80,7 @@ class User extends Authenticatable
 
     public function trips(): HasMany
     {
-        return $this->hasMany(TransportTrip::class);
+        return $this->hasMany(TransportTrip::class)->where('user_id', $this->id);
     }
 
     public function hashTags(): HasMany
