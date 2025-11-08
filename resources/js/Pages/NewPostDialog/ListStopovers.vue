@@ -101,7 +101,7 @@ function getTitle() {
                 {{ t('new_post.select_exit') }}
             </h2>
         </template>
-        <div class="card bg-base-100 min-w-full shadow-md">
+        <div class="card bg-base-100 mb-10 min-w-full shadow-md">
             <!-- Results -->
             <ul class="list">
                 <li class="p-4 pb-2 text-xs tracking-wide opacity-60">
