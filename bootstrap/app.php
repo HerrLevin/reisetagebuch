@@ -2,6 +2,7 @@
 
 use App\Console\Commands\FetchAirports;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Jobs\DeleteOldNearbyRequests;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -30,5 +31,6 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule) {
         $schedule->command(FetchAirports::class)->daily()->runInBackground();
         $schedule->job(App\Jobs\DispatchRefreshJobForActiveTrips::class)->everyMinute();
+        $schedule->job(DeleteOldNearbyRequests::class)->daily();
     })
     ->create();

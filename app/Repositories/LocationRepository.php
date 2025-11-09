@@ -190,10 +190,11 @@ class LocationRepository
             ->get();
     }
 
-    public function createRequestLocation(Point $point): RequestLocation
+    public function createRequestLocation(Point $point, int $radius): RequestLocation
     {
         $requestLocation = new RequestLocation;
         $requestLocation->location = $point;
+        $requestLocation->radius = $radius;
         $requestLocation->to_fetch = 1000;
         $requestLocation->last_requested_at = now();
 
@@ -202,13 +203,12 @@ class LocationRepository
         return $requestLocation;
     }
 
-    private function recentRequestLocationQuery(Point $position): \Illuminate\Database\Eloquent\Builder
+    private function recentRequestLocationQuery(Point $position, int $radius): \Illuminate\Database\Eloquent\Builder
     {
-        $radius = config('app.recent_location.radius');
-
         return RequestLocation::select()
             ->addSelect(ST::distanceSphere($position, 'location')->as('distance'))
             ->where(ST::distanceSphere($position, 'location'), '<=', $radius)
+            ->where('radius', '=', $radius)
             ->where(
                 'last_requested_at',
                 '>=',
@@ -216,16 +216,16 @@ class LocationRepository
             );
     }
 
-    public function getRecentRequestLocation(Point $position): ?RequestLocation
+    public function getRecentRequestLocation(Point $position, int $radius): ?RequestLocation
     {
-        return $this->recentRequestLocationQuery($position)
+        return $this->recentRequestLocationQuery($position, $radius)
             ->addSelect('*')
             ->first();
     }
 
-    public function recentNearbyRequests(Point $position): bool
+    public function recentNearbyRequests(Point $position, int $radius): bool
     {
-        $locations = $this->recentRequestLocationQuery($position);
+        $locations = $this->recentRequestLocationQuery($position, $radius);
 
         return $locations->count() > 0;
     }

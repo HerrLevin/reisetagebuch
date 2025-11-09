@@ -9,6 +9,7 @@ use App\Dto\MotisApi\TripDto;
 use App\Http\Controllers\Backend\LocationController;
 use App\Http\Controllers\Backend\MapController;
 use App\Hydrators\TripDtoHydrator;
+use App\Jobs\PrefetchJob;
 use App\Jobs\RerouteStops;
 use App\Models\RequestLocation;
 use App\Repositories\LocationRepository;
@@ -92,7 +93,7 @@ class LocationControllerTest extends TestCase
         $requestLocation->shouldReceive('getAttribute')->with('to_fetch')->andReturn(3);
 
         // The method under test
-        $this->controller->fetchNearbyLocations($mockPoint, $requestLocation);
+        $this->controller->fetchNearbyLocations($mockPoint, $requestLocation, 100);
         $this->assertTrue(true); // If we reach here, the loop did not break on exception
     }
 
@@ -108,9 +109,6 @@ class LocationControllerTest extends TestCase
             ->willReturn(false);
 
         $this->repository->expects($this->once())
-            ->method('deleteOldNearbyRequests');
-
-        $this->repository->expects($this->once())
             ->method('createRequestLocation')
             ->with($point);
 
@@ -118,7 +116,8 @@ class LocationControllerTest extends TestCase
             ->method('getElements')
             ->willReturn(['elements' => []]);
 
-        $this->controller->prefetch($point);
+        $radius = config('app.recent_location.radius');
+        $this->controller->prefetch($point, $radius);
     }
 
     public function test_prefetch_with_no_requests(): void
@@ -130,27 +129,23 @@ class LocationControllerTest extends TestCase
             ->willReturn(true);
 
         $this->repository->expects($this->never())
-            ->method('deleteOldNearbyRequests');
-
-        $this->repository->expects($this->never())
             ->method('createRequestLocation');
 
         $this->overpassRequestService->expects($this->never())
             ->method('getElements');
 
-        $this->controller->prefetch($point);
+        $radius = config('app.recent_location.radius');
+        $this->controller->prefetch($point, $radius);
     }
 
     public function test_nearby(): void
     {
+        Queue::fake();
         $point = $this->createMock(Point::class);
         $this->repository->expects($this->once())
             ->method('recentNearbyRequests')
             ->with($point)
             ->willReturn(false);
-
-        $this->repository->expects($this->once())
-            ->method('deleteOldNearbyRequests');
 
         $this->repository->expects($this->once())
             ->method('createRequestLocation')
@@ -167,6 +162,7 @@ class LocationControllerTest extends TestCase
 
         $result = $this->controller->nearby($point);
         $this->assertInstanceOf(Collection::class, $result);
+        Queue::assertPushed(PrefetchJob::class);
     }
 
     /**

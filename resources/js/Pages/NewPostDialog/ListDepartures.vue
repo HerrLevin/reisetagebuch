@@ -7,7 +7,7 @@ import { DeparturesDto } from '@/types';
 import { TransportMode } from '@/types/enums';
 import { Head, usePage } from '@inertiajs/vue3';
 import { DateTime } from 'luxon';
-import { onMounted, PropType, ref } from 'vue';
+import { onMounted, onUnmounted, PropType, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -45,14 +45,28 @@ time.value = DateTime.fromISO(props.requestTime);
 
 const latitude = ref(props.requestLatitude);
 const longitude = ref(props.requestLongitude);
+
+const user = usePage().props.auth.user ?? null;
+const intervalId = ref<number | null>(null);
 onMounted(() => {
-    LocationService.getPosition(!!usePage().props.auth.user)
+    updateLocation();
+    intervalId.value = setInterval(updateLocation, 60 * 1000);
+});
+
+onUnmounted(() => {
+    if (intervalId.value) {
+        clearInterval(intervalId.value);
+    }
+});
+
+function updateLocation() {
+    LocationService.getPosition(!!user)
         .then((position) => {
             latitude.value = position.coords.latitude;
             longitude.value = position.coords.longitude;
         })
         .catch(() => {});
-});
+}
 
 const showStartButton = ref(false);
 showStartButton.value = route().current('posts.create.start');

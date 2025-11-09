@@ -16,6 +16,7 @@ use App\Http\Resources\LocationHistoryEntryDto;
 use App\Http\Resources\TripHistoryEntryDto;
 use App\Hydrators\DbTripHydrator;
 use App\Hydrators\TripDtoHydrator;
+use App\Jobs\PrefetchJob;
 use App\Jobs\RerouteStops;
 use App\Models\RequestLocation;
 use App\Models\TimestampedUserWaypoint;
@@ -106,17 +107,17 @@ class LocationController extends Controller
 
     public function getRecentRequestLocation(Point $point): ?RequestLocationDto
     {
-        $recent = $this->locationRepository->getRecentRequestLocation($point);
+        $radius = config('app.recent_location.radius');
+        $recent = $this->locationRepository->getRecentRequestLocation($point, $radius);
 
         return $recent ? RequestLocationDto::fromModel($recent) : null;
     }
 
-    public function prefetch(Point $point): void
+    public function prefetch(Point $point, int $radius): void
     {
-        if (! $this->locationRepository->recentNearbyRequests($point)) {
-            $this->locationRepository->deleteOldNearbyRequests();
-            $requestLocation = $this->locationRepository->createRequestLocation($point);
-            $this->fetchNearbyLocations($point, $requestLocation);
+        if (! $this->locationRepository->recentNearbyRequests($point, $radius)) {
+            $requestLocation = $this->locationRepository->createRequestLocation($point, $radius);
+            $this->fetchNearbyLocations($point, $requestLocation, $radius);
         }
     }
 
@@ -130,7 +131,9 @@ class LocationController extends Controller
     public function nearby(Point $point): DbCollection|Collection
     {
         // Prefetch nearby locations if not already done by job
-        $this->prefetch($point);
+        PrefetchJob::dispatch($point);
+        $radius = config('app.recent_location.radius');
+        $this->prefetch($point, $radius);
 
         $locations = $this->locationRepository->getNearbyLocations($point);
 
@@ -142,8 +145,9 @@ class LocationController extends Controller
         });
     }
 
-    public function fetchNearbyLocations(Point $point, ?RequestLocation $requestLocation): void
+    public function fetchNearbyLocations(Point $point, ?RequestLocation $requestLocation, int $radius): void
     {
+        $this->overpassRequestService->setRadius($radius);
         $this->overpassRequestService->setCoordinates($point);
 
         $response = $this->overpassRequestService->getElements();

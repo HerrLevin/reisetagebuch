@@ -271,6 +271,7 @@ namespace App\Models{
  * @property \Clickbar\Magellan\Data\Geometries\Point $location
  * @property int $fetched
  * @property int $to_fetch
+ * @property int $radius
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RequestLocation newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RequestLocation newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RequestLocation query()
@@ -279,6 +280,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RequestLocation whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RequestLocation whereLastRequestedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RequestLocation whereLocation($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RequestLocation whereRadius($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RequestLocation whereToFetch($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RequestLocation whereUpdatedAt($value)
  */
