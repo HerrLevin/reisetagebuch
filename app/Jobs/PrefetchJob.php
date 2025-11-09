@@ -28,6 +28,6 @@ class PrefetchJob implements ShouldQueue
         if ($this->locationController === null) {
             $this->locationController = App::make(LocationController::class);
         }
-        $this->locationController->prefetch($this->point);
+        $this->locationController->prefetch($this->point, 650);
     }
 }

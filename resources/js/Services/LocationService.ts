@@ -33,7 +33,6 @@ export class LocationService {
                 return parsedPosition;
             } else {
                 localStorage.removeItem('position');
-                localStorage.removeItem('lastRefresh');
             }
         }
         return null;

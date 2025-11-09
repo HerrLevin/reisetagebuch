@@ -10,16 +10,30 @@ import {
     Route,
     SquarePen,
 } from 'lucide-vue-next';
-import { onMounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
 
 const latitude = ref(0);
 const longitude = ref(0);
+const user = usePage().props.auth.user ?? null;
+const intervalId = ref<number | null>(null);
 
 onMounted(() => {
-    LocationService.getPosition(!!usePage().props.auth.user)
+    updateLocation();
+    // Update location every 5 minutes
+    intervalId.value = setInterval(updateLocation, 60 * 1000);
+});
+
+onUnmounted(() => {
+    if (intervalId.value) {
+        clearInterval(intervalId.value);
+    }
+});
+
+function updateLocation() {
+    LocationService.getPosition(!!user)
         .then((position) => {
             latitude.value = position.coords.latitude;
             longitude.value = position.coords.longitude;
@@ -29,9 +43,7 @@ onMounted(() => {
             }
         })
         .catch(() => {});
-});
-
-const user = usePage().props.auth.user ?? null;
+}
 
 const isTripsCreateRoute = () => {
     return route().current()?.startsWith('trips.create');
@@ -148,9 +160,9 @@ const defaultNewPostRoute = () => {
                     :class="{ 'dock-active': isFilterRoute() }"
                 >
                     <Filter class="size-[1.2em]" />
-                    <span class="dock-label">{{
-                        t('posts.filter.title')
-                    }}</span>
+                    <span class="dock-label">
+                        {{ t('posts.filter.title') }}
+                    </span>
                 </Link>
             </template>
         </div>
