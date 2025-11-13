@@ -62,4 +62,9 @@ class Post extends Model
             ->withPivot('hash_tag_id', 'post_id')
             ->using(PostsHashTagsMap::class);
     }
+
+    public function likes(): HasMany
+    {
+        return $this->hasMany(Like::class);
+    }
 }

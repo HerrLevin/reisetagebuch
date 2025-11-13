@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\LikeController;
 use App\Http\Controllers\Api\LocationController as ApiLocationController;
 use App\Http\Controllers\Api\MapController;
 use App\Http\Controllers\Inertia\AccountController;
@@ -47,6 +48,8 @@ Route::middleware('auth')->group(callback: function () {
         Route::delete('/{postId}', [PostController::class, 'destroy'])->name('posts.destroy');
         Route::patch('/{postId}', [PostController::class, 'update'])->name('posts.update');
         Route::get('/{postId}/edit', [PostController::class, 'edit'])->name('posts.edit');
+        Route::post('/{post}/like', [LikeController::class, 'store'])->name('posts.like');
+        Route::delete('/{post}/like', [LikeController::class, 'destroy'])->name('posts.unlike');
 
         Route::prefix('/transport')->group(callback: function () {
             Route::get('/departures', [LocationController::class, 'departures'])->name('posts.create.departures');

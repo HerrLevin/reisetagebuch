@@ -237,6 +237,10 @@ class PostRepository
             'user', 'locationPost.location', 'locationPost.location.tags', 'transportPost', 'transportPost.origin', 'transportPost.destination',
             'transportPost.originStop.location', 'transportPost.destinationStop.location', 'transportPost.transportTrip', 'hashTags',
         ])
+            ->withCount('likes')
+            ->withExists(['likes as liked_by_user' => function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            }])
             ->where('user_id', '=', $user->id)
             ->orWhereIn('visibility', [Visibility::PUBLIC->value, Visibility::ONLY_AUTHENTICATED->value])
             ->orderByDesc('published_at')
@@ -261,12 +265,19 @@ class PostRepository
         }
 
         $posts = Post::with(['user', 'locationPost.location', 'locationPost.location.tags', 'transportPost', 'transportPost.origin', 'transportPost.destination', 'hashTags'])
+            ->withCount('likes')
             ->where('user_id', $user);
 
-        if ($visitingUser && $visitingUser->id !== $user) {
-            // not the owner, show only public posts
-            $posts->whereIn('visibility', [Visibility::ONLY_AUTHENTICATED, Visibility::PUBLIC]);
-        } elseif (! $visitingUser) {
+        if ($visitingUser) {
+            $posts->withExists(['likes as liked_by_user' => function ($query) use ($visitingUser) {
+                $query->where('user_id', $visitingUser->id);
+            }]);
+
+            if ($visitingUser->id !== $user) {
+                // not the owner, show only public posts
+                $posts->whereIn('visibility', [Visibility::ONLY_AUTHENTICATED, Visibility::PUBLIC]);
+            }
+        } else {
             // not logged in, show only public posts
             $posts->where('visibility', Visibility::PUBLIC);
         }
@@ -290,6 +301,12 @@ class PostRepository
     public function getById(string $postId, ?User $visitingUser = null): BasePost|LocationPost|TransportPost
     {
         $post = Post::with(['user', 'locationPost.location', 'locationPost.location.tags', 'transportPost', 'transportPost.origin', 'transportPost.destination', 'hashTags'])
+            ->withCount('likes')
+            ->when($visitingUser, function ($query) use ($visitingUser) {
+                $query->withExists(['likes as liked_by_user' => function ($q) use ($visitingUser) {
+                    $q->where('user_id', $visitingUser->id);
+                }]);
+            })
             ->where('id', $postId)
             ->firstOrFail();
 
