@@ -87,4 +87,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(HashTag::class);
     }
+
+    public function likes(): HasMany
+    {
+        return $this->hasMany(Like::class);
+    }
 }

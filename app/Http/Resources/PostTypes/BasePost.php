@@ -26,6 +26,10 @@ class BasePost
     /** @var string[] */
     public array $hashTags = [];
 
+    public int $likesCount = 0;
+
+    public bool $likedByUser = false;
+
     public function __construct(Post $post, UserDto $userDto)
     {
         $this->id = $post->id;
@@ -36,5 +40,7 @@ class BasePost
         $this->created_at = $post->created_at->toIso8601String();
         $this->updated_at = $post->updated_at->toIso8601String();
         $this->hashTags = $post->hashTags?->map(fn ($hashTag) => $hashTag->value)->toArray() ?? [];
+        $this->likesCount = $post->likes_count ?? 0;
+        $this->likedByUser = $post->liked_by_user ?? false;
     }
 }

@@ -10,6 +10,8 @@ export type BasePost = {
     created_at: string;
     updated_at: string;
     hashTags: string[];
+    likesCount: number;
+    likedByUser: boolean;
 };
 
 export type LocationPost = BasePost & {
