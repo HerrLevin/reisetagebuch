@@ -68,7 +68,7 @@ const isFilterRoute = () => {
 
 <template>
     <div class="md:invisible">
-        <div class="fab mb-15">
+        <div class="fab">
             <div
                 tabindex="0"
                 role="button"
@@ -166,3 +166,8 @@ const isFilterRoute = () => {
         </div>
     </div>
 </template>
+<style scoped>
+.fab {
+    padding-bottom: calc(4rem + env(safe-area-inset-bottom));
+}
+</style>
