@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\LikeController;
 use App\Http\Controllers\Api\LocationController as ApiLocationController;
 use App\Http\Controllers\Api\MapController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Inertia\AccountController;
 use App\Http\Controllers\Inertia\InviteController;
 use App\Http\Controllers\Inertia\LocationController;
@@ -80,6 +81,14 @@ Route::middleware('auth')->group(callback: function () {
     Route::get('invites', [InviteController::class, 'index'])->name('invites.index');
     Route::post('invites', [InviteController::class, 'store'])->name('invites.store');
     Route::delete('invites/{inviteCode}', [InviteController::class, 'destroy'])->name('invites.destroy');
+
+    Route::prefix('notifications')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Inertia\NotificationController::class, 'index'])->name('notifications');
+        Route::get('/list', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::get('/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unread-count');
+        Route::post('/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+        Route::post('/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+    });
 
     Route::prefix('socialite')->group(callback: function () {
         Route::get('/traewelling/connect', [TraewellingOAuthController::class, 'redirectToProvider'])->name('traewelling.connect');
