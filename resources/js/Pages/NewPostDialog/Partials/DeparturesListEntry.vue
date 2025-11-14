@@ -44,8 +44,26 @@ function getRouteTextColor(stopTime: StopTime) {
     if (stopTime.routeTextColor) {
         return '#' + stopTime.routeTextColor;
     }
+    const routeColor = getRouteColor(stopTime);
+    if (routeColor) {
+        return getContrastTextColor(routeColor);
+    }
 
     return '#FFFFFF';
+}
+
+function getContrastTextColor(hexColor: string) {
+    const color = hexColor.charAt(0) === '#' ? hexColor.substring(1) : hexColor;
+
+    const r = parseInt(color.substring(0, 2), 16);
+    const g = parseInt(color.substring(2, 4), 16);
+    const b = parseInt(color.substring(4, 6), 16);
+
+    // Calculate luminance
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+    // Return black for light colors and white for dark colors
+    return luminance > 0.5 ? '#000000' : '#FFFFFF';
 }
 
 function getRouteColor(stopTime: StopTime) {
@@ -62,9 +80,9 @@ function getRouteColor(stopTime: StopTime) {
         :href="route('posts.create.stopovers')"
         :data="linkData"
         as="li"
-        class="list-row hover:bg-base-200 cursor-pointer grid-cols-11"
+        class="list-row hover:bg-base-200 cursor-pointer grid-cols-11 items-center"
     >
-        <div class="col text-center text-3xl">
+        <div class="col text-center text-2xl">
             {{ emoji }}
         </div>
         <div class="col col-span-2 text-center">
