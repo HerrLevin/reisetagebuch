@@ -193,7 +193,6 @@
         },
         "account_settings": {
             "title": "Kontoeinstellungen",
-            "default_new_post": "Standardwert für neuen Beitragstyp",
             "departure_radius": "Radius Abfahrtssuche (Meter)",
             "radius_default": "Standard ({meters} Meter)",
             "radius_meters": "{meters} Meter",

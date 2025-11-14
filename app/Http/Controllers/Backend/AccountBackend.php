@@ -32,10 +32,6 @@ class AccountBackend extends Controller
         /** @var User $user */
         $user = $request->user();
 
-        if (! empty($request->defaultNewPostView)) {
-            $user->default_new_post_view = $request->defaultNewPostView;
-        }
-
         $user->save();
     }
 
