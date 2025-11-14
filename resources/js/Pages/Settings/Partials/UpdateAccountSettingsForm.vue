@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import SelectInput from '@/Components/SelectInput.vue';
 import { useForm, usePage } from '@inertiajs/vue3';
@@ -14,7 +13,6 @@ defineProps<{
 const user = usePage().props.auth.user;
 
 const form = useForm({
-    defaultNewPostView: user.settings?.default_new_post_view || 'location',
     motisRadius: user.settings?.motis_radius || null,
 });
 </script>
@@ -33,39 +31,6 @@ const form = useForm({
             class="mt-6 space-y-6"
             @submit.prevent="form.patch(route('account.settings.update'))"
         >
-            <div>
-                <InputLabel
-                    for="defaultNewPostView"
-                    :value="t('settings.account_settings.default_new_post')"
-                />
-
-                <SelectInput
-                    id="defaultNewPostView"
-                    v-model="form.defaultNewPostView"
-                    class="mt-1 block w-full"
-                    :error="form.errors.defaultNewPostView"
-                    :options="[
-                        {
-                            value: 'location',
-                            label: t('settings.account_settings.locations'),
-                        },
-                        {
-                            value: 'departures',
-                            label: t('settings.account_settings.departures'),
-                        },
-                        {
-                            value: 'text',
-                            label: t('settings.account_settings.text'),
-                        },
-                    ]"
-                />
-
-                <InputError
-                    class="mt-2"
-                    :message="form.errors.defaultNewPostView"
-                />
-            </div>
-
             <div>
                 <InputLabel
                     for="motisRadius"

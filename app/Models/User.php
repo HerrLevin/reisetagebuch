@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\DefaultNewPostView;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -32,7 +31,6 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'default_new_post_view' => DefaultNewPostView::class,
     ];
 
     protected function casts(): array

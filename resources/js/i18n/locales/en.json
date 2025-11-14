@@ -195,7 +195,6 @@
         },
         "account_settings": {
             "title": "Account Settings",
-            "default_new_post": "Default New Post Type",
             "departure_radius": "Departure Search Radius (meters)",
             "radius_default": "Default ({meters} meters)",
             "radius_meters": "{meters} meters",

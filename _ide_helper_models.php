@@ -514,7 +514,6 @@ namespace App\Models{
  * @property string|null $activity_pub_actor_url
  * @property string|null $preferred_username
  * @property string|null $summary
- * @property \App\Enums\DefaultNewPostView $default_new_post_view
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\HashTag> $hashTags
  * @property-read int|null $hash_tags_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Invite> $invites
@@ -560,7 +559,6 @@ namespace App\Models{
 /**
  * @property string $id
  * @property string $user_id
- * @property \App\Enums\DefaultNewPostView $default_new_post_view Default view for new posts, e.g., location, departures, post
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property int|null $motis_radius
@@ -569,7 +567,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings whereDefaultNewPostView($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings whereMotisRadius($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings whereUpdatedAt($value)

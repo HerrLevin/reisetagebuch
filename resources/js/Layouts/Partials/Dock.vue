@@ -2,11 +2,11 @@
 import { LocationService } from '@/Services/LocationService';
 import { Link, usePage } from '@inertiajs/vue3';
 import {
-    CirclePlus,
     Filter,
     House,
     List,
     MapPin,
+    Plus,
     Route,
     SquarePen,
 } from 'lucide-vue-next';
@@ -48,9 +48,6 @@ function updateLocation() {
 const isTripsCreateRoute = () => {
     return route().current()?.startsWith('trips.create');
 };
-const isPostsCreateRoute = () => {
-    return route().current()?.startsWith('posts.create');
-};
 const isDashboardRoute = () => {
     return route().current('dashboard');
 };
@@ -60,32 +57,46 @@ const isVenueRoute = () => {
 const isDeparturesRoute = () => {
     return route().current('posts.create.departures');
 };
-const isTextRoute = () => {
-    return route().current('posts.create.text');
-};
 const isFilterRoute = () => {
     return route().current('posts.filter');
-};
-
-const defaultNewPostRoute = () => {
-    if (user.settings?.default_new_post_view === 'text') {
-        return 'posts.create.text';
-    } else if (user.settings?.default_new_post_view === 'departures') {
-        return 'posts.create.departures';
-    } else {
-        return 'posts.create.start';
-    }
 };
 </script>
 
 <template>
     <div class="md:invisible">
-        <div
-            v-if="user"
-            class="over-dock"
-            :class="{ invisible: !isPostsCreateRoute() }"
-        >
-            <div class="join">
+        <div class="fab mb-15">
+            <div
+                tabindex="0"
+                role="button"
+                class="btn btn-lg btn-circle btn-info"
+            >
+                <span class="sr-only">
+                    {{ t('new_post.title') }}
+                </span>
+                <Plus class="size-[1.2em]" />
+            </div>
+
+            <div class="fab-close">
+                {{ t('verbs.close') }}
+                <span class="btn btn-circle btn-lg btn-error">✕</span>
+            </div>
+            <div>
+                {{ t('posts.departures') }}
+                <Link
+                    :href="
+                        route('posts.create.departures', {
+                            latitude: latitude,
+                            longitude: longitude,
+                        })
+                    "
+                    class="btn btn-lg btn-circle"
+                    as="button"
+                >
+                    <List />
+                </Link>
+            </div>
+            <div>
+                {{ t('posts.locations') }}
                 <Link
                     :href="
                         route('posts.create.start', {
@@ -94,28 +105,16 @@ const defaultNewPostRoute = () => {
                         })
                     "
                     as="button"
-                    class="btn btn-soft btn-info btn-s join-item"
-                    :class="{ 'btn-active': isVenueRoute() }"
+                    class="btn btn-lg btn-circle"
                 >
                     <MapPin />
                 </Link>
-                <Link
-                    :href="
-                        route('posts.create.departures', {
-                            latitude: latitude,
-                            longitude: longitude,
-                        })
-                    "
-                    class="btn btn-soft btn-info btn-s join-item"
-                    :class="{ 'btn-active': isDeparturesRoute() }"
-                    as="button"
-                >
-                    <List />
-                </Link>
+            </div>
+            <div>
+                {{ t('posts.text') }}
                 <Link
                     :href="route('posts.create.text')"
-                    class="btn btn-soft btn-info btn-s join-item"
-                    :class="{ 'btn-active': isTextRoute() }"
+                    class="btn btn-lg btn-circle"
                 >
                     <SquarePen />
                 </Link>
@@ -131,21 +130,6 @@ const defaultNewPostRoute = () => {
                 <span class="dock-label">{{ t('app.home') }}</span>
             </Link>
             <template v-if="user">
-                <Link
-                    :href="
-                        route(defaultNewPostRoute(), {
-                            latitude: latitude,
-                            longitude: longitude,
-                        })
-                    "
-                    as="button"
-                    :class="{ 'dock-active': isPostsCreateRoute() }"
-                >
-                    <CirclePlus class="size-[1.2em]" />
-                    <span class="dock-label">
-                        {{ t('new_post.title') }}
-                    </span>
-                </Link>
                 <Link
                     :href="route('trips.create')"
                     as="button"
@@ -168,20 +152,3 @@ const defaultNewPostRoute = () => {
         </div>
     </div>
 </template>
-<style scoped>
-.over-dock {
-    position: fixed;
-    right: calc(0.25rem * 0);
-    bottom: calc(0.5rem * 0);
-    left: calc(0.25rem * 0);
-    z-index: 1;
-    display: flex;
-    width: 100%;
-    flex-direction: row;
-    align-items: top;
-    justify-content: space-around;
-    color: currentColor;
-    height: calc(7rem + env(safe-area-inset-bottom));
-    padding-bottom: env(safe-area-inset-bottom);
-}
-</style>
