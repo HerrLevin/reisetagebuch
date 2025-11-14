@@ -3,7 +3,12 @@ import Map from '@/Components/Map.vue';
 import Post from '@/Components/Post/Post.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { getColorForPost } from '@/Services/DepartureTypeService';
-import { getArrivalTime, getDepartureTime } from '@/Services/TripTimeService';
+import {
+    getArrivalDelay,
+    getArrivalTime,
+    getDepartureDelay,
+    getDepartureTime,
+} from '@/Services/TripTimeService';
 import {
     BasePost,
     isLocationPost,
@@ -119,12 +124,14 @@ const progress = computed(() => {
     if (!isTransportPost(props.post)) return 0;
 
     const transportPost = props.post as TransportPost;
-    const departureTime =
-        transportPost.manualDepartureTime ||
-        getDepartureTime(transportPost.originStop)?.toISO();
-    const arrivalTime =
-        transportPost.manualArrivalTime ||
-        getArrivalTime(transportPost.destinationStop)?.toISO();
+    const departureDelay = getDepartureDelay(transportPost) || 0;
+    const departureTime = getDepartureTime(transportPost.originStop)
+        ?.plus({ minutes: departureDelay })
+        .toISO();
+    const arrivalDelay = getArrivalDelay(transportPost) || 0;
+    const arrivalTime = getArrivalTime(transportPost.destinationStop)
+        ?.plus({ minutes: arrivalDelay })
+        .toISO();
 
     if (!departureTime || !arrivalTime) return 0;
 
