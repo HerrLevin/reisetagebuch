@@ -14,7 +14,7 @@ const TransportModeEmoji: Record<TransportMode, string> = {
     [TransportMode.CAR_DROPOFF]: '🚗',
     [TransportMode.ODM]: '🚌',
     [TransportMode.FLEX]: '🚍',
-    [TransportMode.TRAM]: '🚋',
+    [TransportMode.TRAM]: '🚊',
     [TransportMode.SUBWAY]: '🚇',
     [TransportMode.FERRY]: '⛴️',
     [TransportMode.AIRPLANE]: '✈️',
