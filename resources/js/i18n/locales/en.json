@@ -5,6 +5,15 @@
             "description": "Reisetagebuch is a travel diary application built with Laravel. It allows users to document their travels, share experiences, and connect with fellow travelers. The application is designed to be self hosted, providing users with full control over their data and privacy. It's a crossover between Träwelling and Swarm."
         }
     },
+    "notifications": {
+        "title": "Notifications",
+        "mark_all_read": "Mark all as read",
+        "none": "No notifications",
+        "fallback": "You have a new notification",
+        "liked": {
+            "lead": "{user} liked your post"
+        }
+    },
     "trip_details": {
         "departure": "Departure",
         "time": "Time",

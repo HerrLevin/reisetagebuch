@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import NotificationBell from '@/Components/Notifications/NotificationBell.vue';
 import { LocationService } from '@/Services/LocationService';
 import { Link, usePage } from '@inertiajs/vue3';
 import {
@@ -40,6 +41,9 @@ function updateLocation() {
         })
         .catch(() => {});
 }
+const isNotificationRoute = () => {
+    return route().current('notifications');
+};
 const isPostsCreateRoute = () => {
     return route().current()?.startsWith('posts.create');
 };
@@ -130,6 +134,16 @@ const isFilterRoute = () => {
                 >
                     <Route class="size-5" />
                     {{ t('new_route.title') }}
+                </Link>
+            </li>
+            <li>
+                <Link
+                    :href="route('notifications')"
+                    :class="{ 'btn-active': isNotificationRoute() }"
+                    class="btn btn-ghost"
+                >
+                    <NotificationBell class="size-5" />
+                    {{ t('notifications.title') }}
                 </Link>
             </li>
             <li>

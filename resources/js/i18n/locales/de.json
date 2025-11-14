@@ -5,6 +5,15 @@
             "description": "Reisetagebuch ist eine mit Laravel entwickelte Reise-Tagebuch-Anwendung. Sie ermöglicht es Nutzenden, ihre Reisen zu dokumentieren, Erfahrungen auszutauschen und sich mit anderen Reisenden zu vernetzen. Die Anwendung ist für den Selbsthosting-Betrieb konzipiert und bietet Nutzerenden vollständige Kontrolle über ihre Daten und Privatsphäre. Sie ist eine Mischung aus Träwelling und Swarm."
         }
     },
+    "notifications": {
+        "title": "Benachrichtigungen",
+        "mark_all_read": "Alle als gelesen markieren",
+        "none": "Keine Benachrichtigungen",
+        "fallback": "Du hast eine neue Benachrichtigung",
+        "liked": {
+            "lead": ":user hat deinen Post geliked"
+        }
+    },
     "trip_details": {
         "departure": "Abfahrt",
         "time": "Uhrzeit",
