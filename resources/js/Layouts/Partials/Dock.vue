@@ -170,4 +170,20 @@ const isFilterRoute = () => {
 .fab {
     padding-bottom: calc(4rem + env(safe-area-inset-bottom));
 }
+
+.fab:focus-within::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(
+        circle at bottom right,
+        rgb(0, 0, 0),
+        transparent 70%
+    );
+    pointer-events: none;
+}
+
+.fab-close {
+    bottom: calc(4rem + env(safe-area-inset-bottom));
+}
 </style>
