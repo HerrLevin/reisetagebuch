@@ -33,6 +33,9 @@ const form = reactive({
     visibility: Visibility.PUBLIC,
     tags: [] as string[],
     travelReason: TravelReason.LEISURE,
+    vehicleIds: [] as string[],
+    metaTripId: null as string | null,
+    travelRole: null as string | null,
 });
 
 function submitForm() {
@@ -47,6 +50,29 @@ form.body = props.post.body || '';
 form.visibility = props.post.visibility;
 form.tags = props.post.hashTags || [];
 form.travelReason = props.post.travelReason || TravelReason.LEISURE;
+
+const vehicleIds = props.post.metaInfos['rtb:vehicle_id'];
+if (Array.isArray(vehicleIds)) {
+    form.vehicleIds = vehicleIds;
+} else if (typeof vehicleIds === 'string') {
+    form.vehicleIds = [vehicleIds];
+} else {
+    form.vehicleIds = [];
+}
+
+const metaTripId = props.post.metaInfos['rtb:trip_id'];
+if (typeof metaTripId === 'string') {
+    form.metaTripId = metaTripId;
+} else {
+    form.metaTripId = null;
+}
+
+const travelRole = props.post.metaInfos['rtb:travel_role'];
+if (typeof travelRole === 'string') {
+    form.travelRole = travelRole;
+} else {
+    form.travelRole = null;
+}
 
 const subtitle = `${getBaseText(props.post)} (${prettyDates(props.post)})`;
 const title = t('edit_post.title');
@@ -75,12 +101,19 @@ const fullTitle = `${title} · ${subtitle}`;
                     :show-travel-reason="
                         isTransportPost(post) || isLocationPost(post)
                     "
+                    :show-vehicle-id="isTransportPost(post)"
+                    :vehicle-ids="form.vehicleIds"
+                    :travel-role="form.travelRole"
+                    :meta-trip-id="form.metaTripId"
                     @select-travel-reason="
                         (reason) => (form.travelReason = reason)
                     "
                     @cancel="goBack"
                     @select-visibility="(vis) => (form.visibility = vis)"
                     @update:tags="(tags) => (form.tags = tags)"
+                    @update:vehicle-ids="(ids) => (form.vehicleIds = ids)"
+                    @update:travel-role="(role) => (form.travelRole = role)"
+                    @update:trip-id="(ids) => (form.metaTripId = ids)"
                 />
             </form>
         </div>

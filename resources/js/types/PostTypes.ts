@@ -12,6 +12,7 @@ export type BasePost = {
     hashTags: string[];
     likesCount: number;
     likedByUser: boolean;
+    metaInfos: Record<string, string | string[]>;
 };
 
 export type LocationPost = BasePost & {

@@ -30,6 +30,9 @@ class BasePost
 
     public bool $likedByUser = false;
 
+    /** @var array<string, mixed> */
+    public array $metaInfos = [];
+
     public function __construct(Post $post, UserDto $userDto)
     {
         $this->id = $post->id;
@@ -42,5 +45,13 @@ class BasePost
         $this->hashTags = $post->hashTags?->map(fn ($hashTag) => $hashTag->value)->toArray() ?? [];
         $this->likesCount = $post->likes_count ?? 0;
         $this->likedByUser = $post->liked_by_user ?? false;
+        $this->metaInfos = $post->metaInfos?->groupBy(fn ($metaInfo) => $metaInfo->key->value)
+            ->map(function ($group) {
+                if ($group->first()->key->valueType() === \App\Enums\PostMetaInfo\MetaInfoValueType::STRING_LIST) {
+                    return $group->sortBy('order')->pluck('value')->values()->toArray();
+                }
+
+                return $group->first()->value;
+            })->toArray() ?? [];
     }
 }

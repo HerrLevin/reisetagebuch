@@ -15,10 +15,10 @@ class PostMetaInfo extends Model
         'post_id',
         'key',
         'value',
+        'order',
     ];
 
     protected $casts = [
-        'post_id' => 'integer',
         'key' => MetaInfoKey::class,
     ];
 

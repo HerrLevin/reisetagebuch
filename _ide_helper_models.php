@@ -217,11 +217,12 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property string $id
- * @property int $post_id
+ * @property string $post_id
  * @property \App\Enums\PostMetaInfo\MetaInfoKey $key
  * @property string|null $value
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int|null $order
  * @property-read \App\Models\Post $post
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PostMetaInfo newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PostMetaInfo newQuery()
@@ -229,6 +230,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PostMetaInfo whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PostMetaInfo whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PostMetaInfo whereKey($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PostMetaInfo whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PostMetaInfo wherePostId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PostMetaInfo whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PostMetaInfo whereValue($value)

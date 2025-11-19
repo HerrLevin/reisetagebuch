@@ -259,6 +259,14 @@
         "locations": "Locations",
         "departures": "Departures",
         "text": "Text",
+        "meta_info": {
+            "title": "Additional Information",
+            "vehicle_id": "Vehicle ID",
+            "vehicle_id_placeholder": "957 A, DLH73P, 21 80 990 3 914-9",
+            "trip_id": "Trip ID",
+            "trip_id_placeholder": "12345",
+            "travel_role": "Travel Role"
+        },
         "edit": {
             "change_times": "Change Times",
             "change_exit": "Change Exit"
@@ -337,6 +345,15 @@
         "unlisted_description": "Hidden for others from timeline and profile. Only visible to you or others who have the link.",
         "only_authenticated": "Authenticated Only",
         "only_authenticated_description": "Only visible to authenticated users"
+    },
+    "travel_role": {
+        "select": "Select Travel Role / none",
+        "deadhead": "Deadhead",
+        "deadhead_description": "Traveling as a non-revenue passenger (e.g., repositioning)",
+        "operator": "Operator",
+        "operator_description": "Traveling as the operator or driver of the vehicle",
+        "catering": "Catering",
+        "catering_description": "Traveling as part of the catering or service staff"
     },
     "travel_reason": {
         "leisure": "Leisure",

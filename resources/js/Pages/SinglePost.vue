@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Map from '@/Components/Map.vue';
 import Post from '@/Components/Post/Post.vue';
+import PostMetaInfo from '@/Components/Post/PostMetaInfo.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { getColorForPost } from '@/Services/DepartureTypeService';
 import {
@@ -191,5 +192,7 @@ const progress = computed(() => {
                 </ul>
             </div>
         </div>
+
+        <PostMetaInfo :meta-infos="post.metaInfos" class="mt-4" />
     </AuthenticatedLayout>
 </template>

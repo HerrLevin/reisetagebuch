@@ -2,6 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\PostMetaInfo\TravelRole;
+use Illuminate\Validation\Rule;
+
 /**
  * @property string $body
  * @property string $tripId
@@ -9,6 +12,9 @@ namespace App\Http\Requests;
  * @property string $startTime
  * @property string $stopId
  * @property string $stopTime
+ * @property array|null $vehicleIds
+ * @property TravelRole|null $travelRole
+ * @property string|null $metaTripId
  */
 class TransportBasePostCreateRequest extends BasePostRequest
 {
@@ -22,6 +28,10 @@ class TransportBasePostCreateRequest extends BasePostRequest
             'startTime' => 'required',
             'stopId' => 'required',
             'stopTime' => 'required',
+            'vehicleIds' => 'array',
+            'vehicleIds.*' => 'string|nullable',
+            'travelRole' => ['nullable', Rule::enum(TravelRole::class)],
+            'metaTripId' => 'nullable|string',
         ], parent::rules());
     }
 }
