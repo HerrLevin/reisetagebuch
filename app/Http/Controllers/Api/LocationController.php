@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Backend\LocationController as BackendLocationController;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GeocodeRequest;
+use App\Http\Resources\LocationDto;
 use App\Jobs\PrefetchJob;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Illuminate\Http\Client\ConnectionException;
@@ -53,6 +54,26 @@ class LocationController extends Controller
         }
 
         return response()->json($location);
+    }
+
+    public function search(Request $request): JsonResponse
+    {
+        $request->validate([
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
+            'query' => 'nullable|string|min:3',
+        ]);
+
+        $point = Point::makeGeodetic($request->latitude, $request->longitude);
+
+        $radius = 50_000; // 50km radius
+        if (empty($request->get('query'))) {
+            $radius = config('app.nearby.radius');
+        }
+
+        $locations = $this->locationController->searchNearby($point, $request->input('query'), $radius);
+
+        return response()->json(array_values($locations->map(fn ($location) => new LocationDto($location))->toArray()));
     }
 
     public function geocode(GeocodeRequest $request): JsonResponse

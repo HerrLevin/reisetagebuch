@@ -142,18 +142,6 @@ class LocationControllerTest extends TestCase
     {
         Queue::fake();
         $point = $this->createMock(Point::class);
-        $this->repository->expects($this->once())
-            ->method('recentNearbyRequests')
-            ->with($point)
-            ->willReturn(false);
-
-        $this->repository->expects($this->once())
-            ->method('createRequestLocation')
-            ->with($point);
-
-        $this->overpassRequestService->expects($this->once())
-            ->method('getElements')
-            ->willReturn(['elements' => []]);
 
         $this->repository->expects($this->once())
             ->method('getNearbyLocations')

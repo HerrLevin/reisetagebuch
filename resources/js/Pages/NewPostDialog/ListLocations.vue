@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import Loading from '@/Components/Loading.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import LocationListEntry from '@/Pages/NewPostDialog/Partials/LocationListEntry.vue';
 import { LocationService } from '@/Services/LocationService';
 import { LocationEntry, RequestLocationDto } from '@/types';
 import { Head, usePage } from '@inertiajs/vue3';
+import axios from 'axios';
 import { Search } from 'lucide-vue-next';
 import { PropType, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -24,10 +26,13 @@ showStartButton.value = route().current('posts.create.start');
 const filteredLocations = ref<LocationEntry[]>([]);
 const search = ref<string>('');
 const fetchingProgress = ref<RequestLocationDto | null>(null);
+const currentPosition = ref<GeolocationPosition | null>(null);
+const loading = ref<boolean>(false);
 
 function fetchRequestLocation() {
     LocationService.getPosition(!!usePage().props.auth.user)
         .then((position) => {
+            currentPosition.value = position;
             fetch(
                 route('api.request-location.get', {
                     latitude: position.coords.latitude,
@@ -53,16 +58,52 @@ function fetchRequestLocation() {
         .catch(() => {});
 }
 
+let debounceTimeout: ReturnType<typeof setTimeout>;
+
 function filterLocations() {
-    if (search.value.length <= 0) {
+    if (search.value.length <= 0 && fetchingProgress.value !== null) {
         filteredLocations.value = props.locations;
-    } else {
-        filteredLocations.value = Object.values(props.locations).filter(
-            (location) =>
-                location.name
-                    .toLowerCase()
-                    .includes(search.value.toLowerCase()),
-        );
+        return;
+    }
+
+    filteredLocations.value = Object.values(props.locations).filter(
+        (location) =>
+            location.name.toLowerCase().includes(search.value.toLowerCase()),
+    );
+
+    if (search.value.length >= 3 && currentPosition.value) {
+        clearTimeout(debounceTimeout);
+        debounceTimeout = setTimeout(() => {
+            loading.value = true;
+            axios
+                .get(
+                    route('api.location.search', {
+                        latitude: currentPosition.value!.coords.latitude,
+                        longitude: currentPosition.value!.coords.longitude,
+                        query: search.value,
+                    }),
+                )
+                .then((response) => {
+                    if (response.data) {
+                        const data = response.data as LocationEntry[];
+                        const existingIds = new Set(
+                            filteredLocations.value.map((l) => l.id),
+                        );
+                        const newLocations = data.filter(
+                            (l) => !existingIds.has(l.id),
+                        );
+                        filteredLocations.value = [
+                            ...filteredLocations.value,
+                            ...newLocations,
+                        ];
+                    }
+                    loading.value = false;
+                })
+                .catch((error) => {
+                    loading.value = false;
+                    console.error('Error fetching search results:', error);
+                });
+        }, 500);
     }
 }
 filterLocations();
@@ -71,6 +112,7 @@ fetchRequestLocation();
 // fetch every 5 seconds
 const fetchInterval = setInterval(() => {
     fetchRequestLocation();
+    filterLocations();
 }, 5000);
 
 // watch for fetchingProgress changes
@@ -154,6 +196,19 @@ watch(search, () => {
                     :show-start-button
                 />
             </ul>
+            <div v-if="loading" class="flex w-full justify-center p-8">
+                <Loading />
+            </div>
+            <div
+                v-if="
+                    !loading &&
+                    filteredLocations.length === 0 &&
+                    fetchingProgress === null
+                "
+                class="p-8 text-center opacity-60"
+            >
+                {{ t('typeahead.no_suggestions') }}
+            </div>
         </div>
     </AuthenticatedLayout>
 </template>

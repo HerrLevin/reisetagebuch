@@ -70,6 +70,7 @@ Route::middleware('auth')->group(callback: function () {
         // this belongs in an api
         Route::get('/new/prefetch/{latitude}/{longitude}', [ApiLocationController::class, 'prefetch'])->name('posts.create.prefetch');
         Route::get('/request-location/{latitude}/{longitude}', [ApiLocationController::class, 'getRecentRequestLocation'])->name('api.request-location.get');
+        Route::get('/search-nearby', [ApiLocationController::class, 'search'])->name('api.location.search');
     });
 
     Route::resource('trips', TripController::class);
