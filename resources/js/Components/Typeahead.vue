@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import Loading from '@/Components/Loading.vue';
 import { CircleX } from 'lucide-vue-next';
-import { PropType, ref } from 'vue';
+import { PropType } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -30,11 +31,13 @@ defineProps({
         type: String,
         default: '',
     },
+    loading: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 defineEmits(['submit', 'select', 'update:modelValue', 'focus']);
-
-const loading = ref(false);
 
 function blur() {
     (document.activeElement as HTMLElement)?.blur();
@@ -59,6 +62,7 @@ function blur() {
                     blur();
                 "
             />
+            <Loading v-show="loading" class="loading-sm" />
             <CircleX
                 v-if="model"
                 class="h-[1.5em] cursor-pointer"
@@ -101,8 +105,5 @@ function blur() {
     </div>
     <div v-if="errors.length" class="invalid-feedback">
         <span v-for="(error, index) in errors" :key="index">{{ error }}</span>
-    </div>
-    <div v-if="loading" class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">{{ t('verbs.loading') }}...</span>
     </div>
 </template>

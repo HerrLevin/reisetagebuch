@@ -330,4 +330,20 @@ class LocationRepository
         $waypoint->location = $point;
         $waypoint->save();
     }
+
+    public function searchNearby(Point $position, ?string $search, int $radius): Collection|SupportCollection
+    {
+        $query = Location::select()
+            ->addSelect(ST::distanceSphere($position, 'location')->as('distance'))
+            ->where(ST::distanceSphere($position, 'location'), '<=', $radius);
+
+        if (! empty($search)) {
+            $query->whereLike('name', '%'.$search.'%', false);
+        }
+
+        return $query->with(['tags', 'identifiers'])
+            ->orderBy('distance')
+            ->limit(50)
+            ->get();
+    }
 }

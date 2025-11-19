@@ -31,7 +31,7 @@ return [
     ],
 
     'recent_location' => [
-        'radius' => env('APP_RECENT_LOCATION_RADIUS', 200),
+        'radius' => env('APP_RECENT_LOCATION_RADIUS', 1000),
         'timeout' => env('APP_RECENT_LOCATION_TIMEOUT', 60 * 24),
     ],
 

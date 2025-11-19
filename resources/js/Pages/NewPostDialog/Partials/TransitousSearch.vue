@@ -30,6 +30,7 @@ const props = defineProps({
 
 const search = ref('');
 const suggestions = ref<Suggestion[]>([]);
+const loading = ref(false);
 
 const emit = defineEmits(['select', 'selectIdentifier']);
 
@@ -40,6 +41,7 @@ function fetchSuggestions() {
         suggestions.value = [];
         return;
     }
+    loading.value = true;
 
     const url = route('posts.create.geocode');
     axios
@@ -64,6 +66,9 @@ function fetchSuggestions() {
         })
         .catch((error) => {
             console.error('Error fetching suggestions:', error);
+        })
+        .finally(() => {
+            loading.value = false;
         });
 }
 const modelChange = debounce(() => fetchSuggestions(), 300);
@@ -127,6 +132,7 @@ function submitTypeahead(element: Suggestion) {
         name="departure-search"
         :required="false"
         :suggestions="suggestions"
+        :loading="loading"
         @submit="submitTypeahead($event)"
         @select="submitTypeahead($event)"
         @focus="modelChange()"

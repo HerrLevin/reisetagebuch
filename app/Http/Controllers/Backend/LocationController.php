@@ -132,10 +132,20 @@ class LocationController extends Controller
     {
         // Prefetch nearby locations if not already done by job
         PrefetchJob::dispatch($point);
-        $radius = config('app.recent_location.radius');
-        $this->prefetch($point, $radius);
 
         $locations = $this->locationRepository->getNearbyLocations($point);
+
+        // remove locations with motis identifier
+        return $locations->filter(function ($location) {
+            return ! $location->identifiers->contains(function ($identifier) {
+                return $identifier->origin === 'motis';
+            });
+        });
+    }
+
+    public function searchNearby(Point $point, ?string $search, int $radius): DbCollection|Collection
+    {
+        $locations = $this->locationRepository->searchNearby($point, $search, $radius);
 
         // remove locations with motis identifier
         return $locations->filter(function ($location) {
