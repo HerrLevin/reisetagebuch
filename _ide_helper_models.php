@@ -509,11 +509,6 @@ namespace App\Models{
  * @property string|null $remember_token
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $activity_pub_private_key
- * @property string|null $activity_pub_public_key
- * @property string|null $activity_pub_actor_url
- * @property string|null $preferred_username
- * @property string|null $summary
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\HashTag> $hashTags
  * @property-read int|null $hash_tags_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Invite> $invites
@@ -537,18 +532,13 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereActivityPubActorUrl($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereActivityPubPrivateKey($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereActivityPubPublicKey($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereEmail($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereEmailVerifiedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User wherePassword($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|User wherePreferredUsername($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereRememberToken($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereSummary($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUsername($value)
  */

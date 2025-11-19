@@ -193,10 +193,9 @@ class PostRepository
         TravelReason $travelReason = TravelReason::LEISURE
     ): BasePost|LocationPost|TransportPost {
         try {
-            $publishedAt = Carbon::now();
-            if ($publishedAt < $originStop->departure_time) {
-                $publishedAt = $originStop->departure_time->subMinutes(10);
-            }
+            // If published_at would be more than 10 minutes in the future, set it to 10 minutes before departure
+            $publishedAt = $originStop->departure_time ?? $originStop->arrival_time ?? Carbon::now();
+            $publishedAt = $publishedAt->subMinutes(10);
 
             DB::beginTransaction();
             /** @var Post $post */
