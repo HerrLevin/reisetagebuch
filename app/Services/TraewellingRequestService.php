@@ -123,6 +123,51 @@ class TraewellingRequestService
         }
     }
 
+    public function getPostTags(string $traewellingPostId, string $userId): array
+    {
+        $this->getAccessToken($userId);
+        $client = $this->getClient();
+        try {
+            $response = $client->get('status/'.$traewellingPostId.'/tags');
+            $data = json_decode($response->getBody()->getContents(), true);
+            Log::debug('Fetched post tags', ['response' => $data]);
+
+            return $data['data'] ?? [];
+        } catch (GuzzleException $e) {
+            Log::error('Error fetching post tags from Traewelling', ['exception' => $e->getMessage()]);
+
+            return [];
+        }
+    }
+
+    public function deletePostTag(int $traewellingPostId, string $userId, string $key): void
+    {
+        $this->getAccessToken($userId);
+        $client = $this->getClient();
+        try {
+            $response = $client->delete('status/'.$traewellingPostId.'/tags/'.$key);
+            Log::debug('Deleted post tag', ['response' => $response->getBody()->getContents()]);
+        } catch (GuzzleException $e) {
+            Log::error('Error deleting post tag in Traewelling', ['exception' => $e->getMessage(), 'traewellingPostId' => $traewellingPostId]);
+        }
+    }
+
+    public function createTag(int $traewellingPostId, string $userId, string $key, string $value, int $visibility = 0): void
+    {
+        $this->getAccessToken($userId);
+        $client = $this->getClient();
+        try {
+            $response = $client->post('status/'.$traewellingPostId.'/tags', ['json' => [
+                'key' => $key,
+                'value' => $value,
+                'visibility' => $visibility,
+            ]]);
+            Log::debug('Created post tag', ['response' => $response->getBody()->getContents()]);
+        } catch (GuzzleException $e) {
+            Log::error('Error creating post tag in Traewelling', ['exception' => $e->getMessage(), 'traewellingPostId' => $traewellingPostId]);
+        }
+    }
+
     public function updatePost(int $traewellingPostId, string $userId, array $data): void
     {
         $this->getAccessToken($userId);

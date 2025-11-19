@@ -125,6 +125,10 @@ class CrossPostControllerTest extends TestCase
                 'name' => 'Idk station name',
             ],
         ]));
+
+        $tagsMockResponse = Mockery::mock(ResponseInterface::class);
+        $tagsMockResponse->shouldReceive('getBody->getContents')->andReturn(json_encode(['data' => []]));
+
         $mockClient = Mockery::mock(Client::class);
         $mockClient->shouldReceive('post')
             ->withArgs(
@@ -142,8 +146,16 @@ class CrossPostControllerTest extends TestCase
             )
             ->andReturn($mockResponse);
         $mockClient->shouldReceive('get')
+            ->withArgs(function ($url) {
+                return str_contains($url, 'trains/station/nearby');
+            })
             ->twice()
             ->andReturn($stationMockResponse);
+
+        $mockClient->shouldReceive('get')
+            ->with('status/trwl_trip_id/tags')
+            ->once()
+            ->andReturn($tagsMockResponse);
 
         $job = new CrossPostController(new TraewellingRequestService($mockClient));
         $job->crossCheckIn($post->id);
@@ -185,6 +197,10 @@ class CrossPostControllerTest extends TestCase
         $mockResponseCheckin->shouldReceive('getBody->getContents')->andReturn(json_encode([
             'data' => ['status' => ['id' => 'trwl_trip_id']],
         ]));
+
+        $tagsMockResponse = Mockery::mock(ResponseInterface::class);
+        $tagsMockResponse->shouldReceive('getBody->getContents')->andReturn(json_encode(['data' => []]));
+
         $mockClient = Mockery::mock(Client::class);
         $mockClient->shouldReceive('post')
             ->withArgs(function ($url, $options) {
@@ -210,18 +226,23 @@ class CrossPostControllerTest extends TestCase
             ],
         ]));
         $mockClient->shouldReceive('get')
-            ->withArgs(function ($url, $options) use ($origin) {
-                return str_contains($url, 'trains/station/nearby') && $options['query']['latitude'] == $origin->location->location->getLatitude() && $options['query']['longitude'] == $origin->location->location->getLongitude();
+            ->withArgs(function ($url, $options = []) use ($origin) {
+                return str_contains($url, 'trains/station/nearby') && ($options['query']['latitude'] ?? null) == $origin->location->location->getLatitude() && ($options['query']['longitude'] ?? null) == $origin->location->location->getLongitude();
             })
             ->once()
             ->andReturn($stationMockResponse);
 
         $mockClient->shouldReceive('get')
-            ->withArgs(function ($url, $options) use ($destination) {
-                return str_contains($url, 'trains/station/nearby') && $options['query']['latitude'] == $destination->location->location->getLatitude() && $options['query']['longitude'] == $destination->location->location->getLongitude();
+            ->withArgs(function ($url, $options = []) use ($destination) {
+                return str_contains($url, 'trains/station/nearby') && ($options['query']['latitude'] ?? null) == $destination->location->location->getLatitude() && ($options['query']['longitude'] ?? null) == $destination->location->location->getLongitude();
             })
             ->once()
             ->andReturn($stationMockResponse);
+
+        $mockClient->shouldReceive('get')
+            ->with('status/trwl_trip_id/tags')
+            ->once()
+            ->andReturn($tagsMockResponse);
 
         $job = new CrossPostController(new TraewellingRequestService($mockClient));
         $job->crossCheckIn($post->id);
@@ -355,10 +376,16 @@ class CrossPostControllerTest extends TestCase
         $mockResponse->shouldReceive('getBody->getContents')->andReturn(json_encode([
             'data' => ['status' => ['id' => 'trwl_trip_id']],
         ]));
+
+        $tagsMockResponse = Mockery::mock(ResponseInterface::class);
+        $tagsMockResponse->shouldReceive('getBody->getContents')->andReturn(json_encode(['data' => []]));
+
         $mockClient = Mockery::mock(Client::class);
         $mockClient->shouldReceive('post')->andReturn($mockResponse);
         $mockClient->shouldReceive('get')
-            ->never();
+            ->with('status/trwl_trip_id/tags')
+            ->once()
+            ->andReturn($tagsMockResponse);
 
         $job = new CrossPostController(new TraewellingRequestService($mockClient));
         $job->crossCheckIn($post->id);
@@ -416,14 +443,23 @@ class CrossPostControllerTest extends TestCase
                 'name' => 'Idk station name',
             ]],
         ]));
+
+        $tagsMockResponse = Mockery::mock(ResponseInterface::class);
+        $tagsMockResponse->shouldReceive('getBody->getContents')->andReturn(json_encode(['data' => []]));
+
         $mockClient = Mockery::mock(Client::class);
         $mockClient->shouldReceive('get')
-            ->withArgs(function ($msg, $options) {
-                return $msg == 'stations' && $options['query']['identifier'] === 'station_origin_id';
+            ->withArgs(function ($msg, $options = []) {
+                return $msg == 'stations' && ($options['query']['identifier'] ?? '') === 'station_origin_id';
             })
             ->twice()
             ->andReturn($stationMockResponse);
         $mockClient->shouldReceive('post')->andReturn($mockResponse);
+
+        $mockClient->shouldReceive('get')
+            ->with('status/trwl_trip_id/tags')
+            ->once()
+            ->andReturn($tagsMockResponse);
 
         $job = new CrossPostController(new TraewellingRequestService($mockClient));
         $job->crossCheckIn($post->id);
@@ -474,12 +510,21 @@ class CrossPostControllerTest extends TestCase
                 'name' => 'Idk station name',
             ],
         ]));
+
+        $tagsMockResponse = Mockery::mock(ResponseInterface::class);
+        $tagsMockResponse->shouldReceive('getBody->getContents')->andReturn(json_encode(['data' => []]));
+
         $mockClient->shouldReceive('get')
             ->withArgs(function ($url) {
                 return str_contains($url, 'trains/station/nearby');
             })
             ->twice()
             ->andReturn($stationMockResponse);
+
+        $mockClient->shouldReceive('get')
+            ->with('status/trwl_trip_id/tags')
+            ->once()
+            ->andReturn($tagsMockResponse);
 
         $job = new CrossPostController(new TraewellingRequestService($mockClient));
         $job->crossCheckIn($post->id);
@@ -535,12 +580,21 @@ class CrossPostControllerTest extends TestCase
                 'name' => 'Idk station name',
             ],
         ]));
+
+        $tagsMockResponse = Mockery::mock(ResponseInterface::class);
+        $tagsMockResponse->shouldReceive('getBody->getContents')->andReturn(json_encode(['data' => []]));
+
         $mockClient->shouldReceive('get')
             ->withArgs(function ($url) {
                 return str_contains($url, 'trains/station/nearby');
             })
             ->twice()
             ->andReturn($stationMockResponse);
+
+        $mockClient->shouldReceive('get')
+            ->with('status/trwl_trip_id/tags')
+            ->once()
+            ->andReturn($tagsMockResponse);
 
         $job = new CrossPostController(new TraewellingRequestService($mockClient));
         $job->crossCheckIn($post->id);

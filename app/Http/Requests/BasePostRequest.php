@@ -20,6 +20,8 @@ class BasePostRequest extends FormRequest
             'tags' => ['sometimes', 'max:5', 'array'],
             'tags.*' => ['string', 'regex:/^[\w\_\- ]+$/'],
             'travelReason' => Rule::enum(TravelReason::class),
+            'vehicleIds' => ['sometimes', 'array'],
+            'vehicleIds.*' => ['string'],
         ];
     }
 

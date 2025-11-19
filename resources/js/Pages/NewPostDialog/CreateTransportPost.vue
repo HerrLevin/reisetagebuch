@@ -42,6 +42,9 @@ const form = reactive({
     visibility: Visibility.PUBLIC,
     tags: [] as string[],
     travelReason: TravelReason.LEISURE,
+    vehicleIds: [] as string[],
+    metaTripId: null,
+    travelRole: null,
 });
 
 function submitForm() {
@@ -66,6 +69,8 @@ function submitForm() {
                     :name="title"
                     :emoji="emoji"
                     :show-travel-reason="true"
+                    :show-vehicle-id="true"
+                    :vehicle-ids="form.vehicleIds"
                     @cancel="goBack"
                     @select-travel-reason="
                         (travelReason) => (form.travelReason = travelReason)
@@ -74,6 +79,11 @@ function submitForm() {
                         (visibility) => (form.visibility = visibility)
                     "
                     @update:tags="(tags) => (form.tags = tags)"
+                    @update:vehicle-ids="(ids) => (form.vehicleIds = ids)"
+                    @update:travel-role="(role) => (form.travelRole = role)"
+                    @update:trip-id="
+                        (metaTripId) => (form.metaTripId = metaTripId)
+                    "
                 />
             </form>
         </div>

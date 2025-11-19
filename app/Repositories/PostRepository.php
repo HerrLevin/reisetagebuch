@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Dto\PostPaginationDto;
 use App\Enums\PostMetaInfo\MetaInfoKey;
 use App\Enums\PostMetaInfo\TravelReason;
+use App\Enums\PostMetaInfo\TravelRole;
 use App\Enums\Visibility;
 use App\Exceptions\OriginAfterDestinationException;
 use App\Exceptions\StationNotOnTripException;
@@ -61,7 +62,7 @@ class PostRepository
             if (! empty($hashTagIds)) {
                 $this->hashTagRepository->syncHashTagsByValue($post, $hashTagIds);
             }
-            $this->postMetaInfoRepository->updateOrCreateMetaInfo($post, MetaInfoKey::TRAVEL_REASON, $travelReason->value);
+            $this->postMetaInfoRepository->setTravelReason($post, $travelReason);
 
             DB::commit();
 
@@ -109,7 +110,10 @@ class PostRepository
         ?Visibility $visibility,
         ?string $body = null,
         array $hashTags = [],
-        ?TravelReason $travelReason = null
+        ?TravelReason $travelReason = null,
+        ?array $vehicleIds = null,
+        ?string $metaTripId = null,
+        ?TravelRole $travelRole = null
     ): BasePost|LocationPost|TransportPost {
         try {
             DB::beginTransaction();
@@ -127,8 +131,14 @@ class PostRepository
             }
 
             if ($travelReason !== null) {
-                $this->postMetaInfoRepository->updateOrCreateMetaInfo($post, MetaInfoKey::TRAVEL_REASON, $travelReason->value);
+                $this->postMetaInfoRepository->setTravelReason($post, $travelReason);
             }
+
+            if ($vehicleIds !== null) {
+                $this->postMetaInfoRepository->setVehicleIds($post, $vehicleIds);
+            }
+            $this->postMetaInfoRepository->updateOrCreateMetaInfo($post, MetaInfoKey::TRIP_ID, $metaTripId);
+            $this->postMetaInfoRepository->updateOrCreateMetaInfo($post, MetaInfoKey::TRAVEL_ROLE, $travelRole?->value);
 
             DB::commit();
 
@@ -169,7 +179,7 @@ class PostRepository
             $transportPost->destination_stop_id = $stop->id;
 
             $transportPost->save();
-            $this->postMetaInfoRepository->updateOrCreateMetaInfo($post, MetaInfoKey::TRAVEL_REASON, $travelReason->value);
+            $this->postMetaInfoRepository->setTravelReason($post, $travelReason);
             DB::commit();
 
             $post->load('transportPost.destination', 'transportPost.origin', 'transportPost.transportTrip', 'transportPost.originStop.location', 'transportPost.destinationStop.location');
@@ -190,7 +200,10 @@ class PostRepository
         Visibility $visibility,
         ?string $body = null,
         array $hashTagIds = [],
-        TravelReason $travelReason = TravelReason::LEISURE
+        TravelReason $travelReason = TravelReason::LEISURE,
+        array $vehicleIds = [],
+        ?string $metaTripId = null,
+        ?TravelRole $travelRole = null
     ): BasePost|LocationPost|TransportPost {
         try {
             // If published_at would be more than 10 minutes in the future, set it to 10 minutes before departure
@@ -217,7 +230,10 @@ class PostRepository
                 $this->hashTagRepository->syncHashTagsByValue($post, $hashTagIds);
             }
 
-            $this->postMetaInfoRepository->updateOrCreateMetaInfo($post, MetaInfoKey::TRAVEL_REASON, $travelReason->value);
+            $this->postMetaInfoRepository->setTravelReason($post, $travelReason);
+            $this->postMetaInfoRepository->setVehicleIds($post, $vehicleIds);
+            $this->postMetaInfoRepository->updateOrCreateMetaInfo($post, MetaInfoKey::TRIP_ID, $metaTripId);
+            $this->postMetaInfoRepository->updateOrCreateMetaInfo($post, MetaInfoKey::TRAVEL_ROLE, $travelRole?->value);
 
             DB::commit();
 
@@ -299,7 +315,7 @@ class PostRepository
 
     public function getById(string $postId, ?User $visitingUser = null): BasePost|LocationPost|TransportPost
     {
-        $post = Post::with(['user', 'locationPost.location', 'locationPost.location.tags', 'transportPost', 'transportPost.origin', 'transportPost.destination', 'hashTags'])
+        $post = Post::with(['user', 'locationPost.location', 'locationPost.location.tags', 'transportPost', 'transportPost.origin', 'transportPost.destination', 'hashTags', 'metaInfos'])
             ->withCount('likes')
             ->when($visitingUser, function ($query) use ($visitingUser) {
                 $query->withExists(['likes as liked_by_user' => function ($q) use ($visitingUser) {
@@ -450,7 +466,7 @@ class PostRepository
                 }
 
                 if ($travelReason !== null && ($post->locationPost !== null || $post->transportPost !== null)) {
-                    $this->postMetaInfoRepository->updateOrCreateMetaInfo($post, MetaInfoKey::TRAVEL_REASON, $travelReason->value);
+                    $this->postMetaInfoRepository->setTravelReason($post, $travelReason);
                 }
 
                 if ($tags !== null) {

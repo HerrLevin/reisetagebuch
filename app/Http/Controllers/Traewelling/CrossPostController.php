@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Traewelling;
 
 use App\Enums\PostMetaInfo\MetaInfoKey;
 use App\Enums\PostMetaInfo\TravelReason;
+use App\Enums\PostMetaInfo\TravelRole;
 use App\Enums\TransportMode;
 use App\Http\Controllers\Controller;
 use App\Models\Location;
@@ -70,12 +71,65 @@ class CrossPostController extends Controller
             return false;
         }
 
-        $trwlId = $data['data']['status']['id'] ?? '';
+        $this->traewellingId = $data['data']['status']['id'] ?? '';
 
-        $meta = $this->postMetaInfoRepository->updateOrCreateMetaInfo($post, MetaInfoKey::TRAEWELLING_TRIP_ID, $trwlId);
-        Log::debug('Created Traewelling check-in for post '.$postId.' with trwl-id '.$trwlId, ['response' => $data, 'meta' => $meta]);
+        $meta = $this->postMetaInfoRepository->updateOrCreateMetaInfo($post, MetaInfoKey::TRAEWELLING_TRIP_ID, $this->traewellingId);
+        Log::debug('Created Traewelling check-in for post '.$postId.' with trwl-id '.$this->traewellingId, ['response' => $data, 'meta' => $meta]);
+
+        $this->syncTags($post);
 
         return true;
+    }
+
+    private function syncTags(Post $post): void
+    {
+        $tags = $this->traewellingRequestService->getPostTags($this->traewellingId, $post->user_id);
+        Log::debug('Syncing tags for Traewelling post '.$this->traewellingId, ['existing_tags' => $tags]);
+        $visibility = $post->visibility->getTraewellingVisibility();
+
+        $updateKeyStuff = [
+            MetaInfoKey::TRAVEL_ROLE->value => 'trwl:role',
+            MetaInfoKey::TRIP_ID->value => 'trwl:journey_number',
+            MetaInfoKey::VEHICLE_ID->value => 'trwl:vehicle_number',
+        ];
+
+        foreach ($updateKeyStuff as $value) {
+            // delete Tag if it exists in $tags
+            $existingTag = collect($tags)->firstWhere('key', $value);
+            if ($existingTag) {
+                $this->traewellingRequestService->deletePostTag($this->traewellingId, $post->user_id, $value);
+            }
+        }
+
+        $travelRole = $this->postMetaInfoRepository->getMetaInfoValue($post, MetaInfoKey::TRAVEL_ROLE);
+        if ($travelRole) {
+            $travelRole = TravelRole::tryFrom($travelRole);
+            if ($travelRole) {
+                $this->traewellingRequestService->createTag($this->traewellingId, $post->user_id, 'trwl:role', $travelRole->getTraewellingIdentifier(), $visibility);
+            }
+        }
+
+        $tripId = $this->postMetaInfoRepository->getMetaInfoValue($post, MetaInfoKey::TRIP_ID);
+        if ($tripId) {
+            $this->traewellingRequestService->createTag($this->traewellingId, $post->user_id, 'trwl:journey_number', $tripId, $visibility);
+        }
+
+        $vehicleIds = $this->getVehicleIds($post);
+        if ($vehicleIds) {
+            $this->traewellingRequestService->createTag($this->traewellingId, $post->user_id, 'trwl:vehicle_number', $vehicleIds, $visibility);
+        }
+    }
+
+    private function getVehicleIds(Post $post): string
+    {
+        $vehicleIds = $post->metaInfos
+            ->where('key', MetaInfoKey::VEHICLE_ID->value)
+            ->sortBy('order')
+            ->pluck('value')
+            ->filter()
+            ->toArray();
+
+        return implode(' + ', $vehicleIds);
     }
 
     public function updatePost(string $postId): void
@@ -90,6 +144,7 @@ class CrossPostController extends Controller
         $payload = $this->getUpdatePayload($post);
 
         $this->traewellingRequestService->updatePost($this->traewellingId, $post->user_id, $payload);
+        $this->syncTags($post);
     }
 
     public function changeExit(string $postId): void

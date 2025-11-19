@@ -44,3 +44,9 @@ export enum TravelReason {
     ERRAND = 'errand',
     OTHER = 'other',
 }
+
+export enum TravelRole {
+    DEADHEAD = 'deadhead',
+    OPERATOR = 'operator',
+    CATERING = 'catering',
+}

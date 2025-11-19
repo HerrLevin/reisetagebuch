@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Backend;
 use App\Dto\MotisApi\TripDto;
 use App\Dto\PostPaginationDto;
 use App\Enums\PostMetaInfo\TravelReason;
+use App\Enums\PostMetaInfo\TravelRole;
 use App\Enums\Visibility;
 use App\Exceptions\OriginAfterDestinationException;
 use App\Exceptions\StationNotOnTripException;
@@ -115,7 +116,10 @@ class PostController extends Controller
             Visibility::from($request->input('visibility')),
             $request->body,
             $request->input('tags', []),
-            TravelReason::from($request->input('travelReason'))
+            TravelReason::from($request->input('travelReason')),
+            $request->input('vehicleIds', []),
+            $request->input('metaTripId'),
+            ! empty($request->input('travelRole')) ? TravelRole::tryFrom($request->input('travelRole')) : null
         );
 
         TraewellingCrossCheckInJob::dispatch($post->id);
@@ -175,7 +179,10 @@ class PostController extends Controller
             Visibility::from($request->input('visibility')),
             $request->input('body'),
             $request->input('tags', []),
-            $reason
+            $reason,
+            $request->input('vehicleIds'),
+            $request->input('metaTripId'),
+            ! empty($request->input('travelRole')) ? TravelRole::tryFrom($request->input('travelRole')) : null
         );
 
         if ($post instanceof TransportPost) {

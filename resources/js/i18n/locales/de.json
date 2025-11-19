@@ -257,6 +257,14 @@
         "locations": "Orte",
         "departures": "Abfahrten",
         "text": "Text",
+        "meta_info": {
+            "title": "Zusatzinformationen",
+            "vehicle_id": "Fahrzeugnummer",
+            "vehicle_id_placeholder": "957 A, DLH73P, 21 80 990 3 914-9",
+            "trip_id": "Trip-ID",
+            "trip_id_placeholder": "1234567890",
+            "travel_role": "Reiserolle"
+        },
         "edit": {
             "change_times": "Zeiten bearbeiten",
             "change_exit": "Ausstieg bearbeiten"
@@ -335,6 +343,15 @@
         "unlisted_description": "Für andere von der Timeline und deinem Profil ausgeblendet. Nur sichtbar für dich oder andere, die den Link haben.",
         "only_authenticated": "Nur für angemeldete",
         "only_authenticated_description": "Nur sichtbar für angemeldete Nutzer:innen"
+    },
+    "travel_role": {
+        "select": "Reiserolle auswählen / keine",
+        "deadhead_description": "Reisen als Gastfahrer:in in einem Fahrzeug",
+        "deadhead": "Gastfahrt",
+        "operator_description": "Reisen als Betreiber:in eines Fahrzeugs",
+        "operator": "Betreiber:in",
+        "catering_description": "Reisen als Teil des Verpflegungspersonals",
+        "catering": "Verpflegungspersonal"
     },
     "travel_reason": {
         "leisure": "Freizeit",

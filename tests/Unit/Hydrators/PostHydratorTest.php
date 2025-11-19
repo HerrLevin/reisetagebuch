@@ -52,12 +52,33 @@ class PostHydratorTest extends TestCase
                 'locationPost' => $locationPost,
                 'visibility' => Visibility::PUBLIC,
                 'user' => new User,
-                'metaInfos' => new Collection([['key' => MetaInfoKey::TRAVEL_REASON, 'value', TravelReason::LEISURE]]),
+                'metaInfos' => new Collection([
+                    $this->createMetaInfoMock(MetaInfoKey::TRAVEL_REASON, TravelReason::LEISURE->value),
+                ]),
                 default => null,
             };
         });
 
         return $post;
+    }
+
+    private function createMetaInfoMock(MetaInfoKey $key, string $value, ?int $order = null)
+    {
+        $mock = $this->createMock(\App\Models\PostMetaInfo::class);
+        $callback = function ($property) use ($key, $value, $order) {
+            return match ($property) {
+                'key' => $key,
+                'value' => $value,
+                'order' => $order,
+                default => null,
+            };
+        };
+
+        $mock->method('__get')->willReturnCallback($callback);
+        $mock->method('offsetGet')->willReturnCallback($callback);
+        $mock->method('offsetExists')->willReturn(true);
+
+        return $mock;
     }
 
     /**
@@ -80,6 +101,48 @@ class PostHydratorTest extends TestCase
         $this->assertEquals('2023-01-01T00:00:01+00:00', $dto->updated_at);
         $this->assertEquals('2023-01-01T00:00:02+00:00', $dto->published_at);
         $this->assertEquals($userHydrator->modelToDto($post->user), $dto->user);
+        $this->assertEquals([MetaInfoKey::TRAVEL_REASON->value => TravelReason::LEISURE->value], $dto->metaInfos);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function test_model_to_dto_with_vehicle_ids()
+    {
+        $userHydrator = $this->createMock(UserHydrator::class);
+        $userHydrator->method('modelToDto')
+            ->willReturn($this->userMock());
+
+        $vehicle1 = $this->createMetaInfoMock(MetaInfoKey::VEHICLE_ID, 'v1', 0);
+        $vehicle2 = $this->createMetaInfoMock(MetaInfoKey::VEHICLE_ID, 'v2', 1);
+
+        $post = $this->postMock();
+        // Override metaInfos for this test
+        $post = $this->getMockBuilder(Post::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['__get'])
+            ->getMock();
+
+        $post->method('__get')->willReturnCallback(function ($property) use ($vehicle1, $vehicle2) {
+            return match ($property) {
+                'id' => 'asdf',
+                'body' => 'This is a test post',
+                'created_at' => Carbon::parse('2023-01-01 00:00:00'),
+                'updated_at' => Carbon::parse('2023-01-01 00:00:01'),
+                'published_at' => Carbon::parse('2023-01-01 00:00:02'),
+                'transportPost' => null,
+                'locationPost' => null,
+                'visibility' => Visibility::PUBLIC,
+                'user' => new User,
+                'metaInfos' => new Collection([$vehicle2, $vehicle1]), // Wrong order to test sorting
+                default => null,
+            };
+        });
+
+        $postHydrator = new PostHydrator($userHydrator);
+        $dto = $postHydrator->modelToDto($post);
+
+        $this->assertEquals(['rtb:vehicle_id' => ['v1', 'v2']], $dto->metaInfos);
     }
 
     /**
