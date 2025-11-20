@@ -10,6 +10,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\Token;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 class TraewellingRequestService
 {
@@ -140,6 +141,20 @@ class TraewellingRequestService
         }
     }
 
+    public function updateOrCreateTag(bool $tagExists, int $traewellingPostId, string $userId, string $key, string $value, int $visibility = 0): void
+    {
+        if ($tagExists) {
+            $this->updateTag($traewellingPostId, $userId, $key, $value, $visibility);
+        } else {
+            try {
+                $this->createTag($traewellingPostId, $userId, $key, $value, $visibility);
+            } catch (ConflictHttpException $e) {
+                Log::warning('Tag already exists when trying to create, updating instead', ['traewellingPostId' => $traewellingPostId, 'key' => $key]);
+                $this->updateTag($traewellingPostId, $userId, $key, $value, $visibility);
+            }
+        }
+    }
+
     public function deletePostTag(int $traewellingPostId, string $userId, string $key): void
     {
         $this->getAccessToken($userId);
@@ -152,6 +167,9 @@ class TraewellingRequestService
         }
     }
 
+    /**
+     * @throws ConflictHttpException
+     */
     public function createTag(int $traewellingPostId, string $userId, string $key, string $value, int $visibility = 0): void
     {
         $this->getAccessToken($userId);
@@ -164,6 +182,28 @@ class TraewellingRequestService
             ]]);
             Log::debug('Created post tag', ['response' => $response->getBody()->getContents()]);
         } catch (GuzzleException $e) {
+            if ($e->getCode() === 400) {
+                throw new ConflictHttpException;
+            }
+            Log::error('Error creating post tag in Traewelling', ['exception' => $e->getMessage(), 'traewellingPostId' => $traewellingPostId]);
+        }
+    }
+
+    public function updateTag(int $traewellingPostId, string $userId, string $key, string $value, int $visibility = 0): void
+    {
+        $this->getAccessToken($userId);
+        $client = $this->getClient();
+        try {
+            $response = $client->put('status/'.$traewellingPostId.'/tags/'.$key, ['json' => [
+                'key' => $key,
+                'value' => $value,
+                'visibility' => $visibility,
+            ]]);
+            Log::debug('Created post tag', ['response' => $response->getBody()->getContents()]);
+        } catch (GuzzleException $e) {
+            if ($e->getCode() === 400) {
+                throw new ConflictHttpException;
+            }
             Log::error('Error creating post tag in Traewelling', ['exception' => $e->getMessage(), 'traewellingPostId' => $traewellingPostId]);
         }
     }

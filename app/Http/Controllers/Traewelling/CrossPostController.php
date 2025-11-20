@@ -87,36 +87,31 @@ class CrossPostController extends Controller
         Log::debug('Syncing tags for Traewelling post '.$this->traewellingId, ['existing_tags' => $tags]);
         $visibility = $post->visibility->getTraewellingVisibility();
 
-        $updateKeyStuff = [
-            MetaInfoKey::TRAVEL_ROLE->value => 'trwl:role',
-            MetaInfoKey::TRIP_ID->value => 'trwl:journey_number',
-            MetaInfoKey::VEHICLE_ID->value => 'trwl:vehicle_number',
-        ];
-
-        foreach ($updateKeyStuff as $value) {
-            // delete Tag if it exists in $tags
-            $existingTag = collect($tags)->firstWhere('key', $value);
-            if ($existingTag) {
-                $this->traewellingRequestService->deletePostTag($this->traewellingId, $post->user_id, $value);
-            }
-        }
-
         $travelRole = $this->postMetaInfoRepository->getMetaInfoValue($post, MetaInfoKey::TRAVEL_ROLE);
+        $existingTag = collect($tags)->firstWhere('key', 'trwl:role') !== null;
         if ($travelRole) {
             $travelRole = TravelRole::tryFrom($travelRole);
             if ($travelRole) {
-                $this->traewellingRequestService->createTag($this->traewellingId, $post->user_id, 'trwl:role', $travelRole->getTraewellingIdentifier(), $visibility);
+                $this->traewellingRequestService->updateOrCreateTag($existingTag, $this->traewellingId, $post->user_id, 'trwl:role', $travelRole->getTraewellingIdentifier(), $visibility);
             }
+        } elseif ($existingTag) {
+            $this->traewellingRequestService->deletePostTag($this->traewellingId, $post->user_id, 'trwl:role');
         }
 
         $tripId = $this->postMetaInfoRepository->getMetaInfoValue($post, MetaInfoKey::TRIP_ID);
+        $existingTag = collect($tags)->firstWhere('key', 'trwl:journey_number') !== null;
         if ($tripId) {
-            $this->traewellingRequestService->createTag($this->traewellingId, $post->user_id, 'trwl:journey_number', $tripId, $visibility);
+            $this->traewellingRequestService->updateOrCreateTag($existingTag, $this->traewellingId, $post->user_id, 'trwl:journey_number', $tripId, $visibility);
+        } elseif ($existingTag) {
+            $this->traewellingRequestService->deletePostTag($this->traewellingId, $post->user_id, 'trwl:journey_number');
         }
 
         $vehicleIds = $this->getVehicleIds($post);
+        $existingTag = collect($tags)->firstWhere('key', 'trwl:journey_number') !== null;
         if ($vehicleIds) {
-            $this->traewellingRequestService->createTag($this->traewellingId, $post->user_id, 'trwl:vehicle_number', $vehicleIds, $visibility);
+            $this->traewellingRequestService->updateOrCreateTag($existingTag, $this->traewellingId, $post->user_id, 'trwl:vehicle_number', $vehicleIds, $visibility);
+        } elseif ($existingTag) {
+            $this->traewellingRequestService->deletePostTag($this->traewellingId, $post->user_id, 'trwl:vehicle_number');
         }
     }
 
