@@ -5,7 +5,7 @@ COPY . .
 RUN composer install --no-dev --optimize-autoloader
 
 # Stage 2: Build PHP application
-FROM php:8.4-fpm-alpine
+FROM php:8.5-fpm-alpine
 
 # Set environment variables for runtime user and group IDs
 ARG RUNTIME_UID=33
