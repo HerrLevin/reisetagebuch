@@ -8,6 +8,8 @@ class TripDto
 {
     public string $id;
 
+    public ?string $foreignId = null;
+
     public string $mode;
 
     public ?string $lineName;
@@ -25,6 +27,7 @@ class TripDto
     public function __construct(TransportTrip $trip)
     {
         $this->id = $trip->id;
+        $this->foreignId = $trip->foreign_trip_id;
         $this->mode = $trip->mode;
         $this->lineName = $trip->line_name;
         $this->routeLongName = $trip->route_long_name;

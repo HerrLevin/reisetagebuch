@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { getOwnShareText, getShareText } from '@/Services/PostTextService';
-import { BasePost, isTransportPost } from '@/types/PostTypes';
+import { BasePost, isTransportPost, TransportPost } from '@/types/PostTypes';
 import { Link, useForm, usePage } from '@inertiajs/vue3';
 import {
     ClockPlus,
@@ -9,9 +9,11 @@ import {
     Share,
     SquarePen,
     Trash2,
+    UserRoundPlus,
 } from 'lucide-vue-next';
 import { PropType, useTemplateRef } from 'vue';
 import { useI18n } from 'vue-i18n';
+
 const { t } = useI18n();
 
 const props = defineProps({
@@ -67,6 +69,24 @@ function sharePost(): void {
     }
 }
 
+function redirectCreatePost(): void {
+    const post = props.post as TransportPost;
+
+    const params = {
+        tripId: post.trip.foreignId || post.trip.id,
+        startId: post.originStop.location.id,
+        startTime: post.originStop.departureTime || post.originStop.arrivalTime,
+        stopId: post.destinationStop.location.id,
+        stopTime:
+            post.destinationStop.arrivalTime ||
+            post.destinationStop.departureTime,
+        stopName: post.destinationStop.name,
+        stopMode: post.trip.mode,
+        lineName: post.trip.displayName || post.trip.lineName,
+    };
+    window.location.href = route('posts.create.transport-post', params);
+}
+
 function blur() {
     (document.activeElement as HTMLElement)?.blur();
 }
@@ -85,6 +105,12 @@ function blur() {
                 <a @click.prevent="sharePost()">
                     <Share class="size-4" />
                     {{ t('verbs.share') }}
+                </a>
+            </li>
+            <li v-if="!isSameUser() && isTransportPost(props.post)">
+                <a @click.prevent="redirectCreatePost()">
+                    <UserRoundPlus class="size-4" />
+                    {{ t('posts.ride_along') }}
                 </a>
             </li>
             <template v-if="isSameUser()">

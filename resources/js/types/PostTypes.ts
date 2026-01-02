@@ -43,6 +43,7 @@ export type Stop = {
 
 export type Trip = {
     id: string;
+    foreignId: string | null;
     mode: TransportMode;
     lineName: string;
     displayName: string | null;
