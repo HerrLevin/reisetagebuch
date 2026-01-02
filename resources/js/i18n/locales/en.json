@@ -258,6 +258,7 @@
         "title": "Posts",
         "locations": "Locations",
         "departures": "Departures",
+        "ride_along": "Ride Along",
         "text": "Text",
         "meta_info": {
             "title": "Additional Information",

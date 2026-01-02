@@ -257,6 +257,7 @@
         "locations": "Orte",
         "departures": "Abfahrten",
         "text": "Text",
+        "ride_along": "Mitfahren",
         "meta_info": {
             "title": "Zusatzinformationen",
             "vehicle_id": "Fahrzeugnummer",
