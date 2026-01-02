@@ -10,7 +10,9 @@ import {
     formatDepartureTime,
 } from '@/Services/TimeFormattingService';
 import { getArrivalDelay, getDepartureDelay } from '@/Services/TripTimeService';
+import { LocationEntry } from '@/types';
 import { TransportPost, Trip } from '@/types/PostTypes';
+import { DateTime } from 'luxon';
 import type { PropType } from 'vue';
 
 const props = defineProps({
@@ -54,6 +56,17 @@ function getRouteColor(trip: Trip) {
 
     return getColor(trip.mode);
 }
+
+function selectStation(location: LocationEntry) {
+    const identifier = location.identifiers.find((id) => id.origin === 'motis');
+
+    window.location.href = route('posts.create.departures', {
+        latitude: location.latitude,
+        longitude: location.longitude,
+        identifier: identifier?.identifier || '',
+        when: DateTime.now().toISO(),
+    });
+}
 </script>
 
 <template>
@@ -62,6 +75,7 @@ function getRouteColor(trip: Trip) {
             <div class="text-left">
                 <div
                     class="mb-2 line-clamp-2 leading-none font-semibold overflow-ellipsis"
+                    @click.prevent="selectStation(post.originStop.location)"
                 >
                     {{ post.originStop.location.name }}
                 </div>
@@ -69,6 +83,9 @@ function getRouteColor(trip: Trip) {
             <div class="text-right">
                 <div
                     class="mb-2 line-clamp-2 leading-none font-semibold overflow-ellipsis"
+                    @click.prevent="
+                        selectStation(post.destinationStop.location)
+                    "
                 >
                     {{ post.destinationStop.location.name }}
                 </div>
