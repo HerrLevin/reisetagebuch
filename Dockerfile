@@ -33,7 +33,6 @@ RUN apk add --no-cache \
 RUN docker-php-ext-install \
         bcmath \
         intl \
-        opcache \
         pdo_mysql \
         pdo_pgsql \
         pdo_sqlite \
