@@ -2,10 +2,14 @@
 
 namespace App\Dto;
 
+use App\Traits\JsonResponseObject;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 
-class PaginationDto
+class PaginationDto implements Arrayable
 {
+    use JsonResponseObject;
+
     /**
      * @template T
      *

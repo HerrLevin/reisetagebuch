@@ -8,6 +8,7 @@ import {
     MglRasterLayer,
     MglRasterSource,
 } from '@indoorequal/vue-maplibre-gl';
+import axios from 'axios';
 import type { GeometryCollection } from 'geojson';
 import {
     LngLat,
@@ -16,9 +17,6 @@ import {
     StyleSpecification,
 } from 'maplibre-gl';
 import { PropType, ref } from 'vue';
-import { useI18n } from 'vue-i18n';
-
-const { t } = useI18n();
 
 const props = defineProps({
     user: {
@@ -42,15 +40,10 @@ const center = new LngLat(8.403, 49);
 const bounds = ref(undefined as LngLatBoundsLike | undefined);
 const geoJson = ref(undefined as GeometryCollection | undefined);
 
-fetch('/profile/' + props.user.username + '/map-data')
-    .then((response) => {
-        if (!response.ok) {
-            throw new Error(t('errors.network_nok'));
-        }
-        return response.json();
-    })
+axios
+    .get('/api/profile/' + props.user.username + '/map-data')
     .then((json) => {
-        geoJson.value = json;
+        geoJson.value = json.data;
         const mapBounds = new LngLatBounds();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         json.geometries.forEach((geometry: any) => {

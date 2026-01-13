@@ -33,26 +33,18 @@ function fetchRequestLocation() {
     LocationService.getPosition(!!usePage().props.auth.user)
         .then((position) => {
             currentPosition.value = position;
-            fetch(
-                route('api.request-location.get', {
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude,
-                }),
-            )
-                .then((response: Response) => {
-                    if (response.ok) {
-                        response.json().then((data: RequestLocationDto) => {
-                            fetchingProgress.value = data;
-                        });
-                    } else {
-                        console.error(
-                            'Failed to fetch request location:',
-                            response.statusText,
-                        );
-                    }
+            axios
+                .get(
+                    route('api.request-location.get', {
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                    }),
+                )
+                .then((data) => {
+                    fetchingProgress.value = data.data;
                 })
                 .catch((error) => {
-                    console.error('Error fetching request location:', error);
+                    console.error('Failed to fetch request location:', error);
                 });
         })
         .catch(() => {});
@@ -154,8 +146,6 @@ watch(search, () => {
                         "
                         autofocus
                     />
-                    <!--                    <kbd class="kbd kbd-sm">⌘</kbd>-->
-                    <!--                    <kbd class="kbd kbd-sm">K</kbd>-->
                 </label>
             </div>
 

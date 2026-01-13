@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Dto\ErrorDto;
+use App\Dto\RequestLocationDto;
 use App\Http\Controllers\Backend\LocationController as BackendLocationController;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GeocodeRequest;
@@ -9,7 +11,6 @@ use App\Http\Resources\LocationDto;
 use App\Jobs\PrefetchJob;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Illuminate\Http\Client\ConnectionException;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class LocationController extends Controller
@@ -44,19 +45,19 @@ class LocationController extends Controller
         abort('204');
     }
 
-    public function getRecentRequestLocation(float $latitude, float $longitude): JsonResponse
+    public function getRecentRequestLocation(float $latitude, float $longitude): ?RequestLocationDto
     {
         $point = Point::makeGeodetic($latitude, $longitude);
         $location = $this->locationController->getRecentRequestLocation($point);
 
         if ($location === null) {
-            return response()->json(['error' => 'Location not found'], 404);
+            abort(404, new ErrorDto('Location not found'));
         }
 
-        return response()->json($location);
+        return $location;
     }
 
-    public function search(Request $request): JsonResponse
+    public function search(Request $request)
     {
         $request->validate([
             'latitude' => 'required|numeric',
@@ -73,10 +74,10 @@ class LocationController extends Controller
 
         $locations = $this->locationController->searchNearby($point, $request->input('query'), $radius);
 
-        return response()->json(array_values($locations->map(fn ($location) => new LocationDto($location))->toArray()));
+        return array_values($locations->map(fn ($location) => new LocationDto($location))->toArray());
     }
 
-    public function geocode(GeocodeRequest $request): JsonResponse
+    public function geocode(GeocodeRequest $request)
     {
         $point = null;
         if ($request->latitude && $request->longitude) {
@@ -87,20 +88,20 @@ class LocationController extends Controller
         }
 
         if ($request->provider === 'airport') {
-            return response()->json($this->locationController->geocodeAirport($request->input('query'), $point));
+            return $this->locationController->geocodeAirport($request->input('query'), $point);
         }
 
         return $this->geocodeMotis($request->input('query'), $point);
     }
 
-    private function geocodeMotis(string $query, ?Point $point): JsonResponse
+    private function geocodeMotis(string $query, ?Point $point)
     {
         try {
             $locations = $this->locationController->geocode($query, $point);
         } catch (ConnectionException $e) {
-            return response()->json(['error' => 'Connection error'], 503);
+            abort(503, new ErrorDto('Connection error to geocoding service'));
         }
 
-        return response()->json($locations);
+        return $locations;
     }
 }

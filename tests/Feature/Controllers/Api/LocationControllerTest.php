@@ -91,7 +91,6 @@ class LocationControllerTest extends TestCase
         });
 
         $result = $locationController->geocode($request);
-        $this->assertEquals(200, $result->getStatusCode());
-        $this->assertEquals('[]', $result->getContent());
+        $this->assertEquals([], $result);
     }
 }

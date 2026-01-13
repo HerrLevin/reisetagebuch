@@ -3,9 +3,12 @@
 namespace App\Dto;
 
 use App\Models\RequestLocation;
+use App\Traits\JsonResponseObject;
 
 class RequestLocationDto
 {
+    use JsonResponseObject;
+
     public int $fetched;
 
     public int $toFetch;

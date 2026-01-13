@@ -1,12 +1,9 @@
 <?php
 
-use App\Http\Controllers\Api\LikeController;
-use App\Http\Controllers\Api\LocationController as ApiLocationController;
-use App\Http\Controllers\Api\MapController;
-use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Inertia\AccountController;
 use App\Http\Controllers\Inertia\InviteController;
 use App\Http\Controllers\Inertia\LocationController;
+use App\Http\Controllers\Inertia\NotificationController;
 use App\Http\Controllers\Inertia\PostController;
 use App\Http\Controllers\Inertia\TripController;
 use App\Http\Controllers\Inertia\UserController;
@@ -49,13 +46,10 @@ Route::middleware('auth')->group(callback: function () {
         Route::delete('/{postId}', [PostController::class, 'destroy'])->name('posts.destroy');
         Route::patch('/{postId}', [PostController::class, 'update'])->name('posts.update');
         Route::get('/{postId}/edit', [PostController::class, 'edit'])->name('posts.edit');
-        Route::post('/{post}/like', [LikeController::class, 'store'])->name('posts.like');
-        Route::delete('/{post}/like', [LikeController::class, 'destroy'])->name('posts.unlike');
 
         Route::prefix('/transport')->group(callback: function () {
             Route::get('/departures', [LocationController::class, 'departures'])->name('posts.create.departures');
             Route::get('/stopovers', [LocationController::class, 'stopovers'])->name('posts.create.stopovers');
-            Route::get('/geocode', [ApiLocationController::class, 'geocode'])->name('posts.create.geocode');
             Route::get('/create', [PostController::class, 'createTransport'])->name('posts.create.transport-post');
             Route::post('/create', [PostController::class, 'storeTransport'])->name('posts.create.transport-post.store');
             Route::get('/{postId}/edit', [PostController::class, 'editTransport'])->name('posts.edit.transport-post');
@@ -67,10 +61,6 @@ Route::middleware('auth')->group(callback: function () {
             Route::post('/create', [PostController::class, 'storeLocation'])->name('posts.create.post.store');
             Route::get('/', [LocationController::class, 'nearby'])->name('posts.create.start');
         });
-        // this belongs in an api
-        Route::get('/new/prefetch/{latitude}/{longitude}', [ApiLocationController::class, 'prefetch'])->name('posts.create.prefetch');
-        Route::get('/request-location/{latitude}/{longitude}', [ApiLocationController::class, 'getRecentRequestLocation'])->name('api.request-location.get');
-        Route::get('/search-nearby', [ApiLocationController::class, 'search'])->name('api.location.search');
     });
 
     Route::resource('trips', TripController::class);
@@ -83,13 +73,7 @@ Route::middleware('auth')->group(callback: function () {
     Route::post('invites', [InviteController::class, 'store'])->name('invites.store');
     Route::delete('invites/{inviteCode}', [InviteController::class, 'destroy'])->name('invites.destroy');
 
-    Route::prefix('notifications')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Inertia\NotificationController::class, 'index'])->name('notifications');
-        Route::get('/list', [NotificationController::class, 'index'])->name('notifications.index');
-        Route::get('/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unread-count');
-        Route::post('/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
-        Route::post('/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
-    });
+    Route::get('notifications', [NotificationController::class, 'index'])->name('notifications');
 
     Route::prefix('socialite')->group(callback: function () {
         Route::get('/traewelling/connect', [TraewellingOAuthController::class, 'redirectToProvider'])->name('traewelling.connect');
@@ -102,12 +86,6 @@ Route::middleware('auth')->group(callback: function () {
 Route::get('posts/{postId}', [PostController::class, 'show'])->name('posts.show');
 Route::get('profile/{username}', [UserController::class, 'show'])->name('profile.show');
 Route::get('profile/{username}/map', [UserController::class, 'showMap'])->name('profile.map');
-Route::get('profile/{username}/map-data', [UserController::class, 'mapData'])->name('profile.mapdata');
-
-Route::prefix('map')->group(function () {
-    Route::get('/linestring/{from}/{to}', [MapController::class, 'getLineStringBetween'])->name('posts.get.linestring');
-    Route::get('/stopovers/{from}/{to}', [MapController::class, 'getStopsBetween'])->name('posts.get.stopovers');
-});
 
 Route::middleware('cache.headers:public;max_age=2628000;etag')->get('/files/{path}', function ($path) {
     $disk = Storage::disk('public');

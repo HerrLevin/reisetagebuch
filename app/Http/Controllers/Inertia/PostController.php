@@ -80,13 +80,7 @@ class PostController extends Controller
 
     public function dashboard(): Response|ResponseFactory
     {
-        $posts = $this->postController->dashboard(Auth::user());
-
-        return Inertia::render('Dashboard', [
-            'posts' => Inertia::merge($posts->items),
-            'nextCursor' => $posts->nextCursor,
-            'previousCursor' => $posts->previousCursor,
-        ]);
+        return Inertia::render('Dashboard');
     }
 
     /**
