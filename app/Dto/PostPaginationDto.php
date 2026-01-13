@@ -3,8 +3,8 @@
 namespace App\Dto;
 
 use App\Http\Resources\PostTypes\BasePost;
-use App\Models\LocationPost;
-use App\Models\TransportPost;
+use App\Http\Resources\PostTypes\LocationPost;
+use App\Http\Resources\PostTypes\TransportPost;
 use Illuminate\Support\Collection;
 
 class PostPaginationDto extends PaginationDto

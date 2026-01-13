@@ -29,6 +29,7 @@ export type PageProps<
 > = T & {
     auth: {
         user: User;
+        token: string;
     };
     ziggy: Config & { location: string };
     canRegister: boolean;

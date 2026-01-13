@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Backend\NotificationController as Backend;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class NotificationController extends Controller
@@ -16,31 +15,29 @@ class NotificationController extends Controller
         $this->notificationController = $notificationRepository;
     }
 
-    public function index(Request $request): JsonResponse
+    public function index(Request $request)
     {
-        $notifications = $this->notificationController->index($request);
-
-        return response()->json($notifications);
+        return $this->notificationController->index($request);
     }
 
-    public function unreadCount(Request $request): JsonResponse
+    public function unreadCount(Request $request)
     {
-        return response()->json([
+        return [
             'count' => $this->notificationController->unreadCount($request),
-        ]);
+        ];
     }
 
-    public function markAsRead(Request $request, string $id): JsonResponse
+    public function markAsRead(Request $request, string $id)
     {
         $this->notificationController->markAsRead($request, $id);
 
-        return response()->json(['success' => true]);
+        return ['success' => true];
     }
 
-    public function markAllAsRead(Request $request): JsonResponse
+    public function markAllAsRead(Request $request)
     {
         $this->notificationController->markAllAsRead($request);
 
-        return response()->json(['success' => true]);
+        return ['success' => true];
     }
 }

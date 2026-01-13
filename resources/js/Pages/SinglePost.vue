@@ -59,7 +59,7 @@ if (isLocationPost(props.post)) {
 
     axios
         .get(
-            '/map/linestring/' +
+            '/api/map/linestring/' +
                 props.post.originStop.id +
                 '/' +
                 props.post.destinationStop.id,
@@ -73,7 +73,7 @@ if (isLocationPost(props.post)) {
 
     axios
         .get(
-            '/map/stopovers/' +
+            '/api/map/stopovers/' +
                 props.post.originStop.id +
                 '/' +
                 props.post.destinationStop.id,

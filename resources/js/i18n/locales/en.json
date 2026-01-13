@@ -241,7 +241,8 @@
     },
     "common": {
         "cancel": "Cancel",
-        "saving": "Saving..."
+        "saving": "Saving...",
+        "load_more": "Load More"
     },
     "verbs": {
         "share": "Share",

@@ -239,7 +239,8 @@
     },
     "common": {
         "cancel": "Abbrechen",
-        "saving": "Speichern..."
+        "saving": "Speichern...",
+        "load_more": "Mehr laden"
     },
     "verbs": {
         "share": "Teilen",

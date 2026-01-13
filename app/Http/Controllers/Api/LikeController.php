@@ -19,19 +19,19 @@ class LikeController
     {
         $response = $this->likeController->store($request->user(), $post);
 
-        return response()->json([
+        return [
             'liked' => $response->likedByUser,
             'likes_count' => $response->likeCount,
-        ]);
+        ];
     }
 
     public function destroy(Request $request, Post $post)
     {
         $response = $this->likeController->destroy($request->user(), $post);
 
-        return response()->json([
+        return [
             'liked' => $response->likedByUser,
             'likes_count' => $response->likeCount,
-        ]);
+        ];
     }
 }

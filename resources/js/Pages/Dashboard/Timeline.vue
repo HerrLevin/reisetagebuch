@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import InfiniteScroller from '@/Components/InfiniteScroller.vue';
 import Post from '@/Components/Post/Post.vue';
 import { BasePost, LocationPost, TransportPost } from '@/types/PostTypes';
 import { Link } from '@inertiajs/vue3';
@@ -13,7 +12,13 @@ defineProps({
         type: Array as PropType<Array<BasePost | TransportPost | LocationPost>>,
         default: () => [],
     },
+    showNext: {
+        type: Boolean,
+        default: false,
+    },
 });
+
+const emit = defineEmits(['next']);
 </script>
 
 <template>
@@ -30,6 +35,11 @@ defineProps({
                 <Post :post="post"></Post>
             </Link>
         </li>
-        <InfiniteScroller :only="['posts']" />
+        <li v-show="showNext" class="p-4 text-center">
+            <button class="btn btn-ghost w-full" @click="emit('next')">
+                {{ t('common.load_more') }}
+            </button>
+        </li>
+        <!--        <InfiniteScroller :only="['posts']" />-->
     </ul>
 </template>

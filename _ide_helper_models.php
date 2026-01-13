@@ -527,6 +527,8 @@ namespace App\Models{
  * @property-read \App\Models\UserSettings|null $settings
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SocialAccount> $socialAccounts
  * @property-read int|null $social_accounts_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Sanctum\PersonalAccessToken> $tokens
+ * @property-read int|null $tokens_count
  * @property-read \App\Models\SocialAccount|null $traewellingAccount
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\TransportTrip> $trips
  * @property-read int|null $trips_count
