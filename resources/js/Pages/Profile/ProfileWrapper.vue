@@ -15,8 +15,8 @@ const { t } = useI18n();
 
 defineProps({
     user: {
-        type: Object as PropType<UserDto>,
-        default: () => ({}),
+        type: Object as PropType<UserDto | null>,
+        default: null,
     },
 });
 </script>
@@ -27,12 +27,12 @@ defineProps({
     <AuthenticatedLayout>
         <template #header>
             <h2 class="text-xl leading-tight font-semibold">
-                {{ t('profile.profile_of', { name: user.name }) }}
+                {{ t('profile.profile_of', { name: user?.name }) }}
             </h2>
         </template>
-        <Banner :src="user.header || ''" />
+        <Banner :src="user?.header || ''" />
 
-        <div class="mb-4 space-y-1 px-5 md:px-0">
+        <div v-if="user" class="mb-4 space-y-1 px-5 md:px-0">
             <AvatarMenu :user="user" />
             <div class="-mt-1">
                 <div class="flex items-center">

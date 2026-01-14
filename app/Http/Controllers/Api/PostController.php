@@ -3,8 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Dto\PostPaginationDto;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
@@ -13,10 +12,16 @@ class PostController extends Controller
     public function __construct(\App\Http\Controllers\Backend\PostController $postController)
     {
         $this->postController = $postController;
+        parent::__construct();
     }
 
     public function timeline(): PostPaginationDto
     {
-        return $this->postController->dashboard(Auth::user());
+        return $this->postController->dashboard($this->auth->user());
+    }
+
+    public function postsForUsername(string $username, Request $request): PostPaginationDto
+    {
+        return $this->postController->postsForUser($username, $this->auth->user());
     }
 }
