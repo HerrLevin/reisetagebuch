@@ -102,12 +102,7 @@ const isFilterRoute = () => {
             <div>
                 {{ t('posts.locations') }}
                 <Link
-                    :href="
-                        route('posts.create.start', {
-                            latitude: latitude,
-                            longitude: longitude,
-                        })
-                    "
+                    :href="route('posts.create.start')"
                     as="button"
                     class="btn btn-lg btn-circle"
                 >

@@ -25,8 +25,6 @@ Route::middleware('auth:api')->group(function () {
         ->name('posts.create.prefetch');
     Route::get('/request-location/{latitude}/{longitude}', [ApiLocationController::class, 'getRecentRequestLocation'])
         ->name('api.request-location.get');
-    Route::get('/search-nearby', [ApiLocationController::class, 'search'])
-        ->name('api.location.search');
 
     Route::post('/{post}/like', [LikeController::class, 'store'])
         ->name('posts.like');
@@ -49,5 +47,10 @@ Route::middleware('auth:api')->group(function () {
             ->name('notifications.read');
         Route::post('/read-all', [NotificationController::class, 'markAllAsRead'])
             ->name('notifications.read-all');
+    });
+
+    Route::prefix('locations')->group(function () {
+        Route::get('/nearby', [ApiLocationController::class, 'search'])
+            ->name('api.location.search');
     });
 });
