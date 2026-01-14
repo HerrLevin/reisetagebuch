@@ -205,6 +205,9 @@ jobs:
       - name: Directory Permissions
         run: chmod -R 777 storage bootstrap/cache
 
+      - name: Set Sail executable permissions
+        run: chmod +x vendor/bin/sail
+
       - name: Start Sail
         run: vendor/bin/sail up -d
 
