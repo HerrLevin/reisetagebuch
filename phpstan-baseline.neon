@@ -1,0 +1,3463 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Call to an undefined method App\\Dto\\Coordinate\:\:toArray\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: app/Dto/BoundingBox.php
+
+		-
+			message: '#^Class App\\Dto\\BoundingBox implements generic interface Illuminate\\Contracts\\Support\\Arrayable but does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Dto/BoundingBox.php
+
+		-
+			message: '#^Method App\\Dto\\DeparturesDto\:\:__construct\(\) has parameter \$departures with generic class Illuminate\\Support\\Collection but does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Dto/DeparturesDto.php
+
+		-
+			message: '#^Property App\\Dto\\DeparturesDto\:\:\$departures type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Dto/DeparturesDto.php
+
+		-
+			message: '#^Property App\\Dto\\DeparturesDto\:\:\$departures type has no value type specified in iterable type array\|\(Illuminate\\Support\\Collection&iterable\<App\\Dto\\MotisApi\\StopTimeDto\>\)\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Dto/DeparturesDto.php
+
+		-
+			message: '#^Property App\\Dto\\DeparturesDto\:\:\$departures with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Dto/DeparturesDto.php
+
+		-
+			message: '#^Method App\\Dto\\ErrorDto\:\:__construct\(\) has parameter \$errors with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Dto/ErrorDto.php
+
+		-
+			message: '#^Method App\\Dto\\ErrorDto\:\:__toString\(\) should return string but returns string\|false\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Dto/ErrorDto.php
+
+		-
+			message: '#^Method App\\Dto\\ErrorDto\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Dto/ErrorDto.php
+
+		-
+			message: '#^Method App\\Dto\\LocationHistoryDto\:\:__construct\(\) has parameter \$locations with generic class Illuminate\\Support\\Collection but does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Dto/LocationHistoryDto.php
+
+		-
+			message: '#^Method App\\Dto\\LocationHistoryDto\:\:__construct\(\) has parameter \$trips with generic class Illuminate\\Support\\Collection but does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Dto/LocationHistoryDto.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Dto/MotisApi/GeocodeResponseEntry.php
+
+		-
+			message: '#^Cannot call method getLatitude\(\) on Clickbar\\Magellan\\Data\\Geometries\\Point\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Dto/MotisApi/GeocodeResponseEntry.php
+
+		-
+			message: '#^Cannot call method getLongitude\(\) on Clickbar\\Magellan\\Data\\Geometries\\Point\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Dto/MotisApi/GeocodeResponseEntry.php
+
+		-
+			message: '#^Method App\\Dto\\MotisApi\\GeocodeResponseEntry\:\:setAreas\(\) has parameter \$areas with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Dto/MotisApi/GeocodeResponseEntry.php
+
+		-
+			message: '#^Method App\\Dto\\MotisApi\\GeocodeResponseEntry\:\:setTokens\(\) has parameter \$tokens with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Dto/MotisApi/GeocodeResponseEntry.php
+
+		-
+			message: '#^Parameter \#1 \$id of method App\\Dto\\MotisApi\\GeocodeResponseEntry\:\:setId\(\) expects string\|null, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Dto/MotisApi/GeocodeResponseEntry.php
+
+		-
+			message: '#^Parameter \#1 \$identifier of method App\\Dto\\MotisApi\\GeocodeResponseEntry\:\:setIdentifier\(\) expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Dto/MotisApi/GeocodeResponseEntry.php
+
+		-
+			message: '#^Parameter \#1 \$locationTag of class App\\Http\\Resources\\LocationIdentifierDto constructor expects App\\Models\\LocationIdentifier, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Dto/MotisApi/GeocodeResponseEntry.php
+
+		-
+			message: '#^Parameter \#1 \$name of method App\\Dto\\MotisApi\\GeocodeResponseEntry\:\:setName\(\) expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Dto/MotisApi/GeocodeResponseEntry.php
+
+		-
+			message: '#^Property App\\Dto\\MotisApi\\GeocodeResponseEntry\:\:\$areas type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Dto/MotisApi/GeocodeResponseEntry.php
+
+		-
+			message: '#^Property App\\Dto\\MotisApi\\GeocodeResponseEntry\:\:\$tokens type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Dto/MotisApi/GeocodeResponseEntry.php
+
+		-
+			message: '#^Method App\\Dto\\MotisApi\\LegDto\:\:setIntermediateStops\(\) has parameter \$intermediateStops with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Dto/MotisApi/LegDto.php
+
+		-
+			message: '#^Method App\\Dto\\MotisApi\\TripDto\:\:setLegs\(\) has parameter \$legs with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Dto/MotisApi/TripDto.php
+
+		-
+			message: '#^Method App\\Dto\\OverpassLocation\:\:__construct\(\) has parameter \$tags with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Dto/OverpassLocation.php
+
+		-
+			message: '#^Property App\\Dto\\OverpassLocation\:\:\$tags type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Dto/OverpassLocation.php
+
+		-
+			message: '#^Class App\\Dto\\PaginationDto implements generic interface Illuminate\\Contracts\\Support\\Arrayable but does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Dto/PaginationDto.php
+
+		-
+			message: '#^Method App\\Dto\\PaginationDto\:\:__construct\(\) has parameter \$items with generic class Illuminate\\Support\\Collection but does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Dto/PaginationDto.php
+
+		-
+			message: '#^Method App\\Dto\\PaginationDto\:\:__construct\(\) has parameter \$items with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Dto/PaginationDto.php
+
+		-
+			message: '#^Method App\\Dto\\PaginationDto\:\:__construct\(\) has parameter \$items with no value type specified in iterable type array\|\(Illuminate\\Support\\Collection&iterable\<T\>\)\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Dto/PaginationDto.php
+
+		-
+			message: '#^Method App\\Dto\\PaginationDto\:\:__toString\(\) should return string but returns string\|false\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Dto/PaginationDto.php
+
+		-
+			message: '#^Cannot call method toIso8601String\(\) on Carbon\\Carbon\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Dto/RequestLocationDto.php
+
+		-
+			message: '#^Expression on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.expr
+			count: 1
+			path: app/Dto/RequestLocationDto.php
+
+		-
+			message: '#^Method App\\Dto\\RequestLocationDto\:\:__toString\(\) should return string but returns string\|false\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Dto/RequestLocationDto.php
+
+		-
+			message: '#^Method App\\Dto\\RequestLocationDto\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Dto/RequestLocationDto.php
+
+		-
+			message: '#^Method App\\Enums\\PostMetaInfo\\TravelRole\:\:getTraewellingIdentifier\(\) never returns null so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: app/Enums/PostMetaInfo/TravelRole.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Api\\LikeController\:\:destroy\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Api/LikeController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Api\\LikeController\:\:store\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Api/LikeController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method App\\Http\\Controllers\\Backend\\LikeController\:\:destroy\(\) expects App\\Models\\User, App\\Models\\User\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Api/LikeController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method App\\Http\\Controllers\\Backend\\LikeController\:\:store\(\) expects App\\Models\\User, App\\Models\\User\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Api/LikeController.php
+
+		-
+			message: '#^Cannot access property \$id on App\\Models\\User\|null\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: app/Http/Controllers/Api/LocationController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Api\\LocationController\:\:geocode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Api/LocationController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Api\\LocationController\:\:geocodeMotis\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Api/LocationController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Api\\LocationController\:\:search\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Api/LocationController.php
+
+		-
+			message: '#^Parameter \#1 \$code of function abort expects Illuminate\\Contracts\\Support\\Responsable\|int\|Symfony\\Component\\HttpFoundation\\Response, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Api/LocationController.php
+
+		-
+			message: '#^Parameter \#1 \$latitude of static method Clickbar\\Magellan\\Data\\Geometries\\Point\:\:makeGeodetic\(\) expects float, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Api/LocationController.php
+
+		-
+			message: '#^Parameter \#1 \$location of class App\\Http\\Resources\\LocationDto constructor expects App\\Models\\Location, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Api/LocationController.php
+
+		-
+			message: '#^Parameter \#1 \$query of method App\\Http\\Controllers\\Api\\LocationController\:\:geocodeMotis\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Api/LocationController.php
+
+		-
+			message: '#^Parameter \#1 \$query of method App\\Http\\Controllers\\Backend\\LocationController\:\:geocodeAirport\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Api/LocationController.php
+
+		-
+			message: '#^Parameter \#1 \$userId of method App\\Http\\Controllers\\Backend\\LocationController\:\:createTimestampedUserWaypoint\(\) expects string, int given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Http/Controllers/Api/LocationController.php
+
+		-
+			message: '#^Parameter \#2 \$longitude of static method Clickbar\\Magellan\\Data\\Geometries\\Point\:\:makeGeodetic\(\) expects float, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Api/LocationController.php
+
+		-
+			message: '#^Parameter \#2 \$search of method App\\Http\\Controllers\\Backend\\LocationController\:\:searchNearby\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Api/LocationController.php
+
+		-
+			message: '#^Parameter \#3 \$radius of method App\\Http\\Controllers\\Backend\\LocationController\:\:searchNearby\(\) expects int, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Api/LocationController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Api\\MapController\:\:getLineStringBetween\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Api/MapController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Api\\NotificationController\:\:index\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Api/NotificationController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Api\\NotificationController\:\:markAllAsRead\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Api/NotificationController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Api\\NotificationController\:\:markAsRead\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Api/NotificationController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Api\\NotificationController\:\:unreadCount\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Api/NotificationController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method App\\Http\\Controllers\\Backend\\PostController\:\:dashboard\(\) expects App\\Models\\User, App\\Models\\User\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Api/PostController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Api\\UserController\:\:mapData\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Api/UserController.php
+
+		-
+			message: '#^Parameter \#1 \$geometries of static method Clickbar\\Magellan\\Data\\Geometries\\GeometryCollection\:\:make\(\) expects array\<Clickbar\\Magellan\\Data\\Geometries\\Geometry\>, array\<mixed\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Api/UserController.php
+
+		-
+			message: '#^Cannot access property \$email on App\\Models\\User\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Controllers/Auth/ConfirmablePasswordController.php
+
+		-
+			message: '#^Cannot call method hasVerifiedEmail\(\) on App\\Models\\User\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Controllers/Auth/EmailVerificationNotificationController.php
+
+		-
+			message: '#^Cannot call method sendEmailVerificationNotification\(\) on App\\Models\\User\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Controllers/Auth/EmailVerificationNotificationController.php
+
+		-
+			message: '#^Cannot call method hasVerifiedEmail\(\) on App\\Models\\User\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Controllers/Auth/EmailVerificationPromptController.php
+
+		-
+			message: '#^Parameter \#1 \$key of function __ expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Auth/NewPasswordController.php
+
+		-
+			message: '#^Parameter \#1 \$key of function trans expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Auth/NewPasswordController.php
+
+		-
+			message: '#^Parameter \#1 \$value of static method Illuminate\\Support\\Facades\\Hash\:\:make\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Auth/NewPasswordController.php
+
+		-
+			message: '#^Cannot call method update\(\) on App\\Models\\User\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Controllers/Auth/PasswordController.php
+
+		-
+			message: '#^Cannot access property \$expires_at on App\\Models\\Invite\|null\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: app/Http/Controllers/Auth/RegisteredUserController.php
+
+		-
+			message: '#^Cannot access property \$name on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Controllers/Auth/RegisteredUserController.php
+
+		-
+			message: '#^Cannot access property \$used_at on App\\Models\\Invite\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Controllers/Auth/RegisteredUserController.php
+
+		-
+			message: '#^Parameter \#1 \$inviteId of method App\\Repositories\\InviteRepository\:\:getAvailableInviteById\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Auth/RegisteredUserController.php
+
+		-
+			message: '#^Parameter \#1 \$inviteId of method App\\Repositories\\InviteRepository\:\:getInviteById\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Auth/RegisteredUserController.php
+
+		-
+			message: '#^Parameter \#1 \$value of static method Illuminate\\Support\\Facades\\Hash\:\:make\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Auth/RegisteredUserController.php
+
+		-
+			message: '#^Cannot call method hasVerifiedEmail\(\) on App\\Models\\User\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Controllers/Auth/VerifyEmailController.php
+
+		-
+			message: '#^Cannot call method markEmailAsVerified\(\) on App\\Models\\User\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Controllers/Auth/VerifyEmailController.php
+
+		-
+			message: '#^Parameter \#1 \$user of class Illuminate\\Auth\\Events\\Verified constructor expects Illuminate\\Contracts\\Auth\\MustVerifyEmail, App\\Models\\User\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Auth/VerifyEmailController.php
+
+		-
+			message: '#^Cannot access property \$email_verified_at on App\\Models\\User\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Controllers/Backend/AccountBackend.php
+
+		-
+			message: '#^Cannot access property \$id on App\\Models\\User\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Controllers/Backend/AccountBackend.php
+
+		-
+			message: '#^Cannot call method fill\(\) on App\\Models\\User\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Controllers/Backend/AccountBackend.php
+
+		-
+			message: '#^Cannot call method isDirty\(\) on App\\Models\\User\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Controllers/Backend/AccountBackend.php
+
+		-
+			message: '#^Cannot call method save\(\) on App\\Models\\User\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Controllers/Backend/AccountBackend.php
+
+		-
+			message: '#^Parameter \#1 \$message of static method Illuminate\\Log\\Logger\:\:error\(\) expects array\|Illuminate\\Contracts\\Support\\Arrayable\|Illuminate\\Contracts\\Support\\Jsonable\|Illuminate\\Support\\Stringable\|string, Throwable given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/AccountBackend.php
+
+		-
+			message: '#^Cannot access property \$id on App\\Models\\User\|null\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: app/Http/Controllers/Backend/HashTagController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Backend\\HashTagController\:\:index\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Http/Controllers/Backend/HashTagController.php
+
+		-
+			message: '#^Method App\\Repositories\\HashTagRepository\:\:findOrCreateHashTag\(\) invoked with 3 parameters, 2 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: app/Http/Controllers/Backend/HashTagController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method App\\Repositories\\HashTagRepository\:\:findOrCreateHashTag\(\) expects App\\Models\\User\|string, App\\Models\\User\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/HashTagController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method App\\Repositories\\HashTagRepository\:\:getHashTagsForUser\(\) expects App\\Models\\User, App\\Models\\User\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/HashTagController.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between string and int will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 2
+			path: app/Http/Controllers/Backend/HashTagController.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 2
+			path: app/Http/Controllers/Backend/HashTagController.php
+
+		-
+			message: '#^Cannot call method delete\(\) on App\\Models\\Invite\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Controllers/Backend/InviteController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Backend\\InviteController\:\:index\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Controllers/Backend/InviteController.php
+
+		-
+			message: '#^Cannot call method notify\(\) on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Controllers/Backend/LikeController.php
+
+		-
+			message: '#^Parameter \#1 \$likeId of method App\\Repositories\\LikeRepository\:\:destroy\(\) expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/LikeController.php
+
+		-
+			message: '#^Parameter \#1 \$userId of method App\\Repositories\\LikeRepository\:\:getLike\(\) expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/LikeController.php
+
+		-
+			message: '#^Parameter \#1 \$userId of method App\\Repositories\\LikeRepository\:\:store\(\) expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/LikeController.php
+
+		-
+			message: '#^Parameter \#2 \$likeId of job class App\\Jobs\\DeletePostLikedNotification constructor expects string in App\\Jobs\\DeletePostLikedNotification\:\:dispatch\(\), int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/LikeController.php
+
+		-
+			message: '#^Parameter \#2 \$postId of method App\\Repositories\\LikeRepository\:\:getLike\(\) expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/LikeController.php
+
+		-
+			message: '#^Parameter \#2 \$postId of method App\\Repositories\\LikeRepository\:\:store\(\) expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/LikeController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$arrival_delay\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Backend/LocationController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$departure_delay\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Backend/LocationController.php
+
+		-
+			message: '#^Cannot access property \$identifiers on mixed\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: app/Http/Controllers/Backend/LocationController.php
+
+		-
+			message: '#^Cannot access property \$legs on App\\Dto\\MotisApi\\TripDto\|null\.$#'
+			identifier: property.nonObject
+			count: 18
+			path: app/Http/Controllers/Backend/LocationController.php
+
+		-
+			message: '#^Cannot access property \$place on mixed\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Controllers/Backend/LocationController.php
+
+		-
+			message: '#^Cannot access property \$to_fetch on App\\Models\\RequestLocation\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Controllers/Backend/LocationController.php
+
+		-
+			message: '#^Cannot call method first\(\) on array\|\(Illuminate\\Support\\Collection&iterable\<App\\Dto\\MotisApi\\StopDto\>\)\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Controllers/Backend/LocationController.php
+
+		-
+			message: '#^Cannot call method isEmpty\(\) on array\|\(Illuminate\\Support\\Collection&iterable\<App\\Dto\\MotisApi\\StopDto\>\)\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Controllers/Backend/LocationController.php
+
+		-
+			message: '#^Cannot call method update\(\) on App\\Models\\RequestLocation\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Controllers/Backend/LocationController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Backend\\LocationController\:\:departuresByIdentifier\(\) has parameter \$filter with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Controllers/Backend/LocationController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Backend\\LocationController\:\:departuresNearby\(\) has parameter \$filter with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Controllers/Backend/LocationController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Backend\\LocationController\:\:geocodeAirport\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Controllers/Backend/LocationController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Backend\\LocationController\:\:nearby\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Http/Controllers/Backend/LocationController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Backend\\LocationController\:\:searchNearby\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Http/Controllers/Backend/LocationController.php
+
+		-
+			message: '#^PHPDoc tag @return with type Illuminate\\Support\\Collection&iterable\<App\\Http\\Resources\\LocationDto\> is incompatible with native type App\\Dto\\LocationHistoryDto\.$#'
+			identifier: return.phpDocType
+			count: 1
+			path: app/Http/Controllers/Backend/LocationController.php
+
+		-
+			message: '#^Parameter \#1 \$location of static method App\\Dto\\MotisApi\\GeocodeResponseEntry\:\:fromLocation\(\) expects App\\Models\\Location, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/LocationController.php
+
+		-
+			message: '#^Parameter \#1 \$location of static method App\\Http\\Resources\\LocationHistoryEntryDto\:\:fromLocationPost\(\) expects App\\Models\\LocationPost, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/LocationController.php
+
+		-
+			message: '#^Parameter \#1 \$stop of method App\\Repositories\\TransportTripRepository\:\:updateStopTimes\(\) expects App\\Models\\TransportTripStop, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/LocationController.php
+
+		-
+			message: '#^Parameter \#1 \$tripDto of job class App\\Jobs\\RerouteStops constructor expects App\\Dto\\MotisApi\\TripDto\|App\\Models\\TransportTrip in App\\Jobs\\RerouteStops\:\:dispatch\(\), App\\Dto\\MotisApi\\TripDto\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/LocationController.php
+
+		-
+			message: '#^Parameter \#2 \$radius of method App\\Repositories\\LocationRepository\:\:getRecentRequestLocation\(\) expects int, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/LocationController.php
+
+		-
+			message: '#^Parameter \#4 \$radius of method App\\Services\\TransitousRequestService\:\:getDepartures\(\) expects int\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/LocationController.php
+
+		-
+			message: '#^Parameter \#6 \$arrivalDelay of method App\\Repositories\\TransportTripRepository\:\:addStopToTrip\(\) expects int\|null, float\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/LocationController.php
+
+		-
+			message: '#^Parameter \#7 \$departureDelay of method App\\Repositories\\TransportTripRepository\:\:addStopToTrip\(\) expects int\|null, float\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/LocationController.php
+
+		-
+			message: '#^Using nullsafe property access on non\-nullable type mixed\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Http/Controllers/Backend/LocationController.php
+
+		-
+			message: '#^Variable \$stopModels in PHPDoc tag @var does not match assigned variable \$order\.$#'
+			identifier: varTag.differentVariable
+			count: 1
+			path: app/Http/Controllers/Backend/LocationController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$geometry\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Backend/MapController.php
+
+		-
+			message: '#^Cannot access property \$location on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: app/Http/Controllers/Backend/MapController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Backend\\MapController\:\:stopsFromTo\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Http/Controllers/Backend/MapController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Backend\\NotificationController\:\:index\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Backend/NotificationController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method App\\Repositories\\NotificationRepository\:\:count\(\) expects App\\Models\\User, App\\Models\\User\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/NotificationController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method App\\Repositories\\NotificationRepository\:\:index\(\) expects App\\Models\\User, App\\Models\\User\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/NotificationController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method App\\Repositories\\NotificationRepository\:\:markAllAsRead\(\) expects App\\Models\\User, App\\Models\\User\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/NotificationController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method App\\Repositories\\NotificationRepository\:\:markAsRead\(\) expects App\\Models\\User, App\\Models\\User\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/NotificationController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Cannot access property \$id on App\\Models\\Location\|null\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Cannot access property \$stops on App\\Models\\TransportTrip\|null\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Backend\\PostController\:\:massEdit\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Parameter \#1 \$id of method App\\Repositories\\LocationRepository\:\:getLocationById\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Parameter \#1 \$trip of method App\\Hydrators\\DbTripHydrator\:\:hydrateTrip\(\) expects App\\Models\\TransportTrip, App\\Models\\TransportTrip\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method App\\Repositories\\PostRepository\:\:getFilteredPosts\(\) expects App\\Models\\User, Illuminate\\Contracts\\Auth\\Authenticatable\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method App\\Repositories\\PostRepository\:\:massEdit\(\) expects App\\Models\\User, App\\Models\\User\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method App\\Repositories\\PostRepository\:\:storeLocation\(\) expects App\\Models\\User, App\\Models\\User\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method App\\Repositories\\PostRepository\:\:storeText\(\) expects App\\Models\\User, App\\Models\\User\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Parameter \#1 \$value of static method App\\Enums\\PostMetaInfo\\TravelReason\:\:from\(\) expects int\|string, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Parameter \#1 \$value of static method App\\Enums\\PostMetaInfo\\TravelReason\:\:tryFrom\(\) expects int\|string, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Parameter \#1 \$value of static method App\\Enums\\PostMetaInfo\\TravelRole\:\:tryFrom\(\) expects int\|string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Parameter \#1 \$value of static method App\\Enums\\Visibility\:\:from\(\) expects int\|string, mixed given\.$#'
+			identifier: argument.type
+			count: 3
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Parameter \#1 \$value of static method App\\Enums\\Visibility\:\:tryFrom\(\) expects int\|string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Parameter \#2 \$dateFrom of method App\\Repositories\\PostRepository\:\:getFilteredPosts\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Parameter \#2 \$location of method App\\Repositories\\PostRepository\:\:storeLocation\(\) expects App\\Models\\Location, App\\Models\\Location\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Parameter \#2 \$manualDepartureTime of method App\\Repositories\\PostRepository\:\:updateTransportTimes\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Parameter \#2 \$postIds of method App\\Repositories\\PostRepository\:\:massEdit\(\) expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Parameter \#2 \$visitingUser of method App\\Repositories\\PostRepository\:\:getById\(\) expects App\\Models\\User\|null, Illuminate\\Contracts\\Auth\\Authenticatable\|null given\.$#'
+			identifier: argument.type
+			count: 8
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Parameter \#3 \$body of method App\\Repositories\\PostRepository\:\:storeText\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Parameter \#3 \$body of method App\\Repositories\\PostRepository\:\:updateBasePost\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Parameter \#3 \$dateTo of method App\\Repositories\\PostRepository\:\:getFilteredPosts\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Parameter \#3 \$manualArrivalTime of method App\\Repositories\\PostRepository\:\:updateTransportTimes\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Parameter \#4 \$body of method App\\Repositories\\PostRepository\:\:storeLocation\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Parameter \#4 \$hashTags of method App\\Repositories\\PostRepository\:\:updateBasePost\(\) expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Parameter \#4 \$tags of method App\\Repositories\\PostRepository\:\:storeText\(\) expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Parameter \#4 \$visibilities of method App\\Repositories\\PostRepository\:\:getFilteredPosts\(\) expects array\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Parameter \#5 \$hashTagIds of method App\\Repositories\\PostRepository\:\:storeLocation\(\) expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Parameter \#5 \$tags of method App\\Repositories\\PostRepository\:\:massEdit\(\) expects array\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Parameter \#5 \$travelReasons of method App\\Repositories\\PostRepository\:\:getFilteredPosts\(\) expects array\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Parameter \#6 \$tags of method App\\Repositories\\PostRepository\:\:getFilteredPosts\(\) expects array\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Parameter \#6 \$vehicleIds of method App\\Repositories\\PostRepository\:\:updateBasePost\(\) expects array\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Parameter \#7 \$metaTripId of method App\\Repositories\\PostRepository\:\:updateBasePost\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Result of \|\| is always true\.$#'
+			identifier: booleanOr.alwaysTrue
+			count: 1
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between null and null will always evaluate to true\.$#'
+			identifier: identical.alwaysTrue
+			count: 2
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between string and int will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 2
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: app/Http/Controllers/Backend/PostController.php
+
+		-
+			message: '#^Cannot access property \$location on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 4
+			path: app/Http/Controllers/Backend/RerouteStopsController.php
+
+		-
+			message: '#^Parameter \#1 \$fromLocation of method App\\Repositories\\TransportTripRepository\:\:createRouteSegment\(\) expects App\\Models\\Location, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/RerouteStopsController.php
+
+		-
+			message: '#^Parameter \#1 \$value of static method App\\Enums\\TransportMode\:\:tryFrom\(\) expects int\|string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/RerouteStopsController.php
+
+		-
+			message: '#^Parameter \#2 \$toLocation of method App\\Repositories\\TransportTripRepository\:\:createRouteSegment\(\) expects App\\Models\\Location, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/RerouteStopsController.php
+
+		-
+			message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: app/Http/Controllers/Backend/TripController.php
+
+		-
+			message: '#^Cannot access an offset on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Http/Controllers/Backend/TripController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Backend\\TripController\:\:getOrCreateAndAddStopToTrip\(\) has parameter \$stopover with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Controllers/Backend/TripController.php
+
+		-
+			message: '#^Parameter \#1 \$array of function array_unshift expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/TripController.php
+
+		-
+			message: '#^Parameter \#1 \$value of function count expects array\|Countable, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/TripController.php
+
+		-
+			message: '#^Parameter \#2 \$stopover of method App\\Http\\Controllers\\Backend\\TripController\:\:getOrCreateAndAddStopToTrip\(\) expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/TripController.php
+
+		-
+			message: '#^Parameter \#3 \$key of method App\\Http\\Controllers\\Backend\\TripController\:\:getOrCreateAndAddStopToTrip\(\) expects int, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/TripController.php
+
+		-
+			message: '#^Variable \$stops might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: app/Http/Controllers/Backend/TripController.php
+
+		-
+			message: '#^Variable \$trip might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: app/Http/Controllers/Backend/TripController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$avatar\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Backend/UserController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$header\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Backend/UserController.php
+
+		-
+			message: '#^Cannot access property \$avatar on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Controllers/Backend/UserController.php
+
+		-
+			message: '#^Cannot access property \$header on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Controllers/Backend/UserController.php
+
+		-
+			message: '#^Cannot access property \$profile on App\\Models\\User\|null\.$#'
+			identifier: property.nonObject
+			count: 4
+			path: app/Http/Controllers/Backend/UserController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method App\\Repositories\\UserRepository\:\:updateUser\(\) expects App\\Models\\User, App\\Models\\User\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Backend/UserController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$motis_radius\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Backend/UserSettingsBackend.php
+
+		-
+			message: '#^Cannot call method load\(\) on App\\Models\\User\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Controllers/Backend/UserSettingsBackend.php
+
+		-
+			message: '#^Property App\\Models\\UserSettings\:\:\$user_id \(string\) does not accept int\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Http/Controllers/Backend/UserSettingsBackend.php
+
+		-
+			message: '#^Call to an undefined method Laravel\\Socialite\\Contracts\\Provider\:\:refreshToken\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Inertia/AccountController.php
+
+		-
+			message: '#^Call to an undefined method Laravel\\Socialite\\Contracts\\Provider\:\:userFromToken\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Inertia/AccountController.php
+
+		-
+			message: '#^Cannot access property \$traewellingAccount on App\\Models\\User\|null\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: app/Http/Controllers/Inertia/AccountController.php
+
+		-
+			message: '#^Cannot access property \$id on App\\Models\\User\|null\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: app/Http/Controllers/Inertia/InviteController.php
+
+		-
+			message: '#^Parameter \#1 \$userId of method App\\Http\\Controllers\\Backend\\InviteController\:\:index\(\) expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Inertia/InviteController.php
+
+		-
+			message: '#^Parameter \#1 \$userId of method App\\Http\\Controllers\\Backend\\InviteController\:\:store\(\) expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Inertia/InviteController.php
+
+		-
+			message: '#^Parameter \#2 \$expiresAt of method App\\Http\\Controllers\\Backend\\InviteController\:\:store\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Inertia/InviteController.php
+
+		-
+			message: '#^Cannot access property \$id on App\\Models\\User\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Controllers/Inertia/LocationController.php
+
+		-
+			message: '#^Cannot access property \$motis_radius on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Controllers/Inertia/LocationController.php
+
+		-
+			message: '#^Cannot call method load\(\) on App\\Models\\User\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Controllers/Inertia/LocationController.php
+
+		-
+			message: '#^Parameter \#1 \$latitude of static method Clickbar\\Magellan\\Data\\Geometries\\Point\:\:makeGeodetic\(\) expects float, float\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Inertia/LocationController.php
+
+		-
+			message: '#^Parameter \#1 \$location of class App\\Http\\Resources\\LocationDto constructor expects App\\Models\\Location, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Inertia/LocationController.php
+
+		-
+			message: '#^Parameter \#1 \$userId of method App\\Http\\Controllers\\Backend\\LocationController\:\:index\(\) expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Inertia/LocationController.php
+
+		-
+			message: '#^Parameter \#2 \$longitude of static method Clickbar\\Magellan\\Data\\Geometries\\Point\:\:makeGeodetic\(\) expects float, float\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Inertia/LocationController.php
+
+		-
+			message: '#^Cannot call method hashTags\(\) on App\\Models\\User\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Controllers/Inertia/PostController.php
+
+		-
+			message: '#^Cannot access property \$location on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Controllers/Inertia/TripController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Inertia\\TripController\:\:destroy\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Inertia/TripController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Inertia\\TripController\:\:edit\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Inertia/TripController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Inertia\\TripController\:\:index\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Inertia/TripController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Inertia\\TripController\:\:show\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Inertia/TripController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Inertia\\TripController\:\:update\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Inertia/TripController.php
+
+		-
+			message: '#^Parameter \#2 \$visitingUser of method App\\Http\\Controllers\\Backend\\PostController\:\:postsForUser\(\) expects App\\Models\\User\|null, Illuminate\\Contracts\\Auth\\Authenticatable\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Inertia/UserController.php
+
+		-
+			message: '#^Cannot access property \$arrival_time on App\\Models\\TransportTripStop\|null\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: app/Http/Controllers/Traewelling/CrossPostController.php
+
+		-
+			message: '#^Cannot access property \$departure_time on App\\Models\\TransportTripStop\|null\.$#'
+			identifier: property.nonObject
+			count: 3
+			path: app/Http/Controllers/Traewelling/CrossPostController.php
+
+		-
+			message: '#^Cannot access property \$destinationStop on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 4
+			path: app/Http/Controllers/Traewelling/CrossPostController.php
+
+		-
+			message: '#^Cannot access property \$id on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 3
+			path: app/Http/Controllers/Traewelling/CrossPostController.php
+
+		-
+			message: '#^Cannot access property \$manual_arrival on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Controllers/Traewelling/CrossPostController.php
+
+		-
+			message: '#^Cannot access property \$manual_departure on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Controllers/Traewelling/CrossPostController.php
+
+		-
+			message: '#^Cannot access property \$name on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Controllers/Traewelling/CrossPostController.php
+
+		-
+			message: '#^Cannot access property \$originStop on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 3
+			path: app/Http/Controllers/Traewelling/CrossPostController.php
+
+		-
+			message: '#^Cannot access property \$transportTrip on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 11
+			path: app/Http/Controllers/Traewelling/CrossPostController.php
+
+		-
+			message: '#^Comparison operation "\>" between int\<2, max\> and 0 is always true\.$#'
+			identifier: greater.alwaysTrue
+			count: 1
+			path: app/Http/Controllers/Traewelling/CrossPostController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Traewelling\\CrossPostController\:\:checkin\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Controllers/Traewelling/CrossPostController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Traewelling\\CrossPostController\:\:createStopover\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Controllers/Traewelling/CrossPostController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Traewelling\\CrossPostController\:\:createStopovers\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Http/Controllers/Traewelling/CrossPostController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Traewelling\\CrossPostController\:\:createTrip\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Controllers/Traewelling/CrossPostController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Traewelling\\CrossPostController\:\:crosspostManualTrip\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Controllers/Traewelling/CrossPostController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Traewelling\\CrossPostController\:\:crosspostTransitous\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Controllers/Traewelling/CrossPostController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Traewelling\\CrossPostController\:\:getTrwlStationIdentifier\(\) should return App\\Models\\LocationIdentifier\|null but returns Illuminate\\Database\\Eloquent\\Model\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Http/Controllers/Traewelling/CrossPostController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Traewelling\\CrossPostController\:\:getUpdatePayload\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Controllers/Traewelling/CrossPostController.php
+
+		-
+			message: '#^Method App\\Services\\TraewellingRequestService\:\:getTrwlStationFromIdentifier\(\) invoked with 2 parameters, 1 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: app/Http/Controllers/Traewelling/CrossPostController.php
+
+		-
+			message: '#^Method App\\Services\\TraewellingRequestService\:\:getTrwlStationFromLocation\(\) invoked with 2 parameters, 1 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: app/Http/Controllers/Traewelling/CrossPostController.php
+
+		-
+			message: '#^Parameter \#1 \$identifier of method App\\Services\\TraewellingRequestService\:\:getTrwlStationFromIdentifier\(\) expects App\\Models\\LocationIdentifier, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Traewelling/CrossPostController.php
+
+		-
+			message: '#^Parameter \#1 \$location of method App\\Http\\Controllers\\Traewelling\\CrossPostController\:\:getTrwlStationIdentifier\(\) expects App\\Models\\Location, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Traewelling/CrossPostController.php
+
+		-
+			message: '#^Parameter \#1 \$message of static method Illuminate\\Log\\Logger\:\:debug\(\) expects array\|Illuminate\\Contracts\\Support\\Arrayable\|Illuminate\\Contracts\\Support\\Jsonable\|Illuminate\\Support\\Stringable\|string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Traewelling/CrossPostController.php
+
+		-
+			message: '#^Parameter \#1 \$point of method App\\Services\\TraewellingRequestService\:\:getTrwlStationFromLocation\(\) expects Clickbar\\Magellan\\Data\\Geometries\\Point, Clickbar\\Magellan\\Data\\Geometries\\Point\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Traewelling/CrossPostController.php
+
+		-
+			message: '#^Parameter \#1 \$traewellingPostId of method App\\Services\\TraewellingRequestService\:\:deletePostTag\(\) expects int, string\|null given\.$#'
+			identifier: argument.type
+			count: 3
+			path: app/Http/Controllers/Traewelling/CrossPostController.php
+
+		-
+			message: '#^Parameter \#1 \$traewellingPostId of method App\\Services\\TraewellingRequestService\:\:getPostTags\(\) expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Traewelling/CrossPostController.php
+
+		-
+			message: '#^Parameter \#1 \$traewellingPostId of method App\\Services\\TraewellingRequestService\:\:updatePost\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Http/Controllers/Traewelling/CrossPostController.php
+
+		-
+			message: '#^Parameter \#1 \$value of static method App\\Enums\\PostMetaInfo\\TravelReason\:\:tryFrom\(\) expects int\|string, string\|null given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Http/Controllers/Traewelling/CrossPostController.php
+
+		-
+			message: '#^Parameter \#2 \$traewellingPostId of method App\\Services\\TraewellingRequestService\:\:updateOrCreateTag\(\) expects int, string\|null given\.$#'
+			identifier: argument.type
+			count: 3
+			path: app/Http/Controllers/Traewelling/CrossPostController.php
+
+		-
+			message: '#^Parameter \#5 \$value of method App\\Services\\TraewellingRequestService\:\:updateOrCreateTag\(\) expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Traewelling/CrossPostController.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>value" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Http/Controllers/Traewelling/CrossPostController.php
+
+		-
+			message: '#^Access to an undefined property Laravel\\Socialite\\Contracts\\User\:\:\$token\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/TraewellingOAuthController.php
+
+		-
+			message: '#^Cannot access property \$id on App\\Models\\User\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Controllers/TraewellingOAuthController.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\BasePostRequest\:\:bodyRule\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/BasePostRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\BasePostRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/BasePostRequest.php
+
+		-
+			message: '#^Property App\\Http\\Requests\\BasePostRequest\:\:\$extraBodyRules type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/BasePostRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\DeparturesRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/DeparturesRequest.php
+
+		-
+			message: '#^PHPDoc tag @return has invalid value \(array\<string, ValidationRule'', ''array'', ''string\>\)\: Unexpected token "'', ''", expected ''\>'' at offset 113 on line 4$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: app/Http/Requests/DeparturesRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\FilterPostsRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/FilterPostsRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\GeocodeRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/GeocodeRequest.php
+
+		-
+			message: '#^PHPDoc tag @return has invalid value \(array\<string, ValidationRule'', ''array'', ''string\>\)\: Unexpected token "'', ''", expected ''\>'' at offset 113 on line 4$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: app/Http/Requests/GeocodeRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\LocationBasePostRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/LocationBasePostRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\LocationHistoryRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/LocationHistoryRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\MassEditPostRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/MassEditPostRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\NearbyLocationRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/NearbyLocationRequest.php
+
+		-
+			message: '#^Cannot access property \$id on App\\Models\\User\|null\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: app/Http/Requests/ProfileUpdateRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\StopoverRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/StopoverRequest.php
+
+		-
+			message: '#^Cannot call method can\(\) on App\\Models\\User\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Requests/StoreInviteCodeRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\StoreInviteCodeRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/StoreInviteCodeRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\StoreTripRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/StoreTripRequest.php
+
+		-
+			message: '#^Class App\\Http\\Requests\\TransportBasePostCreateRequest has PHPDoc tag @property for property \$vehicleIds with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/TransportBasePostCreateRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\TransportBasePostCreateRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/TransportBasePostCreateRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\TransportPostUpdateRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/TransportPostUpdateRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\TransportTimesUpdateRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/TransportTimesUpdateRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\UpdateProfileRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/UpdateProfileRequest.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Location\:\:\$distance\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/LocationDto.php
+
+		-
+			message: '#^Cannot call method getLatitude\(\) on Clickbar\\Magellan\\Data\\Geometries\\Point\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Resources/LocationDto.php
+
+		-
+			message: '#^Cannot call method getLongitude\(\) on Clickbar\\Magellan\\Data\\Geometries\\Point\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Resources/LocationDto.php
+
+		-
+			message: '#^Parameter \#1 \$locationTag of class App\\Http\\Resources\\LocationIdentifierDto constructor expects App\\Models\\LocationIdentifier, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Resources/LocationDto.php
+
+		-
+			message: '#^Parameter \#1 \$locationTag of class App\\Http\\Resources\\LocationTagDto constructor expects App\\Models\\LocationTag, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Resources/LocationDto.php
+
+		-
+			message: '#^Property App\\Http\\Resources\\LocationDto\:\:\$distance \(int\|null\) does not accept float\|null\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Http/Resources/LocationDto.php
+
+		-
+			message: '#^Property App\\Http\\Resources\\LocationDto\:\:\$id \(string\) does not accept int\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Http/Resources/LocationDto.php
+
+		-
+			message: '#^Property App\\Http\\Resources\\LocationDto\:\:\$identifiers \(array\<App\\Http\\Resources\\LocationIdentifierDto\>\) does not accept array\<mixed\>\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Http/Resources/LocationDto.php
+
+		-
+			message: '#^Property App\\Http\\Resources\\LocationDto\:\:\$name \(string\) does not accept string\|null\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Http/Resources/LocationDto.php
+
+		-
+			message: '#^Property App\\Http\\Resources\\LocationDto\:\:\$tags \(array\<App\\Http\\Resources\\LocationTagDto\>\) does not accept array\<mixed\>\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Http/Resources/LocationDto.php
+
+		-
+			message: '#^Cannot access property \$arrival_time on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Resources/LocationHistoryEntryDto.php
+
+		-
+			message: '#^Cannot access property \$departure_time on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Resources/LocationHistoryEntryDto.php
+
+		-
+			message: '#^Cannot access property \$id on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Resources/LocationHistoryEntryDto.php
+
+		-
+			message: '#^Cannot access property \$location on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 10
+			path: app/Http/Resources/LocationHistoryEntryDto.php
+
+		-
+			message: '#^Cannot access property \$name on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Resources/LocationHistoryEntryDto.php
+
+		-
+			message: '#^Cannot call method getLatitude\(\) on Clickbar\\Magellan\\Data\\Geometries\\Point\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Resources/LocationHistoryEntryDto.php
+
+		-
+			message: '#^Cannot call method getLongitude\(\) on Clickbar\\Magellan\\Data\\Geometries\\Point\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Resources/LocationHistoryEntryDto.php
+
+		-
+			message: '#^Cannot call method toIso8601String\(\) on Carbon\\Carbon\|null\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: app/Http/Resources/LocationHistoryEntryDto.php
+
+		-
+			message: '#^Property App\\Http\\Resources\\LocationHistoryEntryDto\:\:\$id \(string\) does not accept int\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Http/Resources/LocationHistoryEntryDto.php
+
+		-
+			message: '#^Property App\\Http\\Resources\\LocationTagDto\:\:\$value \(string\) does not accept string\|null\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Http/Resources/LocationTagDto.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$key\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PostTypes/BasePost.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$value\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PostTypes/BasePost.php
+
+		-
+			message: '#^Cannot access property \$key on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Resources/PostTypes/BasePost.php
+
+		-
+			message: '#^Cannot access property \$value on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Resources/PostTypes/BasePost.php
+
+		-
+			message: '#^Cannot call method toIso8601String\(\) on Carbon\\Carbon\|null\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: app/Http/Resources/PostTypes/BasePost.php
+
+		-
+			message: '#^Expression on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.expr
+			count: 3
+			path: app/Http/Resources/PostTypes/BasePost.php
+
+		-
+			message: '#^Property App\\Http\\Resources\\PostTypes\\BasePost\:\:\$hashTags \(array\<string\>\) does not accept array\<mixed\>\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Http/Resources/PostTypes/BasePost.php
+
+		-
+			message: '#^Property App\\Http\\Resources\\PostTypes\\BasePost\:\:\$id \(string\) does not accept int\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Http/Resources/PostTypes/BasePost.php
+
+		-
+			message: '#^Unable to resolve the template type TGroupKey in call to method Illuminate\\Support\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:groupBy\(\)$#'
+			identifier: argument.templateType
+			count: 1
+			path: app/Http/Resources/PostTypes/BasePost.php
+
+		-
+			message: '#^Unable to resolve the template type TMapValue in call to method Illuminate\\Database\\Eloquent\\Collection\<\(int\|string\),Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\>\:\:map\(\)$#'
+			identifier: argument.templateType
+			count: 1
+			path: app/Http/Resources/PostTypes/BasePost.php
+
+		-
+			message: '#^Unable to resolve the template type TMapValue in call to method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\)$#'
+			identifier: argument.templateType
+			count: 1
+			path: app/Http/Resources/PostTypes/BasePost.php
+
+		-
+			message: '#^Using nullsafe method call on non\-nullable type Carbon\\Carbon\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Http/Resources/PostTypes/BasePost.php
+
+		-
+			message: '#^Using nullsafe method call on non\-nullable type Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 2
+			path: app/Http/Resources/PostTypes/BasePost.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$value\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PostTypes/LocationPost.php
+
+		-
+			message: '#^Cannot access property \$location on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Resources/PostTypes/LocationPost.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$value\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/PostTypes/TransportPost.php
+
+		-
+			message: '#^Cannot access property \$destinationStop on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Resources/PostTypes/TransportPost.php
+
+		-
+			message: '#^Cannot access property \$manual_arrival on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Resources/PostTypes/TransportPost.php
+
+		-
+			message: '#^Cannot access property \$manual_departure on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Resources/PostTypes/TransportPost.php
+
+		-
+			message: '#^Cannot access property \$originStop on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Resources/PostTypes/TransportPost.php
+
+		-
+			message: '#^Cannot access property \$transportTrip on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Resources/PostTypes/TransportPost.php
+
+		-
+			message: '#^Cannot access property \$name on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Resources/StopDto.php
+
+		-
+			message: '#^Parameter \#1 \$location of class App\\Http\\Resources\\LocationDto constructor expects App\\Models\\Location, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Resources/StopDto.php
+
+		-
+			message: '#^Property App\\Http\\Resources\\StopDto\:\:\$id \(string\) does not accept int\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Http/Resources/StopDto.php
+
+		-
+			message: '#^Property App\\Http\\Resources\\TripDto\:\:\$id \(string\) does not accept int\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Http/Resources/TripDto.php
+
+		-
+			message: '#^Parameter \#1 \$trip of class App\\Http\\Resources\\TripDto constructor expects App\\Models\\TransportTrip, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Resources/TripHistoryEntryDto.php
+
+		-
+			message: '#^Property App\\Http\\Resources\\TripHistoryEntryDto\:\:\$id \(string\) does not accept int\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Http/Resources/TripHistoryEntryDto.php
+
+		-
+			message: '#^Method App\\Http\\Resources\\UserDto\:\:__toString\(\) should return string but returns string\|false\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Http/Resources/UserDto.php
+
+		-
+			message: '#^Method App\\Http\\Resources\\UserDto\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Resources/UserDto.php
+
+		-
+			message: '#^Method App\\Http\\Resources\\UserResource\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Resources/UserResource.php
+
+		-
+			message: '#^PHPDoc tag @var with type App\\Models\\User is not subtype of native type \$this\(App\\Http\\Resources\\UserResource\)\.$#'
+			identifier: varTag.nativeType
+			count: 1
+			path: app/Http/Resources/UserResource.php
+
+		-
+			message: '#^Call to an undefined method App\\Dto\\MotisApi\\StopDto\:\:setCancelled\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Hydrators/DbTripHydrator.php
+
+		-
+			message: '#^Cannot access property \$id on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Hydrators/DbTripHydrator.php
+
+		-
+			message: '#^Cannot access property \$latitude on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Hydrators/DbTripHydrator.php
+
+		-
+			message: '#^Cannot access property \$longitude on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Hydrators/DbTripHydrator.php
+
+		-
+			message: '#^Cannot access property \$name on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Hydrators/DbTripHydrator.php
+
+		-
+			message: '#^Method App\\Hydrators\\DbTripHydrator\:\:hydrateTrip\(\) has parameter \$stops with generic class Illuminate\\Support\\Collection but does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Hydrators/DbTripHydrator.php
+
+		-
+			message: '#^Parameter \#1 \$endTime of method App\\Dto\\MotisApi\\TripDto\:\:setEndTime\(\) expects Carbon\\Carbon, Carbon\\Carbon\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Hydrators/DbTripHydrator.php
+
+		-
+			message: '#^Parameter \#1 \$source of method App\\Dto\\MotisApi\\LegDto\:\:setSource\(\) expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Hydrators/DbTripHydrator.php
+
+		-
+			message: '#^Parameter \#1 \$startTime of method App\\Dto\\MotisApi\\TripDto\:\:setStartTime\(\) expects Carbon\\Carbon, Carbon\\Carbon\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Hydrators/DbTripHydrator.php
+
+		-
+			message: '#^Parameter \#1 \$stop of method App\\Hydrators\\DbTripHydrator\:\:hydrateStopPlace\(\) expects App\\Models\\TransportTripStop, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Hydrators/DbTripHydrator.php
+
+		-
+			message: '#^Parameter \#1 \$tripId of method App\\Dto\\MotisApi\\LegDto\:\:setTripId\(\) expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Hydrators/DbTripHydrator.php
+
+		-
+			message: '#^Parameter \#1 \$tripStopId of method App\\Dto\\MotisApi\\StopDto\:\:setTripStopId\(\) expects string\|null, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Hydrators/DbTripHydrator.php
+
+		-
+			message: '#^Property App\\Http\\Resources\\InviteDto\:\:\$id \(string\) does not accept int\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Hydrators/InviteHydrator.php
+
+		-
+			message: '#^Call to an undefined method App\\Dto\\MotisApi\\StopDto\:\:setArrival\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Hydrators/MotisHydrator.php
+
+		-
+			message: '#^Method App\\Hydrators\\MotisHydrator\:\:hydrateArea\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Hydrators/MotisHydrator.php
+
+		-
+			message: '#^Method App\\Hydrators\\MotisHydrator\:\:hydrateGeocodeEntry\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Hydrators/MotisHydrator.php
+
+		-
+			message: '#^Method App\\Hydrators\\MotisHydrator\:\:hydrateLeg\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Hydrators/MotisHydrator.php
+
+		-
+			message: '#^Method App\\Hydrators\\MotisHydrator\:\:hydrateStop\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Hydrators/MotisHydrator.php
+
+		-
+			message: '#^Method App\\Hydrators\\MotisHydrator\:\:hydrateStopPlace\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Hydrators/MotisHydrator.php
+
+		-
+			message: '#^Method App\\Hydrators\\MotisHydrator\:\:hydrateStopTime\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Hydrators/MotisHydrator.php
+
+		-
+			message: '#^Method App\\Hydrators\\MotisHydrator\:\:hydrateTrip\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Hydrators/MotisHydrator.php
+
+		-
+			message: '#^Parameter \#1 \$data of method App\\Hydrators\\MotisHydrator\:\:hydrateArea\(\) expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Hydrators/MotisHydrator.php
+
+		-
+			message: '#^Parameter \#1 \$endTime of method App\\Dto\\MotisApi\\TripDto\:\:setEndTime\(\) expects Carbon\\Carbon, Carbon\\Carbon\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Hydrators/MotisHydrator.php
+
+		-
+			message: '#^Parameter \#1 \$startTime of method App\\Dto\\MotisApi\\TripDto\:\:setStartTime\(\) expects Carbon\\Carbon, Carbon\\Carbon\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Hydrators/MotisHydrator.php
+
+		-
+			message: '#^Parameter \#1 \$type of method App\\Dto\\MotisApi\\GeocodeResponseEntry\:\:setType\(\) expects App\\Dto\\MotisApi\\LocationType, App\\Dto\\MotisApi\\LocationType\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Hydrators/MotisHydrator.php
+
+		-
+			message: '#^Variable \$distance on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.variable
+			count: 1
+			path: app/Hydrators/MotisHydrator.php
+
+		-
+			message: '#^Parameter \#1 \$user of method App\\Hydrators\\UserHydrator\:\:modelToDto\(\) expects App\\Models\\User, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Hydrators/PostHydrator.php
+
+		-
+			message: '#^Call to an undefined method App\\Dto\\MotisApi\\StopDto\:\:setCancelled\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Hydrators/TripDtoHydrator.php
+
+		-
+			message: '#^Cannot access property \$id on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Hydrators/TripDtoHydrator.php
+
+		-
+			message: '#^Cannot access property \$location on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: app/Hydrators/TripDtoHydrator.php
+
+		-
+			message: '#^Cannot access property \$name on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Hydrators/TripDtoHydrator.php
+
+		-
+			message: '#^Cannot call method addSeconds\(\) on Carbon\\Carbon\|null\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: app/Hydrators/TripDtoHydrator.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$avatar\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Hydrators/UserHydrator.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$bio\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Hydrators/UserHydrator.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$header\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Hydrators/UserHydrator.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$website\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Hydrators/UserHydrator.php
+
+		-
+			message: '#^Cannot call method toIso8601String\(\) on Carbon\\Carbon\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Hydrators/UserHydrator.php
+
+		-
+			message: '#^Property App\\Http\\Resources\\UserDto\:\:\$id \(string\) does not accept int\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Hydrators/UserHydrator.php
+
+		-
+			message: '#^Using nullsafe property access on non\-nullable type Illuminate\\Database\\Eloquent\\Model\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 2
+			path: app/Hydrators/UserHydrator.php
+
+		-
+			message: '#^Argument of an invalid type Generator\|null supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: app/Jobs/FetchAirports.php
+
+		-
+			message: '#^Method App\\Jobs\\FetchAirports\:\:parseLine\(\) has parameter \$header with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Jobs/FetchAirports.php
+
+		-
+			message: '#^Method App\\Jobs\\FetchAirports\:\:parseLine\(\) has parameter \$line with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Jobs/FetchAirports.php
+
+		-
+			message: '#^Parameter \#1 \$airport of method App\\Repositories\\LocationRepository\:\:updateOrCreateAirport\(\) expects App\\Dto\\AirportDto, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Jobs/FetchAirports.php
+
+		-
+			message: '#^Property App\\Dto\\AirportDto\:\:\$foreignIdentifier \(string\) does not accept string\|null\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Jobs/FetchAirports.php
+
+		-
+			message: '#^Property App\\Dto\\AirportDto\:\:\$name \(string\) does not accept string\|null\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Jobs/FetchAirports.php
+
+		-
+			message: '#^Yield can be used only with these return types\: Generator, Iterator, Traversable, iterable\.$#'
+			identifier: generator.returnType
+			count: 1
+			path: app/Jobs/FetchAirports.php
+
+		-
+			message: '#^Parameter \#2 \$radius of method App\\Http\\Controllers\\Backend\\LocationController\:\:prefetch\(\) expects int, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Jobs/PrefetchJob.php
+
+		-
+			message: '#^Method App\\Jobs\\RerouteStops\:\:__construct\(\) has parameter \$stops with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Jobs/RerouteStops.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$value\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Jobs/TraewellingDeletePostJob.php
+
+		-
+			message: '#^Cannot access property \$metaInfos on App\\Models\\Post\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Jobs/TraewellingDeletePostJob.php
+
+		-
+			message: '#^Cannot access property \$user_id on App\\Models\\Post\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Jobs/TraewellingDeletePostJob.php
+
+		-
+			message: '#^Method App\\Models\\HashTag\:\:posts\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany does not specify its types\: TRelatedModel, TDeclaringModel, TPivotModel, TAccessor \(2\-4 required\)$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/HashTag.php
+
+		-
+			message: '#^Method App\\Models\\HashTag\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/HashTag.php
+
+		-
+			message: '#^Class App\\Models\\Invite uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Invite.php
+
+		-
+			message: '#^Method App\\Models\\Invite\:\:createdBy\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Invite.php
+
+		-
+			message: '#^Method App\\Models\\Invite\:\:usedBy\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Invite.php
+
+		-
+			message: '#^Method App\\Models\\Like\:\:post\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Like.php
+
+		-
+			message: '#^Method App\\Models\\Like\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Like.php
+
+		-
+			message: '#^Class App\\Models\\Location uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Location.php
+
+		-
+			message: '#^Method App\\Models\\Location\:\:identifiers\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Location.php
+
+		-
+			message: '#^Method App\\Models\\Location\:\:tags\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Location.php
+
+		-
+			message: '#^Property App\\Models\\Location\:\:\$relations type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Models/Location.php
+
+		-
+			message: '#^Class App\\Models\\LocationIdentifier uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/LocationIdentifier.php
+
+		-
+			message: '#^Method App\\Models\\LocationIdentifier\:\:location\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/LocationIdentifier.php
+
+		-
+			message: '#^Method App\\Models\\LocationPost\:\:location\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/LocationPost.php
+
+		-
+			message: '#^Method App\\Models\\LocationPost\:\:post\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/LocationPost.php
+
+		-
+			message: '#^Method App\\Models\\LocationTag\:\:location\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/LocationTag.php
+
+		-
+			message: '#^Class App\\Models\\Post uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Post.php
+
+		-
+			message: '#^Method App\\Models\\Post\:\:hashTags\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany does not specify its types\: TRelatedModel, TDeclaringModel, TPivotModel, TAccessor \(2\-4 required\)$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Post.php
+
+		-
+			message: '#^Method App\\Models\\Post\:\:likes\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Post.php
+
+		-
+			message: '#^Method App\\Models\\Post\:\:locationPost\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasOne does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Post.php
+
+		-
+			message: '#^Method App\\Models\\Post\:\:metaInfos\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Post.php
+
+		-
+			message: '#^Method App\\Models\\Post\:\:transportPost\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasOne does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Post.php
+
+		-
+			message: '#^Method App\\Models\\Post\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Post.php
+
+		-
+			message: '#^Method App\\Models\\PostMetaInfo\:\:post\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/PostMetaInfo.php
+
+		-
+			message: '#^Method App\\Models\\PostsHashTagsMap\:\:hashTag\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/PostsHashTagsMap.php
+
+		-
+			message: '#^Method App\\Models\\PostsHashTagsMap\:\:post\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/PostsHashTagsMap.php
+
+		-
+			message: '#^Class App\\Models\\Profile uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Profile.php
+
+		-
+			message: '#^Method App\\Models\\Profile\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Profile.php
+
+		-
+			message: '#^Method App\\Models\\RouteSegment\:\:fromLocation\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/RouteSegment.php
+
+		-
+			message: '#^Method App\\Models\\RouteSegment\:\:toLocation\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/RouteSegment.php
+
+		-
+			message: '#^Class App\\Models\\SocialAccount uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/SocialAccount.php
+
+		-
+			message: '#^Method App\\Models\\TimestampedUserWaypoint\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/TimestampedUserWaypoint.php
+
+		-
+			message: '#^Class App\\Models\\TransportPost uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/TransportPost.php
+
+		-
+			message: '#^Method App\\Models\\TransportPost\:\:destination\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/TransportPost.php
+
+		-
+			message: '#^Method App\\Models\\TransportPost\:\:destinationStop\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/TransportPost.php
+
+		-
+			message: '#^Method App\\Models\\TransportPost\:\:origin\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/TransportPost.php
+
+		-
+			message: '#^Method App\\Models\\TransportPost\:\:originStop\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/TransportPost.php
+
+		-
+			message: '#^Method App\\Models\\TransportPost\:\:transportTrip\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/TransportPost.php
+
+		-
+			message: '#^Class App\\Models\\TransportTrip uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/TransportTrip.php
+
+		-
+			message: '#^Method App\\Models\\TransportTrip\:\:stops\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/TransportTrip.php
+
+		-
+			message: '#^Method App\\Models\\TransportTrip\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/TransportTrip.php
+
+		-
+			message: '#^Class App\\Models\\TransportTripStop uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/TransportTripStop.php
+
+		-
+			message: '#^Method App\\Models\\TransportTripStop\:\:location\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/TransportTripStop.php
+
+		-
+			message: '#^Method App\\Models\\TransportTripStop\:\:routeSegment\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/TransportTripStop.php
+
+		-
+			message: '#^Method App\\Models\\TransportTripStop\:\:transportTrip\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/TransportTripStop.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:hashTags\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:invites\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:likes\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:locationHistory\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:posts\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:profile\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasOne does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:settings\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasOne does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:socialAccounts\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:traewellingAccount\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasOne does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:trips\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\UserSettings\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/UserSettings.php
+
+		-
+			message: '#^Method App\\Notifications\\PostLiked\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Notifications/PostLiked.php
+
+		-
+			message: '#^Method App\\Notifications\\PostLiked\:\:via\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Notifications/PostLiked.php
+
+		-
+			message: '#^Parameter \#2 \$haystack of function in_array expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Policies/InvitePolicy.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between int and string will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: app/Policies/InvitePolicy.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between int and string will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 2
+			path: app/Policies/PostPolicy.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between int\|null and string will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: app/Policies/PostPolicy.php
+
+		-
+			message: '#^Binary operation "\." between mixed and ''/socialite…'' results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: app/Providers/AppServiceProvider.php
+
+		-
+			message: '#^Cannot call method getClientOriginalExtension\(\) on Illuminate\\Http\\UploadedFile\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Repositories/FileRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\FileRepository\:\:uploadFile\(\) should return string but returns string\|false\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Repositories/FileRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\HashTagRepository\:\:getHashTagsForUser\(\) return type with generic class Illuminate\\Database\\Eloquent\\Collection does not specify its types\: TKey, TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Repositories/HashTagRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\HashTagRepository\:\:syncHashTagsByValue\(\) has parameter \$tagValues with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Repositories/HashTagRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\HashTagRepository\:\:updateHashTagRelevance\(\) should return App\\Models\\HashTag but returns App\\Models\\HashTag\|null\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Repositories/HashTagRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\InviteRepository\:\:getAllInvitesForUser\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Repositories/InviteRepository.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Repositories/LocationRepository.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:identifiers\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: app/Repositories/LocationRepository.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:tags\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Repositories/LocationRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\LocationRepository\:\:findAirportsByName\(\) return type with generic class Illuminate\\Database\\Eloquent\\Collection does not specify its types\: TKey, TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Repositories/LocationRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\LocationRepository\:\:getLocationsForUser\(\) return type with generic class Illuminate\\Database\\Eloquent\\Collection does not specify its types\: TKey, TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Repositories/LocationRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\LocationRepository\:\:getNearbyLocations\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Repositories/LocationRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\LocationRepository\:\:getRecentRequestLocation\(\) should return App\\Models\\RequestLocation\|null but returns Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Repositories/LocationRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\LocationRepository\:\:getTimestampedUserWaypoints\(\) return type with generic class Illuminate\\Database\\Eloquent\\Collection does not specify its types\: TKey, TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Repositories/LocationRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\LocationRepository\:\:recentRequestLocationQuery\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Repositories/LocationRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\LocationRepository\:\:searchNearby\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Repositories/LocationRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\LocationRepository\:\:updateOrCreateOsmLocation\(\) has parameter \$location with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Repositories/LocationRepository.php
+
+		-
+			message: '#^Parameter \#1 \$location of method App\\Repositories\\LocationRepository\:\:setLocationData\(\) expects App\\Models\\Location, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Repositories/LocationRepository.php
+
+		-
+			message: '#^Parameter \#1 \$value of method Carbon\\Carbon\:\:subMinutes\(\) expects float\|int, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Repositories/LocationRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\NotificationRepository\:\:index\(\) return type with generic class Illuminate\\Database\\Eloquent\\Collection does not specify its types\: TKey, TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Repositories/NotificationRepository.php
+
+		-
+			message: '#^Cannot call static method tryFrom\(\) on string\|null\.$#'
+			identifier: staticMethod.nonObject
+			count: 1
+			path: app/Repositories/PostMetaInfoRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\PostMetaInfoRepository\:\:setTravelReason\(\) should return App\\Models\\PostMetaInfo but returns App\\Models\\PostMetaInfo\|null\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Repositories/PostMetaInfoRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\PostMetaInfoRepository\:\:setVehicleIds\(\) has parameter \$vehicleIds with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Repositories/PostMetaInfoRepository.php
+
+		-
+			message: '#^Cannot access property \$destination_stop_id on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Repositories/PostRepository.php
+
+		-
+			message: '#^Cannot access property \$id on App\\Models\\User\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Repositories/PostRepository.php
+
+		-
+			message: '#^Cannot access property \$manual_arrival on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Repositories/PostRepository.php
+
+		-
+			message: '#^Cannot access property \$manual_departure on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Repositories/PostRepository.php
+
+		-
+			message: '#^Cannot access property \$origin_stop_id on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Repositories/PostRepository.php
+
+		-
+			message: '#^Cannot access property \$transportTrip on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Repositories/PostRepository.php
+
+		-
+			message: '#^Cannot access property \$transport_trip_id on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Repositories/PostRepository.php
+
+		-
+			message: '#^Cannot call method save\(\) on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: app/Repositories/PostRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\PostRepository\:\:getFilteredPosts\(\) has parameter \$tags with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Repositories/PostRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\PostRepository\:\:getFilteredPosts\(\) has parameter \$travelReasons with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Repositories/PostRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\PostRepository\:\:getFilteredPosts\(\) has parameter \$visibilities with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Repositories/PostRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\PostRepository\:\:massEdit\(\) has parameter \$postIds with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Repositories/PostRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\PostRepository\:\:massEdit\(\) has parameter \$tags with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Repositories/PostRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\PostRepository\:\:storeLocation\(\) has parameter \$hashTagIds with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Repositories/PostRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\PostRepository\:\:storeText\(\) has parameter \$tags with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Repositories/PostRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\PostRepository\:\:storeTransport\(\) has parameter \$hashTagIds with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Repositories/PostRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\PostRepository\:\:storeTransport\(\) has parameter \$vehicleIds with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Repositories/PostRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\PostRepository\:\:updateBasePost\(\) has parameter \$hashTags with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Repositories/PostRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\PostRepository\:\:updateBasePost\(\) has parameter \$vehicleIds with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Repositories/PostRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\PostRepository\:\:updateTransportPost\(\) should return App\\Http\\Resources\\PostTypes\\TransportPost but returns App\\Http\\Resources\\PostTypes\\BasePost\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Repositories/PostRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\PostRepository\:\:updateTransportTimes\(\) should return App\\Http\\Resources\\PostTypes\\TransportPost but returns App\\Http\\Resources\\PostTypes\\BasePost\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Repositories/PostRepository.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between int\|null and string will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: app/Repositories/PostRepository.php
+
+		-
+			message: '#^Variable \$post might not be defined\.$#'
+			identifier: variable.undefined
+			count: 4
+			path: app/Repositories/PostRepository.php
+
+		-
+			message: '#^Cannot access property \$foreign_trip_id on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: app/Repositories/TransportTripRepository.php
+
+		-
+			message: '#^Cannot access property \$last_refreshed_at on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: app/Repositories/TransportTripRepository.php
+
+		-
+			message: '#^Cannot access property \$provider on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Repositories/TransportTripRepository.php
+
+		-
+			message: '#^Cannot call method addMinutes\(\) on Carbon\\Carbon\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Repositories/TransportTripRepository.php
+
+		-
+			message: '#^Cannot call method getDimension\(\) on Clickbar\\Magellan\\Data\\Geometries\\Geometry\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Repositories/TransportTripRepository.php
+
+		-
+			message: '#^Cannot call method getPoints\(\) on Clickbar\\Magellan\\Data\\Geometries\\Geometry\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Repositories/TransportTripRepository.php
+
+		-
+			message: '#^Cannot call method getSrid\(\) on Clickbar\\Magellan\\Data\\Geometries\\Geometry\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Repositories/TransportTripRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\TransportTripRepository\:\:getActiveTrips\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Repositories/TransportTripRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\TransportTripRepository\:\:getStopsBetween\(\) return type with generic class Illuminate\\Database\\Eloquent\\Collection does not specify its types\: TKey, TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Repositories/TransportTripRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\TransportTripRepository\:\:getStopsForTripQuery\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Repositories/TransportTripRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\TransportTripRepository\:\:getTripById\(\) has parameter \$with with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Repositories/TransportTripRepository.php
+
+		-
+			message: '#^Method App\\Repositories\\TransportTripRepository\:\:getTripByIdentifier\(\) has parameter \$with with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Repositories/TransportTripRepository.php
+
+		-
+			message: '#^Parameter \#1 \$array \(list\<string\>\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
+			count: 1
+			path: app/Repositories/TransportTripRepository.php
+
+		-
+			message: '#^Parameter \#1 \$value of method Carbon\\Carbon\:\:subMinutes\(\) expects float\|int, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Repositories/TransportTripRepository.php
+
+		-
+			message: '#^Property App\\Models\\RouteSegment\:\:\$distance \(int\) does not accept Clickbar\\Magellan\\Database\\MagellanExpressions\\MagellanNumericExpression\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Repositories/TransportTripRepository.php
+
+		-
+			message: '#^Property App\\Models\\RouteSegment\:\:\$from_location_id \(string\) does not accept int\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Repositories/TransportTripRepository.php
+
+		-
+			message: '#^Property App\\Models\\RouteSegment\:\:\$geometry \(Clickbar\\Magellan\\Data\\Geometries\\LineString\|null\) does not accept Clickbar\\Magellan\\Data\\Geometries\\Geometry\|null\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Repositories/TransportTripRepository.php
+
+		-
+			message: '#^Property App\\Models\\RouteSegment\:\:\$to_location_id \(string\) does not accept int\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Repositories/TransportTripRepository.php
+
+		-
+			message: '#^Property App\\Models\\TransportTrip\:\:\$user_id \(string\|null\) does not accept int\|null\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Repositories/TransportTripRepository.php
+
+		-
+			message: '#^Property App\\Models\\TransportTripStop\:\:\$location_id \(string\) does not accept int\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Repositories/TransportTripRepository.php
+
+		-
+			message: '#^Property App\\Models\\TransportTripStop\:\:\$route_segment_id \(string\|null\) does not accept int\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Repositories/TransportTripRepository.php
+
+		-
+			message: '#^Property App\\Models\\TransportTripStop\:\:\$route_segment_id \(string\|null\) does not accept int\|null\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Repositories/TransportTripRepository.php
+
+		-
+			message: '#^Property App\\Models\\TransportTripStop\:\:\$transport_trip_id \(string\) does not accept int\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Repositories/TransportTripRepository.php
+
+		-
+			message: '#^Binary operation "\." between ''BRouter returned an…'' and mixed results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: app/Services/BrouterRequestService.php
+
+		-
+			message: '#^Cannot access offset ''error'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Services/BrouterRequestService.php
+
+		-
+			message: '#^Cannot access offset ''features'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Services/BrouterRequestService.php
+
+		-
+			message: '#^Cannot access offset ''geometry'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Services/BrouterRequestService.php
+
+		-
+			message: '#^Cannot access offset ''profileid'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Services/BrouterRequestService.php
+
+		-
+			message: '#^Cannot access offset 0 on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Services/BrouterRequestService.php
+
+		-
+			message: '#^Method App\\Services\\BrouterRequestService\:\:getRoute\(\) should return string but returns string\|false\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/BrouterRequestService.php
+
+		-
+			message: '#^Method App\\Services\\BrouterRequestService\:\:getTempProfile\(\) never returns null so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: app/Services/BrouterRequestService.php
+
+		-
+			message: '#^Property App\\Services\\BrouterRequestService\:\:\$tempProfile \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Services/BrouterRequestService.php
+
+		-
+			message: '#^Method App\\Services\\OverpassRequestService\:\:getElements\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/OverpassRequestService.php
+
+		-
+			message: '#^Method App\\Services\\OverpassRequestService\:\:getElements\(\) should return array but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/OverpassRequestService.php
+
+		-
+			message: '#^Method App\\Services\\OverpassRequestService\:\:getNwrFor\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Services/OverpassRequestService.php
+
+		-
+			message: '#^Method App\\Services\\OverpassRequestService\:\:getNwrFor\(\) has parameter \$filters with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/OverpassRequestService.php
+
+		-
+			message: '#^Method App\\Services\\OverpassRequestService\:\:parseLocations\(\) has parameter \$response with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/OverpassRequestService.php
+
+		-
+			message: '#^Unsafe access to private constant App\\Services\\OverpassRequestService\:\:EXCLUDE through static\:\:\.$#'
+			identifier: staticClassAccess.privateConstant
+			count: 2
+			path: app/Services/OverpassRequestService.php
+
+		-
+			message: '#^Binary operation "\." between mixed and ''/api/v1/auth/logout'' results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: app/Services/Socialite/TraewellingProvider.php
+
+		-
+			message: '#^Binary operation "\." between mixed and ''/api/v1/auth/user'' results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: app/Services/Socialite/TraewellingProvider.php
+
+		-
+			message: '#^Binary operation "\." between mixed and ''/oauth/authorize'' results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: app/Services/Socialite/TraewellingProvider.php
+
+		-
+			message: '#^Binary operation "\." between mixed and ''/oauth/token'' results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: app/Services/Socialite/TraewellingProvider.php
+
+		-
+			message: '#^Cannot access offset ''data'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Services/Socialite/TraewellingProvider.php
+
+		-
+			message: '#^Method App\\Services\\Socialite\\TraewellingProvider\:\:formatScopes\(\) has parameter \$scopes with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/Socialite/TraewellingProvider.php
+
+		-
+			message: '#^Method App\\Services\\Socialite\\TraewellingProvider\:\:formatScopes\(\) should return string but returns array\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Socialite/TraewellingProvider.php
+
+		-
+			message: '#^Method App\\Services\\Socialite\\TraewellingProvider\:\:getTokenFields\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/Socialite/TraewellingProvider.php
+
+		-
+			message: '#^Method App\\Services\\Socialite\\TraewellingProvider\:\:logout\(\) has parameter \$token with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Services/Socialite/TraewellingProvider.php
+
+		-
+			message: '#^Method App\\Services\\Socialite\\TraewellingProvider\:\:mapUserToObject\(\) has parameter \$user with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/Socialite/TraewellingProvider.php
+
+		-
+			message: '#^Property App\\Services\\Socialite\\TraewellingProvider\:\:\$scopes type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/Socialite/TraewellingProvider.php
+
+		-
+			message: '#^Call to an undefined method Laravel\\Socialite\\Contracts\\Provider\:\:logout\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Services/Socialite/TraewellingUser.php
+
+		-
+			message: '#^Binary operation "\." between mixed and ''/api/v1/'' results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: app/Services/TraewellingRequestService.php
+
+		-
+			message: '#^Call to an undefined method Laravel\\Socialite\\Contracts\\Provider\:\:refreshToken\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Services/TraewellingRequestService.php
+
+		-
+			message: '#^Cannot access offset ''data'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 3
+			path: app/Services/TraewellingRequestService.php
+
+		-
+			message: '#^Cannot access offset 0 on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Services/TraewellingRequestService.php
+
+		-
+			message: '#^Method App\\Services\\TraewellingRequestService\:\:checkin\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/TraewellingRequestService.php
+
+		-
+			message: '#^Method App\\Services\\TraewellingRequestService\:\:checkin\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/TraewellingRequestService.php
+
+		-
+			message: '#^Method App\\Services\\TraewellingRequestService\:\:checkin\(\) should return array but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/TraewellingRequestService.php
+
+		-
+			message: '#^Method App\\Services\\TraewellingRequestService\:\:createTrip\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/TraewellingRequestService.php
+
+		-
+			message: '#^Method App\\Services\\TraewellingRequestService\:\:createTrip\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/TraewellingRequestService.php
+
+		-
+			message: '#^Method App\\Services\\TraewellingRequestService\:\:createTrip\(\) should return array but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/TraewellingRequestService.php
+
+		-
+			message: '#^Method App\\Services\\TraewellingRequestService\:\:getPostTags\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/TraewellingRequestService.php
+
+		-
+			message: '#^Method App\\Services\\TraewellingRequestService\:\:getPostTags\(\) should return array but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/TraewellingRequestService.php
+
+		-
+			message: '#^Method App\\Services\\TraewellingRequestService\:\:getTrwlStationFromIdentifier\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/TraewellingRequestService.php
+
+		-
+			message: '#^Method App\\Services\\TraewellingRequestService\:\:getTrwlStationFromIdentifier\(\) should return array\|null but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/TraewellingRequestService.php
+
+		-
+			message: '#^Method App\\Services\\TraewellingRequestService\:\:getTrwlStationFromLocation\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/TraewellingRequestService.php
+
+		-
+			message: '#^Method App\\Services\\TraewellingRequestService\:\:getTrwlStationFromLocation\(\) should return array\|null but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/TraewellingRequestService.php
+
+		-
+			message: '#^Method App\\Services\\TraewellingRequestService\:\:updatePost\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/TraewellingRequestService.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>access_token" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Services/TraewellingRequestService.php
+
+		-
+			message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: app/Services/TransitousRequestService.php
+
+		-
+			message: '#^Cannot access offset ''lat'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Services/TransitousRequestService.php
+
+		-
+			message: '#^Cannot access offset ''lon'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Services/TransitousRequestService.php
+
+		-
+			message: '#^Cannot access offset ''stopId'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Services/TransitousRequestService.php
+
+		-
+			message: '#^Method App\\Services\\TransitousRequestService\:\:getDepartures\(\) has parameter \$filter with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/TransitousRequestService.php
+
+		-
+			message: '#^Method App\\Services\\TransitousRequestService\:\:getDepartures\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/TransitousRequestService.php
+
+		-
+			message: '#^Method App\\Services\\TransitousRequestService\:\:getDeparturesWithStop\(\) has parameter \$filter with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/TransitousRequestService.php
+
+		-
+			message: '#^Method App\\Services\\TransitousRequestService\:\:getDeparturesWithStop\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/TransitousRequestService.php
+
+		-
+			message: '#^Method App\\Services\\TransitousRequestService\:\:getNearby\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/TransitousRequestService.php
+
+		-
+			message: '#^Method App\\Services\\TransitousRequestService\:\:getNearby\(\) return type has no value type specified in iterable type array\|\(Illuminate\\Support\\Collection&iterable\<App\\Dto\\MotisApi\\StopDto\>\)\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/TransitousRequestService.php
+
+		-
+			message: '#^Method App\\Services\\TransitousRequestService\:\:getNearby\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/TransitousRequestService.php
+
+		-
+			message: '#^Parameter \#1 \$data of method App\\Hydrators\\MotisHydrator\:\:hydrateGeocodeEntry\(\) expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/TransitousRequestService.php
+
+		-
+			message: '#^Parameter \#1 \$data of method App\\Hydrators\\MotisHydrator\:\:hydrateStop\(\) expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/TransitousRequestService.php
+
+		-
+			message: '#^Parameter \#1 \$data of method App\\Hydrators\\MotisHydrator\:\:hydrateStopPlace\(\) expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/TransitousRequestService.php
+
+		-
+			message: '#^Parameter \#1 \$data of method App\\Hydrators\\MotisHydrator\:\:hydrateStopTime\(\) expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/TransitousRequestService.php
+
+		-
+			message: '#^Parameter \#1 \$data of method App\\Hydrators\\MotisHydrator\:\:hydrateTrip\(\) expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/TransitousRequestService.php
+
+		-
+			message: '#^Parameter \#1 \$latitude of class App\\Dto\\Coordinate constructor expects float, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/TransitousRequestService.php
+
+		-
+			message: '#^Parameter \#1 \$value of function collect expects Illuminate\\Contracts\\Support\\Arrayable\<\(int\|string\), mixed\>\|iterable\<\(int\|string\), mixed\>\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Services/TransitousRequestService.php
+
+		-
+			message: '#^Parameter \#2 \$longitude of class App\\Dto\\Coordinate constructor expects float, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/TransitousRequestService.php
+
+		-
+			message: '#^Unable to resolve the template type TKey in call to function collect$#'
+			identifier: argument.templateType
+			count: 2
+			path: app/Services/TransitousRequestService.php
+
+		-
+			message: '#^Unable to resolve the template type TValue in call to function collect$#'
+			identifier: argument.templateType
+			count: 2
+			path: app/Services/TransitousRequestService.php
+
+		-
+			message: '#^Method App\\Services\\VersionService\:\:getCurrentGitCommit\(\) should return string\|null but returns string\|false\|null\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/VersionService.php
+
+		-
+			message: '#^Method App\\Services\\VersionService\:\:getVersion\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Services/VersionService.php
+
+		-
+			message: '#^Parameter \#1 \$haystack of function str_contains expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/VersionService.php
+
+		-
+			message: '#^Parameter \#2 \$needle of function str_contains expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/VersionService.php
+
+		-
+			message: '#^Parameter \#2 \.\.\.\$values of function sprintf expects bool\|float\|int\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/VersionService.php
+
+		-
+			message: '#^Parameter \#4 \.\.\.\$values of function sprintf expects bool\|float\|int\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/VersionService.php
+
+		-
+			message: '#^Parameter \#5 \.\.\.\$values of function sprintf expects bool\|float\|int\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/VersionService.php

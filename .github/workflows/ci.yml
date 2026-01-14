@@ -1,0 +1,236 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+
+jobs:
+  node-audit:
+    name: Node.js Security Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 25
+
+      - name: Check for vulnerabilities (without installing)
+        run: npm audit --package-lock-only
+
+  install-node-dependencies:
+    name: Install Node Dependencies & Build
+    runs-on: ubuntu-latest
+    needs: install-composer-dependencies
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.5
+          extensions: mbstring, ctype, fileinfo, json, openssl, pdo, tokenizer, xml
+
+      - name: Download vendor directory
+        uses: actions/download-artifact@v7
+        with:
+          name: vendor
+          path: vendor
+
+      - name: Copy .env
+        run: cp .env.example .env
+
+      - name: Generate key
+        run: php artisan key:generate
+
+      - name: Generate Ziggy routes
+        run: php artisan ziggy:generate
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 25
+          cache: npm
+
+      - name: Install npm Dependencies
+        run: npm ci
+
+      - name: Create Vite Production build
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: vite-build
+          path: public/build
+          retention-days: 1
+
+  install-composer-dependencies:
+    name: Install & Validate Composer Dependencies
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.5
+          extensions: mbstring, ctype, fileinfo, json, openssl, pdo, tokenizer, xml
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v5
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install Composer Dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --prefer-dist
+
+      - name: Upload vendor directory
+        uses: actions/upload-artifact@v6
+        with:
+          name: vendor
+          path: vendor
+          retention-days: 1
+
+  lint:
+    name: ESLint Code Quality Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 25
+          cache: npm
+
+      - name: Install npm Dependencies
+        run: npm ci
+
+      - name: Run format check
+        run: npm run format:check
+
+      - name: Run ESLint
+        run: npm run lint
+
+  pint:
+    name: Laravel Pint Code Style Check
+    runs-on: ubuntu-latest
+    needs: install-composer-dependencies
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.5
+          extensions: mbstring, ctype, fileinfo, json, openssl, pdo, tokenizer, xml
+
+      - name: Download vendor directory
+        uses: actions/download-artifact@v7
+        with:
+          name: vendor
+          path: vendor
+
+      - name: Run Laravel Pint
+        run: php vendor/bin/pint --test
+
+#  phpstan:
+#    name: PHPStan Static Analysis
+#    runs-on: ubuntu-latest
+#    needs: install-composer-dependencies
+#
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v6
+#
+#      - name: Setup PHP
+#        uses: shivammathur/setup-php@v2
+#        with:
+#          php-version: 8.5
+#          extensions: mbstring, ctype, fileinfo, json, openssl, pdo, tokenizer, xml
+#
+#      - name: Download vendor directory
+#        uses: actions/download-artifact@v7
+#        with:
+#          name: vendor
+#          path: vendor
+#
+#      - name: Run PHPStan
+#        run: php vendor/bin/phpstan analyse --memory-limit=2G
+
+  test:
+    name: Unit & Feature Tests with Coverage
+    runs-on: ubuntu-latest
+    needs: [install-node-dependencies, install-composer-dependencies]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Download vendor directory
+        uses: actions/download-artifact@v7
+        with:
+          name: vendor
+          path: vendor
+
+      - name: Download Vite build artifacts
+        uses: actions/download-artifact@v7
+        with:
+          name: vite-build
+          path: public/build
+
+      - name: Copy .env
+        run: cp .env.example .env
+
+      - name: Directory Permissions
+        run: chmod -R 777 storage bootstrap/cache
+
+      - name: Set Sail executable permissions
+        run: |
+          chmod +x vendor/bin/sail
+          chmod +x vendor/laravel/sail/bin/sail
+
+      - name: Start Sail
+        run: vendor/bin/sail up -d
+
+      - name: Wait for database
+        run: while ! vendor/bin/sail artisan migrate --force; do sleep 5; done
+
+      - name: Generate application key
+        run: vendor/bin/sail artisan key:generate
+
+      - name: Generate passport keys
+        run: vendor/bin/sail artisan passport:keys
+
+      - name: Run tests
+        run: vendor/bin/sail test --parallel
+
+      - name: Run optimizer
+        run: vendor/bin/sail artisan optimize
+
+      - name: Stop Sail
+        if: always()
+        run: vendor/bin/sail down
