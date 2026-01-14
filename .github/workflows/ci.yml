@@ -206,7 +206,9 @@ jobs:
         run: chmod -R 777 storage bootstrap/cache
 
       - name: Set Sail executable permissions
-        run: chmod +x vendor/bin/sail
+        run: |
+          chmod +x vendor/bin/sail
+          chmod +x vendor/laravel/sail/bin/sail
 
       - name: Start Sail
         run: vendor/bin/sail up -d
