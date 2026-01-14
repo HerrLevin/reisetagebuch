@@ -24,10 +24,8 @@ class UserController extends Controller
 
     public function showMap(string $username): Response|ResponseFactory
     {
-        $user = $this->userController->show($username);
-
         return inertia('Profile/ShowMap', [
-            'user' => $user,
+            'username' => $username,
         ]);
     }
 
