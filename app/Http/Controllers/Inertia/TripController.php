@@ -5,9 +5,7 @@ namespace App\Http\Controllers\Inertia;
 use App\Http\Controllers\Backend\TripController as BackendTripController;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTripRequest;
-use App\Models\TransportTrip;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -40,37 +38,5 @@ class TripController extends Controller
         }
 
         return redirect()->route('posts.create.stopovers', ['tripId' => $trip->foreign_trip_id, 'startId' => $origin->id, 'startTime' => $request->departureTime]);
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(TransportTrip $transportTrip)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(TransportTrip $transportTrip)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, TransportTrip $transportTrip)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(TransportTrip $transportTrip)
-    {
-        //
     }
 }

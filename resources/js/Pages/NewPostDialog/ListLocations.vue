@@ -7,22 +7,15 @@ import { LocationEntry, RequestLocationDto } from '@/types';
 import { Head, usePage } from '@inertiajs/vue3';
 import axios from 'axios';
 import { Search } from 'lucide-vue-next';
-import { PropType, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
 
-const props = defineProps({
-    locations: {
-        type: Array as PropType<LocationEntry[]>,
-        default: () => [] as LocationEntry[],
-        required: false,
-    },
-});
-
 const showStartButton = ref(false);
 showStartButton.value = route().current('posts.create.start');
 
+const locations = ref<LocationEntry[]>([]);
 const filteredLocations = ref<LocationEntry[]>([]);
 const search = ref<string>('');
 const fetchingProgress = ref<RequestLocationDto | null>(null);
@@ -54,11 +47,11 @@ let debounceTimeout: ReturnType<typeof setTimeout>;
 
 function filterLocations() {
     if (search.value.length <= 0 && fetchingProgress.value !== null) {
-        filteredLocations.value = props.locations;
+        filteredLocations.value = locations.value;
         return;
     }
 
-    filteredLocations.value = Object.values(props.locations).filter(
+    filteredLocations.value = Object.values(locations.value).filter(
         (location) =>
             location.name.toLowerCase().includes(search.value.toLowerCase()),
     );
@@ -67,36 +60,49 @@ function filterLocations() {
         clearTimeout(debounceTimeout);
         debounceTimeout = setTimeout(() => {
             loading.value = true;
-            axios
-                .get(
-                    route('api.location.search', {
-                        latitude: currentPosition.value!.coords.latitude,
-                        longitude: currentPosition.value!.coords.longitude,
-                        query: search.value,
-                    }),
-                )
-                .then((response) => {
-                    if (response.data) {
-                        const data = response.data as LocationEntry[];
-                        const existingIds = new Set(
-                            filteredLocations.value.map((l) => l.id),
-                        );
-                        const newLocations = data.filter(
-                            (l) => !existingIds.has(l.id),
-                        );
-                        filteredLocations.value = [
-                            ...filteredLocations.value,
-                            ...newLocations,
-                        ];
-                    }
-                    loading.value = false;
-                })
-                .catch((error) => {
-                    loading.value = false;
-                    console.error('Error fetching search results:', error);
-                });
+            fetchLocations();
         }, 500);
     }
+}
+
+function fetchLocations() {
+    if (!currentPosition.value) {
+        return;
+    }
+    loading.value = true;
+    axios
+        .get(
+            route('api.location.search', {
+                latitude: currentPosition.value!.coords.latitude,
+                longitude: currentPosition.value!.coords.longitude,
+                query: search.value,
+            }),
+        )
+        .then((response) => {
+            if (response.data) {
+                const data = response.data as LocationEntry[];
+                const existingLocationsIds = new Set(
+                    locations.value.map((l) => l.id),
+                );
+                const newBaseLocations = data.filter(
+                    (l) => !existingLocationsIds.has(l.id),
+                );
+                locations.value = [...locations.value, ...newBaseLocations];
+                const existingIds = new Set(
+                    filteredLocations.value.map((l) => l.id),
+                );
+                const newLocations = data.filter((l) => !existingIds.has(l.id));
+                filteredLocations.value = [
+                    ...filteredLocations.value,
+                    ...newLocations,
+                ];
+            }
+            loading.value = false;
+        })
+        .catch((error) => {
+            loading.value = false;
+            console.error('Error fetching search results:', error);
+        });
 }
 filterLocations();
 fetchRequestLocation();
@@ -111,16 +117,23 @@ const fetchInterval = setInterval(() => {
 watch(fetchingProgress, (newValue) => {
     if (newValue) {
         const progress = (newValue.fetched / newValue.toFetch) * 100;
-        if (progress >= 100) {
+        if (progress >= 100 || newValue.fetched === newValue.toFetch) {
             clearInterval(fetchInterval);
             fetchingProgress.value = null; // Reset after completion
         }
     }
 });
 
+watch(currentPosition, (newValue, oldValue) => {
+    if (newValue && oldValue === null) {
+        fetchLocations();
+    }
+});
+
 watch(search, () => {
     filterLocations();
 });
+fetchLocations();
 </script>
 
 <template>

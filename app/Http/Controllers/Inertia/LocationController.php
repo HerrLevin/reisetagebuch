@@ -6,9 +6,7 @@ use App\Http\Controllers\Backend\LocationController as BackendLocationController
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DeparturesRequest;
 use App\Http\Requests\LocationHistoryRequest;
-use App\Http\Requests\NearbyLocationRequest;
 use App\Http\Requests\StopoverRequest;
-use App\Http\Resources\LocationDto;
 use App\Models\User;
 use Carbon\Carbon;
 use Clickbar\Magellan\Data\Geometries\Point;
@@ -37,16 +35,9 @@ class LocationController extends Controller
         ]);
     }
 
-    public function nearby(NearbyLocationRequest $request): Response|ResponseFactory
+    public function nearby(): Response|ResponseFactory
     {
-        $point = Point::makeGeodetic($request->latitude, $request->longitude);
-        $locations = $this->locationController->nearby($point);
-
-        return inertia('NewPostDialog/ListLocations', [
-            'locations' => $locations->map(fn ($location) => new LocationDto($location))->toArray(),
-            'latitude' => $request->latitude,
-            'longitude' => $request->longitude,
-        ]);
+        return inertia('NewPostDialog/ListLocations');
     }
 
     public function departures(DeparturesRequest $request): Response|ResponseFactory

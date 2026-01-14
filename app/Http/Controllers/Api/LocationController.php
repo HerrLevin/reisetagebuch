@@ -7,6 +7,7 @@ use App\Dto\RequestLocationDto;
 use App\Http\Controllers\Backend\LocationController as BackendLocationController;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GeocodeRequest;
+use App\Http\Requests\NearbyLocationRequest;
 use App\Http\Resources\LocationDto;
 use App\Jobs\PrefetchJob;
 use Clickbar\Magellan\Data\Geometries\Point;
@@ -75,6 +76,14 @@ class LocationController extends Controller
         $locations = $this->locationController->searchNearby($point, $request->input('query'), $radius);
 
         return array_values($locations->map(fn ($location) => new LocationDto($location))->toArray());
+    }
+
+    public function nearby(NearbyLocationRequest $request)
+    {
+        $point = Point::makeGeodetic($request->latitude, $request->longitude);
+        $locations = $this->locationController->nearby($point);
+
+        return $locations->map(fn ($location) => new LocationDto($location))->toArray();
     }
 
     public function geocode(GeocodeRequest $request)
