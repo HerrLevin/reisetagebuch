@@ -31,11 +31,14 @@ class PostRepository
 
     private PostMetaInfoRepository $postMetaInfoRepository;
 
-    public function __construct(?PostHydrator $postHydrator = null, ?HashTagRepository $hashTagRepository = null, ?PostMetaInfoRepository $postMetaInfoRepository = null)
+    private UserRepository $userRepository;
+
+    public function __construct(?PostHydrator $postHydrator = null, ?HashTagRepository $hashTagRepository = null, ?PostMetaInfoRepository $postMetaInfoRepository = null, ?UserRepository $userRepository = null)
     {
         $this->postHydrator = $postHydrator ?? new PostHydrator;
         $this->hashTagRepository = $hashTagRepository ?? new HashTagRepository;
         $this->postMetaInfoRepository = $postMetaInfoRepository ?? new PostMetaInfoRepository;
+        $this->userRepository = $userRepository ?? new UserRepository;
     }
 
     public function storeLocation(
@@ -275,9 +278,11 @@ class PostRepository
 
     public function getPostsForUser(User|string $user, ?User $visitingUser = null): PostPaginationDto
     {
-        if ($user instanceof User) {
-            $user = $user->id;
+        if (! $user instanceof User) {
+            $user = $this->userRepository->getUserByUsername($user);
         }
+
+        $user = $user->id;
 
         $posts = Post::with(['user', 'locationPost.location', 'locationPost.location.tags', 'transportPost', 'transportPost.origin', 'transportPost.destination', 'hashTags'])
             ->withCount('likes')

@@ -30,4 +30,9 @@ class UserController extends Controller
 
         return new GeojsonGenerator()->generateGeometryCollection($locations);
     }
+
+    public function show(string $username)
+    {
+        return $this->userController->show($username);
+    }
 }

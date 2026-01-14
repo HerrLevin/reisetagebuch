@@ -7,7 +7,13 @@ use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\UserController;
 
-Route::get('profile/{username}/map-data', [UserController::class, 'mapData'])->name('profile.mapdata');
+Route::prefix('profile')->group(function () {
+    Route::prefix('{username}')->group(function () {
+        Route::get('map-data', [UserController::class, 'mapData'])->name('profile.mapdata');
+        Route::get('posts', [PostController::class, 'postsForUsername'])->name('profile.posts');
+        Route::get('', [UserController::class, 'show']);
+    });
+});
 
 Route::middleware('auth:api')->group(function () {
     Route::get('/timeline', [PostController::class, 'timeline'])
