@@ -1,60 +1,77 @@
 <script setup lang="ts">
+import Loading from '@/Components/Loading.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import StopoversListEntry from '@/Pages/NewPostDialog/Partials/StopoversListEntry.vue';
 import { getEmoji } from '@/Services/DepartureTypeService';
 import { StopPlace, TripDto } from '@/types';
 import { Head, router } from '@inertiajs/vue3';
+import axios from 'axios';
 import { DateTime } from 'luxon';
-import { PropType, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
 
-const props = defineProps({
-    trip: {
-        type: Object as PropType<TripDto> | null,
-        required: false,
-        default: () => null,
-    },
-    startTime: {
-        type: String,
-        default: '',
-    },
-    tripId: {
-        type: String,
-        default: '',
-    },
-    startId: {
-        type: String,
-        default: '',
-    },
-    postId: {
-        type: String,
-        default: '',
-    },
-});
-const stopovers = ref([] as StopPlace[]);
-const filterTime = props.startTime ? DateTime.fromISO(props.startTime) : null;
+const urlParams = new URLSearchParams(window.location.search);
+const tripId = ref<string>(urlParams.get('tripId') || '');
+const startId = ref<string>(urlParams.get('startId') || '');
+const startTime = ref<string>(urlParams.get('startTime') || '');
+const postId = ref<string>(urlParams.get('postId') || '');
 
-stopovers.value = props.trip?.legs[0]
-    ? [...props.trip!.legs[0].intermediateStops, props.trip!.legs[0].to]
-    : [];
+const trip = ref<TripDto | null>(null);
+const stopovers = ref<StopPlace[]>([]);
+const loading = ref(true);
 
-stopovers.value = stopovers.value.filter((stopover) => {
-    const time = stopover.scheduledDeparture || stopover.scheduledArrival;
-    const luxonTime = time ? DateTime.fromISO(time) : null;
+async function loadStopovers() {
+    loading.value = true;
+    try {
+        const response = await axios.get('/api/locations/stopovers', {
+            params: {
+                tripId: tripId.value,
+                startId: startId.value,
+                startTime: startTime.value,
+            },
+        });
+        trip.value = response.data.trip;
+        startTime.value = response.data.startTime;
+        startId.value = response.data.startId;
+        tripId.value = response.data.tripId;
 
-    if (filterTime && luxonTime) {
-        return luxonTime >= filterTime;
+        const filterTime = startTime.value
+            ? DateTime.fromISO(startTime.value)
+            : null;
+
+        stopovers.value = trip.value?.legs[0]
+            ? [...trip.value.legs[0].intermediateStops, trip.value.legs[0].to]
+            : [];
+
+        stopovers.value = stopovers.value.filter((stopover) => {
+            const time =
+                stopover.scheduledDeparture || stopover.scheduledArrival;
+            const luxonTime = time ? DateTime.fromISO(time) : null;
+
+            if (filterTime && luxonTime) {
+                return luxonTime >= filterTime;
+            }
+            return true;
+        });
+    } catch (error) {
+        console.error('Error loading stopovers:', error);
+    } finally {
+        loading.value = false;
     }
+}
+
+onMounted(() => {
+    loadStopovers();
 });
 
 function submit(stopover: StopPlace) {
-    if (props.postId && props.postId.length > 0) {
+    if (postId.value && postId.value.length > 0) {
         console.log(stopover);
-        router.put(route('posts.update.transport-post', props.postId), {
+        router.put(route('posts.update.transport-post', postId.value), {
             stopId: stopover.tripStopId,
-            postId: props.postId,
+            postId: postId.value,
         });
         return;
     }
@@ -64,31 +81,31 @@ function submit(stopover: StopPlace) {
 
 function redirectCreatePost(stopover: StopPlace) {
     const params = {
-        tripId: props.tripId,
-        startId: props.startId,
-        startTime: props.startTime,
+        tripId: tripId.value,
+        startId: startId.value,
+        startTime: startTime.value,
         stopId: stopover.stopId,
         stopTime: stopover.scheduledDeparture || stopover.scheduledArrival,
         stopName: stopover.name,
-        stopMode: props.trip?.legs[0].mode,
+        stopMode: trip.value?.legs[0].mode,
         lineName:
-            props.trip?.legs[0].displayName ||
-            props.trip?.legs[0].routeShortName,
+            trip.value?.legs[0].displayName ||
+            trip.value?.legs[0].routeShortName,
     };
     window.location.href = route('posts.create.transport-post', params);
 }
 
 function getTitle() {
-    let title = props.trip?.legs[0].mode
-        ? getEmoji(props.trip?.legs[0].mode)
+    let title = trip.value?.legs[0].mode
+        ? getEmoji(trip.value?.legs[0].mode)
         : '';
     title =
         title +
         ' ' +
-        ((props.trip?.legs[0].displayName ||
-            props.trip?.legs[0].routeShortName) ??
+        ((trip.value?.legs[0].displayName ||
+            trip.value?.legs[0].routeShortName) ??
             '');
-    return title + ' ➜ ' + props.trip?.legs[0].headSign;
+    return title + ' ➜ ' + trip.value?.legs[0].headSign;
 }
 </script>
 
@@ -101,7 +118,8 @@ function getTitle() {
                 {{ t('new_post.select_exit') }}
             </h2>
         </template>
-        <div class="card bg-base-100 mb-10 min-w-full shadow-md">
+        <Loading v-if="loading" class="mx-auto my-4"></Loading>
+        <div v-else class="card bg-base-100 mb-10 min-w-full shadow-md">
             <!-- Results -->
             <ul class="list">
                 <li class="p-4 pb-2 text-xs tracking-wide opacity-60">

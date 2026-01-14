@@ -3,15 +3,22 @@
 namespace App\Http\Controllers\Api;
 
 use App\Dto\ErrorDto;
+use App\Dto\LocationHistoryDto;
 use App\Dto\RequestLocationDto;
 use App\Http\Controllers\Backend\LocationController as BackendLocationController;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\DeparturesRequest;
 use App\Http\Requests\GeocodeRequest;
+use App\Http\Requests\LocationHistoryRequest;
 use App\Http\Requests\NearbyLocationRequest;
+use App\Http\Requests\StopoverRequest;
 use App\Http\Resources\LocationDto;
 use App\Jobs\PrefetchJob;
+use App\Models\User;
+use Carbon\Carbon;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class LocationController extends Controller
@@ -112,5 +119,58 @@ class LocationController extends Controller
         }
 
         return $locations;
+    }
+
+    public function index(LocationHistoryRequest $request): LocationHistoryDto
+    {
+        $when = $request->when ? Carbon::parse($request->when) : Carbon::now();
+
+        return $this->locationController->index(
+            $request->user()->id,
+            $when->startOfDay(),
+            $when->clone()->endOfDay()
+        );
+    }
+
+    public function departures(DeparturesRequest $request): JsonResponse
+    {
+        $filter = $request->filter ? explode(',', $request->filter) : [];
+        $time = $request->when ? Carbon::parse($request->when) : now()->subMinutes(2);
+        $request->user()->load('settings');
+        /** @var User $user */
+        $user = $request->user();
+        $radius = $user->settings->motis_radius;
+
+        if (! empty($request->identifier)) {
+            $departures = $this->locationController->departuresByIdentifier($request->identifier, $time, $filter);
+        } else {
+            $point = Point::makeGeodetic($request->latitude, $request->longitude);
+            $departures = $this->locationController->departuresNearby($point, $time, $filter, $radius);
+        }
+
+        return response()->json([
+            'departures' => $departures,
+            'filter' => $filter,
+            'requestTime' => $time->toIso8601String(),
+            'requestIdentifier' => $request->identifier,
+            'requestLatitude' => (float) $request->latitude,
+            'requestLongitude' => (float) $request->longitude,
+        ]);
+    }
+
+    public function stopovers(StopoverRequest $request): JsonResponse
+    {
+        $trip = $this->locationController->stopovers(
+            tripId: $request->tripId,
+            startId: $request->startId,
+            startTime: $request->startTime
+        );
+
+        return response()->json([
+            'trip' => $trip,
+            'startTime' => $request->startTime,
+            'startId' => $request->startId,
+            'tripId' => $request->tripId,
+        ]);
     }
 }
