@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { UserDto } from '@/types';
 import {
     MglCircleLayer,
     MglGeoJsonSource,
@@ -19,9 +18,9 @@ import {
 import { PropType, ref } from 'vue';
 
 const props = defineProps({
-    user: {
-        type: Object as PropType<UserDto>,
-        default: () => ({}),
+    username: {
+        type: String as PropType<string>,
+        required: true,
     },
 });
 
@@ -41,12 +40,12 @@ const bounds = ref(undefined as LngLatBoundsLike | undefined);
 const geoJson = ref(undefined as GeometryCollection | undefined);
 
 axios
-    .get('/api/profile/' + props.user.username + '/map-data')
+    .get('/api/profile/' + props.username + '/map-data')
     .then((json) => {
         geoJson.value = json.data;
         const mapBounds = new LngLatBounds();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        json.geometries.forEach((geometry: any) => {
+        geoJson.value?.geometries.forEach((geometry: any) => {
             mapBounds.extend(geometry.coordinates);
         });
         bounds.value = mapBounds;

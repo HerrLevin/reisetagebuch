@@ -15,7 +15,6 @@ const props = defineProps<{ username: string }>();
 
 const posts = ref<Array<BasePost | TransportPost | LocationPost>>([]);
 const nextCursor = ref<string | null>(null);
-const prevCursor = ref<string | null>(null);
 const user = ref<UserDto | null>(null);
 const loading = ref(true);
 const userLoading = ref(true);
