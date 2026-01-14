@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import Loading from '@/Components/Loading.vue';
 import LocationHistoryMap from '@/Components/Maps/LocationHistoryMap.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { LocationHistoryDto, TripHistoryEntryDto } from '@/types';
+import axios from 'axios';
 import { ArrowLeft, ArrowRight } from 'lucide-vue-next';
 import { DateTime } from 'luxon';
 import { ref } from 'vue';
@@ -9,27 +11,30 @@ import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
 
-const props = defineProps({
-    locations: {
-        type: Array as () => LocationHistoryDto[],
-        required: true,
-    },
-    trips: {
-        type: Array as () => TripHistoryEntryDto[],
-        required: true,
-    },
-    when: {
-        type: String,
-        default: '',
-    },
-});
+const selectedDate = ref<DateTime>(DateTime.now());
+const locations = ref<LocationHistoryDto[]>([]);
+const trips = ref<TripHistoryEntryDto[]>([]);
+const loading = ref(true);
 
-const selectedDate = ref<DateTime | null>();
-
-selectedDate.value = props.when ? DateTime.fromISO(props.when) : null;
+async function fetchData() {
+    loading.value = true;
+    try {
+        const response = await axios.get('/api/locations/history', {
+            params: {
+                when: selectedDate.value.toISODate(),
+            },
+        });
+        locations.value = response.data.locations;
+        trips.value = response.data.trips;
+    } catch (error) {
+        console.error('Error loading location history:', error);
+    } finally {
+        loading.value = false;
+    }
+}
 
 function countWaypoints() {
-    const waypoints = props.locations.filter(
+    const waypoints = locations.value.filter(
         (location) => location.name === null,
     );
 
@@ -38,35 +43,27 @@ function countWaypoints() {
 
 function selectDate(newValue: string) {
     if (newValue) {
-        window.location.href = route('location-history.index', {
-            when: newValue,
-        });
+        selectedDate.value = DateTime.fromISO(newValue);
+        fetchData();
     }
 }
 
 function previousDay() {
-    if (selectedDate.value) {
-        const previous = selectedDate.value.minus({ days: 1 });
-        selectDate(previous.toISODate() || '');
-    } else {
-        const previous = DateTime.now().minus({ days: 1 });
-        selectDate(previous.toISODate() || '');
-    }
+    selectedDate.value = selectedDate.value.minus({ days: 1 });
+    fetchData();
 }
 
 function nextDay() {
-    if (selectedDate.value) {
-        const next = selectedDate.value.plus({ days: 1 });
-        selectDate(next.toISODate() || '');
-    } else {
-        const next = DateTime.now().plus({ days: 1 });
-        selectDate(next.toISODate() || '');
-    }
+    selectedDate.value = selectedDate.value.plus({ days: 1 });
+    fetchData();
 }
 
 function today() {
-    window.location.href = route('location-history.index');
+    selectedDate.value = DateTime.now();
+    fetchData();
 }
+
+fetchData();
 </script>
 
 <template>
@@ -112,7 +109,8 @@ function today() {
                     </button>
                 </div>
             </div>
-            <template v-if="locations.length > 0 || trips.length > 0">
+            <Loading v-if="loading" class="mx-auto my-4"></Loading>
+            <template v-else-if="locations.length > 0 || trips.length > 0">
                 <LocationHistoryMap :locations="locations" :trips="trips" />
                 <div
                     class="card bg-base-100 min-w-full p-8 text-center shadow-md"

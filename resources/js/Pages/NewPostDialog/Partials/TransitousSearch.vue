@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import Typeahead, { Suggestion } from '@/Components/Typeahead.vue';
-import { Area } from '@/types';
+import { Area, StopDto } from '@/types';
 import { AutocompleteResponse } from '@/types/motis';
 import axios from 'axios';
-import { ref } from 'vue';
+import { PropType, ref, watch } from 'vue';
 import { debounce } from 'vue-debounce';
 import { useI18n } from 'vue-i18n';
 
@@ -18,9 +18,9 @@ const props = defineProps({
         type: Number,
         default: 0,
     },
-    locationName: {
-        type: String,
-        default: '',
+    stop: {
+        type: Object as PropType<StopDto | null>,
+        default: null,
     },
     placeholder: {
         type: String,
@@ -34,7 +34,7 @@ const loading = ref(false);
 
 const emit = defineEmits(['select', 'selectIdentifier']);
 
-search.value = props.locationName || '';
+search.value = props.stop?.name || '';
 
 function fetchSuggestions() {
     if (search.value.length < 3) {
@@ -122,6 +122,13 @@ function submitTypeahead(element: Suggestion) {
         emit('select', element.value as AutocompleteResponse);
     }
 }
+
+watch(
+    () => props.stop,
+    (newValue) => {
+        search.value = newValue?.name || '';
+    },
+);
 </script>
 
 <template>

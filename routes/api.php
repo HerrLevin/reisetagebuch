@@ -52,5 +52,11 @@ Route::middleware('auth:api')->group(function () {
     Route::prefix('locations')->group(function () {
         Route::get('/nearby', [ApiLocationController::class, 'search'])
             ->name('api.location.search');
+        Route::get('/history', [ApiLocationController::class, 'index'])
+            ->name('api.location.history');
+        Route::get('/departures', [ApiLocationController::class, 'departures'])
+            ->name('api.location.departures');
+        Route::get('/stopovers', [ApiLocationController::class, 'stopovers'])
+            ->name('api.location.stopovers');
     });
 });

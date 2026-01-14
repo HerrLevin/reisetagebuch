@@ -90,7 +90,7 @@ function submitTypeahead(identifier: string | null) {
             <li class="list-row">
                 <div class="list-col-grow">
                     <TransitousSearch
-                        :location-name="props.location?.name"
+                        :stop="props.location"
                         :latitude="props.latitude"
                         :longitude="props.longitude"
                         @select-identifier="submitTypeahead"

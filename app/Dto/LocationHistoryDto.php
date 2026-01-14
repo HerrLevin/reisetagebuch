@@ -4,10 +4,13 @@ namespace App\Dto;
 
 use App\Http\Resources\LocationHistoryEntryDto;
 use App\Http\Resources\TripHistoryEntryDto;
+use App\Traits\JsonResponseObject;
 use Illuminate\Support\Collection;
 
 readonly class LocationHistoryDto
 {
+    use JsonResponseObject;
+
     /** @var Collection<int, LocationHistoryEntryDto> */
     public Collection $locations;
 
