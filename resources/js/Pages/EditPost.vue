@@ -11,9 +11,9 @@ import {
     TransportPost,
 } from '@/types/PostTypes';
 import { Head, router } from '@inertiajs/vue3';
+import axios from 'axios';
 import { reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import axios from 'axios';
 
 const { t } = useI18n();
 
@@ -28,6 +28,7 @@ const post = ref<BasePost | TransportPost | LocationPost | null>(null);
 const title = ref<string>(t('edit_post.title'));
 const subtitle = ref<string>('');
 const fullTitle = ref<string>(t('edit_post.title'));
+const loading = ref<boolean>(false);
 
 function goBack() {
     window.history.back();
@@ -63,10 +64,20 @@ function submitForm() {
     if (!post.value) {
         return;
     }
+    loading.value = true;
     if (!form.body?.trim()) {
         form.body = undefined;
     }
-    router.patch(route('posts.update', post.value.id), form);
+
+    axios
+        .patch(`/api/posts/${props.postId}`, form)
+        .then((response) => {
+            const postId = response.data.id;
+            router.visit(`/posts/${postId}`);
+        })
+        .finally(() => {
+            loading.value = false;
+        });
 }
 
 function prefillForm() {

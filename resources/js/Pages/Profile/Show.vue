@@ -58,6 +58,13 @@ const loadPosts = async () => {
     }
 };
 
+function deletePost(postId: string): void {
+    const index = posts.value.findIndex((post) => post.id === postId);
+    if (index !== -1) {
+        posts.value.splice(index, 1);
+    }
+}
+
 loadProfileData();
 loadPosts();
 </script>
@@ -74,7 +81,10 @@ loadPosts();
                         as="div"
                         :href="route('posts.show', post.id)"
                     >
-                        <Post :post="post"></Post>
+                        <Post
+                            :post="post"
+                            @delete:post="deletePost(post.id)"
+                        ></Post>
                     </Link>
                 </li>
                 <li v-show="!loading && nextCursor" class="p-4 text-center">

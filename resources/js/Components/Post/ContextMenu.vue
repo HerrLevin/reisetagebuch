@@ -2,6 +2,7 @@
 import { getOwnShareText, getShareText } from '@/Services/PostTextService';
 import { BasePost, isTransportPost, TransportPost } from '@/types/PostTypes';
 import { Link, useForm, usePage } from '@inertiajs/vue3';
+import axios from 'axios';
 import {
     ClockPlus,
     Ellipsis,
@@ -11,7 +12,7 @@ import {
     Trash2,
     UserRoundPlus,
 } from 'lucide-vue-next';
-import { PropType, useTemplateRef } from 'vue';
+import { PropType, ref, useTemplateRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -27,18 +28,22 @@ const emit = defineEmits(['delete:post']);
 
 const deleteModal = useTemplateRef('deleteModal');
 const form = useForm({});
+const deleteProcessing = ref(false);
 
 function deletePost() {
-    form.delete(route('posts.destroy', props.post.id), {
-        preserveScroll: true,
-        onSuccess: () => {
+    deleteProcessing.value = true;
+    axios
+        .delete('/api/posts/' + props.post.id)
+        .then(() => {
             deleteModal.value?.close();
             emit('delete:post', props.post.id);
-        },
-        onFinish: () => {
-            form.reset();
-        },
-    });
+        })
+        .catch(() => {
+            // handle error
+        })
+        .finally(() => {
+            deleteProcessing.value = false;
+        });
 }
 
 const isSameUser = () => {
@@ -177,7 +182,7 @@ function blur() {
                 <button
                     class="btn btn-error"
                     :class="{ 'opacity-25': form.processing }"
-                    :disabled="form.processing"
+                    :disabled="deleteProcessing"
                     @click.prevent="deletePost()"
                 >
                     {{ t('verbs.delete') }}

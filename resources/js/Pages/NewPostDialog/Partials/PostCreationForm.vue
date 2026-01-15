@@ -69,6 +69,10 @@ const props = defineProps({
         type: String as () => string | null,
         default: null,
     },
+    loading: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const emit = defineEmits([
@@ -343,7 +347,7 @@ function updateTripId(event: Event) {
         <button class="btn btn-secondary" @click.prevent="$emit('cancel')">
             {{ t('verbs.cancel') }}
         </button>
-        <button class="btn btn-primary" type="submit">
+        <button class="btn btn-primary" type="submit" :disabled="loading">
             {{ confirmButtonText || t('verbs.confirm') }}
         </button>
     </div>

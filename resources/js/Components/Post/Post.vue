@@ -21,6 +21,7 @@ import { PropType } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
+const emit = defineEmits(['delete:post']);
 
 const props = defineProps({
     post: {
@@ -39,7 +40,7 @@ if (date.diffNow('days').days < -1) {
 }
 </script>
 
-<template>
+<template v-show="!deleted">
     <div class="avatar">
         <div class="bg-primary size-10 rounded-xl">
             <img
@@ -111,7 +112,7 @@ if (date.diffNow('days').days < -1) {
             :post="post as TransportPost"
         />
         <HashTags :hash-tags="post.hashTags" />
-        <Interactions :post />
+        <Interactions :post @delete:post="emit('delete:post')" />
     </div>
 </template>
 

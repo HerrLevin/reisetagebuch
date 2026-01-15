@@ -1,23 +1,46 @@
 <script setup lang="ts">
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import type { Invite } from '@/types';
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
+import axios from 'axios';
 import { DateTime } from 'luxon';
-import { PropType } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
 
-defineProps({
-    invites: {
-        type: Array as PropType<Array<Invite>>,
-        default: () => [],
-    },
-});
+const invites = ref<Invite[]>([]);
+const loading = ref(false);
 
-const createForm = useForm({
-    expiresAt: null,
-});
+async function fetchInvites(): Promise<void> {
+    loading.value = true;
+    try {
+        const response = await axios.get('/api/invites');
+        invites.value = response.data;
+    } finally {
+        loading.value = false;
+    }
+}
+
+async function createInvite(): Promise<void> {
+    loading.value = true;
+    try {
+        await axios.post('/api/invites');
+        await fetchInvites();
+    } finally {
+        loading.value = false;
+    }
+}
+
+async function deleteInvite(inviteCode: string): Promise<void> {
+    loading.value = true;
+    try {
+        await axios.delete(`/api/invites/${inviteCode}`);
+        await fetchInvites();
+    } finally {
+        loading.value = false;
+    }
+}
 
 function humanTimestamp(timestamp: string | null): string {
     if (!timestamp) {
@@ -31,14 +54,16 @@ function copy(id: string): void {
     navigator.clipboard
         .writeText(registerRoute + '?invite=' + id)
         .then(() => {
-            // show success message
             alert(t('invites.copied_to_clipboard'));
         })
         .catch(() => {
-            // show error message
             alert(t('invites.copy_failed'));
         });
 }
+
+onMounted(() => {
+    fetchInvites();
+});
 </script>
 <template>
     <Head :title="t('invites.title')" />
@@ -52,11 +77,14 @@ function copy(id: string): void {
 
         <div class="card bg-base-100 flex min-w-full shadow-md">
             <div class="flex min-w-full justify-center py-5">
-                <form @submit.prevent="createForm.post('/invites')">
-                    <button type="submit" class="btn btn-primary">
-                        {{ t('invites.create_invite') }}
-                    </button>
-                </form>
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    :disabled="loading"
+                    @click="createInvite"
+                >
+                    {{ t('invites.create_invite') }}
+                </button>
             </div>
             <div class="divider"></div>
             <div class="overflow-x-auto">
@@ -76,6 +104,7 @@ function copy(id: string): void {
                                     type="text"
                                     class="input input-bordered w-full"
                                     :value="invite.id"
+                                    readonly
                                 />
                             </td>
                             <td>{{ humanTimestamp(invite.createdAt) }}</td>
@@ -86,14 +115,13 @@ function copy(id: string): void {
                                 </button>
                             </td>
                             <td>
-                                <Link
-                                    :href="route('invites.destroy', invite.id)"
-                                    method="delete"
-                                    as="button"
+                                <button
                                     class="btn btn-error"
+                                    :disabled="loading"
+                                    @click="deleteInvite(invite.id)"
                                 >
                                     {{ t('verbs.delete') }}
-                                </Link>
+                                </button>
                             </td>
                         </tr>
                     </tbody>

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Backend;
 
-use App\Dto\MotisApi\TripDto;
 use App\Dto\PostPaginationDto;
 use App\Enums\PostMetaInfo\TravelReason;
 use App\Enums\PostMetaInfo\TravelRole;
@@ -22,7 +21,6 @@ use App\Http\Requests\TransportTimesUpdateRequest;
 use App\Http\Resources\PostTypes\BasePost;
 use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
-use App\Hydrators\DbTripHydrator;
 use App\Jobs\PrefetchJob;
 use App\Jobs\TraewellingChangeExitJob;
 use App\Jobs\TraewellingCrossCheckInJob;
@@ -150,11 +148,10 @@ class PostController extends Controller
         return $post;
     }
 
-
     /**
      * @throws AuthorizationException
      */
-    public function updatePost(string $postId, BasePostRequest $request): BasePost
+    public function updatePost(string $postId, BasePostRequest $request): BasePost|LocationPost|TransportPost
     {
         $post = $this->postRepository->getById($postId, Auth::user());
         $this->authorize('update', $post);

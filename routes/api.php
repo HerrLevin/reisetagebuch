@@ -1,11 +1,13 @@
 <?php
 
+use App\Http\Controllers\Api\InviteController;
 use App\Http\Controllers\Api\LikeController;
 use App\Http\Controllers\Api\LocationController as ApiLocationController;
 use App\Http\Controllers\Api\MapController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\UserController;
+use Illuminate\Support\Facades\Route;
 
 Route::prefix('profile')->group(function () {
     Route::prefix('{username}')->group(function () {
@@ -27,13 +29,29 @@ Route::middleware('auth:api')->group(function () {
         ->name('api.request-location.get');
 
     Route::prefix('posts')->group(function () {
+        Route::post('/', [PostController::class, 'storeText'])->name('posts.create.text-post.store');
+
+        Route::post('/location', [PostController::class, 'storeLocation'])->name('posts.create.post.store');
+
+        Route::get('/filter', [PostController::class, 'filter'])->name('api.posts.filter');
+        Route::post('/mass-edit', [PostController::class, 'massEdit'])->name('api.posts.mass-edit');
         Route::prefix('{post}')->group(function () {
             Route::get('/', [PostController::class, 'show'])
                 ->name('api.posts.show');
+            Route::patch('/', [PostController::class, 'update'])->name('posts.update');
+
             Route::post('/like', [LikeController::class, 'store'])
                 ->name('posts.like');
             Route::delete('/like', [LikeController::class, 'destroy'])
                 ->name('posts.unlike');
+            Route::delete('/', [PostController::class, 'destroy'])
+                ->name('api.posts.destroy');
+        });
+
+        Route::prefix('transport')->group(function () {
+            Route::post('/', [PostController::class, 'storeTransport'])->name('posts.create.transport-post.store');
+            Route::put('/{postId}', [PostController::class, 'updateTransport'])->name('posts.update.transport-post');
+            Route::put('/{postId}/times', [PostController::class, 'updateTimesTransport'])->name('posts.update.transport-times');
         });
     });
 
@@ -64,5 +82,11 @@ Route::middleware('auth:api')->group(function () {
             ->name('api.location.departures');
         Route::get('/stopovers', [ApiLocationController::class, 'stopovers'])
             ->name('api.location.stopovers');
+    });
+
+    Route::prefix('invites')->group(function () {
+        Route::get('/', [InviteController::class, 'index'])->name('api.invites.index');
+        Route::post('/', [InviteController::class, 'store'])->name('api.invites.store');
+        Route::delete('/{inviteCode}', [InviteController::class, 'destroy'])->name('api.invites.destroy');
     });
 });

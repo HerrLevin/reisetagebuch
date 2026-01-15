@@ -1,24 +1,56 @@
 <script setup lang="ts">
+import Loading from '@/Components/Loading.vue';
 import Post from '@/Components/Post/Post.vue';
 import { BasePost, LocationPost, TransportPost } from '@/types/PostTypes';
 import { Link } from '@inertiajs/vue3';
-import type { PropType } from 'vue';
+import axios from 'axios';
+import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
 
-defineProps({
-    posts: {
-        type: Array as PropType<Array<BasePost | TransportPost | LocationPost>>,
-        default: () => [],
-    },
-    showNext: {
-        type: Boolean,
-        default: false,
-    },
+const posts = ref<Array<BasePost | TransportPost | LocationPost>>([]);
+const loading = ref(false);
+const nextCursor = ref<string | null>(null);
+
+loading.value = true;
+axios.get('/api/timeline').then((response) => {
+    posts.value = response.data.items;
+    nextCursor.value = response.data.nextCursor;
+    loading.value = false;
 });
 
-const emit = defineEmits(['next']);
+function loadMore() {
+    if (loading.value || !nextCursor.value) {
+        return;
+    }
+
+    loading.value = true;
+    axios
+        .get('/api/timeline', {
+            params: {
+                cursor: nextCursor.value,
+            },
+        })
+        .then((response) => {
+            posts.value.push(...response.data.items);
+            if (response.data.nextCursor === nextCursor.value) {
+                nextCursor.value = null;
+                return;
+            }
+            nextCursor.value = response.data.nextCursor;
+        })
+        .finally(() => {
+            loading.value = false;
+        });
+}
+
+function removePost(postId: string): void {
+    const index = posts.value.findIndex((post) => post.id === postId);
+    if (index !== -1) {
+        posts.value.splice(index, 1);
+    }
+}
 </script>
 
 <template>
@@ -32,14 +64,15 @@ const emit = defineEmits(['next']);
                 as="div"
                 :href="route('posts.show', post.id)"
             >
-                <Post :post="post"></Post>
+                <Post :post="post" @delete:post="removePost(post.id)"></Post>
             </Link>
         </li>
-        <li v-show="showNext" class="p-4 text-center">
-            <button class="btn btn-ghost w-full" @click="emit('next')">
+        <li v-show="!loading && !!nextCursor" class="p-4 text-center">
+            <button class="btn btn-ghost w-full" @click="loadMore()">
                 {{ t('common.load_more') }}
             </button>
         </li>
+        <Loading v-show="loading" class="m-4 mx-auto" />
         <!--        <InfiniteScroller :only="['posts']" />-->
     </ul>
 </template>

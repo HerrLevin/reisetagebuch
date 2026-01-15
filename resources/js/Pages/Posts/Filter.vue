@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import InfiniteScroller from '@/Components/InfiniteScroller.vue';
+import Loading from '@/Components/Loading.vue';
 import MassEdit from '@/Components/Post/MassEdit.vue';
 import Post from '@/Components/Post/Post.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
@@ -8,16 +8,13 @@ import { getVisibilityLabel } from '@/Services/VisibilityMapping';
 import { TravelReason, Visibility } from '@/types/enums';
 import { AllPosts } from '@/types/PostTypes';
 import { Head, router } from '@inertiajs/vue3';
-import { PropType, reactive, ref, watch } from 'vue';
+import axios from 'axios';
+import { onMounted, PropType, reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
 
 const props = defineProps({
-    posts: {
-        type: Array as PropType<AllPosts[]>,
-        default: () => [],
-    },
     filters: {
         type: Object as PropType<{
             dateFrom: string | null;
@@ -28,11 +25,12 @@ const props = defineProps({
         }>,
         required: true,
     },
-    availableTags: {
-        type: Array as PropType<string[]>,
-        default: () => [],
-    },
 });
+
+const posts = ref<AllPosts[]>([]);
+const availableTags = ref<string[]>([]);
+const loading = ref(false);
+const nextCursor = ref<string | null>(null);
 
 const filterForm = reactive({
     dateFrom: props.filters.dateFrom || '',
@@ -42,25 +40,60 @@ const filterForm = reactive({
     tags: props.filters.tags || [],
 });
 
+const buildFilterParams = () => {
+    return {
+        dateFrom: filterForm.dateFrom || null,
+        dateTo: filterForm.dateTo || null,
+        visibility:
+            filterForm.visibility.length > 0 ? filterForm.visibility : null,
+        travelReason:
+            filterForm.travelReason.length > 0 ? filterForm.travelReason : null,
+        tags: filterForm.tags.length > 0 ? filterForm.tags : null,
+    };
+};
+
+const fetchPosts = (cursor: string | null = null, append = false) => {
+    if (loading.value) return;
+
+    loading.value = true;
+    axios
+        .get('/api/posts/filter', {
+            params: {
+                ...buildFilterParams(),
+                cursor,
+            },
+        })
+        .then((response) => {
+            if (append) {
+                posts.value.push(...response.data.items);
+            } else {
+                posts.value = response.data.items;
+            }
+            nextCursor.value = response.data.nextCursor;
+            availableTags.value = response.data.availableTags;
+        })
+        .finally(() => {
+            loading.value = false;
+        });
+};
+
+const updateUrl = () => {
+    const params = new URLSearchParams();
+    if (filterForm.dateFrom) params.set('dateFrom', filterForm.dateFrom);
+    if (filterForm.dateTo) params.set('dateTo', filterForm.dateTo);
+    filterForm.visibility.forEach((v) => params.append('visibility[]', v));
+    filterForm.travelReason.forEach((r) => params.append('travelReason[]', r));
+    filterForm.tags.forEach((tag) => params.append('tags[]', tag));
+
+    const url = params.toString()
+        ? `${window.location.pathname}?${params.toString()}`
+        : window.location.pathname;
+    window.history.replaceState({}, '', url);
+};
+
 const applyFilters = () => {
-    router.get(
-        route('posts.filter'),
-        {
-            dateFrom: filterForm.dateFrom || null,
-            dateTo: filterForm.dateTo || null,
-            visibility:
-                filterForm.visibility.length > 0 ? filterForm.visibility : null,
-            travelReason:
-                filterForm.travelReason.length > 0
-                    ? filterForm.travelReason
-                    : null,
-            tags: filterForm.tags.length > 0 ? filterForm.tags : null,
-        },
-        {
-            preserveState: true,
-            preserveScroll: true,
-        },
-    );
+    updateUrl();
+    fetchPosts();
 };
 
 const clearFilters = () => {
@@ -109,7 +142,11 @@ const hasActiveFilters = () => {
     );
 };
 
-// automatically apply filters when form changes. Debounce to avoid too many requests.
+const loadMore = () => {
+    if (loading.value || !nextCursor.value) return;
+    fetchPosts(nextCursor.value, true);
+};
+
 let debounceTimer: number | null = null;
 watch(
     () => ({ ...filterForm }),
@@ -124,7 +161,9 @@ watch(
     { deep: true },
 );
 
-// mass edit logic
+onMounted(() => {
+    fetchPosts();
+});
 
 const selectionMode = ref(false);
 const selectedPosts = ref<Array<AllPosts>>([]);
@@ -132,7 +171,7 @@ const showMassEditModal = ref(false);
 
 function goToPost(postId: string) {
     if (selectionMode.value) {
-        const post = props.posts.find((p) => p.id === postId);
+        const post = posts.value.find((p) => p.id === postId);
         if (post) {
             togglePostSelection(post);
         }
@@ -170,8 +209,15 @@ const openMassEdit = () => {
 const handleMassEditUpdated = () => {
     selectionMode.value = false;
     selectedPosts.value = [];
-    router.reload({ only: ['posts'] });
+    fetchPosts();
 };
+
+function deletePost(postId: string): void {
+    const index = posts.value.findIndex((post) => post.id === postId);
+    if (index !== -1) {
+        posts.value.splice(index, 1);
+    }
+}
 </script>
 
 <template>
@@ -391,14 +437,30 @@ const handleMassEditUpdated = () => {
                                     @click.stop="togglePostSelection(post)"
                                 />
                             </div>
-                            <Post :post="post"></Post>
+                            <Post
+                                :post="post"
+                                @delete:post="deletePost(post.id)"
+                            ></Post>
                         </li>
-                        <li v-if="posts.length === 0" class="p-8 text-center">
+                        <li
+                            v-if="posts.length === 0 && !loading"
+                            class="p-8 text-center"
+                        >
                             <div class="text-base-content/60">
                                 {{ t('posts.filter.no_results') }}
                             </div>
                         </li>
-                        <InfiniteScroller :only="['posts']" />
+                        <li v-if="loading" class="p-4 text-center">
+                            <Loading class="mx-auto" />
+                        </li>
+                        <li v-else-if="nextCursor" class="p-4 text-center">
+                            <button
+                                class="btn btn-ghost btn-sm"
+                                @click="loadMore"
+                            >
+                                {{ t('common.load_more') }}
+                            </button>
+                        </li>
                     </ul>
 
                     <MassEdit
