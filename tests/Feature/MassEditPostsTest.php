@@ -7,6 +7,7 @@ use App\Enums\Visibility;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Passport\Passport;
 use Tests\TestCase;
 
 class MassEditPostsTest extends TestCase
@@ -21,12 +22,14 @@ class MassEditPostsTest extends TestCase
             'visibility' => Visibility::PRIVATE,
         ]);
 
-        $response = $this->actingAs($user)->post(route('posts.mass-edit'), [
+        Passport::actingAs($user);
+        $response = $this->postJson(route('api.posts.mass-edit'), [
             'postIds' => $posts->pluck('id')->toArray(),
             'visibility' => Visibility::PUBLIC->value,
         ]);
 
-        $response->assertRedirect(route('posts.filter'));
+        $response->assertOk();
+        $response->assertJson(['success' => true]);
 
         foreach ($posts as $post) {
             $this->assertEquals(Visibility::PUBLIC, $post->fresh()->visibility);
@@ -40,12 +43,14 @@ class MassEditPostsTest extends TestCase
             'user_id' => $user->id,
         ]);
 
-        $response = $this->actingAs($user)->post(route('posts.mass-edit'), [
+        Passport::actingAs($user);
+        $response = $this->postJson(route('api.posts.mass-edit'), [
             'postIds' => $posts->pluck('id')->toArray(),
             'travelReason' => TravelReason::BUSINESS->value,
         ]);
 
-        $response->assertRedirect(route('posts.filter'));
+        $response->assertOk();
+        $response->assertJson(['success' => true]);
     }
 
     public function test_user_can_mass_edit_tags(): void
@@ -55,13 +60,15 @@ class MassEditPostsTest extends TestCase
             'user_id' => $user->id,
         ]);
 
-        $response = $this->actingAs($user)->post(route('posts.mass-edit'), [
+        Passport::actingAs($user);
+        $response = $this->postJson(route('api.posts.mass-edit'), [
             'postIds' => $posts->pluck('id')->toArray(),
             'tags' => ['vacation', 'summer'],
             'addTags' => false,
         ]);
 
-        $response->assertRedirect(route('posts.filter'));
+        $response->assertOk();
+        $response->assertJson(['success' => true]);
 
         foreach ($posts as $post) {
             $tags = $post->fresh()->hashTags->pluck('value')->toArray();
@@ -79,12 +86,13 @@ class MassEditPostsTest extends TestCase
             'visibility' => Visibility::PRIVATE,
         ]);
 
-        $response = $this->actingAs($user)->post(route('posts.mass-edit'), [
+        Passport::actingAs($user);
+        $response = $this->postJson(route('api.posts.mass-edit'), [
             'postIds' => $posts->pluck('id')->toArray(),
             'visibility' => Visibility::PUBLIC->value,
         ]);
 
-        $response->assertRedirect(route('posts.filter'));
+        $response->assertOk();
 
         foreach ($posts as $post) {
             $this->assertEquals(Visibility::PRIVATE, $post->fresh()->visibility);
@@ -95,22 +103,26 @@ class MassEditPostsTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->post(route('posts.mass-edit'), [
+        Passport::actingAs($user);
+        $response = $this->postJson(route('api.posts.mass-edit'), [
             'visibility' => Visibility::PUBLIC->value,
         ]);
 
-        $response->assertSessionHasErrors('postIds');
+        $response->assertUnprocessable();
+        $response->assertJsonValidationErrors('postIds');
     }
 
     public function test_mass_edit_validates_post_ids_exist(): void
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->post(route('posts.mass-edit'), [
+        Passport::actingAs($user);
+        $response = $this->postJson(route('api.posts.mass-edit'), [
             'postIds' => ['00000000-0000-0000-0000-000000000000'],
             'visibility' => Visibility::PUBLIC->value,
         ]);
 
-        $response->assertSessionHasErrors('postIds.0');
+        $response->assertUnprocessable();
+        $response->assertJsonValidationErrors('postIds.0');
     }
 }

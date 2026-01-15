@@ -68,11 +68,14 @@ onMounted(() => {
 
 function submit(stopover: StopPlace) {
     if (postId.value && postId.value.length > 0) {
-        console.log(stopover);
-        router.put(route('posts.update.transport-post', postId.value), {
-            stopId: stopover.tripStopId,
-            postId: postId.value,
-        });
+        axios
+            .put(route('posts.update.transport-post', postId.value), {
+                stopId: stopover.tripStopId,
+                postId: postId.value,
+            })
+            .then(() => {
+                router.visit(`/posts/${postId.value}`);
+            });
         return;
     }
 

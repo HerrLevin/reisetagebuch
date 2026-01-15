@@ -40,25 +40,17 @@ Route::middleware('auth')->group(callback: function () {
     Route::prefix('posts')->group(callback: function () {
         Route::get('/filter', [PostController::class, 'filter'])->name('posts.filter');
         Route::get('/create', [PostController::class, 'create'])->name('posts.create.post');
-        Route::post('/create', [PostController::class, 'storeText'])->name('posts.create.text-post.store');
         Route::get('/new', [PostController::class, 'createText'])->name('posts.create.text');
-        Route::post('/mass-edit', [PostController::class, 'massEdit'])->name('posts.mass-edit');
-        Route::delete('/{postId}', [PostController::class, 'destroy'])->name('posts.destroy');
-        Route::patch('/{postId}', [PostController::class, 'update'])->name('posts.update');
         Route::get('/{postId}/edit', [PostController::class, 'edit'])->name('posts.edit');
 
         Route::prefix('/transport')->group(callback: function () {
             Route::get('/departures', [LocationController::class, 'departures'])->name('posts.create.departures');
             Route::get('/stopovers', [LocationController::class, 'stopovers'])->name('posts.create.stopovers');
             Route::get('/create', [PostController::class, 'createTransport'])->name('posts.create.transport-post');
-            Route::post('/create', [PostController::class, 'storeTransport'])->name('posts.create.transport-post.store');
             Route::get('/exit/edit', [PostController::class, 'editTransport'])->name('posts.edit.transport-post');
             Route::get('/{postId}/times/edit', [PostController::class, 'editTimesTransport'])->name('posts.edit.transport-times');
-            Route::put('/{postId}/times', [PostController::class, 'updateTimesTransport'])->name('posts.update.transport-times');
-            Route::put('/{postId}', [PostController::class, 'updateTransport'])->name('posts.update.transport-post');
         });
         Route::prefix('/location')->group(callback: function () {
-            Route::post('/create', [PostController::class, 'storeLocation'])->name('posts.create.post.store');
             Route::get('/', [LocationController::class, 'nearby'])->name('posts.create.start');
         });
     });
@@ -70,8 +62,6 @@ Route::middleware('auth')->group(callback: function () {
     Route::post('profile/{username}', [UserController::class, 'update'])->name('profile.update');
 
     Route::get('invites', [InviteController::class, 'index'])->name('invites.index');
-    Route::post('invites', [InviteController::class, 'store'])->name('invites.store');
-    Route::delete('invites/{inviteCode}', [InviteController::class, 'destroy'])->name('invites.destroy');
 
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications');
 

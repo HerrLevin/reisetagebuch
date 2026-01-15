@@ -14,6 +14,7 @@ const props = defineProps({
 
 const likesCount = ref(props.post.likesCount);
 const likedByUser = ref(props.post.likedByUser);
+const emit = defineEmits(['delete:post']);
 
 const handleLikeToggled = (liked: boolean, count: number) => {
     likesCount.value = count;
@@ -33,6 +34,6 @@ const handleLikeToggled = (liked: boolean, count: number) => {
             />
         </div>
 
-        <ContextMenu :post />
+        <ContextMenu :post @delete:post="emit('delete:post')" />
     </div>
 </template>

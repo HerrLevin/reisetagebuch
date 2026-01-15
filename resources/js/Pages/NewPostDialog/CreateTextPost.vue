@@ -3,10 +3,13 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PostCreationForm from '@/Pages/NewPostDialog/Partials/PostCreationForm.vue';
 import { Visibility } from '@/types/enums';
 import { Head, router } from '@inertiajs/vue3';
-import { reactive } from 'vue';
+import axios from 'axios';
+import { reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
+
+const loading = ref(false);
 
 function goBack() {
     window.history.back();
@@ -19,7 +22,16 @@ const form = reactive({
 });
 
 function submitForm() {
-    router.post(route('posts.create.text-post.store'), form);
+    loading.value = true;
+    axios
+        .post('/api/posts', form)
+        .then((response) => {
+            const postId = response.data.id;
+            router.visit(`/posts/${postId}`);
+        })
+        .finally(() => {
+            loading.value = false;
+        });
 }
 </script>
 

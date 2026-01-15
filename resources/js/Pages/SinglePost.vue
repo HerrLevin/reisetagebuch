@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Loading from '@/Components/Loading.vue';
 import Map from '@/Components/Map.vue';
 import Post from '@/Components/Post/Post.vue';
 import PostMetaInfo from '@/Components/Post/PostMetaInfo.vue';
@@ -24,7 +25,6 @@ import { ArrowLeft } from 'lucide-vue-next';
 import { LngLat } from 'maplibre-gl';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import Loading from '@/Components/Loading.vue';
 
 const { t } = useI18n();
 
@@ -180,6 +180,10 @@ const progress = computed(() => {
 
     return Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
 });
+
+function deleted() {
+    window.location.href = route('dashboard');
+}
 </script>
 
 <template>
@@ -219,8 +223,8 @@ const progress = computed(() => {
             <div class="p-4">
                 <ul class="list">
                     <li class="list-row">
-                        <Loading v-if="loading" class="my-4 mx-auto" />
-                        <Post v-if="post" :post />
+                        <Loading v-if="loading" class="mx-auto my-4" />
+                        <Post v-if="post" :post @delete:post="deleted()" />
                     </li>
                 </ul>
             </div>

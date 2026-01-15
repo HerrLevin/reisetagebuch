@@ -55,14 +55,18 @@ function submit() {
         alert(t('edit_transport_times.arrival_before_departure_error'));
         return;
     }
-    router.put(route('posts.update.transport-times', post.value?.id), {
-        manualDepartureTime: manualDeparture.value
-            ? manualDeparture.value.toISO()
-            : null,
-        manualArrivalTime: manualArrival.value
-            ? manualArrival.value.toISO()
-            : null,
-    });
+    axios
+        .put(route('posts.update.transport-times', post.value?.id), {
+            manualDepartureTime: manualDeparture.value
+                ? manualDeparture.value.set({ second: 0 }).toISO()
+                : null,
+            manualArrivalTime: manualArrival.value
+                ? manualArrival.value.set({ second: 0 }).toISO()
+                : null,
+        })
+        .then(() => {
+            router.visit(`/posts/${post.value?.id}`);
+        });
 }
 
 function getTitles() {

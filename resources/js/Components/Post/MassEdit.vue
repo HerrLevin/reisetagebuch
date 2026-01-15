@@ -4,7 +4,7 @@ import TagsInput from '@/Pages/NewPostDialog/Partials/TagsInput.vue';
 import { getVisibilityLabel } from '@/Services/VisibilityMapping';
 import { TravelReason, Visibility } from '@/types/enums';
 import { AllPosts } from '@/types/PostTypes';
-import { useForm } from '@inertiajs/vue3';
+import axios from 'axios';
 import { computed, PropType, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -25,6 +25,13 @@ const emit = defineEmits(['close', 'updated']);
 
 const existingTags = ref<string[]>([]);
 const changeTags = ref(false);
+const processing = ref(false);
+
+const form = ref({
+    visibility: null as Visibility | null,
+    travelReason: null as TravelReason | null,
+    tags: null as string[] | null,
+});
 
 function mapTags() {
     props.selectedPosts?.forEach((post) => {
@@ -36,12 +43,7 @@ function mapTags() {
     });
 }
 
-const form = useForm({
-    postIds: computed(() => props.selectedPosts.map((p) => p.id)),
-    visibility: null as Visibility | null,
-    travelReason: null as TravelReason | null,
-    tags: null as string[] | null,
-});
+const postIds = computed(() => props.selectedPosts.map((p) => p.id));
 
 const visibilityOptions = () => {
     const options: { value: null | Visibility; label: string }[] = [
@@ -70,20 +72,39 @@ const travelReasonOptions = () => {
     return options;
 };
 
+const resetForm = () => {
+    form.value = {
+        visibility: null,
+        travelReason: null,
+        tags: null,
+    };
+    existingTags.value = [];
+    changeTags.value = false;
+};
+
 const submit = () => {
-    form.tags = changeTags.value ? existingTags.value.slice(0, 5) : null;
-    form.post(route('posts.mass-edit'), {
-        preserveScroll: true,
-        onSuccess: () => {
+    processing.value = true;
+    const tags = changeTags.value ? existingTags.value.slice(0, 5) : null;
+
+    axios
+        .post('/api/posts/mass-edit', {
+            postIds: postIds.value,
+            visibility: form.value.visibility,
+            travelReason: form.value.travelReason,
+            tags,
+        })
+        .then(() => {
             emit('updated');
             emit('close');
-            form.reset();
-        },
-    });
+            resetForm();
+        })
+        .finally(() => {
+            processing.value = false;
+        });
 };
 
 const cancel = () => {
-    form.reset();
+    resetForm();
     emit('close');
 };
 
@@ -93,8 +114,7 @@ watch(
         if (newVal) {
             mapTags();
         } else {
-            existingTags.value = [];
-            form.reset();
+            resetForm();
         }
     },
 );
@@ -137,7 +157,7 @@ watch(
                             </span>
                         </label>
                         <SelectInput
-                            v-model="form.visibility"
+                            v-model="form.value.visibility"
                             :options="visibilityOptions()"
                         />
                     </div>
@@ -149,7 +169,7 @@ watch(
                             </span>
                         </label>
                         <SelectInput
-                            v-model="form.travelReason"
+                            v-model="form.value.travelReason"
                             :options="travelReasonOptions()"
                         />
                     </div>
@@ -209,10 +229,10 @@ watch(
                     <button
                         type="submit"
                         class="btn btn-primary"
-                        :disabled="form.processing"
+                        :disabled="processing"
                     >
                         {{
-                            form.processing
+                            processing
                                 ? t('common.saving')
                                 : t('posts.mass_edit.apply')
                         }}
