@@ -48,6 +48,12 @@ jobs:
       - name: Wait for database
         run: while ! vendor/bin/sail artisan migrate --force; do sleep 5; done
 
+      - name: Generate application key
+        run: vendor/bin/sail artisan key:generate
+
+      - name: Generate passport keys
+        run: vendor/bin/sail artisan passport:keys
+
       - name: Run tests
         run: vendor/bin/sail test --parallel
 
