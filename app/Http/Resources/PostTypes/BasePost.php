@@ -7,33 +7,74 @@ use App\Http\Resources\UserDto;
 use App\Models\Post;
 use App\Traits\JsonResponseObject;
 use Carbon\Carbon;
+use OpenApi\Attributes as OA;
 
+#[OA\Schema(
+    schema: 'BasePost',
+    description: 'Base Post Resource',
+    required: ['id', 'user', 'body', 'visibility', 'published_at', 'created_at', 'updated_at', 'likesCount', 'likedByUser', 'metaInfos', 'hashTags'],
+    type: 'object'
+)]
 class BasePost
 {
     use JsonResponseObject;
 
+    #[OA\Property('id', description: 'Post ID', type: 'string', format: 'uuid')]
     public string $id;
 
+    #[OA\Property(
+        'user',
+        ref: UserDto::class,
+        description: 'User who created the post',
+    )]
     public UserDto $user;
 
+    #[OA\Property('body', description: 'Post body content', type: 'string', nullable: true)]
     public ?string $body = null;
 
+    #[OA\Property(
+        'visibility',
+        ref: Visibility::class,
+        description: 'Post visibility level',
+    )]
     public Visibility $visibility;
 
-    public string $published_at;
+    #[OA\Property('publishedAt', description: 'Post published at timestamp', type: 'string', format: 'date-time')]
+    public string $publishedAt;
 
-    public string $created_at;
+    #[OA\Property('createdAt', description: 'Post created at timestamp', type: 'string', format: 'date-time')]
+    public string $createdAt;
 
-    public string $updated_at;
+    #[OA\Property('updatedAt', description: 'Post updated at timestamp', type: 'string', format: 'date-time')]
+    public string $updatedAt;
 
+    #[OA\Property(
+        'hashTags',
+        description: 'List of hashtags associated with the post',
+        type: 'array',
+        items: new OA\Items(type: 'string')
+    )]
     /** @var string[] */
     public array $hashTags = [];
 
+    #[OA\Property('likesCount', type: 'integer', description: 'Number of likes on the post')]
     public int $likesCount = 0;
 
+    #[OA\Property('likedByUser', type: 'boolean', description: 'Indicates if the post is liked by the current user')]
     public bool $likedByUser = false;
 
-    /** @var array<string, mixed> */
+    #[OA\Property(
+        'metaInfos',
+        description: 'Additional meta information associated with the post',
+        type: 'object',
+        additionalProperties: new OA\AdditionalProperties(
+            oneOf: [
+                new OA\Schema(type: 'string'),
+                new OA\Schema(type: 'array', items: new OA\Items(type: 'string')),
+            ]
+        )
+    )]
+    /** @var array<string, string|string[]> */
     public array $metaInfos = [];
 
     public function __construct(Post $post, UserDto $userDto)
@@ -42,9 +83,9 @@ class BasePost
         $this->body = $post->body;
         $this->user = $userDto;
         $this->visibility = $post->visibility;
-        $this->published_at = $post->published_at?->toIso8601String() ?? Carbon::now()->toIso8601String();
-        $this->created_at = $post->created_at->toIso8601String();
-        $this->updated_at = $post->updated_at->toIso8601String();
+        $this->publishedAt = $post->published_at?->toIso8601String() ?? Carbon::now()->toIso8601String();
+        $this->createdAt = $post->created_at->toIso8601String();
+        $this->updatedAt = $post->updated_at->toIso8601String();
         $this->hashTags = $post->hashTags?->map(fn ($hashTag) => $hashTag->value)->toArray() ?? [];
         $this->likesCount = $post->likes_count ?? 0;
         $this->likedByUser = $post->liked_by_user ?? false;

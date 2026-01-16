@@ -1,19 +1,20 @@
 <script setup lang="ts">
+import { api } from '@/app';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PostCreationForm from '@/Pages/NewPostDialog/Partials/PostCreationForm.vue';
-import { getBaseText, prettyDates } from '@/Services/PostTextService';
-import { TravelReason, TravelRole, Visibility } from '@/types/enums';
-import {
-    BasePost,
-    isLocationPost,
-    isTransportPost,
-    LocationPost,
-    TransportPost,
-} from '@/types/PostTypes';
+import { getBaseText, prettyDates } from '@/Services/ApiPostTextService';
+import { isApiLocationPost, isApiTransportPost } from '@/types/PostTypes';
 import { Head, router } from '@inertiajs/vue3';
-import axios from 'axios';
 import { reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import {
+    BasePost,
+    LocationPost,
+    TransportPost,
+    TravelReason,
+    TravelRole,
+    Visibility,
+} from '../../types/Api.gen';
 
 const { t } = useI18n();
 
@@ -35,8 +36,8 @@ function goBack() {
 }
 
 function fetchPost() {
-    axios
-        .get(`/api/posts/${props.postId}`)
+    api.posts
+        .showPost(props.postId)
         .then((response) => {
             post.value = response.data as
                 | BasePost
@@ -52,9 +53,9 @@ function fetchPost() {
 const form = reactive({
     id: '',
     body: '' as string | undefined,
-    visibility: Visibility.PUBLIC,
+    visibility: Visibility.Public,
     tags: [] as string[],
-    travelReason: TravelReason.LEISURE,
+    travelReason: TravelReason.Leisure,
     vehicleIds: [] as string[],
     metaTripId: null as string | null,
     travelRole: null as TravelRole | null,
@@ -69,8 +70,8 @@ function submitForm() {
         form.body = undefined;
     }
 
-    axios
-        .patch(`/api/posts/${props.postId}`, form)
+    api.posts
+        .updatePost(props.postId, form)
         .then((response) => {
             const postId = response.data.id;
             router.visit(`/posts/${postId}`);
@@ -89,7 +90,8 @@ function prefillForm() {
     form.body = post.value.body || '';
     form.visibility = post.value.visibility;
     form.tags = post.value.hashTags || [];
-    form.travelReason = post.value.travelReason || TravelReason.LEISURE;
+    form.travelReason =
+        (post.value as LocationPost)?.travelReason || TravelReason.Leisure;
 
     const vehicleIds = post.value.metaInfos['rtb:vehicle_id'];
     if (Array.isArray(vehicleIds)) {
@@ -141,9 +143,9 @@ fetchPost();
                     :tags="form.tags"
                     :travel-reason="form.travelReason"
                     :show-travel-reason="
-                        isTransportPost(post) || isLocationPost(post)
+                        isApiTransportPost(post) || isApiLocationPost(post)
                     "
-                    :show-vehicle-id="isTransportPost(post)"
+                    :show-vehicle-id="isApiTransportPost(post)"
                     :vehicle-ids="form.vehicleIds"
                     :travel-role="form.travelRole"
                     :meta-trip-id="form.metaTripId"

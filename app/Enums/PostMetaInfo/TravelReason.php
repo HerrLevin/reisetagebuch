@@ -2,6 +2,14 @@
 
 namespace App\Enums\PostMetaInfo;
 
+use OpenApi\Attributes as OA;
+
+#[OA\Schema(
+    schema: 'TravelReason',
+    description: 'Reasons for travel associated with transport posts',
+    type: 'string',
+    enum: ['commute', 'business', 'leisure', 'crew', 'errand', 'other']
+)]
 enum TravelReason: string
 {
     case COMMUTE = 'commute';

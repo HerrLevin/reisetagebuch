@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { api } from '@/app';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
-import axios from 'axios';
 import { reactive, ref, useTemplateRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -18,8 +18,8 @@ const deleteModal = useTemplateRef('deleteModal');
 
 const deleteUser = () => {
     processing.value = true;
-    axios
-        .delete('/api/account', { data: { password: form.password } })
+    api.account
+        .deleteAccount({ password: form.password })
         .then(() => {
             deleteModal.value?.close();
             window.location.href = '/';

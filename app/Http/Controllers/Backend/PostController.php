@@ -16,7 +16,7 @@ use App\Http\Requests\FilterPostsRequest;
 use App\Http\Requests\LocationBasePostRequest;
 use App\Http\Requests\MassEditPostRequest;
 use App\Http\Requests\TransportBasePostCreateRequest;
-use App\Http\Requests\TransportPostUpdateRequest;
+use App\Http\Requests\TransportPostExitUpdateRequest;
 use App\Http\Requests\TransportTimesUpdateRequest;
 use App\Http\Resources\PostTypes\BasePost;
 use App\Http\Resources\PostTypes\LocationPost;
@@ -131,9 +131,9 @@ class PostController extends Controller
         return $this->postRepository->getDashboardForUser($user);
     }
 
-    public function postsForUser(User|string $user, ?User $visitingUser = null): PostPaginationDto
+    public function postsForUser(string $userId, ?User $visitingUser = null): PostPaginationDto
     {
-        return $this->postRepository->getPostsForUser($user, $visitingUser);
+        return $this->postRepository->getPostsForUserId($userId, $visitingUser);
     }
 
     /**
@@ -221,7 +221,7 @@ class PostController extends Controller
     /**
      * @throws AuthorizationException
      */
-    public function updateTransport(string $postId, TransportPostUpdateRequest $request): BasePost|LocationPost|TransportPost
+    public function updateTransportPostExit(string $postId, TransportPostExitUpdateRequest $request): BasePost|LocationPost|TransportPost
     {
         $post = $this->postRepository->getById($postId, Auth::user());
         $this->authorize('update', $post);
@@ -249,10 +249,8 @@ class PostController extends Controller
         return $post;
     }
 
-    public function filter(FilterPostsRequest $request): PostPaginationDto
+    public function filter(FilterPostsRequest $request, User $user): PostPaginationDto
     {
-        $user = Auth::user();
-
         return $this->postRepository->getFilteredPosts(
             $user,
             $request->input('dateFrom'),

@@ -1,30 +1,25 @@
 <script setup lang="ts">
+import { api } from '@/app';
 import Loading from '@/Components/Loading.vue';
 import Map from '@/Components/Map.vue';
 import Post from '@/Components/Post/Post.vue';
 import PostMetaInfo from '@/Components/Post/PostMetaInfo.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { getColorForPost } from '@/Services/DepartureTypeService';
+import { getColorForPost } from '@/Services/ApiDepartureTypeService';
 import {
     getArrivalDelay,
     getArrivalTime,
     getDepartureDelay,
     getDepartureTime,
 } from '@/Services/TripTimeService';
-import {
-    BasePost,
-    isLocationPost,
-    isTransportPost,
-    LocationPost,
-    TransportPost,
-} from '@/types/PostTypes';
+import { isApiLocationPost, isApiTransportPost } from '@/types/PostTypes';
 import { Head, usePage } from '@inertiajs/vue3';
-import axios from 'axios';
 import { GeometryCollection } from 'geojson';
 import { ArrowLeft } from 'lucide-vue-next';
 import { LngLat } from 'maplibre-gl';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { BasePost, LocationPost, TransportPost } from '../../types/Api.gen';
 
 const { t } = useI18n();
 
@@ -50,63 +45,64 @@ const post = ref<BasePost | TransportPost | LocationPost | null>(null);
 
 function fetchPost() {
     loading.value = true;
-    axios
-        .get('/api/posts/' + props.postId)
+    api.posts
+        .showPost(props.postId)
         .then((response) => {
+            if (!response.data) {
+                post.value = null;
+                return;
+            }
             post.value = response.data;
             heading.value = t('posts.name_post', {
                 name: post.value?.user.name,
             });
             getPageTitle();
             mapPostDetails();
-            loading.value = false;
         })
         .catch(() => {
             post.value = null;
+        })
+        .finally(() => {
+            loading.value = false;
         });
 }
 
 function mapPostDetails() {
-    if (isLocationPost(post.value)) {
+    if (isApiLocationPost(post.value)) {
         startPoint.value = new LngLat(
             (post.value as LocationPost).location?.longitude ?? 9,
             (post.value as LocationPost).location?.latitude ?? 49,
         );
-    } else if (isTransportPost(post.value)) {
+    } else if (isApiTransportPost(post.value)) {
+        const tPost = post.value as TransportPost;
         startPoint.value = new LngLat(
-            (post.value as TransportPost).originStop.location.longitude ?? 9,
-            (post.value as TransportPost).originStop.location.latitude ?? 49,
+            tPost.originStop.location.longitude ?? 9,
+            tPost.originStop.location.latitude ?? 49,
         );
         endPoint.value = new LngLat(
-            (post.value as TransportPost).destinationStop.location.longitude ??
-                9,
-            (post.value as TransportPost).destinationStop.location.latitude ??
-                49,
+            tPost.destinationStop.location.longitude ?? 9,
+            tPost.destinationStop.location.latitude ?? 49,
         );
 
-        axios
-            .get(
-                '/api/map/linestring/' +
-                    post.value.originStop.id +
-                    '/' +
-                    post.value.destinationStop.id,
-            )
+        api.map
+            .getLineStringBetween({
+                from: tPost.originStop.id,
+                to: tPost.destinationStop.id,
+            })
             .then((response) => {
-                lineString.value = response.data;
+                lineString.value = response.data as GeometryCollection;
             })
             .catch(() => {
                 lineString.value = null;
             });
 
-        axios
-            .get(
-                '/api/map/stopovers/' +
-                    post.value.originStop.id +
-                    '/' +
-                    post.value.destinationStop.id,
-            )
+        api.map
+            .getStopsBetween({
+                from: tPost.originStop.id,
+                to: tPost.destinationStop.id,
+            })
             .then((response) => {
-                stopovers.value = response.data;
+                stopovers.value = response.data as GeometryCollection;
             })
             .catch(() => {
                 stopovers.value = null;
@@ -119,16 +115,17 @@ function mapPostDetails() {
 
 function getPageTitle() {
     pageTitle.value = heading.value;
-    if (isLocationPost(post.value)) {
+    if (isApiLocationPost(post.value)) {
         pageTitle.value = t('posts.name_location_post', {
             name: post.value.user.name,
             location: post.value.location.name,
         });
-    } else if (isTransportPost(post.value)) {
+    } else if (isApiTransportPost(post.value)) {
+        const tPost = post.value as TransportPost;
         pageTitle.value = t('posts.name_transport_post', {
-            name: post.value.user.name,
-            from: post.value.originStop.location.name,
-            to: post.value.destinationStop.location.name,
+            name: tPost.user.name,
+            from: tPost.originStop.location.name,
+            to: tPost.destinationStop.location.name,
         });
     }
     if (post.value?.body) {
@@ -154,7 +151,7 @@ onUnmounted(() => {
 watch(() => props.postId, fetchPost, { immediate: true });
 
 const progress = computed(() => {
-    if (!isTransportPost(post.value)) return 0;
+    if (!isApiTransportPost(post.value)) return 0;
 
     const transportPost = post.value as TransportPost;
     const departureDelay = getDepartureDelay(transportPost) || 0;
@@ -216,7 +213,7 @@ function deleted() {
                     usePage().props.auth.user?.id === post.user.id
                 "
                 :line-color="
-                    isTransportPost(post) ? getColorForPost(post) : undefined
+                    isApiTransportPost(post) ? getColorForPost(post) : undefined
                 "
                 :progress="progress"
             ></Map>

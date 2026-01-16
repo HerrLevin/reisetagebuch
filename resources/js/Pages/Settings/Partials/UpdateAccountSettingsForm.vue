@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { api } from '@/app';
 import InputLabel from '@/Components/InputLabel.vue';
 import SelectInput from '@/Components/SelectInput.vue';
 import { usePage } from '@inertiajs/vue3';
-import axios from 'axios';
 import { reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -23,8 +23,8 @@ const form = reactive({
 function formSubmit() {
     processing.value = true;
     recentlySuccessful.value = false;
-    axios
-        .patch('/api/account/settings', form)
+    api.account
+        .updateSettings(form)
         .then(() => {
             recentlySuccessful.value = true;
             setTimeout(() => {

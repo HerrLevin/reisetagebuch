@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Dto\DeparturesResponseDto;
 use App\Dto\ErrorDto;
 use App\Dto\LocationHistoryDto;
+use App\Dto\MotisApi\GeocodeResponseEntry;
 use App\Dto\RequestLocationDto;
+use App\Dto\StopoversResponseDto;
+use App\Enums\TransportMode;
 use App\Http\Controllers\Backend\LocationController as BackendLocationController;
-use App\Http\Controllers\Controller;
 use App\Http\Requests\DeparturesRequest;
 use App\Http\Requests\GeocodeRequest;
 use App\Http\Requests\LocationHistoryRequest;
-use App\Http\Requests\NearbyLocationRequest;
+use App\Http\Requests\LocationQueryRequest;
+use App\Http\Requests\LocationRequest;
 use App\Http\Requests\StopoverRequest;
 use App\Http\Resources\LocationDto;
 use App\Jobs\PrefetchJob;
@@ -18,8 +22,8 @@ use App\Models\User;
 use Carbon\Carbon;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Illuminate\Http\Client\ConnectionException;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use OpenApi\Attributes as OA;
 
 class LocationController extends Controller
 {
@@ -27,6 +31,7 @@ class LocationController extends Controller
 
     public function __construct(BackendLocationController $locationController)
     {
+        parent::__construct();
         $this->locationController = $locationController;
     }
 
@@ -42,9 +47,21 @@ class LocationController extends Controller
         return false;
     }
 
-    public function prefetch(float $latitude, float $longitude, Request $request): void
+    #[OA\Post(
+        path: '/location/prefetch',
+        operationId: 'prefetchLocation',
+        description: 'Prefetch location data and optionally store user history',
+        summary: 'Prefetch location',
+        tags: ['Location'],
+        parameters: [
+            new OA\Parameter(name: 'latitude', in: 'query', required: true, schema: new OA\Schema(type: 'number', format: 'float')),
+            new OA\Parameter(name: 'longitude', in: 'query', required: true, schema: new OA\Schema(type: 'number', format: 'float')),
+        ],
+        responses: [new OA\Response(response: 204, description: Controller::OA_DESC_NO_CONTENT)]
+    )]
+    public function prefetch(LocationRequest $request): void
     {
-        $point = Point::makeGeodetic($latitude, $longitude);
+        $point = Point::makeGeodetic($request->latitude, $request->longitude);
         if ($this->canStoreHistory($request)) {
             $this->locationController->createTimestampedUserWaypoint($request->user()->id, $point);
         }
@@ -53,9 +70,24 @@ class LocationController extends Controller
         abort('204');
     }
 
-    public function getRecentRequestLocation(float $latitude, float $longitude): ?RequestLocationDto
+    #[OA\Get(
+        path: '/location/request-location',
+        operationId: 'getRecentRequestLocation',
+        description: 'Return a recent location matching the requested coordinates',
+        summary: 'Get recent request location',
+        tags: ['Location'],
+        parameters: [
+            new OA\Parameter(name: 'latitude', in: 'query', required: true, schema: new OA\Schema(type: 'number', format: 'float')),
+            new OA\Parameter(name: 'longitude', in: 'query', required: true, schema: new OA\Schema(type: 'number', format: 'float')),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: Controller::OA_DESC_SUCCESS, content: new OA\JsonContent(ref: RequestLocationDto::class)),
+            new OA\Response(response: 404, description: 'Location not found', content: new OA\JsonContent(ref: ErrorDto::class)),
+        ]
+    )]
+    public function getRecentRequestLocation(LocationRequest $request): ?RequestLocationDto
     {
-        $point = Point::makeGeodetic($latitude, $longitude);
+        $point = Point::makeGeodetic($request->latitude, $request->longitude);
         $location = $this->locationController->getRecentRequestLocation($point);
 
         if ($location === null) {
@@ -65,14 +97,21 @@ class LocationController extends Controller
         return $location;
     }
 
-    public function search(Request $request)
+    #[OA\Get(
+        path: '/locations/nearby',
+        operationId: 'searchLocations',
+        description: 'Search for locations near a point or by query',
+        summary: 'Search locations',
+        tags: ['Location'],
+        parameters: [
+            new OA\Parameter(name: 'latitude', in: 'query', required: true, schema: new OA\Schema(type: 'number', format: 'float')),
+            new OA\Parameter(name: 'longitude', in: 'query', required: true, schema: new OA\Schema(type: 'number', format: 'float')),
+            new OA\Parameter(name: 'query', in: 'query', required: false, schema: new OA\Schema(type: 'string')),
+        ],
+        responses: [new OA\Response(response: 200, description: Controller::OA_DESC_SUCCESS, content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: LocationDto::class)))]
+    )]
+    public function search(LocationQueryRequest $request)
     {
-        $request->validate([
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
-            'query' => 'nullable|string|min:3',
-        ]);
-
         $point = Point::makeGeodetic($request->latitude, $request->longitude);
 
         $radius = 50_000; // 50km radius
@@ -85,15 +124,21 @@ class LocationController extends Controller
         return array_values($locations->map(fn ($location) => new LocationDto($location))->toArray());
     }
 
-    public function nearby(NearbyLocationRequest $request)
-    {
-        $point = Point::makeGeodetic($request->latitude, $request->longitude);
-        $locations = $this->locationController->nearby($point);
-
-        return $locations->map(fn ($location) => new LocationDto($location))->toArray();
-    }
-
-    public function geocode(GeocodeRequest $request)
+    #[OA\Get(
+        path: '/geocode',
+        operationId: 'geocode',
+        description: 'Geocode a query using configured providers',
+        summary: 'Geocode',
+        tags: ['Location'],
+        parameters: [
+            new OA\Parameter(name: 'query', in: 'query', required: true, schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'provider', in: 'query', required: false, schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'latitude', in: 'query', required: false, schema: new OA\Schema(type: 'number', format: 'float')),
+            new OA\Parameter(name: 'longitude', in: 'query', required: false, schema: new OA\Schema(type: 'number', format: 'float')),
+        ],
+        responses: [new OA\Response(response: 200, description: Controller::OA_DESC_SUCCESS, content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: GeocodeResponseEntry::class)))]
+    )]
+    public function geocode(GeocodeRequest $request): array
     {
         $point = null;
         if ($request->latitude && $request->longitude) {
@@ -110,6 +155,9 @@ class LocationController extends Controller
         return $this->geocodeMotis($request->input('query'), $point);
     }
 
+    /**
+     * @return GeocodeResponseEntry[]
+     */
     private function geocodeMotis(string $query, ?Point $point)
     {
         try {
@@ -121,6 +169,17 @@ class LocationController extends Controller
         return $locations;
     }
 
+    #[OA\Get(
+        path: '/locations/history',
+        operationId: 'locationHistory',
+        description: 'Return location history for the authenticated user for a given day',
+        summary: 'Location history',
+        tags: ['Location'],
+        parameters: [
+            new OA\Parameter(name: 'when', in: 'query', required: false, schema: new OA\Schema(type: 'string', format: 'date')),
+        ],
+        responses: [new OA\Response(response: 200, description: Controller::OA_DESC_SUCCESS, content: new OA\JsonContent(ref: LocationHistoryDto::class))]
+    )]
     public function index(LocationHistoryRequest $request): LocationHistoryDto
     {
         $when = $request->when ? Carbon::parse($request->when) : Carbon::now();
@@ -132,9 +191,24 @@ class LocationController extends Controller
         );
     }
 
-    public function departures(DeparturesRequest $request): JsonResponse
+    #[OA\Get(
+        path: '/locations/departures',
+        operationId: 'departures',
+        description: 'Return departures for a given point or station identifier',
+        summary: 'Departures',
+        tags: ['Location'],
+        parameters: [
+            new OA\Parameter(name: 'latitude', in: 'query', required: false, schema: new OA\Schema(type: 'number', format: 'float')),
+            new OA\Parameter(name: 'longitude', in: 'query', required: false, schema: new OA\Schema(type: 'number', format: 'float')),
+            new OA\Parameter(name: 'identifier', in: 'query', required: false, schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'when', in: 'query', required: false, schema: new OA\Schema(type: 'string', format: 'date-time')),
+            new OA\Parameter(name: 'modes', in: 'query', required: false, schema: new OA\Schema(type: 'array', items: new OA\Items(ref: TransportMode::class))),
+        ],
+        responses: [new OA\Response(response: 200, description: Controller::OA_DESC_SUCCESS, content: new OA\JsonContent(ref: DeparturesResponseDto::class))]
+    )]
+    public function departures(DeparturesRequest $request): DeparturesResponseDto
     {
-        $filter = $request->filter ? explode(',', $request->filter) : [];
+        $filter = $request->modes ? explode(',', $request->modes) : [];
         $time = $request->when ? Carbon::parse($request->when) : now()->subMinutes(2);
         $request->user()->load('settings');
         /** @var User $user */
@@ -148,17 +222,30 @@ class LocationController extends Controller
             $departures = $this->locationController->departuresNearby($point, $time, $filter, $radius);
         }
 
-        return response()->json([
-            'departures' => $departures,
-            'filter' => $filter,
-            'requestTime' => $time->toIso8601String(),
-            'requestIdentifier' => $request->identifier,
-            'requestLatitude' => (float) $request->latitude,
-            'requestLongitude' => (float) $request->longitude,
-        ]);
+        return new DeparturesResponseDto(
+            departures: $departures,
+            modes: $filter,
+            requestTime: $time->toIso8601String(),
+            requestIdentifier: $request->identifier,
+            requestLatitude: (float) $request->latitude,
+            requestLongitude: (float) $request->longitude,
+        );
     }
 
-    public function stopovers(StopoverRequest $request): JsonResponse
+    #[OA\Get(
+        path: '/locations/stopovers',
+        operationId: 'stopovers',
+        description: 'Return stopovers for a given trip start',
+        summary: 'Stopovers',
+        tags: ['Location'],
+        parameters: [
+            new OA\Parameter(name: 'tripId', in: 'query', required: true, schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'startId', in: 'query', required: true, schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'startTime', in: 'query', required: true, schema: new OA\Schema(type: 'string')),
+        ],
+        responses: [new OA\Response(response: 200, description: Controller::OA_DESC_SUCCESS, content: new OA\JsonContent(ref: StopoversResponseDto::class))]
+    )]
+    public function stopovers(StopoverRequest $request): StopoversResponseDto
     {
         $trip = $this->locationController->stopovers(
             tripId: $request->tripId,
@@ -166,11 +253,11 @@ class LocationController extends Controller
             startTime: $request->startTime
         );
 
-        return response()->json([
-            'trip' => $trip,
-            'startTime' => $request->startTime,
-            'startId' => $request->startId,
-            'tripId' => $request->tripId,
-        ]);
+        return new StopoversResponseDto(
+            trip: $trip,
+            startTime: $request->startTime,
+            startId: $request->startId,
+            tripId: $request->tripId,
+        );
     }
 }

@@ -1,14 +1,18 @@
 <script setup lang="ts">
+import { api } from '@/app';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { getBaseText, prettyDates } from '@/Services/PostTextService';
+import { getBaseText, prettyDates } from '@/Services/ApiPostTextService';
 import { getDepartureDelay } from '@/Services/TripTimeService';
-import { TransportPost } from '@/types/PostTypes';
+import { isApiTransportPost } from '@/types/PostTypes';
 import { Head, router } from '@inertiajs/vue3';
-import axios from 'axios';
 import { CircleX, PlaneLanding, PlaneTakeoff } from 'lucide-vue-next';
 import { DateTime } from 'luxon';
 import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import {
+    TransportPost,
+    TransportTimesUpdateRequest,
+} from '../../../types/Api.gen';
 
 const { t } = useI18n();
 
@@ -28,9 +32,12 @@ const title = t('edit_transport_times.title');
 const fullTitle = ref('');
 
 function fetchPost() {
-    axios
-        .get('/api/posts/' + props.postId)
+    api.posts
+        .showPost(props.postId)
         .then((response) => {
+            if (!isApiTransportPost(response.data)) {
+                throw new Error('Post is not a transport post');
+            }
             post.value = response.data;
             manualDeparture.value = post.value?.manualDepartureTime
                 ? DateTime.fromISO(post.value.manualDepartureTime)
@@ -47,6 +54,9 @@ function fetchPost() {
 }
 
 function submit() {
+    if (!post.value) {
+        return;
+    }
     if (
         manualDeparture.value &&
         manualArrival.value &&
@@ -55,15 +65,15 @@ function submit() {
         alert(t('edit_transport_times.arrival_before_departure_error'));
         return;
     }
-    axios
-        .put(route('posts.update.transport-times', post.value?.id), {
+    api.posts
+        .updateTransportTimes(post.value!.id, {
             manualDepartureTime: manualDeparture.value
                 ? manualDeparture.value.set({ second: 0 }).toISO()
                 : null,
             manualArrivalTime: manualArrival.value
                 ? manualArrival.value.set({ second: 0 }).toISO()
                 : null,
-        })
+        } as TransportTimesUpdateRequest)
         .then(() => {
             router.visit(`/posts/${post.value?.id}`);
         });

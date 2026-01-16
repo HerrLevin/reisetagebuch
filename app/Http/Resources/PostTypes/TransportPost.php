@@ -8,19 +8,61 @@ use App\Http\Resources\StopDto;
 use App\Http\Resources\TripDto;
 use App\Http\Resources\UserDto;
 use App\Models\Post;
+use OpenApi\Attributes as OA;
 
+#[OA\Schema(
+    schema: 'TransportPost',
+    description: 'Transport Post Resource',
+    required: ['originStop', 'destinationStop', 'trip', 'travelReason', 'manualDepartureTime', 'manualArrivalTime'],
+    type: 'object'
+)]
 class TransportPost extends BasePost
 {
+    #[OA\Property(
+        property: 'originStop',
+        ref: StopDto::class,
+        description: 'Origin stop details of the transport post'
+    )]
     public StopDto $originStop;
 
+    #[OA\Property(
+        property: 'destinationStop',
+        ref: StopDto::class,
+        description: 'Destination stop details of the transport post'
+    )]
     public StopDto $destinationStop;
 
+    #[OA\Property(
+        property: 'trip',
+        ref: TripDto::class,
+        description: 'Trip details associated with the transport post'
+    )]
     public TripDto $trip;
 
+    #[OA\Property(
+        property: 'manualDepartureTime',
+        description: 'Manually specified departure time in ISO 8601 format',
+        type: 'string',
+        format: 'date-time',
+        nullable: true
+    )]
     public ?string $manualDepartureTime = null;
 
+    #[OA\Property(
+        property: 'manualArrivalTime',
+        description: 'Manually specified arrival time in ISO 8601 format',
+        type: 'string',
+        format: 'date-time',
+        nullable: true
+    )]
     public ?string $manualArrivalTime = null;
 
+    #[OA\Property(
+        property: 'travelReason',
+        ref: TravelReason::class,
+        description: 'Reason for travel associated with the transport post',
+        nullable: true
+    )]
     public ?TravelReason $travelReason;
 
     public function __construct(Post $post, UserDto $userDto)

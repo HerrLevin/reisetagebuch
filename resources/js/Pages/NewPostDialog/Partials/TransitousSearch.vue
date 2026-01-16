@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import { api } from '@/app';
 import Typeahead, { Suggestion } from '@/Components/Typeahead.vue';
 import { Area, StopDto } from '@/types';
-import { AutocompleteResponse } from '@/types/motis';
-import axios from 'axios';
 import { PropType, ref, watch } from 'vue';
 import { debounce } from 'vue-debounce';
 import { useI18n } from 'vue-i18n';
+import { MotisGeocodeResponseEntry } from '../../../../types/Api.gen';
 
 const { t } = useI18n();
 
@@ -43,14 +43,11 @@ function fetchSuggestions() {
     }
     loading.value = true;
 
-    const url = route('posts.create.geocode');
-    axios
-        .get(url, {
-            params: {
-                query: search.value,
-                latitude: props.latitude,
-                longitude: props.longitude,
-            },
+    api.geocode
+        .geocode({
+            query: search.value,
+            latitude: props.latitude,
+            longitude: props.longitude,
         })
         .then((response) => {
             if (!response.data) {
@@ -119,7 +116,7 @@ function submitTypeahead(element: Suggestion) {
     }
 
     if (element?.value && typeof element.value === 'object') {
-        emit('select', element.value as AutocompleteResponse);
+        emit('select', element.value as MotisGeocodeResponseEntry);
     }
 }
 

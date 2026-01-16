@@ -2,8 +2,8 @@
 import ContextMenu from '@/Components/Post/ContextMenu.vue';
 import LikeButton from '@/Components/Post/LikeButton.vue';
 import LikesIndicator from '@/Components/Post/LikesIndicator.vue';
-import { BasePost, LocationPost, TransportPost } from '@/types/PostTypes';
 import { PropType, ref } from 'vue';
+import { BasePost, LocationPost, TransportPost } from '../../../types/Api.gen';
 
 const props = defineProps({
     post: {

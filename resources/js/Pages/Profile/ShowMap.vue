@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { api } from '@/app';
 import LocationsMap from '@/Components/Maps/LocationsMap.vue';
 import ProfileWrapper from '@/Pages/Profile/ProfileWrapper.vue';
 import type { UserDto } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import axios from 'axios';
 import { PropType, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -21,7 +21,7 @@ const loading = ref(true);
 const loadProfileData = async () => {
     loading.value = true;
     try {
-        axios.get('/api/profile/' + props.username).then((response) => {
+        api.profile.getProfile(props.username).then((response) => {
             user.value = response.data;
             loading.value = false;
         });
@@ -40,7 +40,7 @@ loadProfileData();
 
     <ProfileWrapper :user="user">
         <div class="card bg-base-100 min-w-full shadow-md">
-            <LocationsMap v-if="username" :username="username" />
+            <LocationsMap v-if="user" :user />
         </div>
     </ProfileWrapper>
 </template>

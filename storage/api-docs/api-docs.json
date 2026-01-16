@@ -1,0 +1,2993 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Reisetagebuch API Draft",
+        "description": "This is a draft version of the Reisetagebuch API documentation. The API is still under development and may change in future releases. Use at your own risk!",
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        },
+        "version": "0.1.0-draft",
+        "x-logo": {
+            "url": "https://raw.githubusercontent.com/HerrLevin/reisetagebuch/refs/heads/main/public/assets/logo.webp"
+        }
+    },
+    "servers": [
+        {
+            "url": "http://localhost/api",
+            "description": "Local server"
+        }
+    ],
+    "paths": {
+        "/account": {
+            "delete": {
+                "tags": [
+                    "Account"
+                ],
+                "summary": "Delete account",
+                "description": "Delete the authenticated account",
+                "operationId": "deleteAccount",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "password": {
+                                        "description": "Current password of the account",
+                                        "type": "string",
+                                        "example": "your-current-password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "405": {
+                        "description": "Account deletion failed"
+                    }
+                },
+                "security": [
+                    {
+                        "oauth2_security_example": [
+                            "write:projects",
+                            "read:projects"
+                        ]
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Account"
+                ],
+                "summary": "Update account",
+                "description": "Update account details",
+                "operationId": "updateAccount",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProfileUpdateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                },
+                "security": [
+                    {
+                        "oauth2_security_example": [
+                            "write:projects",
+                            "read:projects"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/account/socialite/traewelling": {
+            "delete": {
+                "tags": [
+                    "Account"
+                ],
+                "summary": "Disconnect Traewelling",
+                "description": "Disconnect Traewelling from account",
+                "operationId": "disconnectTraewelling",
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "405": {
+                        "description": "Disconnection failed"
+                    }
+                },
+                "security": [
+                    {
+                        "oauth2_security_example": [
+                            "write:projects",
+                            "read:projects"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/invites": {
+            "get": {
+                "tags": [
+                    "Invites"
+                ],
+                "summary": "List invites",
+                "description": "List invite codes for the authenticated user",
+                "operationId": "listInvites",
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/InviteDto"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "oauth2_security_example": [
+                            "write:projects",
+                            "read:projects"
+                        ]
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Invites"
+                ],
+                "summary": "Create invite",
+                "description": "Create a new invite code",
+                "operationId": "createInvite",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreInviteCodeRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "oauth2_security_example": [
+                            "write:projects",
+                            "read:projects"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/invites/{inviteCode}": {
+            "delete": {
+                "tags": [
+                    "Invites"
+                ],
+                "summary": "Delete invite",
+                "description": "Delete an invite code",
+                "operationId": "deleteInvite",
+                "parameters": [
+                    {
+                        "name": "inviteCode",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "oauth2_security_example": [
+                            "write:projects",
+                            "read:projects"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/posts/{post}/likes": {
+            "post": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Like post",
+                "description": "Like a post",
+                "operationId": "likePost",
+                "parameters": [
+                    {
+                        "name": "post",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LikeResponseDto"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Post not found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Unlike post",
+                "description": "Remove like from a post",
+                "operationId": "unlikePost",
+                "parameters": [
+                    {
+                        "name": "post",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LikeResponseDto"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Post not found"
+                    }
+                }
+            }
+        },
+        "/location/prefetch": {
+            "post": {
+                "tags": [
+                    "Location"
+                ],
+                "summary": "Prefetch location",
+                "description": "Prefetch location data and optionally store user history",
+                "operationId": "prefetchLocation",
+                "parameters": [
+                    {
+                        "name": "latitude",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "longitude",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        },
+        "/location/request-location": {
+            "get": {
+                "tags": [
+                    "Location"
+                ],
+                "summary": "Get recent request location",
+                "description": "Return a recent location matching the requested coordinates",
+                "operationId": "getRecentRequestLocation",
+                "parameters": [
+                    {
+                        "name": "latitude",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "longitude",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "App\\Dto\\RequestLocationDto"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Location not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "App\\Dto\\ErrorDto"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/locations/nearby": {
+            "get": {
+                "tags": [
+                    "Location"
+                ],
+                "summary": "Search locations",
+                "description": "Search for locations near a point or by query",
+                "operationId": "searchLocations",
+                "parameters": [
+                    {
+                        "name": "latitude",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "longitude",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "query",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/LocationDto"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/geocode": {
+            "get": {
+                "tags": [
+                    "Location"
+                ],
+                "summary": "Geocode",
+                "description": "Geocode a query using configured providers",
+                "operationId": "geocode",
+                "parameters": [
+                    {
+                        "name": "query",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "provider",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "latitude",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "longitude",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/MotisGeocodeResponseEntry"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/locations/history": {
+            "get": {
+                "tags": [
+                    "Location"
+                ],
+                "summary": "Location history",
+                "description": "Return location history for the authenticated user for a given day",
+                "operationId": "locationHistory",
+                "parameters": [
+                    {
+                        "name": "when",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LocationHistoryDto"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/locations/departures": {
+            "get": {
+                "tags": [
+                    "Location"
+                ],
+                "summary": "Departures",
+                "description": "Return departures for a given point or station identifier",
+                "operationId": "departures",
+                "parameters": [
+                    {
+                        "name": "latitude",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "longitude",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "identifier",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "when",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    },
+                    {
+                        "name": "modes",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/components/schemas/TransportMode"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeparturesResponseDto"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/locations/stopovers": {
+            "get": {
+                "tags": [
+                    "Location"
+                ],
+                "summary": "Stopovers",
+                "description": "Return stopovers for a given trip start",
+                "operationId": "stopovers",
+                "parameters": [
+                    {
+                        "name": "tripId",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "startId",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "startTime",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StopoversResponseDto"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/map/linestring": {
+            "get": {
+                "tags": [
+                    "Map"
+                ],
+                "summary": "Get linestring",
+                "description": "Get a LineString geometry between two locations",
+                "operationId": "getLineStringBetween",
+                "parameters": [
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid stops provided",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "App\\Dto\\ErrorDto"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/map/stopovers": {
+            "get": {
+                "tags": [
+                    "Map"
+                ],
+                "summary": "Get stopovers",
+                "description": "Get stop points between two locations as MultiPoint geometry",
+                "operationId": "getStopsBetween",
+                "parameters": [
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/notifications/list": {
+            "get": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "List notifications",
+                "description": "List notifications for authenticated user",
+                "operationId": "listNotifications",
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
+        "/notifications/unread-count": {
+            "get": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Unread count",
+                "description": "Get unread notifications count",
+                "operationId": "unreadNotificationCount",
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "required": [
+                                        "count"
+                                    ],
+                                    "properties": {
+                                        "count": {
+                                            "description": "Number of unread notifications",
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/notifications/{id}/read": {
+            "post": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Mark as read",
+                "description": "Mark a notification as read",
+                "operationId": "markNotificationAsRead",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        },
+        "/notifications/read-all": {
+            "post": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Mark all as read",
+                "description": "Mark all notifications as read",
+                "operationId": "markAllNotificationsAsRead",
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        },
+        "/timeline": {
+            "get": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Get timeline posts",
+                "description": "Returns paginated posts for the authenticated user timeline",
+                "operationId": "timeline",
+                "parameters": [
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "description": "Pagination cursor",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PostPaginationDto"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    }
+                },
+                "security": [
+                    {
+                        "oauth2_security_example": [
+                            "write:projects",
+                            "read:projects"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/users/{userId}/posts": {
+            "get": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Get posts for a specific user",
+                "description": "Returns paginated posts for a specific user",
+                "operationId": "postsForUser",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "User id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "description": "Pagination cursor",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PostPaginationDto"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    }
+                },
+                "security": [
+                    {
+                        "oauth2_security_example": [
+                            "write:projects",
+                            "read:projects"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/posts/{id}": {
+            "get": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Get post by ID",
+                "description": "Returns post data",
+                "operationId": "showPost",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Post id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "oneOf": [
+                                        {
+                                            "$ref": "#/components/schemas/BasePost"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/TransportPost"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/LocationPost"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    }
+                },
+                "security": [
+                    {
+                        "oauth2_security_example": [
+                            "write:projects",
+                            "read:projects"
+                        ]
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Update post",
+                "description": "Update a post (text, transport or location)",
+                "operationId": "updatePost",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Post id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "App\\Http\\Requests\\BasePostRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "oneOf": [
+                                        {
+                                            "$ref": "#/components/schemas/BasePost"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/TransportPost"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/LocationPost"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    }
+                },
+                "security": [
+                    {
+                        "oauth2_security_example": [
+                            "write:projects",
+                            "read:projects"
+                        ]
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Delete post",
+                "description": "Delete a post by id",
+                "operationId": "deletePost",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Post id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    }
+                },
+                "security": [
+                    {
+                        "oauth2_security_example": [
+                            "write:projects",
+                            "read:projects"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/posts": {
+            "get": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Filter posts",
+                "description": "Returns filtered posts",
+                "operationId": "filterPosts",
+                "parameters": [
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "description": "Pagination cursor",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "dateFrom",
+                        "in": "query",
+                        "description": "Filter posts from this date (YYYY-MM-DD)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "dateTo",
+                        "in": "query",
+                        "description": "Filter posts to this date (YYYY-MM-DD)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "visibility",
+                        "in": "query",
+                        "description": "Filter by visibility (e.g., PUBLIC, PRIVATE)",
+                        "required": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/components/schemas/Visibility"
+                            }
+                        }
+                    },
+                    {
+                        "name": "travelReason",
+                        "in": "query",
+                        "description": "Filter by travel reason (e.g., WORK, LEISURE)",
+                        "required": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/components/schemas/TravelReason"
+                            }
+                        }
+                    },
+                    {
+                        "name": "tags",
+                        "in": "query",
+                        "description": "Filter by tags",
+                        "required": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FilteredPostPaginationDto"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    }
+                },
+                "security": [
+                    {
+                        "oauth2_security_example": [
+                            "write:projects",
+                            "read:projects"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/posts/mass-edit": {
+            "post": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Mass edit posts",
+                "description": "Mass edit multiple posts",
+                "operationId": "massEditPosts",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "App\\Http\\Requests\\MassEditPostRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "oauth2_security_example": [
+                            "write:projects",
+                            "read:projects"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/posts/transport": {
+            "post": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Create transport post",
+                "description": "Create a transport post",
+                "operationId": "storeTransportPost",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "App\\Http\\Requests\\TransportBasePostCreateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TransportPost"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "oauth2_security_example": [
+                            "write:projects",
+                            "read:projects"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/posts/text": {
+            "post": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Create text post",
+                "description": "Create a text post",
+                "operationId": "storeTextPost",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "App\\Http\\Requests\\BasePostRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BasePost"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "oauth2_security_example": [
+                            "write:projects",
+                            "read:projects"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/posts/location": {
+            "post": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Create location post",
+                "description": "Create a location post",
+                "operationId": "storeLocationPost",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "App\\Http\\Requests\\LocationBasePostRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LocationPost"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "oauth2_security_example": [
+                            "write:projects",
+                            "read:projects"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/posts/{id}/transport/exit": {
+            "put": {
+                "tags": [
+                    "Posts",
+                    "TransportPosts"
+                ],
+                "summary": "Update transport post",
+                "description": "Update transport-specific fields of a post",
+                "operationId": "updateTransportPostExit",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Post id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TransportPostExitUpdateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TransportPost"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    }
+                },
+                "security": [
+                    {
+                        "oauth2_security_example": [
+                            "write:projects",
+                            "read:projects"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/posts/{id}/transport/times": {
+            "put": {
+                "tags": [
+                    "Posts",
+                    "TransportPosts"
+                ],
+                "summary": "Update transport times",
+                "description": "Update transport times for a transport post",
+                "operationId": "updateTransportTimes",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Post id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TransportTimesUpdateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TransportPost"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    }
+                },
+                "security": [
+                    {
+                        "oauth2_security_example": [
+                            "write:projects",
+                            "read:projects"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/trips": {
+            "post": {
+                "tags": [
+                    "Trips"
+                ],
+                "summary": "Store trip",
+                "description": "Create a new trip",
+                "operationId": "storeTrip",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreTripRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TripCreationResponseDto"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation or processing error"
+                    }
+                },
+                "security": [
+                    {
+                        "oauth2_security_example": [
+                            "write:projects",
+                            "read:projects"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/users/{userId}/map-data": {
+            "get": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Profile map data",
+                "description": "Return GeoJSON map data for a user",
+                "operationId": "getProfileMapData",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/profile/{username}": {
+            "get": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Get profile",
+                "description": "Return profile data for a user",
+                "operationId": "getProfile",
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserDto"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/account/profile": {
+            "post": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Update profile",
+                "description": "Update profile for authenticated user",
+                "operationId": "updateProfile",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateProfileRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserDto"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/account/settings": {
+            "patch": {
+                "tags": [
+                    "Account"
+                ],
+                "summary": "Update settings",
+                "description": "Update user settings",
+                "operationId": "updateSettings",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SettingsUpdateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                },
+                "security": [
+                    {
+                        "oauth2_security_example": [
+                            "write:projects",
+                            "read:projects"
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "DeparturesDto": {
+                "description": "Data Transfer Object for Departures at a Stop",
+                "required": [
+                    "stop",
+                    "departures"
+                ],
+                "properties": {
+                    "stop": {
+                        "$ref": "#/components/schemas/MotisStopDto"
+                    },
+                    "departures": {
+                        "description": "Collection of departure stop times",
+                        "type": "array",
+                        "items": {
+                            "$ref": "App\\Dto\\MotisApi\\StopTimeDto"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "DeparturesResponseDto": {
+                "description": "Data Transfer Object for Departures Response",
+                "required": [
+                    "departures",
+                    "modes",
+                    "requestTime",
+                    "requestIdentifier",
+                    "requestLatitude",
+                    "requestLongitude"
+                ],
+                "properties": {
+                    "departures": {
+                        "$ref": "#/components/schemas/DeparturesDto"
+                    },
+                    "modes": {
+                        "description": "Filter modes applied to the request",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TransportMode"
+                        }
+                    },
+                    "requestTime": {
+                        "description": "Time when the request was made",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "requestIdentifier": {
+                        "description": "Unique identifier for the request",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "requestLatitude": {
+                        "description": "Latitude of the request location",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "requestLongitude": {
+                        "description": "Longitude of the request location",
+                        "type": "number",
+                        "format": "float"
+                    }
+                },
+                "type": "object"
+            },
+            "FilteredPostPaginationDto": {
+                "description": "Pagination DTO specifically for posts",
+                "required": [
+                    "perPage",
+                    "items",
+                    "nextCursor",
+                    "previousCursor",
+                    "availableTags"
+                ],
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/PostPaginationDto"
+                    },
+                    {
+                        "properties": {
+                            "availableTags": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "items": {
+                                "description": "Array of post items on the current page",
+                                "type": "array",
+                                "items": {
+                                    "anyOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LocationPost"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/BasePost"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/TransportPost"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "LikeResponseDto": {
+                "required": [
+                    "likedByUser",
+                    "likeCount"
+                ],
+                "properties": {
+                    "likedByUser": {
+                        "description": "Indicates if the post is liked by the user",
+                        "type": "boolean"
+                    },
+                    "likeCount": {
+                        "description": "Total number of likes on the post",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "LocationHistoryDto": {
+                "description": "Data Transfer Object for Location History",
+                "required": [
+                    "locations",
+                    "trips"
+                ],
+                "properties": {
+                    "locations": {
+                        "description": "Collection of location history entries",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/LocationHistoryEntryDto"
+                        }
+                    },
+                    "trips": {
+                        "description": "Collection of trip history entries",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TripHistoryEntryDto"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "MotisGeocodeResponseEntry": {
+                "required": [
+                    "type",
+                    "tokens",
+                    "name",
+                    "identifier",
+                    "lat",
+                    "lon",
+                    "score",
+                    "id",
+                    "level",
+                    "street",
+                    "houseNumber",
+                    "zip",
+                    "areas",
+                    "identifiers"
+                ],
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/MotisLocationType"
+                    },
+                    "tokens": {
+                        "description": "An array of tokens representing parts of the location name or identifier",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "name": {
+                        "description": "The name of the location",
+                        "type": "string"
+                    },
+                    "identifier": {
+                        "description": "A unique identifier for the location",
+                        "type": "string"
+                    },
+                    "id": {
+                        "description": "The ID of the location",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "lat": {
+                        "description": "The latitude of the location",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "lon": {
+                        "description": "The longitude of the location",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "level": {
+                        "description": "The level or floor of the location, if applicable",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "street": {
+                        "description": "The street name of the location, if applicable",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "houseNumber": {
+                        "description": "The house number of the location, if applicable",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "zip": {
+                        "description": "The ZIP code of the location, if applicable",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "areas": {
+                        "description": "An array of area names or identifiers associated with the location",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "score": {
+                        "description": "The confidence score of the geocode result",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "identifiers": {
+                        "description": "An array of location identifiers",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/LocationIdentifierDto"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "MotisLocationType": {
+                "type": "string",
+                "enum": [
+                    "ADDRESS",
+                    "PLACE",
+                    "STOP"
+                ]
+            },
+            "MotisStopDto": {
+                "description": "Data Transfer Object for a Stop",
+                "required": [
+                    "stopId",
+                    "tripStopId",
+                    "name",
+                    "latitude",
+                    "longitude",
+                    "distance"
+                ],
+                "properties": {
+                    "stopId": {
+                        "description": "Unique identifier for the stop",
+                        "type": "string"
+                    },
+                    "tripStopId": {
+                        "description": "Trip-specific identifier for the stop",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "name": {
+                        "description": "Name of the stop",
+                        "type": "string"
+                    },
+                    "latitude": {
+                        "description": "Latitude of the stop",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "longitude": {
+                        "description": "Longitude of the stop",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "distance": {
+                        "description": "Distance to the stop in meters",
+                        "type": "integer",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "PaginationDto": {
+                "description": "A generic pagination DTO",
+                "required": [
+                    "perPage",
+                    "items",
+                    "nextCursor",
+                    "previousCursor"
+                ],
+                "properties": {
+                    "perPage": {
+                        "description": "Number of items per page",
+                        "type": "integer"
+                    },
+                    "nextCursor": {
+                        "description": "Cursor for the next page",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "previousCursor": {
+                        "description": "Cursor for the previous page",
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "PostPaginationDto": {
+                "description": "Pagination DTO specifically for posts",
+                "required": [
+                    "items"
+                ],
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/PaginationDto"
+                    },
+                    {
+                        "properties": {
+                            "items": {
+                                "description": "Array of post items on the current page",
+                                "type": "array",
+                                "items": {
+                                    "oneOf": [
+                                        {
+                                            "$ref": "#/components/schemas/LocationPost"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/BasePost"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/TransportPost"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "StopoversResponseDto": {
+                "description": "Data Transfer Object for Stopovers Response",
+                "required": [
+                    "trip",
+                    "startTime",
+                    "startId",
+                    "tripId"
+                ],
+                "properties": {
+                    "trip": {
+                        "$ref": "App\\Dto\\MotisApi\\TripDto"
+                    },
+                    "startTime": {
+                        "description": "Start time of the trip",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "startId": {
+                        "description": "Identifier for the start location",
+                        "type": "string"
+                    },
+                    "tripId": {
+                        "description": "Unique identifier for the trip",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "TripCreationResponseDto": {
+                "description": "Data Transfer Object for Trip Creation Response",
+                "required": [
+                    "tripId",
+                    "startId",
+                    "startTime"
+                ],
+                "properties": {
+                    "tripId": {
+                        "description": "The identifier of the created trip (foreign trip id)",
+                        "type": "string",
+                        "example": "trip_12345"
+                    },
+                    "startId": {
+                        "description": "The identifier of the starting location of the trip",
+                        "type": "string",
+                        "example": "loc_67890"
+                    },
+                    "startTime": {
+                        "description": "The departure time of the trip in ISO 8601 format",
+                        "type": "string",
+                        "example": "2024-07-01T10:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "TravelReason": {
+                "description": "Reasons for travel associated with transport posts",
+                "type": "string",
+                "enum": [
+                    "commute",
+                    "business",
+                    "leisure",
+                    "crew",
+                    "errand",
+                    "other"
+                ]
+            },
+            "TravelRole": {
+                "description": "Enum representing different travel roles",
+                "type": "string",
+                "enum": [
+                    "deadhead",
+                    "operator",
+                    "catering"
+                ]
+            },
+            "TransportMode": {
+                "description": "Enumeration of transport modes",
+                "type": "string",
+                "enum": [
+                    "WALK",
+                    "BIKE",
+                    "RENTAL",
+                    "CAR",
+                    "CAR_PARKING",
+                    "CAR_DROPOFF",
+                    "ODM",
+                    "FLEX",
+                    "TRANSIT",
+                    "TRAM",
+                    "SUBWAY",
+                    "FERRY",
+                    "AIRPLANE",
+                    "SUBURBAN",
+                    "BUS",
+                    "COACH",
+                    "RAIL",
+                    "HIGHSPEED_RAIL",
+                    "LONG_DISTANCE",
+                    "NIGHT_RAIL",
+                    "REGIONAL_FAST_RAIL",
+                    "REGIONAL_RAIL",
+                    "CABLE_CAR",
+                    "FUNICULAR",
+                    "AERIAL_LIFT",
+                    "OTHER",
+                    "AREAL_LIFT",
+                    "METRO"
+                ]
+            },
+            "Visibility": {
+                "description": "Visibility levels for posts",
+                "type": "string",
+                "enum": [
+                    "public",
+                    "private",
+                    "unlisted",
+                    "only-authenticated"
+                ]
+            },
+            "ProfileUpdateRequest": {
+                "title": "Profile Update Request",
+                "description": "Request schema for updating user profile information",
+                "required": [
+                    "name",
+                    "username",
+                    "email"
+                ],
+                "properties": {
+                    "name": {
+                        "description": "The full name of the user",
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "John Doe"
+                    },
+                    "username": {
+                        "description": "The unique username for the user (lowercase, alphanumeric, dashes, and underscores only)",
+                        "type": "string",
+                        "maxLength": 30,
+                        "example": "john_doe"
+                    },
+                    "email": {
+                        "description": "The email address of the user (lowercase)",
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 255,
+                        "example": "mail@example.com"
+                    }
+                },
+                "type": "object"
+            },
+            "SettingsUpdateRequest": {
+                "description": "Request to update user settings",
+                "properties": {
+                    "motisRadius": {
+                        "description": "Radius for Motis suggestions in meters (allowed values: 50, 100, 200, 500)",
+                        "type": "integer",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "StoreInviteCodeRequest": {
+                "required": [],
+                "properties": {
+                    "expires_at": {
+                        "description": "The expiration date of the invite code",
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "StoreTripRequest": {
+                "required": [
+                    "mode",
+                    "origin",
+                    "destination",
+                    "departureTime",
+                    "arrivalTime"
+                ],
+                "properties": {
+                    "mode": {
+                        "description": "The mode of transport for the trip.",
+                        "type": "string",
+                        "enum": [
+                            "WALK",
+                            "BIKE",
+                            "RENTAL",
+                            "CAR",
+                            "CAR_PARKING",
+                            "CAR_DROPOFF",
+                            "ODM",
+                            "FLEX",
+                            "TRANSIT",
+                            "TRAM",
+                            "SUBWAY",
+                            "FERRY",
+                            "AIRPLANE",
+                            "SUBURBAN",
+                            "BUS",
+                            "COACH",
+                            "RAIL",
+                            "HIGHSPEED_RAIL",
+                            "LONG_DISTANCE",
+                            "NIGHT_RAIL",
+                            "REGIONAL_FAST_RAIL",
+                            "REGIONAL_RAIL",
+                            "CABLE_CAR",
+                            "FUNICULAR",
+                            "AERIAL_LIFT",
+                            "OTHER",
+                            "AREAL_LIFT",
+                            "METRO"
+                        ]
+                    },
+                    "lineName": {
+                        "description": "The name of the line.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "routeLongName": {
+                        "description": "The long name of the route.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "tripShortName": {
+                        "description": "The short name of the trip.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "displayName": {
+                        "description": "The display name of the trip.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "origin": {
+                        "description": "The origin location of the trip.",
+                        "type": "string"
+                    },
+                    "originType": {
+                        "description": "The type of identifier used for the origin (id or identifier).",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "destination": {
+                        "description": "The destination location of the trip.",
+                        "type": "string"
+                    },
+                    "destinationType": {
+                        "description": "The type of identifier used for the destination (id or identifier).",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "departureTime": {
+                        "description": "The departure time of the trip.",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "arrivalTime": {
+                        "description": "The arrival time of the trip.",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "stops": {
+                        "description": "An array of stops for the trip.",
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "identifier": {
+                                    "description": "The identifier of the stop.",
+                                    "type": "string"
+                                },
+                                "identifierType": {
+                                    "description": "The type of identifier used for the stop (id or identifier).",
+                                    "type": "string",
+                                    "nullable": true
+                                },
+                                "order": {
+                                    "description": "The order of the stop in the trip sequence.",
+                                    "type": "integer"
+                                }
+                            },
+                            "type": "object"
+                        },
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "TransportPostExitUpdateRequest": {
+                "required": [
+                    "stopId"
+                ],
+                "properties": {
+                    "stopId": {
+                        "description": "The ID of the transport trip stop, the user wants to exit at.",
+                        "type": "string",
+                        "example": "123e4567-e89b-12d3-a456-426614174000"
+                    }
+                },
+                "type": "object"
+            },
+            "TransportTimesUpdateRequest": {
+                "properties": {
+                    "manualDepartureTime": {
+                        "description": "The manually set departure time for the transport post.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-08-01T10:00:00Z"
+                    },
+                    "manualArrivalTime": {
+                        "description": "The manually set arrival time for the transport post.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-08-01T12:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateProfileRequest": {
+                "description": "Request to update user profile",
+                "required": [
+                    "name"
+                ],
+                "properties": {
+                    "name": {
+                        "description": "Full name of the user",
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "bio": {
+                        "description": "Biography of the user",
+                        "type": "string",
+                        "maxLength": 500,
+                        "nullable": true
+                    },
+                    "website": {
+                        "description": "Website URL of the user",
+                        "type": "string",
+                        "format": "uri",
+                        "maxLength": 255,
+                        "nullable": true
+                    },
+                    "avatar": {
+                        "description": "Avatar image file upload",
+                        "type": "string",
+                        "format": "binary",
+                        "nullable": true
+                    },
+                    "header": {
+                        "description": "Header image file upload",
+                        "type": "string",
+                        "format": "binary",
+                        "nullable": true
+                    },
+                    "deleteAvatar": {
+                        "description": "Flag to delete existing avatar",
+                        "type": "boolean",
+                        "nullable": true
+                    },
+                    "deleteHeader": {
+                        "description": "Flag to delete existing header",
+                        "type": "boolean",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "InviteDto": {
+                "required": [
+                    "id",
+                    "createdAt",
+                    "expiresAt",
+                    "usedAt"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "The unique identifier of the invite code",
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "description": "The creation timestamp of the invite code",
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "expiresAt": {
+                        "description": "The expiration timestamp of the invite code",
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "usedAt": {
+                        "description": "The timestamp when the invite code was used",
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "LocationDto": {
+                "description": "Location Data Object",
+                "required": [
+                    "id",
+                    "name",
+                    "latitude",
+                    "longitude",
+                    "distance",
+                    "tags",
+                    "identifiers"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Location ID",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "description": "Name of the location",
+                        "type": "string"
+                    },
+                    "latitude": {
+                        "description": "Latitude of the location",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "longitude": {
+                        "description": "Longitude of the location",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "distance": {
+                        "description": "Distance to the location in meters",
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "identifiers": {
+                        "description": "List of location identifiers",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/LocationIdentifierDto"
+                        }
+                    },
+                    "tags": {
+                        "description": "List of location tags",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/LocationTagDto"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "LocationHistoryEntryDto": {
+                "description": "Location History Entry Data Transfer Object",
+                "required": [
+                    "id",
+                    "name",
+                    "latitude",
+                    "longitude",
+                    "type",
+                    "timestamp"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Location ID",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "description": "Name of the location",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "latitude": {
+                        "description": "Latitude of the location",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "longitude": {
+                        "description": "Longitude of the location",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "type": {
+                        "description": "Type of the location history entry",
+                        "type": "string"
+                    },
+                    "timestamp": {
+                        "description": "Timestamp of the location history entry in ISO 8601 format",
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "LocationIdentifierDto": {
+                "description": "Location Identifier Data Object",
+                "required": [
+                    "type",
+                    "origin",
+                    "identifier"
+                ],
+                "properties": {
+                    "type": {
+                        "description": "Type of the location identifier",
+                        "type": "string"
+                    },
+                    "origin": {
+                        "description": "Origin of the location identifier",
+                        "type": "string"
+                    },
+                    "identifier": {
+                        "description": "The location identifier value",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "LocationTagDto": {
+                "description": "Location Tag Data Object",
+                "required": [
+                    "key",
+                    "value"
+                ],
+                "properties": {
+                    "key": {
+                        "description": "Key of the location tag",
+                        "type": "string"
+                    },
+                    "value": {
+                        "description": "Value of the location tag",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "BasePost": {
+                "description": "Base Post Resource",
+                "required": [
+                    "id",
+                    "user",
+                    "body",
+                    "visibility",
+                    "published_at",
+                    "created_at",
+                    "updated_at",
+                    "likesCount",
+                    "likedByUser",
+                    "metaInfos",
+                    "hashTags"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Post ID",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "user": {
+                        "$ref": "#/components/schemas/UserDto"
+                    },
+                    "body": {
+                        "description": "Post body content",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "visibility": {
+                        "$ref": "#/components/schemas/Visibility"
+                    },
+                    "publishedAt": {
+                        "description": "Post published at timestamp",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "createdAt": {
+                        "description": "Post created at timestamp",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updatedAt": {
+                        "description": "Post updated at timestamp",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "hashTags": {
+                        "description": "List of hashtags associated with the post",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "likesCount": {
+                        "description": "Number of likes on the post",
+                        "type": "integer"
+                    },
+                    "likedByUser": {
+                        "description": "Indicates if the post is liked by the current user",
+                        "type": "boolean"
+                    },
+                    "metaInfos": {
+                        "description": "Additional meta information associated with the post",
+                        "type": "object",
+                        "additionalProperties": {
+                            "oneOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "LocationPost": {
+                "description": "Location Post Resource",
+                "required": [
+                    "location",
+                    "travelReason"
+                ],
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/BasePost"
+                    },
+                    {
+                        "properties": {
+                            "location": {
+                                "$ref": "#/components/schemas/LocationDto"
+                            },
+                            "travelReason": {
+                                "oneOf": [
+                                    {
+                                        "$ref": "#/components/schemas/TravelReason"
+                                    }
+                                ],
+                                "nullable": true,
+                                "description": "Reason for travel associated with the location post"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "TransportPost": {
+                "description": "Transport Post Resource",
+                "required": [
+                    "originStop",
+                    "destinationStop",
+                    "trip",
+                    "travelReason",
+                    "manualDepartureTime",
+                    "manualArrivalTime"
+                ],
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/BasePost"
+                    },
+                    {
+                        "properties": {
+                            "originStop": {
+                                "$ref": "#/components/schemas/StopDto"
+                            },
+                            "destinationStop": {
+                                "$ref": "#/components/schemas/StopDto"
+                            },
+                            "trip": {
+                                "$ref": "#/components/schemas/TripDto"
+                            },
+                            "manualDepartureTime": {
+                                "description": "Manually specified departure time in ISO 8601 format",
+                                "type": "string",
+                                "format": "date-time",
+                                "nullable": true
+                            },
+                            "manualArrivalTime": {
+                                "description": "Manually specified arrival time in ISO 8601 format",
+                                "type": "string",
+                                "format": "date-time",
+                                "nullable": true
+                            },
+                            "travelReason": {
+                                "oneOf": [
+                                    {
+                                        "$ref": "#/components/schemas/TravelReason"
+                                    }
+                                ],
+                                "nullable": true,
+                                "description": "Reason for travel associated with the transport post"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "StopDto": {
+                "description": "Data Transfer Object for a Transport Trip Stop",
+                "required": [
+                    "id",
+                    "name",
+                    "location",
+                    "arrivalTime",
+                    "departureTime",
+                    "arrivalDelay",
+                    "departureDelay"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier for the stop",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "description": "Name of the stop",
+                        "type": "string"
+                    },
+                    "location": {
+                        "$ref": "#/components/schemas/LocationDto"
+                    },
+                    "arrivalTime": {
+                        "description": "Scheduled arrival time in ISO 8601 format",
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "departureTime": {
+                        "description": "Scheduled departure time in ISO 8601 format",
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "arrivalDelay": {
+                        "description": "Arrival delay in minutes",
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "departureDelay": {
+                        "description": "Departure delay in minutes",
+                        "type": "integer",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "TripDto": {
+                "description": "Data Transfer Object for a Transport Trip",
+                "required": [
+                    "id",
+                    "foreignId",
+                    "mode",
+                    "lineName",
+                    "routeLongName",
+                    "tripShortName",
+                    "displayName",
+                    "routeColor",
+                    "routeTextColor"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier for the trip",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "foreignId": {
+                        "description": "Foreign identifier for the trip",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "mode": {
+                        "$ref": "#/components/schemas/TransportMode"
+                    },
+                    "lineName": {
+                        "description": "Name of the line",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "routeLongName": {
+                        "description": "Long name of the route",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "tripShortName": {
+                        "description": "Short name of the trip",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "displayName": {
+                        "description": "Display name of the trip",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "routeColor": {
+                        "description": "Color of the route in HEX format",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "routeTextColor": {
+                        "description": "Text color of the route in HEX format",
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "TripHistoryEntryDto": {
+                "description": "Trip History Entry Data Transfer Object",
+                "required": [
+                    "id",
+                    "geometry",
+                    "trip"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Transport Post ID",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "geometry": {
+                        "description": "Geometry of the trip as a GeoJSON LineString",
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "trip": {
+                        "$ref": "#/components/schemas/TripDto"
+                    }
+                },
+                "type": "object"
+            },
+            "UserDto": {
+                "description": "User Data Object",
+                "required": [
+                    "id",
+                    "name",
+                    "username",
+                    "avatar",
+                    "header",
+                    "bio",
+                    "website",
+                    "createdAt"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "User ID",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "description": "Full name of the user",
+                        "type": "string"
+                    },
+                    "username": {
+                        "description": "Username of the user",
+                        "type": "string"
+                    },
+                    "avatar": {
+                        "description": "URL of the user avatar image",
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
+                    },
+                    "header": {
+                        "description": "URL of the user header image",
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
+                    },
+                    "bio": {
+                        "description": "Biography of the user",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "website": {
+                        "description": "Website URL of the user",
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
+                    },
+                    "createdAt": {
+                        "description": "Account creation timestamp",
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "passport": {
+                "type": "oauth2",
+                "description": "Laravel passport oauth2 security.",
+                "in": "header",
+                "scheme": "https",
+                "flows": {
+                    "password": {
+                        "authorizationUrl": "http://localhost/oauth/authorize",
+                        "tokenUrl": "http://localhost/oauth/token",
+                        "refreshUrl": "http://localhost/token/refresh",
+                        "scopes": []
+                    }
+                }
+            },
+            "sanctum": {
+                "type": "apiKey",
+                "description": "Enter token in format (Bearer <token>)",
+                "name": "Authorization",
+                "in": "header"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Posts",
+            "description": "Operations related to posts created by users"
+        },
+        {
+            "name": "Account",
+            "description": "Account"
+        },
+        {
+            "name": "Invites",
+            "description": "Invites"
+        },
+        {
+            "name": "Location",
+            "description": "Location"
+        },
+        {
+            "name": "Map",
+            "description": "Map"
+        },
+        {
+            "name": "Notifications",
+            "description": "Notifications"
+        },
+        {
+            "name": "TransportPosts",
+            "description": "TransportPosts"
+        },
+        {
+            "name": "Trips",
+            "description": "Trips"
+        },
+        {
+            "name": "Profile",
+            "description": "Profile"
+        }
+    ]
+}

@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { api } from '@/app';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import type { Invite } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import axios from 'axios';
 import { DateTime } from 'luxon';
 import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -15,7 +15,7 @@ const loading = ref(false);
 async function fetchInvites(): Promise<void> {
     loading.value = true;
     try {
-        const response = await axios.get('/api/invites');
+        const response = await api.invites.listInvites();
         invites.value = response.data;
     } finally {
         loading.value = false;
@@ -25,8 +25,9 @@ async function fetchInvites(): Promise<void> {
 async function createInvite(): Promise<void> {
     loading.value = true;
     try {
-        await axios.post('/api/invites');
-        await fetchInvites();
+        api.invites.createInvite({}).then(() => {
+            fetchInvites();
+        });
     } finally {
         loading.value = false;
     }
@@ -35,8 +36,9 @@ async function createInvite(): Promise<void> {
 async function deleteInvite(inviteCode: string): Promise<void> {
     loading.value = true;
     try {
-        await axios.delete(`/api/invites/${inviteCode}`);
-        await fetchInvites();
+        api.invites.deleteInvite(inviteCode).then(() => {
+            fetchInvites();
+        });
     } finally {
         loading.value = false;
     }

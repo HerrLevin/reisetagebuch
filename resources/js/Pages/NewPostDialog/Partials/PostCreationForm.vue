@@ -5,15 +5,19 @@ import {
     getTravelReasonDescription,
     getTravelReasonIcon,
     getTravelReasonLabel,
-} from '@/Services/TravelReasonMapping';
+} from '@/Services/ApiTravelReasonMapping';
 import {
     getVisibilityDescription,
     getVisibilityIcon,
     getVisibilityLabel,
 } from '@/Services/VisibilityMapping';
-import { TravelReason, TravelRole, Visibility } from '@/types/enums';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import {
+    TravelReason,
+    TravelRole,
+    Visibility,
+} from '../../../../types/Api.gen';
 
 const { t } = useI18n();
 
@@ -85,8 +89,8 @@ const emit = defineEmits([
     'update:travelRole',
     'update:tripId',
 ]);
-const selectedVisibility = ref(props.defaultVisibility || Visibility.PUBLIC);
-const selectedTravelReason = ref(props.travelReason || TravelReason.LEISURE);
+const selectedVisibility = ref(props.defaultVisibility || Visibility.Public);
+const selectedTravelReason = ref(props.travelReason || TravelReason.Leisure);
 
 if (!props.defaultVisibility) {
     recallStoredVisibility();
@@ -322,13 +326,13 @@ function updateTripId(event: Event) {
                         <option :value="null">
                             {{ t('travel_role.select') }}
                         </option>
-                        <option :value="TravelRole.OPERATOR">
+                        <option :value="TravelRole.Operator">
                             {{ t('travel_role.operator') }}
                         </option>
-                        <option :value="TravelRole.DEADHEAD">
+                        <option :value="TravelRole.Deadhead">
                             {{ t('travel_role.deadhead') }}
                         </option>
-                        <option :value="TravelRole.CATERING">
+                        <option :value="TravelRole.Catering">
                             {{ t('travel_role.catering') }}
                         </option>
                     </select>

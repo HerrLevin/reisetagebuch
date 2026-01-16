@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import { api } from '@/app';
 import Loading from '@/Components/Loading.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import LocationListEntry from '@/Pages/NewPostDialog/Partials/LocationListEntry.vue';
 import { LocationService } from '@/Services/LocationService';
 import { LocationEntry, RequestLocationDto } from '@/types';
 import { Head, usePage } from '@inertiajs/vue3';
-import axios from 'axios';
 import { Search } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -26,13 +26,11 @@ function fetchRequestLocation() {
     LocationService.getPosition(!!usePage().props.auth.user)
         .then((position) => {
             currentPosition.value = position;
-            axios
-                .get(
-                    route('api.request-location.get', {
-                        latitude: position.coords.latitude,
-                        longitude: position.coords.longitude,
-                    }),
-                )
+            api.location
+                .getRecentRequestLocation({
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                })
                 .then((data) => {
                     fetchingProgress.value = data.data;
                 })
@@ -70,14 +68,12 @@ function fetchLocations() {
         return;
     }
     loading.value = true;
-    axios
-        .get(
-            route('api.location.search', {
-                latitude: currentPosition.value!.coords.latitude,
-                longitude: currentPosition.value!.coords.longitude,
-                query: search.value,
-            }),
-        )
+    api.locations
+        .searchLocations({
+            latitude: currentPosition.value!.coords.latitude,
+            longitude: currentPosition.value!.coords.longitude,
+            query: search.value,
+        })
         .then((response) => {
             if (response.data) {
                 const data = response.data as LocationEntry[];

@@ -5,9 +5,9 @@ namespace Tests\Feature\Controllers\Api;
 use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\Backend\LocationController as LocationControllerBackend;
 use App\Http\Requests\GeocodeRequest;
+use App\Http\Requests\LocationRequest;
 use App\Jobs\PrefetchJob;
 use Clickbar\Magellan\Data\Geometries\Point;
-use Illuminate\Http\Request;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Queue;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -24,13 +24,19 @@ class LocationControllerTest extends TestCase
             ->with($this->isString(), $this->isInstanceOf(Point::class));
 
         $locationController = new LocationController($locationControllerMock);
-        $request = Request::create(uri: '/api/location/prefetch/48.8566/2.3522', cookies: ['rtb_allow_history' => 'allow']);
+        $request = LocationRequest::create(
+            uri: '/api/location/prefetch',
+            parameters: [
+                'latitude' => 48.8566,
+                'longitude' => 2.3522,
+            ],
+            cookies: ['rtb_allow_history' => 'allow']);
         $request->setUserResolver(function () {
             return (object) ['id' => 1]; // Mock user ID
         });
 
         $this->expectException(HttpException::class);
-        $locationController->prefetch(1, 2, $request);
+        $locationController->prefetch($request);
 
         Queue::assertPushed(function (PrefetchJob $job) {
             return $job->point->getLatitude() === 48.8566 && $job->point->getLongitude() === 2.3522;
@@ -59,13 +65,13 @@ class LocationControllerTest extends TestCase
             ->with($this->isString(), $this->isInstanceOf(Point::class));
 
         $locationController = new LocationController($locationControllerMock);
-        $request = Request::create(uri: '/api/location/prefetch/48.8566/2.3522', cookies: $cookies);
+        $request = LocationRequest::create(uri: '/api/location/prefetch?latitude=48.8566&longitude=2.3522', parameters: ['latitude' => 1, 'longitude' => 2], cookies: $cookies);
         $request->setUserResolver(function () {
             return (object) ['id' => 1]; // Mock user ID
         });
 
         $this->expectException(HttpException::class);
-        $locationController->prefetch(1, 2, $request);
+        $locationController->prefetch($request);
 
         Queue::assertPushed(function (PrefetchJob $job) {
             return $job->point->getLatitude() === 48.8566 && $job->point->getLongitude() === 2.3522;

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { api } from '@/app';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import TransitousSearch from '@/Pages/NewPostDialog/Partials/TransitousSearch.vue';
 import AirportSearch from '@/Pages/NewRoute/Partials/AirportSearch.vue';
@@ -12,11 +13,11 @@ import {
     TripLocation,
 } from '@/types/TripCreation';
 import { Head } from '@inertiajs/vue3';
-import axios from 'axios';
 import { PlaneTakeoff, TrainFront } from 'lucide-vue-next';
 import { DateTime } from 'luxon';
 import { reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { StoreTripRequest, TransportMode } from '../../../types/Api.gen';
 
 const { t } = useI18n();
 
@@ -47,7 +48,7 @@ const model = ref<CreateTripForm>({
 });
 
 const form = reactive({
-    mode: '',
+    mode: TransportMode.BUS,
     lineName: '',
     routeLongName: '',
     tripShortName: '',
@@ -59,7 +60,7 @@ const form = reactive({
     departureTime: '',
     arrivalTime: '',
     stops: [] as FormStops[],
-});
+} as StoreTripRequest);
 
 function selectLocation(
     e: AutocompleteResponse,
@@ -151,29 +152,30 @@ function submit() {
         identifierType: stop.id ? 'id' : 'identifier',
     }));
 
-    axios
-        .post(route('trips.store'), form)
+    api.trips
+        .storeTrip(form)
         .then((response) => {
-            if (response.data.success) {
-                // Reset the form after successful submission
-                model.value = {
-                    startLocation: null,
-                    endLocation: null,
-                    departureTime: DateTime.now(),
-                    arrivalTime: DateTime.now().plus({ hours: 1 }),
-                    transportMode: null,
-                    lineName: '',
-                    tripShortName: '',
-                    stops: [],
-                    routeColor: null,
-                    routeTextColor: null,
-                };
-                window.location.href = route('posts.create.stopovers', {
-                    tripId: response.data.tripId,
-                    startId: response.data.startId,
-                    startTime: response.data.startTime,
-                });
-            } else {
+            // Reset the form after successful submission
+            model.value = {
+                startLocation: null,
+                endLocation: null,
+                departureTime: DateTime.now(),
+                arrivalTime: DateTime.now().plus({ hours: 1 }),
+                transportMode: null,
+                lineName: '',
+                tripShortName: '',
+                stops: [],
+                routeColor: null,
+                routeTextColor: null,
+            };
+            window.location.href = route('posts.create.stopovers', {
+                tripId: response.data.tripId,
+                startId: response.data.startId,
+                startTime: response.data.startTime,
+            });
+        })
+        .catch((response) => {
+            if (response.status === 422) {
                 alert(response.data.message || 'Failed to create trip');
             }
         })

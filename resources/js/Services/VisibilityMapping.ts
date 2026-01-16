@@ -2,6 +2,7 @@ import i18n from '@/i18n';
 import { Visibility } from '@/types/enums';
 import { Earth, Lock, LucideProps, Moon, Users } from 'lucide-vue-next';
 import * as vue from 'vue';
+import { Visibility as ApiVisibility } from '../../types/Api.gen';
 
 const { t } = i18n.global;
 
@@ -36,16 +37,20 @@ const visibilityMappings: Record<Visibility, VisibilityMapping> = {
 };
 
 export function getVisibilityIcon(
-    visibility: Visibility,
+    visibility: Visibility | ApiVisibility,
     // eslint-disable-next-line
 ): vue.FunctionalComponent<LucideProps, {}, any, {}> {
     return visibilityMappings[visibility].icon;
 }
 
-export function getVisibilityDescription(visibility: Visibility): string {
+export function getVisibilityDescription(
+    visibility: Visibility | ApiVisibility,
+): string {
     return visibilityMappings[visibility].description;
 }
 
-export function getVisibilityLabel(visibility: Visibility): string {
+export function getVisibilityLabel(
+    visibility: Visibility | ApiVisibility,
+): string {
     return visibilityMappings[visibility].label;
 }

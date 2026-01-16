@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { api } from '@/app';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import UpdateAccountSettingsForm from '@/Pages/Settings/Partials/UpdateAccountSettingsForm.vue';
 import UpdateDeviceSettingsForm from '@/Pages/Settings/Partials/UpdateDeviceSettingsForm.vue';
 import { Head } from '@inertiajs/vue3';
-import axios from 'axios';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import DeleteUserForm from './Partials/DeleteUserForm.vue';
@@ -26,8 +26,8 @@ function connectTraewelling() {
 
 function disconnectTraewelling() {
     processingTraewelling.value = true;
-    axios
-        .delete('/api/account/socialite/traewelling')
+    api.account
+        .disconnectTraewelling()
         .then(() => {
             window.location.reload();
         })

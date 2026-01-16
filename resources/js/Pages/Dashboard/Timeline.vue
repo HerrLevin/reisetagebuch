@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import { api } from '@/app';
 import Loading from '@/Components/Loading.vue';
 import Post from '@/Components/Post/Post.vue';
-import { BasePost, LocationPost, TransportPost } from '@/types/PostTypes';
 import { Link } from '@inertiajs/vue3';
-import axios from 'axios';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { BasePost, LocationPost, TransportPost } from '../../../types/Api.gen';
 
 const { t } = useI18n();
 
@@ -13,25 +13,14 @@ const posts = ref<Array<BasePost | TransportPost | LocationPost>>([]);
 const loading = ref(false);
 const nextCursor = ref<string | null>(null);
 
-loading.value = true;
-axios.get('/api/timeline').then((response) => {
-    posts.value = response.data.items;
-    nextCursor.value = response.data.nextCursor;
-    loading.value = false;
-});
-
-function loadMore() {
-    if (loading.value || !nextCursor.value) {
+function loadPosts() {
+    if (loading.value) {
         return;
     }
 
     loading.value = true;
-    axios
-        .get('/api/timeline', {
-            params: {
-                cursor: nextCursor.value,
-            },
-        })
+    api.timeline
+        .timeline({ cursor: nextCursor.value || undefined })
         .then((response) => {
             posts.value.push(...response.data.items);
             if (response.data.nextCursor === nextCursor.value) {
@@ -51,6 +40,8 @@ function removePost(postId: string): void {
         posts.value.splice(index, 1);
     }
 }
+
+loadPosts();
 </script>
 
 <template>
@@ -68,7 +59,7 @@ function removePost(postId: string): void {
             </Link>
         </li>
         <li v-show="!loading && !!nextCursor" class="p-4 text-center">
-            <button class="btn btn-ghost w-full" @click="loadMore()">
+            <button class="btn btn-ghost w-full" @click="loadPosts()">
                 {{ t('common.load_more') }}
             </button>
         </li>

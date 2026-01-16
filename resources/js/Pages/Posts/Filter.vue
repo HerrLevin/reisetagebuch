@@ -1,16 +1,22 @@
 <script setup lang="ts">
+import { api } from '@/app';
 import Loading from '@/Components/Loading.vue';
 import MassEdit from '@/Components/Post/MassEdit.vue';
 import Post from '@/Components/Post/Post.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { getTravelReasonLabel } from '@/Services/TravelReasonMapping';
 import { getVisibilityLabel } from '@/Services/VisibilityMapping';
-import { TravelReason, Visibility } from '@/types/enums';
 import { AllPosts } from '@/types/PostTypes';
 import { Head, router } from '@inertiajs/vue3';
-import axios from 'axios';
 import { onMounted, PropType, reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import {
+    BasePost,
+    LocationPost,
+    TransportPost,
+    TravelReason,
+    Visibility,
+} from '../../../types/Api.gen';
 
 const { t } = useI18n();
 
@@ -27,6 +33,8 @@ const props = defineProps({
     },
 });
 
+type AllPosts = TransportPost | BasePost | LocationPost;
+
 const posts = ref<AllPosts[]>([]);
 const availableTags = ref<string[]>([]);
 const loading = ref(false);
@@ -35,20 +43,24 @@ const nextCursor = ref<string | null>(null);
 const filterForm = reactive({
     dateFrom: props.filters.dateFrom || '',
     dateTo: props.filters.dateTo || '',
-    visibility: props.filters.visibility || [],
-    travelReason: props.filters.travelReason || [],
-    tags: props.filters.tags || [],
+    visibility: props.filters.visibility || ([] as Visibility[]),
+    travelReason: props.filters.travelReason || ([] as TravelReason[]),
+    tags: props.filters.tags || ([] as string[]),
 });
 
 const buildFilterParams = () => {
     return {
-        dateFrom: filterForm.dateFrom || null,
-        dateTo: filterForm.dateTo || null,
+        dateFrom: filterForm.dateFrom || undefined,
+        dateTo: filterForm.dateTo || undefined,
         visibility:
-            filterForm.visibility.length > 0 ? filterForm.visibility : null,
+            filterForm.visibility.length > 0
+                ? filterForm.visibility
+                : undefined,
         travelReason:
-            filterForm.travelReason.length > 0 ? filterForm.travelReason : null,
-        tags: filterForm.tags.length > 0 ? filterForm.tags : null,
+            filterForm.travelReason.length > 0
+                ? filterForm.travelReason
+                : undefined,
+        tags: filterForm.tags.length > 0 ? filterForm.tags : undefined,
     };
 };
 
@@ -56,21 +68,21 @@ const fetchPosts = (cursor: string | null = null, append = false) => {
     if (loading.value) return;
 
     loading.value = true;
-    axios
-        .get('/api/posts/filter', {
-            params: {
-                ...buildFilterParams(),
-                cursor,
-            },
+    api.posts
+        .filterPosts({
+            ...buildFilterParams(),
+            cursor: cursor || undefined,
         })
         .then((response) => {
-            if (append) {
-                posts.value.push(...response.data.items);
-            } else {
-                posts.value = response.data.items;
-            }
             nextCursor.value = response.data.nextCursor;
             availableTags.value = response.data.availableTags;
+            if (response.data.items !== undefined) {
+                if (append) {
+                    posts.value.push(...response.data.items);
+                } else {
+                    posts.value = response.data.items;
+                }
+            }
         })
         .finally(() => {
             loading.value = false;
