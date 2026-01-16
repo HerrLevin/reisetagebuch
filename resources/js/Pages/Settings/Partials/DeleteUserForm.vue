@@ -1,30 +1,40 @@
 <script setup lang="ts">
-import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
-import { useForm } from '@inertiajs/vue3';
-import { ref, useTemplateRef } from 'vue';
+import axios from 'axios';
+import { reactive, ref, useTemplateRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
 
 const passwordInput = ref<HTMLInputElement | null>(null);
 
-const form = useForm({
+const processing = ref(false);
+const form = reactive({
     password: '',
 });
 
 const deleteModal = useTemplateRef('deleteModal');
 
 const deleteUser = () => {
-    form.delete(route('account.destroy'), {
-        preserveScroll: true,
-        onSuccess: () => deleteModal.value?.close(),
-        onError: () => passwordInput.value?.focus(),
-        onFinish: () => {
-            form.reset();
-        },
-    });
+    processing.value = true;
+    axios
+        .delete('/api/account', { data: { password: form.password } })
+        .then(() => {
+            deleteModal.value?.close();
+            window.location.href = '/';
+        })
+        .catch((error) => {
+            passwordInput.value?.focus();
+            // http response contains "message" field with error description
+            alert(
+                error.response.data.message ||
+                    t('settings.delete_account.error'),
+            );
+        })
+        .finally(() => {
+            processing.value = false;
+        });
 };
 </script>
 
@@ -63,14 +73,11 @@ const deleteUser = () => {
                         id="password"
                         ref="passwordInput"
                         v-model="form.password"
-                        :error="form.errors.password"
                         type="password"
                         class="mt-1 block w-3/4"
                         :placeholder="t('settings.delete_account.password')"
                         @keyup.enter="deleteUser"
                     />
-
-                    <InputError :message="form.errors.password" class="mt-2" />
                 </div>
                 <div class="modal-action">
                     <form method="dialog">
@@ -81,8 +88,8 @@ const deleteUser = () => {
 
                     <button
                         class="btn btn-error"
-                        :class="{ 'opacity-25': form.processing }"
-                        :disabled="form.processing"
+                        :class="{ 'opacity-25': processing }"
+                        :disabled="processing"
                         @click="deleteUser"
                     >
                         {{ t('settings.delete_account.confirm') }}

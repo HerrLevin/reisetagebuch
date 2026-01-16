@@ -1,12 +1,15 @@
 <?php
 
+use App\Http\Controllers\Api\AccountController;
 use App\Http\Controllers\Api\InviteController;
 use App\Http\Controllers\Api\LikeController;
 use App\Http\Controllers\Api\LocationController as ApiLocationController;
 use App\Http\Controllers\Api\MapController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PostController;
+use App\Http\Controllers\Api\TripController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\UserSettingsController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('profile')->group(function () {
@@ -20,6 +23,9 @@ Route::prefix('profile')->group(function () {
 Route::middleware('auth:api')->group(function () {
     Route::get('/timeline', [PostController::class, 'timeline'])
         ->name('posts.timeline');
+
+    Route::post('/trips', [TripController::class, 'store'])
+        ->name('trips.store');
 
     Route::get('/geocode', [ApiLocationController::class, 'geocode'])
         ->name('posts.create.geocode');
@@ -88,5 +94,16 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/', [InviteController::class, 'index'])->name('api.invites.index');
         Route::post('/', [InviteController::class, 'store'])->name('api.invites.store');
         Route::delete('/{inviteCode}', [InviteController::class, 'destroy'])->name('api.invites.destroy');
+    });
+
+    Route::prefix('account')->group(function () {
+        Route::patch('/settings', [UserSettingsController::class, 'update'])->name('account.settings.update');
+        Route::post('/profile', [UserController::class, 'update'])->name('profile.update'); // needs to be post b/c of file upload
+        Route::patch('/', [AccountController::class, 'update'])->name('account.update');
+        Route::delete('/', [AccountController::class, 'destroy'])->name('account.destroy');
+
+        Route::prefix('socialite')->group(callback: function () {
+            Route::delete('/traewelling', [AccountController::class, 'disconnectTraewelling'])->name('traewelling.disconnect');
+        });
     });
 });

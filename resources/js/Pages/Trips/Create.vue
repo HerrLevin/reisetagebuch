@@ -11,10 +11,11 @@ import {
     Providers,
     TripLocation,
 } from '@/types/TripCreation';
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
+import axios from 'axios';
 import { PlaneTakeoff, TrainFront } from 'lucide-vue-next';
 import { DateTime } from 'luxon';
-import { ref, watch } from 'vue';
+import { reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -41,9 +42,11 @@ const model = ref<CreateTripForm>({
     lineName: '',
     tripShortName: '',
     stops: [],
+    routeColor: null,
+    routeTextColor: null,
 });
 
-const form = useForm({
+const form = reactive({
     mode: '',
     lineName: '',
     routeLongName: '',
@@ -148,22 +151,45 @@ function submit() {
         identifierType: stop.id ? 'id' : 'identifier',
     }));
 
-    form.post(route('trips.store'), {
-        onSuccess: () => {
-            // Reset the form after successful submission
-            model.value = {
-                startLocation: null,
-                endLocation: null,
-                departureTime: DateTime.now(),
-                arrivalTime: DateTime.now().plus({ hours: 1 }),
-                transportMode: null,
-                lineName: '',
-                tripShortName: '',
-                stops: [],
-            };
-            form.reset();
-        },
-    });
+    axios
+        .post(route('trips.store'), form)
+        .then((response) => {
+            if (response.data.success) {
+                // Reset the form after successful submission
+                model.value = {
+                    startLocation: null,
+                    endLocation: null,
+                    departureTime: DateTime.now(),
+                    arrivalTime: DateTime.now().plus({ hours: 1 }),
+                    transportMode: null,
+                    lineName: '',
+                    tripShortName: '',
+                    stops: [],
+                    routeColor: null,
+                    routeTextColor: null,
+                };
+                window.location.href = route('posts.create.stopovers', {
+                    tripId: response.data.tripId,
+                    startId: response.data.startId,
+                    startTime: response.data.startTime,
+                });
+            } else {
+                alert(response.data.message || 'Failed to create trip');
+            }
+        })
+        .catch((error) => {
+            if (error.response && error.response.status === 422) {
+                alert(
+                    'Validation error: ' +
+                        JSON.stringify(error.response.data.errors),
+                );
+            } else {
+                alert(
+                    'An error occurred: ' +
+                        (error.response?.data?.message || error.message),
+                );
+            }
+        });
 }
 
 function blur() {
@@ -186,6 +212,8 @@ watch(
             lineName: '',
             tripShortName: '',
             stops: [],
+            routeColor: null,
+            routeTextColor: null,
         };
     },
 );
