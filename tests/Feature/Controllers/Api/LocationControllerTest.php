@@ -1,6 +1,6 @@
 <?php
 
-namespace Feature\Controllers\Api;
+namespace Tests\Feature\Controllers\Api;
 
 use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\Backend\LocationController as LocationControllerBackend;
