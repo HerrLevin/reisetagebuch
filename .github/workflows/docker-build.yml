@@ -3,8 +3,7 @@ name: Docker Build & Push
 on:
   push:
     tags:
-      - "v*.*.*"
-      - "v*.*"
+      - "v*"
     branches:
       - main
   workflow_run:
@@ -31,7 +30,7 @@ jobs:
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Docker meta
         id: meta
@@ -41,6 +40,7 @@ jobs:
             herrlevin/reisetagebuch
           tags: |
             type=ref,event=branch
+            type=ref,event=tag
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
 
