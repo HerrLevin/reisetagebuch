@@ -1,6 +1,6 @@
 <?php
 
-namespace Feature\Controllers\Traewelling;
+namespace Tests\Feature\Controllers\Traewelling;
 
 use App\Enums\PostMetaInfo\MetaInfoKey;
 use App\Http\Controllers\Traewelling\CrossPostController;
