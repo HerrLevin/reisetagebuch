@@ -1,12 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Inertia;
+namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Backend\UserSettingsBackend;
-use App\Http\Controllers\Controller;
 use App\Http\Requests\SettingsUpdateRequest;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Redirect;
 
 class UserSettingsController extends Controller
 {
@@ -14,13 +11,14 @@ class UserSettingsController extends Controller
 
     public function __construct(UserSettingsBackend $userSettingsBackend)
     {
+        parent::__construct();
         $this->backend = $userSettingsBackend;
     }
 
-    public function update(SettingsUpdateRequest $request): RedirectResponse
+    public function update(SettingsUpdateRequest $request)
     {
         $this->backend->update($request);
 
-        return Redirect::route('account.edit');
+        return response()->noContent();
     }
 }

@@ -2,7 +2,9 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import UpdateAccountSettingsForm from '@/Pages/Settings/Partials/UpdateAccountSettingsForm.vue';
 import UpdateDeviceSettingsForm from '@/Pages/Settings/Partials/UpdateDeviceSettingsForm.vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
+import axios from 'axios';
+import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import DeleteUserForm from './Partials/DeleteUserForm.vue';
 import UpdateAccountInformationForm from './Partials/UpdateAccountInformationForm.vue';
@@ -16,8 +18,28 @@ const props = defineProps<{
     traewellingConnected?: boolean;
 }>();
 
+const processingTraewelling = ref(false);
+
 function connectTraewelling() {
     window.location.href = route('traewelling.connect');
+}
+
+function disconnectTraewelling() {
+    processingTraewelling.value = true;
+    axios
+        .delete('/api/account/socialite/traewelling')
+        .then(() => {
+            window.location.reload();
+        })
+        .catch((error) => {
+            alert(
+                error.response.data.message ||
+                    t('settings.traewelling_disconnect.error'),
+            );
+        })
+        .finally(() => {
+            processingTraewelling.value = false;
+        });
 }
 </script>
 
@@ -58,13 +80,13 @@ function connectTraewelling() {
                     <span class="text-success">
                         {{ t('settings.connected_to_traewelling') }}
                     </span>
-                    <Link
-                        :href="route('traewelling.disconnect')"
+                    <a
                         class="btn btn-error btn-sm ml-4"
                         type="button"
+                        @click="disconnectTraewelling()"
                     >
                         {{ t('settings.disconnect_traewelling') }}
-                    </Link>
+                    </a>
                 </div>
                 <button
                     v-else

@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Backend;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Resources\UserDto;
+use App\Models\User;
 use App\Repositories\FileRepository;
 use App\Repositories\UserRepository;
 
@@ -27,9 +28,8 @@ class UserController extends Controller
         return $this->userRepository->getUserByUsername($username);
     }
 
-    public function update(UpdateProfileRequest $request): UserDto
+    public function update(UpdateProfileRequest $request, User $user): UserDto
     {
-        $user = auth()->user();
         $avatarPath = $user->profile?->avatar;
         $headerPath = $user->profile?->header;
 

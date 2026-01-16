@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextArea from '@/Components/TextArea.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { UserDto } from '@/types';
-import { router, useForm, usePage } from '@inertiajs/vue3';
-import { PropType, ref, useTemplateRef } from 'vue';
+import { usePage } from '@inertiajs/vue3';
+import axios from 'axios';
+import { PropType, reactive, ref, useTemplateRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -19,7 +19,7 @@ const props = defineProps({
     },
 });
 
-const form = useForm({
+const form = reactive({
     bio: '',
     website: '',
     avatar: null as File | null,
@@ -30,14 +30,16 @@ const form = useForm({
 const editModal = useTemplateRef('editModal');
 const avatarInput = ref('');
 const headerInput = ref('');
+const processing = ref(false);
 
 const resetModal = () => {
-    form.reset();
     avatarInput.value = '';
     headerInput.value = '';
     form.name = props.user.name;
     form.bio = props.user.bio || '';
     form.website = props.user.website || '';
+    form.avatar = null;
+    form.header = null;
 };
 
 const openModal = () => {
@@ -46,24 +48,21 @@ const openModal = () => {
 };
 
 const submit = () => {
-    form.post(route('profile.update', authUser.username), {
-        preserveScroll: true,
-        onSuccess: () => {
+    processing.value = true;
+    axios
+        .post('/api/account/profile', form)
+        .then(() => {
+            // Handle success if needed
             resetModal();
-            editModal.value?.close();
-            router.reload();
-        },
-        onError: () => {
-            if (form.errors.avatar) {
-                avatarInput.value = '';
-                form.avatar = null;
-            }
-            if (form.errors.header) {
-                headerInput.value = '';
-                form.header = null;
-            }
-        },
-    });
+            // reload the page to reflect changes
+            window.location.reload();
+        })
+        .catch((error) => {
+            alert('Error updating profile: ' + error.response.data.message);
+        })
+        .finally(() => {
+            processing.value = false;
+        });
 };
 
 const avatarUpload = (event: Event) => {
@@ -108,13 +107,10 @@ const headerUpload = (event: Event) => {
                     id="displayname"
                     ref="displaynameInput"
                     v-model="form.name"
-                    :error="form.errors.name"
                     class="mt-1 block w-3/4"
                     :placeholder="t('profile.display_name')"
                     @keydown.enter="submit"
                 />
-
-                <InputError :message="form.errors.name" class="mt-2" />
             </div>
 
             <div class="mt-6">
@@ -128,12 +124,9 @@ const headerUpload = (event: Event) => {
                     id="bio"
                     ref="bioInput"
                     v-model="form.bio"
-                    :error="form.errors.bio"
                     class="mt-1 block w-3/4"
                     :placeholder="t('profile.bio')"
                 />
-
-                <InputError :message="form.errors.bio" class="mt-2" />
             </div>
 
             <div class="mt-6">
@@ -147,13 +140,10 @@ const headerUpload = (event: Event) => {
                     id="website"
                     ref="websiteInput"
                     v-model="form.website"
-                    :error="form.errors.website"
                     class="mt-1 block w-3/4"
                     :placeholder="t('profile.website')"
                     @keydown.enter="submit"
                 />
-
-                <InputError :message="form.errors.website" class="mt-2" />
             </div>
             <div class="mt-6">
                 <fieldset class="fieldset">
@@ -170,7 +160,6 @@ const headerUpload = (event: Event) => {
                     <label class="label">
                         {{ t('profile.max_size') }}
                     </label>
-                    <InputError :message="form.errors.avatar" class="mt-2" />
                 </fieldset>
             </div>
             <div class="">
@@ -188,7 +177,6 @@ const headerUpload = (event: Event) => {
                     <label class="label">
                         {{ t('profile.max_size') }}
                     </label>
-                    <InputError :message="form.errors.header" class="mt-2" />
                 </fieldset>
             </div>
             <div class="modal-action">
@@ -200,8 +188,8 @@ const headerUpload = (event: Event) => {
 
                 <button
                     class="btn btn-primary"
-                    :class="{ 'opacity-25': form.processing }"
-                    :disabled="form.processing"
+                    :class="{ 'opacity-25': processing }"
+                    :disabled="processing"
                     @click.prevent="submit"
                 >
                     {{ t('verbs.save') }}

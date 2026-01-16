@@ -45,11 +45,11 @@ function getDateString(date: string): string {
             <div class="flex items-center gap-1">
                 <Link class="h-4 w-4" />
                 <a
+                    :href="user.website"
+                    target="_blank"
                     class="link link-hover link-primary max-w-60 truncate text-sm"
                 >
-                    <a :href="user.website" target="_blank">
-                        {{ user.website }}
-                    </a>
+                    {{ user.website }}
                 </a>
             </div>
         </div>

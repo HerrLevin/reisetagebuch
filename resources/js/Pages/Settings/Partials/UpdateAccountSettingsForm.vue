@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import InputLabel from '@/Components/InputLabel.vue';
 import SelectInput from '@/Components/SelectInput.vue';
-import { useForm, usePage } from '@inertiajs/vue3';
+import { usePage } from '@inertiajs/vue3';
+import axios from 'axios';
+import { reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -11,10 +13,31 @@ defineProps<{
 }>();
 
 const user = usePage().props.auth.user;
+const processing = ref(false);
+const recentlySuccessful = ref(false);
 
-const form = useForm({
+const form = reactive({
     motisRadius: user.settings?.motis_radius || null,
 });
+
+function formSubmit() {
+    processing.value = true;
+    recentlySuccessful.value = false;
+    axios
+        .patch('/api/account/settings', form)
+        .then(() => {
+            recentlySuccessful.value = true;
+            setTimeout(() => {
+                recentlySuccessful.value = false;
+            }, 2000);
+        })
+        .catch((error) => {
+            console.error('Error updating account settings:', error);
+        })
+        .finally(() => {
+            processing.value = false;
+        });
+}
 </script>
 
 <template>
@@ -27,10 +50,7 @@ const form = useForm({
             <p class="mt-1 text-sm opacity-65"></p>
         </header>
 
-        <form
-            class="mt-6 space-y-6"
-            @submit.prevent="form.patch(route('account.settings.update'))"
-        >
+        <form class="mt-6 space-y-6" @submit.prevent="formSubmit()">
             <div>
                 <InputLabel
                     for="motisRadius"
@@ -41,7 +61,6 @@ const form = useForm({
                     id="motisRadius"
                     v-model="form.motisRadius"
                     class="mt-1 block w-full"
-                    :error="form.errors.motisRadius"
                     :options="[
                         {
                             value: null,
@@ -97,7 +116,7 @@ const form = useForm({
             </div>
 
             <div class="flex items-center gap-4">
-                <button class="btn btn-primary" :disabled="form.processing">
+                <button class="btn btn-primary" :disabled="processing">
                     {{ t('verbs.save') }}
                 </button>
 
@@ -107,10 +126,7 @@ const form = useForm({
                     leave-active-class="transition ease-in-out"
                     leave-to-class="opacity-0"
                 >
-                    <p
-                        v-if="form.recentlySuccessful"
-                        class="text-sm opacity-65"
-                    >
+                    <p v-if="recentlySuccessful" class="text-sm opacity-65">
                         {{ t('verbs.saved') }}
                     </p>
                 </Transition>

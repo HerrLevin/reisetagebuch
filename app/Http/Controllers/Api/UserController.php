@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateProfileRequest;
+use App\Http\Resources\UserDto;
 use App\Models\Location;
 use Clickbar\Magellan\Data\Geometries\GeometryCollection;
 use Clickbar\Magellan\IO\Generator\Geojson\GeojsonGenerator;
@@ -13,6 +14,7 @@ class UserController extends Controller
 
     public function __construct(\App\Http\Controllers\Backend\UserController $userController)
     {
+        parent::__construct();
         $this->userController = $userController;
     }
 
@@ -34,5 +36,10 @@ class UserController extends Controller
     public function show(string $username)
     {
         return $this->userController->show($username);
+    }
+
+    public function update(UpdateProfileRequest $request): UserDto
+    {
+        return $this->userController->update($request, $this->auth->user());
     }
 }

@@ -7,7 +7,6 @@ use App\Http\Controllers\Inertia\NotificationController;
 use App\Http\Controllers\Inertia\PostController;
 use App\Http\Controllers\Inertia\TripController;
 use App\Http\Controllers\Inertia\UserController;
-use App\Http\Controllers\Inertia\UserSettingsController;
 use App\Http\Controllers\TraewellingOAuthController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -25,12 +24,6 @@ Route::get('/', function () {
 Route::middleware('auth')->group(callback: function () {
     Route::prefix('account')->group(function () {
         Route::get('/', [AccountController::class, 'edit'])->name('account.edit');
-        Route::patch('/', [AccountController::class, 'update'])->name('account.update');
-        Route::delete('/', [AccountController::class, 'destroy'])->name('account.destroy');
-    });
-
-    Route::prefix('settings')->group(function () {
-        Route::patch('/', [UserSettingsController::class, 'update'])->name('account.settings.update');
     });
 
     Route::prefix('location-history')->group(function () {
@@ -55,11 +48,9 @@ Route::middleware('auth')->group(callback: function () {
         });
     });
 
-    Route::resource('trips', TripController::class);
+    Route::get('/trips/create', [TripController::class, 'create'])->name('trips.create');
 
     Route::get('/home', [PostController::class, 'dashboard'])->name('dashboard');
-
-    Route::post('profile/{username}', [UserController::class, 'update'])->name('profile.update');
 
     Route::get('invites', [InviteController::class, 'index'])->name('invites.index');
 
@@ -68,7 +59,6 @@ Route::middleware('auth')->group(callback: function () {
     Route::prefix('socialite')->group(callback: function () {
         Route::get('/traewelling/connect', [TraewellingOAuthController::class, 'redirectToProvider'])->name('traewelling.connect');
         Route::get('/traewelling/callback', [TraewellingOAuthController::class, 'handleProviderCallback'])->name('traewelling.callback');
-        Route::get('/traewelling/disconnect', [AccountController::class, 'disconnectTraewelling'])->name('traewelling.disconnect');
     });
 });
 
