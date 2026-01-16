@@ -24,7 +24,7 @@ class PostRepositoryTest extends TestCase
         $unlistedPost = Post::factory()->create(['user_id' => $user->id, 'visibility' => Visibility::UNLISTED->value]);
         $onlyAuthPost = Post::factory()->create(['user_id' => $user->id, 'visibility' => Visibility::ONLY_AUTHENTICATED->value]);
 
-        $result = $repo->getPostsForUser($user, $user);
+        $result = $repo->getPostsForUserId($user->id, $user);
         $ids = collect($result->items)->pluck('id')->all();
 
         $this->assertContains($publicPost->id, $ids);
@@ -44,7 +44,7 @@ class PostRepositoryTest extends TestCase
         $unlistedPost = Post::factory()->create(['user_id' => $owner->id, 'visibility' => Visibility::UNLISTED->value]);
         $onlyAuthPost = Post::factory()->create(['user_id' => $owner->id, 'visibility' => Visibility::ONLY_AUTHENTICATED->value]);
 
-        $result = $repo->getPostsForUser($owner, $visitor);
+        $result = $repo->getPostsForUserId($owner->id, $visitor);
         $ids = collect($result->items)->pluck('id')->all();
 
         $this->assertContains($publicPost->id, $ids);
@@ -63,7 +63,7 @@ class PostRepositoryTest extends TestCase
         $unlistedPost = Post::factory()->create(['user_id' => $owner->id, 'visibility' => Visibility::UNLISTED->value]);
         $onlyAuthPost = Post::factory()->create(['user_id' => $owner->id, 'visibility' => Visibility::ONLY_AUTHENTICATED->value]);
 
-        $result = $repo->getPostsForUser($owner, null);
+        $result = $repo->getPostsForUserId($owner->id, null);
         $unauthenticatedIds = collect($result->items)->pluck('id')->all();
 
         $this->assertContains($publicPost->id, $unauthenticatedIds);

@@ -1,6 +1,7 @@
 <?php
 
 use App\Console\Commands\FetchAirports;
+use App\Http\Middleware\ApiMiddleware;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Jobs\DeleteOldNearbyRequests;
 use Illuminate\Foundation\Application;
@@ -23,11 +24,12 @@ return Application::configure(basePath: dirname(__DIR__))
             // Should be the last middleware to run in the web group
             CreateFreshApiToken::class,
         ]);
+        $middleware->api(append: [
+            ApiMiddleware::class,
+        ]);
         $middleware->encryptCookies(except: [
             'rtb_allow_history',
         ]);
-
-        //
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

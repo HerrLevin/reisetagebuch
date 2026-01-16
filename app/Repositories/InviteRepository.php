@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Http\Resources\InviteDto;
 use App\Hydrators\InviteHydrator;
 use App\Models\Invite;
 
@@ -14,6 +15,9 @@ class InviteRepository
         $this->inviteHydrator = $inviteHydrator ?? new InviteHydrator;
     }
 
+    /**
+     * @return array<InviteDto>
+     */
     public function getAllInvitesForUser(string $userId): array
     {
         $invites = Invite::where('user_id', $userId)

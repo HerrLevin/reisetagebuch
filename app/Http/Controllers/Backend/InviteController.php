@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\InviteDto;
 use App\Repositories\InviteRepository;
 
 class InviteController extends Controller
@@ -14,6 +15,9 @@ class InviteController extends Controller
         $this->inviteRepository = $inviteRepository;
     }
 
+    /**
+     * @return InviteDto[]
+     */
     public function index(string $userId): array
     {
         return $this->inviteRepository->getAllInvitesForUser($userId);

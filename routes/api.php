@@ -12,13 +12,17 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\UserSettingsController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('profile')->group(function () {
-    Route::prefix('{username}')->group(function () {
+Route::get('profile/{username}', [UserController::class, 'show']);
+
+Route::prefix('users')->group(function () {
+    route::prefix('{userId}')->group(function () {
         Route::get('map-data', [UserController::class, 'mapData'])->name('profile.mapdata');
-        Route::get('posts', [PostController::class, 'postsForUsername'])->name('profile.posts');
-        Route::get('', [UserController::class, 'show']);
+        Route::get('posts', [PostController::class, 'postsForUser'])->name('profile.posts');
     });
 });
+
+Route::get('posts/{post}', [PostController::class, 'show'])
+    ->name('api.posts.show');
 
 Route::middleware('auth:api')->group(function () {
     Route::get('/timeline', [PostController::class, 'timeline'])
@@ -29,42 +33,39 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('/geocode', [ApiLocationController::class, 'geocode'])
         ->name('posts.create.geocode');
-    Route::get('/new/prefetch/{latitude}/{longitude}', [ApiLocationController::class, 'prefetch'])
+    Route::get('/location/prefetch', [ApiLocationController::class, 'prefetch'])
         ->name('posts.create.prefetch');
-    Route::get('/request-location/{latitude}/{longitude}', [ApiLocationController::class, 'getRecentRequestLocation'])
+    Route::get('/location/request-location', [ApiLocationController::class, 'getRecentRequestLocation'])
         ->name('api.request-location.get');
 
     Route::prefix('posts')->group(function () {
-        Route::post('/', [PostController::class, 'storeText'])->name('posts.create.text-post.store');
-
+        Route::get('/', [PostController::class, 'index'])->name('api.posts.filter');
+        Route::post('/text', [PostController::class, 'storeText'])->name('posts.create.text-post.store');
         Route::post('/location', [PostController::class, 'storeLocation'])->name('posts.create.post.store');
-
-        Route::get('/filter', [PostController::class, 'filter'])->name('api.posts.filter');
         Route::post('/mass-edit', [PostController::class, 'massEdit'])->name('api.posts.mass-edit');
-        Route::prefix('{post}')->group(function () {
-            Route::get('/', [PostController::class, 'show'])
-                ->name('api.posts.show');
-            Route::patch('/', [PostController::class, 'update'])->name('posts.update');
 
-            Route::post('/like', [LikeController::class, 'store'])
+        Route::prefix('{post}')->group(function () {
+            Route::patch('/', [PostController::class, 'update'])->name('posts.update');
+            Route::post('/likes', [LikeController::class, 'store'])
                 ->name('posts.like');
-            Route::delete('/like', [LikeController::class, 'destroy'])
+            Route::delete('/likes', [LikeController::class, 'destroy'])
                 ->name('posts.unlike');
             Route::delete('/', [PostController::class, 'destroy'])
                 ->name('api.posts.destroy');
+
+            Route::prefix('transport')->group(function () {
+                Route::put('/exit', [PostController::class, 'updateTransportPostExit'])->name('posts.update.transport-post');
+                Route::put('/times', [PostController::class, 'updateTimesTransport'])->name('posts.update.transport-times');
+            });
         });
 
-        Route::prefix('transport')->group(function () {
-            Route::post('/', [PostController::class, 'storeTransport'])->name('posts.create.transport-post.store');
-            Route::put('/{postId}', [PostController::class, 'updateTransport'])->name('posts.update.transport-post');
-            Route::put('/{postId}/times', [PostController::class, 'updateTimesTransport'])->name('posts.update.transport-times');
-        });
+        Route::post('/transport', [PostController::class, 'storeTransport'])->name('posts.create.transport-post.store');
     });
 
     Route::prefix('map')->group(function () {
-        Route::get('/linestring/{from}/{to}', [MapController::class, 'getLineStringBetween'])
+        Route::get('/linestring', [MapController::class, 'getLineStringBetween'])
             ->name('posts.get.linestring');
-        Route::get('/stopovers/{from}/{to}', [MapController::class, 'getStopsBetween'])
+        Route::get('/stopovers', [MapController::class, 'getStopsBetween'])
             ->name('posts.get.stopovers');
     });
 

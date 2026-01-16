@@ -231,6 +231,9 @@ class LocationController extends Controller
         return $this->transitousRequestService->geocode($query, null, LocationType::STOP, $point);
     }
 
+    /**
+     * @return array<GeocodeResponseEntry>
+     */
     public function geocodeAirport(string $query, ?Point $point): array
     {
         $airports = [];

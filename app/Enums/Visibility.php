@@ -2,6 +2,14 @@
 
 namespace App\Enums;
 
+use OpenApi\Attributes as OA;
+
+#[OA\Schema(
+    schema: 'Visibility',
+    description: 'Visibility levels for posts',
+    type: 'string',
+    enum: ['public', 'private', 'unlisted', 'only-authenticated']
+)]
 enum Visibility: string
 {
     case PUBLIC = 'public'; // Visible to everyone, listed publicly on profile and search

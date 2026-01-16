@@ -276,24 +276,18 @@ class PostRepository
         );
     }
 
-    public function getPostsForUser(User|string $user, ?User $visitingUser = null): PostPaginationDto
+    public function getPostsForUserId(string $userId, ?User $visitingUser = null): PostPaginationDto
     {
-        if (! $user instanceof User) {
-            $user = $this->userRepository->getUserByUsername($user);
-        }
-
-        $user = $user->id;
-
         $posts = Post::with(['user', 'locationPost.location', 'locationPost.location.tags', 'transportPost', 'transportPost.origin', 'transportPost.destination', 'hashTags'])
             ->withCount('likes')
-            ->where('user_id', $user);
+            ->where('user_id', $userId);
 
         if ($visitingUser) {
             $posts->withExists(['likes as liked_by_user' => function ($query) use ($visitingUser) {
                 $query->where('user_id', $visitingUser->id);
             }]);
 
-            if ($visitingUser->id !== $user) {
+            if ($visitingUser->id !== $userId) {
                 // not the owner, show only public posts
                 $posts->whereIn('visibility', [Visibility::ONLY_AUTHENTICATED, Visibility::PUBLIC]);
             }

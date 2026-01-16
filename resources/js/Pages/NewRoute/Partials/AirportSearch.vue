@@ -1,11 +1,12 @@
 <script setup lang="ts">
+import { api } from '@/app';
 import Typeahead, { Suggestion } from '@/Components/Typeahead.vue';
 import { LocationIdentifier } from '@/types';
 import { AutocompleteResponse } from '@/types/motis';
-import axios from 'axios';
 import { ref } from 'vue';
 import { debounce } from 'vue-debounce';
 import { useI18n } from 'vue-i18n';
+import { MotisGeocodeResponseEntry } from '../../../../types/Api.gen';
 
 const { t } = useI18n();
 
@@ -41,23 +42,22 @@ function fetchSuggestions() {
         return;
     }
 
-    const url = route('posts.create.geocode');
-    axios
-        .get(url, {
-            params: {
-                query: search.value,
-                provider: 'airport',
-                latitude: props.latitude,
-                longitude: props.longitude,
-            },
+    api.geocode
+        .geocode({
+            query: search.value,
+            provider: 'airport',
+            latitude: props.latitude,
+            longitude: props.longitude,
         })
         .then((response) => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            suggestions.value = response.data.map((item: any) => ({
-                label: item.name,
-                value: item,
-                subLabel: getAirportIdentifier(item.identifiers),
-            }));
+            suggestions.value = response.data.map(
+                (item: MotisGeocodeResponseEntry) =>
+                    ({
+                        label: item.name,
+                        value: item,
+                        subLabel: getAirportIdentifier(item.identifiers),
+                    }) as Suggestion,
+            );
         })
         .catch((error) => {
             console.error('Error fetching suggestions:', error);

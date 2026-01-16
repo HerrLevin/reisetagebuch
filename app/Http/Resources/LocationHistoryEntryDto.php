@@ -5,19 +5,32 @@ namespace App\Http\Resources;
 use App\Models\LocationPost;
 use App\Models\TimestampedUserWaypoint;
 use App\Models\TransportPost;
+use OpenApi\Attributes as OA;
 
+#[OA\Schema(
+    schema: 'LocationHistoryEntryDto',
+    description: 'Location History Entry Data Transfer Object',
+    required: ['id', 'name', 'latitude', 'longitude', 'type', 'timestamp'],
+    type: 'object'
+)]
 class LocationHistoryEntryDto
 {
+    #[OA\Property('id', description: 'Location ID', type: 'string', format: 'uuid')]
     public string $id;
 
+    #[OA\Property('name', description: 'Name of the location', type: 'string', nullable: true)]
     public ?string $name = null;
 
+    #[OA\Property('latitude', description: 'Latitude of the location', type: 'number', format: 'float')]
     public float $latitude;
 
+    #[OA\Property('longitude', description: 'Longitude of the location', type: 'number', format: 'float')]
     public float $longitude;
 
+    #[OA\Property('type', description: 'Type of the location history entry', type: 'string')]
     public string $type = 'location';
 
+    #[OA\Property('timestamp', description: 'Timestamp of the location history entry in ISO 8601 format', type: 'string', format: 'date-time')]
     public string $timestamp;
 
     /**

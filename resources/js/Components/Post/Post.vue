@@ -6,19 +6,14 @@ import RouteDisplay from '@/Components/Post/RouteDisplay.vue';
 import {
     getTravelReasonIcon,
     getTravelReasonLabel,
-} from '@/Services/TravelReasonMapping';
+} from '@/Services/ApiTravelReasonMapping';
 import { getVisibilityIcon } from '@/Services/VisibilityMapping';
-import {
-    BasePost,
-    isLocationPost,
-    isTransportPost,
-    LocationPost,
-    TransportPost,
-} from '@/types/PostTypes';
+import { isApiLocationPost, isApiTransportPost } from '@/types/PostTypes';
 import { Link } from '@inertiajs/vue3';
 import { DateTime } from 'luxon';
 import { PropType } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { BasePost, LocationPost, TransportPost } from '../../../types/Api.gen';
 
 const { t } = useI18n();
 const emit = defineEmits(['delete:post']);
@@ -31,7 +26,7 @@ const props = defineProps({
 });
 
 let relativeCreatedAt;
-const date = DateTime.fromISO(props.post?.created_at);
+const date = DateTime.fromISO(props.post?.createdAt);
 
 if (date.diffNow('days').days < -1) {
     relativeCreatedAt = date.toLocaleString();
@@ -60,7 +55,7 @@ if (date.diffNow('days').days < -1) {
             </Link>
             <div
                 v-if="
-                    (isLocationPost(post) || isTransportPost(post)) &&
+                    (isApiLocationPost(post) || isApiTransportPost(post)) &&
                     post.travelReason
                 "
                 class="inline text-xs"
@@ -93,8 +88,8 @@ if (date.diffNow('days').days < -1) {
                 />
                 {{ relativeCreatedAt }}
             </span>
-            <span v-if="isTransportPost(post)" class="text-xs opacity-60">
-                · {{ DateTime.fromISO(post.published_at).toLocaleString() }}
+            <span v-if="isApiTransportPost(post)" class="text-xs opacity-60">
+                · {{ DateTime.fromISO(post.publishedAt).toLocaleString() }}
             </span>
         </div>
         <p
@@ -104,11 +99,11 @@ if (date.diffNow('days').days < -1) {
             {{ post.body }}
         </p>
         <LocationDisplay
-            v-if="isLocationPost(post)"
+            v-if="isApiLocationPost(post)"
             :post="post as LocationPost"
         />
         <RouteDisplay
-            v-else-if="isTransportPost(post)"
+            v-else-if="isApiTransportPost(post)"
             :post="post as TransportPost"
         />
         <HashTags :hash-tags="post.hashTags" />

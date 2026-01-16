@@ -2,6 +2,20 @@
 
 namespace App\Enums;
 
+use OpenApi\Attributes as OA;
+
+#[OA\Schema(
+    schema: 'TransportMode',
+    description: 'Enumeration of transport modes',
+    type: 'string',
+    enum: [
+        'WALK', 'BIKE', 'RENTAL', 'CAR', 'CAR_PARKING', 'CAR_DROPOFF', 'ODM', 'FLEX',
+        'TRANSIT', 'TRAM', 'SUBWAY', 'FERRY', 'AIRPLANE', 'SUBURBAN', 'BUS', 'COACH',
+        'RAIL', 'HIGHSPEED_RAIL', 'LONG_DISTANCE', 'NIGHT_RAIL', 'REGIONAL_FAST_RAIL',
+        'REGIONAL_RAIL', 'CABLE_CAR', 'FUNICULAR', 'AERIAL_LIFT', 'OTHER', 'AREAL_LIFT',
+        'METRO',
+    ]
+)]
 enum TransportMode: string
 {
     case WALK = 'WALK';

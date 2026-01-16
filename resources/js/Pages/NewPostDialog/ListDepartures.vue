@@ -1,16 +1,19 @@
 <script setup lang="ts">
+import { api } from '@/app';
 import Loading from '@/Components/Loading.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import DeparturesFilter from '@/Pages/NewPostDialog/Partials/DeparturesFilter.vue';
 import DeparturesListEntry from '@/Pages/NewPostDialog/Partials/DeparturesListEntry.vue';
 import { LocationService } from '@/Services/LocationService';
-import { DeparturesDto, StopDto } from '@/types';
-import { TransportMode } from '@/types/enums';
 import { Head, usePage } from '@inertiajs/vue3';
-import axios from 'axios';
 import { DateTime } from 'luxon';
 import { onMounted, onUnmounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import {
+    DeparturesDto,
+    MotisStopDto,
+    TransportMode,
+} from '../../../types/Api.gen';
 
 const { t } = useI18n();
 
@@ -23,14 +26,14 @@ const requestLongitude = ref<number>(
     Number.parseFloat(urlParams.get('longitude') || '0'),
 );
 const requestTime = ref<string>(urlParams.get('when') || '');
-const filter = ref<TransportMode[]>(
+const modes = ref<TransportMode[]>(
     urlParams.get('filter')
         ? (urlParams.get('filter')!.split(',') as TransportMode[])
         : [],
 );
 
 const departures = ref<DeparturesDto | null>(null);
-const stop = ref<StopDto | null>(null);
+const stop = ref<MotisStopDto | null>(null);
 const loading = ref(true);
 const time = ref<DateTime | null>(null);
 
@@ -43,20 +46,15 @@ const intervalId = ref<number | null>(null);
 async function loadDepartures() {
     loading.value = true;
     try {
-        const response = await axios.get('/api/locations/departures', {
-            params: {
-                latitude: latitude.value,
-                longitude: longitude.value,
-                identifier: requestIdentifier.value,
-                when: requestTime.value || undefined,
-                filter:
-                    filter.value.length > 0
-                        ? filter.value.join(',')
-                        : undefined,
-            },
+        const response = await api.locations.departures({
+            latitude: latitude.value,
+            longitude: longitude.value,
+            identifier: requestIdentifier.value || undefined,
+            when: requestTime.value || undefined,
+            modes: modes.value.length > 0 ? modes.value : undefined,
         });
         departures.value = response.data.departures;
-        filter.value = response.data.filter;
+        modes.value = response.data.modes;
         requestTime.value = response.data.requestTime;
         stop.value =
             requestIdentifier.value === null
@@ -109,7 +107,7 @@ showStartButton.value = route().current('posts.create.start');
         <DeparturesFilter
             :latitude="latitude"
             :longitude="longitude"
-            :filter="filter"
+            :filter="modes"
             :request-time="requestTime"
             :location="stop"
         />

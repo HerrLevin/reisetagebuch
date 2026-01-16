@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { api } from '@/app';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PostCreationForm from '@/Pages/NewPostDialog/Partials/PostCreationForm.vue';
 import { TravelReason, Visibility } from '@/types/enums';
 import { Head, router } from '@inertiajs/vue3';
-import axios from 'axios';
 import { reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -32,8 +32,8 @@ const form = reactive({
 
 function submitForm() {
     loading.value = true;
-    axios
-        .post('/api/posts/location', form)
+    api.posts
+        .storeLocationPost(form)
         .then((response) => {
             const postId = response.data.id;
             router.visit(`/posts/${postId}`);

@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import { api } from '@/app';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextArea from '@/Components/TextArea.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { UserDto } from '@/types';
 import { usePage } from '@inertiajs/vue3';
-import axios from 'axios';
 import { PropType, reactive, ref, useTemplateRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -49,8 +49,8 @@ const openModal = () => {
 
 const submit = () => {
     processing.value = true;
-    axios
-        .post('/api/account/profile', form)
+    api.account
+        .updateProfile(form)
         .then(() => {
             // Handle success if needed
             resetModal();

@@ -1,28 +1,29 @@
 <script setup lang="ts">
+import { api } from '@/app';
 import Loading from '@/Components/Loading.vue';
 import LocationHistoryMap from '@/Components/Maps/LocationHistoryMap.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { LocationHistoryDto, TripHistoryEntryDto } from '@/types';
-import axios from 'axios';
 import { ArrowLeft, ArrowRight } from 'lucide-vue-next';
 import { DateTime } from 'luxon';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import {
+    LocationHistoryEntryDto,
+    TripHistoryEntryDto,
+} from '../../../types/Api.gen';
 
 const { t } = useI18n();
 
 const selectedDate = ref<DateTime>(DateTime.now());
-const locations = ref<LocationHistoryDto[]>([]);
+const locations = ref<LocationHistoryEntryDto[]>([]);
 const trips = ref<TripHistoryEntryDto[]>([]);
 const loading = ref(true);
 
 async function fetchData() {
     loading.value = true;
     try {
-        const response = await axios.get('/api/locations/history', {
-            params: {
-                when: selectedDate.value.toISODate(),
-            },
+        const response = await api.locations.locationHistory({
+            when: selectedDate.value?.toISODate() || undefined,
         });
         locations.value = response.data.locations;
         trips.value = response.data.trips;

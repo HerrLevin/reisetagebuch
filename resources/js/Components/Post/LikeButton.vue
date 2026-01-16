@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import axios from 'axios';
+import { api } from '@/app';
 import { Heart } from 'lucide-vue-next';
 import { ref } from 'vue';
 
@@ -21,21 +21,18 @@ const toggleLike = async () => {
     loading.value = true;
     const willBeLiked = !liked.value;
 
-    axios
-        .request({
-            url: route(
-                willBeLiked ? 'posts.like' : 'posts.unlike',
-                props.postId,
-            ),
-            method: willBeLiked ? 'POST' : 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json',
-            },
-        })
+    let request;
+
+    if (willBeLiked) {
+        request = api.posts.likePost(props.postId);
+    } else {
+        request = api.posts.unlikePost(props.postId);
+    }
+
+    request
         .then((data) => {
-            liked.value = data.data.liked;
-            emit('likeToggled', data.data.liked, data.data.likes_count);
+            liked.value = data.data.likedByUser;
+            emit('likeToggled', data.data.likedByUser, data.data.likeCount);
         })
         .catch((error) => {
             console.error('Error toggling like:', error);

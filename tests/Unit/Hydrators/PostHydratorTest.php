@@ -4,6 +4,7 @@ namespace Tests\Unit\Hydrators;
 
 use App\Enums\PostMetaInfo\MetaInfoKey;
 use App\Enums\PostMetaInfo\TravelReason;
+use App\Enums\TransportMode;
 use App\Enums\Visibility;
 use App\Http\Resources\UserDto;
 use App\Hydrators\PostHydrator;
@@ -97,9 +98,9 @@ class PostHydratorTest extends TestCase
         $this->assertNotInstanceOf(TransportPost::class, $dto);
         $this->assertEquals('asdf', $dto->id);
         $this->assertEquals('This is a test post', $dto->body);
-        $this->assertEquals('2023-01-01T00:00:00+00:00', $dto->created_at);
-        $this->assertEquals('2023-01-01T00:00:01+00:00', $dto->updated_at);
-        $this->assertEquals('2023-01-01T00:00:02+00:00', $dto->published_at);
+        $this->assertEquals('2023-01-01T00:00:00+00:00', $dto->createdAt);
+        $this->assertEquals('2023-01-01T00:00:01+00:00', $dto->updatedAt);
+        $this->assertEquals('2023-01-01T00:00:02+00:00', $dto->publishedAt);
         $this->assertEquals($userHydrator->modelToDto($post->user), $dto->user);
         $this->assertEquals([MetaInfoKey::TRAVEL_REASON->value => TravelReason::LEISURE->value], $dto->metaInfos);
     }
@@ -170,8 +171,8 @@ class PostHydratorTest extends TestCase
         $this->assertInstanceOf(\App\Http\Resources\PostTypes\LocationPost::class, $dto);
         $this->assertEquals('asdf', $dto->id);
         $this->assertEquals('This is a test post', $dto->body);
-        $this->assertEquals('2023-01-01T00:00:00+00:00', $dto->created_at);
-        $this->assertEquals('2023-01-01T00:00:01+00:00', $dto->updated_at);
+        $this->assertEquals('2023-01-01T00:00:00+00:00', $dto->createdAt);
+        $this->assertEquals('2023-01-01T00:00:01+00:00', $dto->updatedAt);
         $this->assertEquals($userHydrator->modelToDto($post->user), $dto->user);
     }
 
@@ -189,7 +190,7 @@ class PostHydratorTest extends TestCase
             return match ($property) {
                 'id' => 'trip-id',
                 'provider' => 'Test Provider',
-                'mode' => 'bus',
+                'mode' => 'BUS',
                 'line_name' => '123',
                 default => null,
             };
@@ -219,12 +220,12 @@ class PostHydratorTest extends TestCase
         $this->assertInstanceOf(\App\Http\Resources\PostTypes\TransportPost::class, $dto);
         $this->assertEquals('asdf', $dto->id);
         $this->assertEquals('This is a test post', $dto->body);
-        $this->assertEquals('2023-01-01T00:00:00+00:00', $dto->created_at);
-        $this->assertEquals('2023-01-01T00:00:01+00:00', $dto->updated_at);
+        $this->assertEquals('2023-01-01T00:00:00+00:00', $dto->createdAt);
+        $this->assertEquals('2023-01-01T00:00:01+00:00', $dto->updatedAt);
         $this->assertEquals($userHydrator->modelToDto($post->user), $dto->user);
         $this->assertEquals('2023-01-01T00:00:00+00:00', $dto->originStop->arrivalTime);
         $this->assertEquals('2023-01-01T00:00:01+00:00', $dto->destinationStop->arrivalTime);
-        $this->assertEquals('bus', $dto->trip->mode);
+        $this->assertEquals(TransportMode::BUS, $dto->trip->mode);
         $this->assertEquals('123', $dto->trip->lineName);
         $this->assertEquals('location-id', $dto->originStop->location->id);
         $this->assertEquals('Test Location', $dto->originStop->location->name);

@@ -3,6 +3,28 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use OpenApi\Attributes as OA;
+
+#[OA\Schema(
+    schema: 'TransportTimesUpdateRequest',
+    properties: [
+        new OA\Property(
+            property: 'manualDepartureTime',
+            description: 'The manually set departure time for the transport post.',
+            type: 'string',
+            format: 'date-time',
+            example: '2024-08-01T10:00:00Z'
+        ),
+        new OA\Property(
+            property: 'manualArrivalTime',
+            description: 'The manually set arrival time for the transport post.',
+            type: 'string',
+            format: 'date-time',
+            example: '2024-08-01T12:00:00Z'
+        ),
+    ],
+    type: 'object'
+)]
 
 /**
  * * @property string $manualDepartureTime

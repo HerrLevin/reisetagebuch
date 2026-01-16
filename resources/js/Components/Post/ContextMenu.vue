@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { getOwnShareText, getShareText } from '@/Services/PostTextService';
-import { BasePost, isTransportPost, TransportPost } from '@/types/PostTypes';
+import { api } from '@/app';
+import { getOwnShareText, getShareText } from '@/Services/ApiPostTextService';
+import { isApiTransportPost } from '@/types/PostTypes';
 import { Link, useForm, usePage } from '@inertiajs/vue3';
-import axios from 'axios';
 import {
     ClockPlus,
     Ellipsis,
@@ -14,6 +14,7 @@ import {
 } from 'lucide-vue-next';
 import { PropType, ref, useTemplateRef } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { BasePost, TransportPost } from '../../../types/Api.gen';
 
 const { t } = useI18n();
 
@@ -32,8 +33,8 @@ const deleteProcessing = ref(false);
 
 function deletePost() {
     deleteProcessing.value = true;
-    axios
-        .delete('/api/posts/' + props.post.id)
+    api.posts
+        .deletePost(props.post.id)
         .then(() => {
             deleteModal.value?.close();
             emit('delete:post', props.post.id);
@@ -112,7 +113,7 @@ function blur() {
                     {{ t('verbs.share') }}
                 </a>
             </li>
-            <li v-if="!isSameUser() && isTransportPost(props.post)">
+            <li v-if="!isSameUser() && isApiTransportPost(props.post)">
                 <a @click.prevent="redirectCreatePost()">
                     <UserRoundPlus class="size-4" />
                     {{ t('posts.ride_along') }}
@@ -126,13 +127,13 @@ function blur() {
                         {{ t('verbs.edit') }}
                     </Link>
                 </li>
-                <li v-if="isTransportPost(post)">
+                <li v-if="isApiTransportPost(post)">
                     <Link :href="route('posts.edit.transport-times', post.id)">
                         <ClockPlus class="size-4" />
                         {{ t('posts.edit.change_times') }}
                     </Link>
                 </li>
-                <li v-if="isTransportPost(post)">
+                <li v-if="isApiTransportPost(post)">
                     <Link
                         :href="
                             route('posts.edit.transport-post', {

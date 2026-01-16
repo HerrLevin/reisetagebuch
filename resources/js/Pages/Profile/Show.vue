@@ -1,13 +1,13 @@
 <script setup lang="ts">
+import { api } from '@/app';
 import Loading from '@/Components/Loading.vue';
 import Post from '@/Components/Post/Post.vue';
 import ProfileWrapper from '@/Pages/Profile/ProfileWrapper.vue';
 import type { UserDto } from '@/types';
-import type { BasePost, LocationPost, TransportPost } from '@/types/PostTypes';
 import { Head, Link } from '@inertiajs/vue3';
-import axios from 'axios';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { BasePost, LocationPost, TransportPost } from '../../../types/Api.gen';
 
 const { t } = useI18n();
 
@@ -22,9 +22,10 @@ const userLoading = ref(true);
 const loadProfileData = async () => {
     loading.value = true;
     try {
-        axios.get('/api/profile/' + props.username).then((response) => {
+        api.profile.getProfile(props.username).then((response) => {
             user.value = response.data;
             userLoading.value = false;
+            loadPosts();
         });
     } catch (error) {
         console.error('Error loading profile data:', error);
@@ -34,28 +35,26 @@ const loadProfileData = async () => {
 };
 
 const loadPosts = async () => {
+    if (loading.value || !user.value) return;
     loading.value = true;
-    try {
-        const response = await axios.get(
-            '/api/profile/' + props.username + '/posts',
-            {
-                params: {
-                    cursor: nextCursor.value,
-                },
-            },
-        );
-        posts.value.push(...response.data.items);
-
-        if (response.data.nextCursor === nextCursor.value) {
-            nextCursor.value = null;
-            return;
-        }
-        nextCursor.value = response.data.nextCursor;
-    } catch (error) {
-        console.error('Error loading posts:', error);
-    } finally {
-        loading.value = false;
-    }
+    api.users
+        .postsForUser(user.value.id, {
+            cursor: nextCursor.value || undefined,
+        })
+        .then((response) => {
+            posts.value.push(...response.data.items);
+            if (response.data.nextCursor === nextCursor.value) {
+                nextCursor.value = null;
+                return;
+            }
+            nextCursor.value = response.data.nextCursor;
+        })
+        .catch((error) => {
+            console.error('Error loading posts:', error);
+        })
+        .finally(() => {
+            loading.value = false;
+        });
 };
 
 function deletePost(postId: string): void {
@@ -66,7 +65,6 @@ function deletePost(postId: string): void {
 }
 
 loadProfileData();
-loadPosts();
 </script>
 
 <template>

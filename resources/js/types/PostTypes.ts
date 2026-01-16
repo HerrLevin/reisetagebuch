@@ -1,5 +1,10 @@
 import { TransportMode, TravelReason, Visibility } from '@/types/enums';
 import { LocationEntry, UserDto } from '@/types/index';
+import {
+    BasePost as ApiBasePost,
+    LocationPost as ApiLocationPost,
+    TransportPost as ApiTransportPost,
+} from '../../types/Api.gen';
 
 export type BasePost = {
     id: string;
@@ -56,6 +61,18 @@ export type Trip = {
 
 export const isLocationPost = (post: BasePost | null): post is LocationPost => {
     return post !== null && (post as LocationPost).location !== undefined;
+};
+
+export const isApiLocationPost = (
+    post: ApiBasePost | ApiLocationPost | ApiTransportPost | null,
+): post is ApiLocationPost => {
+    return post !== null && (post as ApiLocationPost).location !== undefined;
+};
+
+export const isApiTransportPost = (
+    post: ApiBasePost | null,
+): post is ApiTransportPost => {
+    return post !== null && (post as ApiTransportPost).originStop !== undefined;
 };
 
 export const isTransportPost = (

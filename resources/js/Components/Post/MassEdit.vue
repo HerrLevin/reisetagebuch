@@ -1,14 +1,16 @@
 <script setup lang="ts">
+import { api } from '@/app';
 import SelectInput from '@/Components/SelectInput.vue';
 import TagsInput from '@/Pages/NewPostDialog/Partials/TagsInput.vue';
 import { getVisibilityLabel } from '@/Services/VisibilityMapping';
 import { TravelReason, Visibility } from '@/types/enums';
-import { AllPosts } from '@/types/PostTypes';
-import axios from 'axios';
 import { computed, PropType, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { BasePost, LocationPost, TransportPost } from '../../../types/Api.gen';
 
 const { t } = useI18n();
+
+type AllPosts = BasePost | TransportPost | LocationPost;
 
 const props = defineProps({
     selectedPosts: {
@@ -86,8 +88,8 @@ const submit = () => {
     processing.value = true;
     const tags = changeTags.value ? existingTags.value.slice(0, 5) : null;
 
-    axios
-        .post('/api/posts/mass-edit', {
+    api.posts
+        .massEditPosts({
             postIds: postIds.value,
             visibility: form.value.visibility,
             travelReason: form.value.travelReason,
@@ -157,7 +159,7 @@ watch(
                             </span>
                         </label>
                         <SelectInput
-                            v-model="form.value.visibility"
+                            v-model="form.visibility"
                             :options="visibilityOptions()"
                         />
                     </div>
@@ -169,7 +171,7 @@ watch(
                             </span>
                         </label>
                         <SelectInput
-                            v-model="form.value.travelReason"
+                            v-model="form.travelReason"
                             :options="travelReasonOptions()"
                         />
                     </div>

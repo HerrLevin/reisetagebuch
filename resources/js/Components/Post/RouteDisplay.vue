@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import Delay from '@/Components/Post/Partials/Delay.vue';
-import { getColor, getEmoji } from '@/Services/DepartureTypeService';
 import {
     getPostLineName,
     getPostTripNumber,
-} from '@/Services/LineNameFormattingService';
+} from '@/Services/ApiLineNameFormattingService';
+import { getColor, getEmoji } from '@/Services/DepartureTypeService';
 import {
     formatArrivalTime,
     formatDepartureTime,
 } from '@/Services/TimeFormattingService';
 import { getArrivalDelay, getDepartureDelay } from '@/Services/TripTimeService';
 import { LocationEntry } from '@/types';
-import { TransportPost, Trip } from '@/types/PostTypes';
 import { DateTime } from 'luxon';
 import type { PropType } from 'vue';
+import { TransportPost, TripDto } from '../../../types/Api.gen';
 
 const props = defineProps({
     post: {
@@ -41,7 +41,7 @@ function getFormattedArrivalTime(): string | null {
     );
 }
 
-function getRouteTextColor(trip: Trip) {
+function getRouteTextColor(trip: TripDto) {
     if (trip.routeTextColor && trip.routeTextColor.length > 2) {
         return '#' + trip.routeTextColor;
     }
@@ -49,7 +49,7 @@ function getRouteTextColor(trip: Trip) {
     return '#FFFFFF';
 }
 
-function getRouteColor(trip: Trip) {
+function getRouteColor(trip: TripDto) {
     if (trip.routeColor && trip.routeColor.length > 2) {
         return '#' + trip.routeColor;
     }

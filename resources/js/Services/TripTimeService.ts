@@ -1,5 +1,6 @@
 import { Stop, TransportPost } from '@/types/PostTypes';
 import { DateTime, DateTimeMaybeValid } from 'luxon';
+import { TransportPost as ApiTransportPost } from '../../types/Api.gen';
 
 export function calculateDelay(
     plannedTime: DateTimeMaybeValid | null,
@@ -21,7 +22,9 @@ export function calculateDelay(
     return null;
 }
 
-export function getDepartureDelay(post: TransportPost): number | null {
+export function getDepartureDelay(
+    post: TransportPost | ApiTransportPost,
+): number | null {
     return calculateDelay(
         getDepartureTime(post.originStop),
         post?.manualDepartureTime,
@@ -29,7 +32,9 @@ export function getDepartureDelay(post: TransportPost): number | null {
     );
 }
 
-export function getArrivalDelay(post: TransportPost): number | null {
+export function getArrivalDelay(
+    post: TransportPost | ApiTransportPost,
+): number | null {
     return calculateDelay(
         getArrivalTime(post.destinationStop),
         post?.manualArrivalTime,

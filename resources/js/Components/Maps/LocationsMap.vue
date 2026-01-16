@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { api } from '@/app';
 import {
     MglCircleLayer,
     MglGeoJsonSource,
@@ -7,7 +8,6 @@ import {
     MglRasterLayer,
     MglRasterSource,
 } from '@indoorequal/vue-maplibre-gl';
-import axios from 'axios';
 import type { GeometryCollection } from 'geojson';
 import {
     LngLat,
@@ -16,10 +16,11 @@ import {
     StyleSpecification,
 } from 'maplibre-gl';
 import { PropType, ref } from 'vue';
+import { UserDto } from '../../../types/Api.gen';
 
 const props = defineProps({
-    username: {
-        type: String as PropType<string>,
+    user: {
+        type: Object as PropType<UserDto>,
         required: true,
     },
 });
@@ -39,10 +40,10 @@ const center = new LngLat(8.403, 49);
 const bounds = ref(undefined as LngLatBoundsLike | undefined);
 const geoJson = ref(undefined as GeometryCollection | undefined);
 
-axios
-    .get('/api/profile/' + props.username + '/map-data')
+api.users
+    .getProfileMapData(props.user.id)
     .then((json) => {
-        geoJson.value = json.data;
+        geoJson.value = json.data as GeometryCollection;
         const mapBounds = new LngLatBounds();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         geoJson.value?.geometries.forEach((geometry: any) => {

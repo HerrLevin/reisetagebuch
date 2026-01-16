@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import LocationListEntryInfo from '@/Pages/NewPostDialog/Partials/LocationListEntryInfo.vue';
 import { getEmojiFromTags } from '@/Services/LocationTypeService';
-import { LocationPost } from '@/types/PostTypes';
 import type { PropType } from 'vue';
+import { LocationPost } from '../../../types/Api.gen';
 
 defineProps({
     post: {

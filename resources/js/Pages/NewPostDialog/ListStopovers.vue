@@ -1,14 +1,15 @@
 <script setup lang="ts">
+import { api } from '@/app';
 import Loading from '@/Components/Loading.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import StopoversListEntry from '@/Pages/NewPostDialog/Partials/StopoversListEntry.vue';
 import { getEmoji } from '@/Services/DepartureTypeService';
 import { StopPlace, TripDto } from '@/types';
 import { Head, router } from '@inertiajs/vue3';
-import axios from 'axios';
 import { DateTime } from 'luxon';
 import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { TransportPostExitUpdateRequest } from '../../../types/Api.gen';
 
 const { t } = useI18n();
 
@@ -25,12 +26,10 @@ const loading = ref(true);
 async function loadStopovers() {
     loading.value = true;
     try {
-        const response = await axios.get('/api/locations/stopovers', {
-            params: {
-                tripId: tripId.value,
-                startId: startId.value,
-                startTime: startTime.value,
-            },
+        const response = await api.locations.stopovers({
+            tripId: tripId.value,
+            startId: startId.value,
+            startTime: startTime.value,
         });
         trip.value = response.data.trip;
         startTime.value = response.data.startTime;
@@ -68,11 +67,10 @@ onMounted(() => {
 
 function submit(stopover: StopPlace) {
     if (postId.value && postId.value.length > 0) {
-        axios
-            .put(route('posts.update.transport-post', postId.value), {
+        api.posts
+            .updateTransportPostExit(postId.value, {
                 stopId: stopover.tripStopId,
-                postId: postId.value,
-            })
+            } as TransportPostExitUpdateRequest)
             .then(() => {
                 router.visit(`/posts/${postId.value}`);
             });

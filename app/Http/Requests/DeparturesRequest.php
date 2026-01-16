@@ -8,7 +8,7 @@ use Illuminate\Foundation\Http\FormRequest;
 /**
  * @property float|null $latitude
  * @property float|null $longitude
- * @property string|null $filter
+ * @property string|null $modes
  * @property string|null $when
  * @property string|null $identifier
  */
@@ -25,7 +25,7 @@ class DeparturesRequest extends FormRequest
             'latitude' => 'required_if:locationId,null', 'numeric',
             'longitude' => 'required_if:locationId,null', 'numeric',
             'identifier' => 'nullable', 'string',
-            'filter' => 'nullable', 'string',
+            'modes' => 'nullable', 'string',
             'when' => 'nullable', 'date',
         ];
     }
