@@ -10,7 +10,7 @@ import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import { Api } from '../types/Api.gen';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Reisetagebuch';
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
+const apiBaseUrl = '/api';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
