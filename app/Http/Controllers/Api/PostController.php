@@ -369,7 +369,7 @@ class PostController extends Controller
     /**
      * @throws AuthorizationException
      */
-    #[OA\Put(
+    #[OA\Patch(
         path: '/posts/{id}',
         operationId: 'updatePost',
         description: 'Update a post (text, transport or location)',

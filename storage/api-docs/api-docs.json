@@ -982,7 +982,49 @@
                     }
                 ]
             },
-            "put": {
+            "delete": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Delete post",
+                "description": "Delete a post by id",
+                "operationId": "deletePost",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Post id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    }
+                },
+                "security": [
+                    {
+                        "oauth2_security_example": [
+                            "write:projects",
+                            "read:projects"
+                        ]
+                    }
+                ]
+            },
+            "patch": {
                 "tags": [
                     "Posts"
                 ],
@@ -1031,48 +1073,6 @@
                                 }
                             }
                         }
-                    },
-                    "400": {
-                        "description": "Bad request"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    },
-                    "404": {
-                        "description": "Resource Not Found"
-                    }
-                },
-                "security": [
-                    {
-                        "oauth2_security_example": [
-                            "write:projects",
-                            "read:projects"
-                        ]
-                    }
-                ]
-            },
-            "delete": {
-                "tags": [
-                    "Posts"
-                ],
-                "summary": "Delete post",
-                "description": "Delete a post by id",
-                "operationId": "deletePost",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Post id",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "No Content"
                     },
                     "400": {
                         "description": "Bad request"
