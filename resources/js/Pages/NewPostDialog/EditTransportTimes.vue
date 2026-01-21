@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { api } from '@/app';
+import { api } from '@/api';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { getBaseText, prettyDates } from '@/Services/ApiPostTextService';
 import { getDepartureDelay } from '@/Services/TripTimeService';

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { api } from '@/app';
+import { api } from '@/api';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PostCreationForm from '@/Pages/NewPostDialog/Partials/PostCreationForm.vue';
 import { TravelReason, Visibility } from '@/types/enums';

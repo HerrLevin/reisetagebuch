@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { api } from '@/app';
+import { api } from '@/api';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import UpdateAccountSettingsForm from '@/Pages/Settings/Partials/UpdateAccountSettingsForm.vue';
 import UpdateDeviceSettingsForm from '@/Pages/Settings/Partials/UpdateDeviceSettingsForm.vue';

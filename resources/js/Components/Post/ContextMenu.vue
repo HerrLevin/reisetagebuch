@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { api } from '@/app';
+import { api } from '@/api';
 import { getOwnShareText, getShareText } from '@/Services/ApiPostTextService';
 import { isApiTransportPost } from '@/types/PostTypes';
 import { Link, useForm, usePage } from '@inertiajs/vue3';

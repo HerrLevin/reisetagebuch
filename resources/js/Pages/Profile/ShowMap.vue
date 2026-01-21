@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { api } from '@/app';
+import { api } from '@/api';
 import LocationsMap from '@/Components/Maps/LocationsMap.vue';
 import ProfileWrapper from '@/Pages/Profile/ProfileWrapper.vue';
 import type { UserDto } from '@/types';

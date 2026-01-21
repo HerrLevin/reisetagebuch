@@ -7,10 +7,8 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createPinia } from 'pinia';
 import { createApp, DefineComponent, h } from 'vue';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
-import { Api } from '../types/Api.gen';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Reisetagebuch';
-const apiBaseUrl = '/api';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
@@ -33,6 +31,3 @@ createInertiaApp({
         color: '#4B5563',
     },
 });
-
-const api = new Api({ baseURL: apiBaseUrl });
-export { api };

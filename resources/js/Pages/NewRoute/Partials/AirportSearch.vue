@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { api } from '@/app';
+import { api } from '@/api';
 import Typeahead, { Suggestion } from '@/Components/Typeahead.vue';
 import { LocationIdentifier } from '@/types';
 import { AutocompleteResponse } from '@/types/motis';

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { api } from '@/app';
+import { api } from '@/api';
 import Loading from '@/Components/Loading.vue';
 import Post from '@/Components/Post/Post.vue';
 import ProfileWrapper from '@/Pages/Profile/ProfileWrapper.vue';

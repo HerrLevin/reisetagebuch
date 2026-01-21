@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { api } from '@/app';
+import { api } from '@/api';
 import Loading from '@/Components/Loading.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import DeparturesFilter from '@/Pages/NewPostDialog/Partials/DeparturesFilter.vue';
