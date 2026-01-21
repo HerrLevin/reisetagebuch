@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { api } from '@/app';
+import { api } from '@/api';
 import SelectInput from '@/Components/SelectInput.vue';
 import TagsInput from '@/Pages/NewPostDialog/Partials/TagsInput.vue';
 import { getVisibilityLabel } from '@/Services/VisibilityMapping';

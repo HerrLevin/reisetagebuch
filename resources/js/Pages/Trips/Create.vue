@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { api } from '@/app';
+import { api } from '@/api';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import TransitousSearch from '@/Pages/NewPostDialog/Partials/TransitousSearch.vue';
 import AirportSearch from '@/Pages/NewRoute/Partials/AirportSearch.vue';
