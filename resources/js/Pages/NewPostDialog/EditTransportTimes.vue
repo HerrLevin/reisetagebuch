@@ -68,10 +68,10 @@ function submit() {
     api.posts
         .updateTransportTimes(post.value!.id, {
             manualDepartureTime: manualDeparture.value
-                ? manualDeparture.value.set({ second: 0 }).toISO()
+                ? manualDeparture.value.toISO()
                 : null,
             manualArrivalTime: manualArrival.value
-                ? manualArrival.value.set({ second: 0 }).toISO()
+                ? manualArrival.value.toISO()
                 : null,
         } as TransportTimesUpdateRequest)
         .then(() => {
@@ -132,6 +132,32 @@ function selectDepartureTime(event: Event) {
         });
     } else {
         manualDeparture.value = DateTime.fromISO(target.value);
+    }
+}
+
+function selectDepartureSeconds(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const seconds = Number(target.value);
+
+    if (manualDeparture.value) {
+        manualDeparture.value = manualDeparture.value.set({
+            second: seconds,
+        });
+    } else {
+        manualDeparture.value = DateTime.now().set({ second: seconds });
+    }
+}
+
+function selectArrivalSeconds(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const seconds = Number(target.value);
+
+    if (manualArrival.value) {
+        manualArrival.value = manualArrival.value.set({
+            second: seconds,
+        });
+    } else {
+        manualArrival.value = DateTime.now().set({ second: seconds });
     }
 }
 
@@ -207,13 +233,26 @@ watch(() => props.postId, fetchPost, { immediate: true });
                                     {{ manualDeparture?.zoneName }}
                                 </span>
                             </div>
-                            <input
-                                id="departureTime"
-                                type="time"
-                                class="input input-bordered w-full"
-                                :value="manualDeparture?.toFormat('HH:mm')"
-                                @change="selectDepartureTime"
-                            />
+                            <div class="join w-full">
+                                <input
+                                    id="departureTime"
+                                    type="time"
+                                    class="input input-bordered join-item w-full"
+                                    :value="manualDeparture?.toFormat('HH:mm')"
+                                    @change="selectDepartureTime"
+                                />
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max="59"
+                                    class="input input-bordered join-item w-full"
+                                    step="5"
+                                    :value="
+                                        manualDeparture?.toFormat('ss') || ''
+                                    "
+                                    @change="selectDepartureSeconds"
+                                />
+                            </div>
                         </div>
                         <div class="col col-span-2 content-end md:col-span-1">
                             <button
@@ -254,13 +293,24 @@ watch(() => props.postId, fetchPost, { immediate: true });
                                     {{ manualArrival?.zoneName }}
                                 </span>
                             </div>
-                            <input
-                                id="departureTime"
-                                type="time"
-                                class="input input-bordered w-full"
-                                :value="manualArrival?.toFormat('HH:mm')"
-                                @change="selectArrivalTime"
-                            />
+                            <div class="join w-full">
+                                <input
+                                    id="arrivalTime"
+                                    type="time"
+                                    class="input input-bordered w-full"
+                                    :value="manualArrival?.toFormat('HH:mm')"
+                                    @change="selectArrivalTime"
+                                />
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max="59"
+                                    class="input input-bordered join-item w-full"
+                                    step="5"
+                                    :value="manualArrival?.toFormat('ss') || ''"
+                                    @change="selectArrivalSeconds"
+                                />
+                            </div>
                         </div>
 
                         <div class="col col-span-2 content-end md:col-span-1">
@@ -277,7 +327,7 @@ watch(() => props.postId, fetchPost, { immediate: true });
                                 class="btn btn-primary w-full"
                                 @click.prevent="
                                     manualArrival = DateTime.now().set({
-                                        second: 1,
+                                        second: 30,
                                         millisecond: 0,
                                     })
                                 "

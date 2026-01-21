@@ -346,8 +346,8 @@ class PostRepository
             /** @var Post $post */
             $post = Post::where('id', $transportPost->id)->with('transportPost')->firstOrFail();
 
-            $post->transportPost->manual_departure = $manualDepartureTime ? Carbon::parse($manualDepartureTime)->setSeconds(0)->toIso8601ZuluString() : null;
-            $post->transportPost->manual_arrival = $manualArrivalTime ? Carbon::parse($manualArrivalTime)->setSeconds(0)->toIso8601ZuluString() : null;
+            $post->transportPost->manual_departure = $manualDepartureTime ? Carbon::parse($manualDepartureTime)->toIso8601ZuluString() : null;
+            $post->transportPost->manual_arrival = $manualArrivalTime ? Carbon::parse($manualArrivalTime)->toIso8601ZuluString() : null;
             $post->transportPost->save();
 
             DB::commit();
