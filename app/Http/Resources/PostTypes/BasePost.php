@@ -12,7 +12,7 @@ use OpenApi\Attributes as OA;
 #[OA\Schema(
     schema: 'BasePost',
     description: 'Base Post Resource',
-    required: ['id', 'user', 'body', 'visibility', 'published_at', 'created_at', 'updated_at', 'likesCount', 'likedByUser', 'metaInfos', 'hashTags'],
+    required: ['id', 'user', 'body', 'visibility', 'publishedAt', 'createdAt', 'updatedAt', 'likesCount', 'likedByUser', 'metaInfos', 'hashTags'],
     type: 'object'
 )]
 class BasePost

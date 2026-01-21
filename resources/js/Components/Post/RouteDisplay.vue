@@ -12,7 +12,7 @@ import {
 import { getArrivalDelay, getDepartureDelay } from '@/Services/TripTimeService';
 import { LocationEntry } from '@/types';
 import { DateTime } from 'luxon';
-import type { PropType } from 'vue';
+import { computed, PropType, ref, watch } from 'vue';
 import { TransportPost, TripDto } from '../../../types/Api.gen';
 
 const props = defineProps({
@@ -22,22 +22,37 @@ const props = defineProps({
     },
 });
 
-const departureDelay = getDepartureDelay(props.post);
-const arrivalDelay = getArrivalDelay(props.post);
+// Local reactive post state
+const localPost = ref(props.post);
+
+// Watch for prop changes and update localPost
+watch(
+    () => props.post,
+    (newPost) => {
+        localPost.value = newPost;
+    },
+);
+
+const departureDelay = computed(() => {
+    return getDepartureDelay(localPost.value);
+});
+const arrivalDelay = computed(() => {
+    return getArrivalDelay(localPost.value);
+});
 
 function getFormattedDepartureTime(): string | null {
     return formatDepartureTime(
-        props.post?.originStop,
-        props.post?.manualDepartureTime,
-        departureDelay || 0,
+        localPost.value?.originStop,
+        localPost.value?.manualDepartureTime,
+        departureDelay.value || 0,
     );
 }
 
 function getFormattedArrivalTime(): string | null {
     return formatArrivalTime(
-        props.post?.destinationStop,
-        props.post?.manualArrivalTime,
-        arrivalDelay || 0,
+        localPost.value?.destinationStop,
+        localPost.value?.manualArrivalTime,
+        arrivalDelay.value || 0,
     );
 }
 
@@ -75,19 +90,21 @@ function selectStation(location: LocationEntry) {
             <div class="text-left">
                 <div
                     class="mb-2 line-clamp-2 leading-none font-semibold overflow-ellipsis"
-                    @click.prevent="selectStation(post.originStop.location)"
+                    @click.prevent="
+                        selectStation(localPost.originStop.location)
+                    "
                 >
-                    {{ post.originStop.location.name }}
+                    {{ localPost.originStop.location.name }}
                 </div>
             </div>
             <div class="text-right">
                 <div
                     class="mb-2 line-clamp-2 leading-none font-semibold overflow-ellipsis"
                     @click.prevent="
-                        selectStation(post.destinationStop.location)
+                        selectStation(localPost.destinationStop.location)
                     "
                 >
-                    {{ post.destinationStop.location.name }}
+                    {{ localPost.destinationStop.location.name }}
                 </div>
             </div>
         </div>
@@ -100,11 +117,11 @@ function selectStation(location: LocationEntry) {
             </div>
             <div class="self-end text-center">
                 <div
-                    v-show="post.trip.lineName"
+                    v-show="localPost.trip.lineName"
                     class="badge min-w-[3em] px-[0.5] text-sm font-medium"
-                    :style="`background-color: ${getRouteColor(post.trip)}; color: ${getRouteTextColor(post.trip)}`"
+                    :style="`background-color: ${getRouteColor(localPost.trip)}; color: ${getRouteTextColor(localPost.trip)}`"
                 >
-                    {{ getPostLineName(post) }}
+                    {{ getPostLineName(localPost) }}
                 </div>
             </div>
             <div class="text-right">
@@ -116,11 +133,11 @@ function selectStation(location: LocationEntry) {
         </div>
         <div class="flex w-full flex-col">
             <div class="divider divider-dashed mt-0 mb-0">
-                <div>{{ getEmoji(post.trip.mode!) }}</div>
+                <div>{{ getEmoji(localPost.trip.mode!) }}</div>
             </div>
         </div>
         <div class="flex w-full flex-col text-center text-xs font-medium">
-            {{ getPostTripNumber(post) }}
+            {{ getPostTripNumber(localPost) }}
         </div>
     </div>
 </template>

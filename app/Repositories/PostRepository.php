@@ -7,6 +7,7 @@ use App\Enums\PostMetaInfo\MetaInfoKey;
 use App\Enums\PostMetaInfo\TravelReason;
 use App\Enums\PostMetaInfo\TravelRole;
 use App\Enums\Visibility;
+use App\Exceptions\NegativePeriodException;
 use App\Exceptions\OriginAfterDestinationException;
 use App\Exceptions\StationNotOnTripException;
 use App\Http\Resources\PostTypes\BasePost;
@@ -31,14 +32,11 @@ class PostRepository
 
     private PostMetaInfoRepository $postMetaInfoRepository;
 
-    private UserRepository $userRepository;
-
-    public function __construct(?PostHydrator $postHydrator = null, ?HashTagRepository $hashTagRepository = null, ?PostMetaInfoRepository $postMetaInfoRepository = null, ?UserRepository $userRepository = null)
+    public function __construct(?PostHydrator $postHydrator = null, ?HashTagRepository $hashTagRepository = null, ?PostMetaInfoRepository $postMetaInfoRepository = null)
     {
         $this->postHydrator = $postHydrator ?? new PostHydrator;
         $this->hashTagRepository = $hashTagRepository ?? new HashTagRepository;
         $this->postMetaInfoRepository = $postMetaInfoRepository ?? new PostMetaInfoRepository;
-        $this->userRepository = $userRepository ?? new UserRepository;
     }
 
     public function storeLocation(
@@ -337,17 +335,31 @@ class PostRepository
     }
 
     /**
+     * @throws NegativePeriodException
      * @throws Throwable
      */
-    public function updateTransportTimes(TransportPost $transportPost, ?string $manualDepartureTime, ?string $manualArrivalTime): TransportPost
+    public function updateTransportTimes(TransportPost $transportPost, ?string $manualDepartureTime, bool $updateDeparture, ?string $manualArrivalTime, bool $updateArrival): TransportPost
     {
         try {
             DB::beginTransaction();
             /** @var Post $post */
             $post = Post::where('id', $transportPost->id)->with('transportPost')->firstOrFail();
 
-            $post->transportPost->manual_departure = $manualDepartureTime ? Carbon::parse($manualDepartureTime)->toIso8601ZuluString() : null;
-            $post->transportPost->manual_arrival = $manualArrivalTime ? Carbon::parse($manualArrivalTime)->toIso8601ZuluString() : null;
+            if ($updateDeparture) {
+                $post->transportPost->manual_departure = $manualDepartureTime ? Carbon::parse($manualDepartureTime)->toIso8601ZuluString() : null;
+            }
+            if ($updateArrival) {
+                $post->transportPost->manual_arrival = $manualArrivalTime ? Carbon::parse($manualArrivalTime)->toIso8601ZuluString() : null;
+            }
+
+            // check that manual arrival is after manual departure
+            if ($post->transportPost->manual_departure !== null && $post->transportPost->manual_arrival !== null) {
+                $departure = Carbon::parse($post->transportPost->manual_departure);
+                $arrival = Carbon::parse($post->transportPost->manual_arrival);
+                if ($arrival->lessThanOrEqualTo($departure)) {
+                    throw new NegativePeriodException('Manual arrival time must be after manual departure time');
+                }
+            }
             $post->transportPost->save();
 
             DB::commit();
