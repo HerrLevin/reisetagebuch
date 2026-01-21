@@ -6,12 +6,15 @@ import { Link, useForm, usePage } from '@inertiajs/vue3';
 import {
     ClockPlus,
     Ellipsis,
+    PlaneLanding,
+    PlaneTakeoff,
     Route,
     Share,
     SquarePen,
     Trash2,
     UserRoundPlus,
 } from 'lucide-vue-next';
+import { DateTime } from 'luxon';
 import { PropType, ref, useTemplateRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { BasePost, TransportPost } from '../../../types/Api.gen';
@@ -25,11 +28,96 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(['delete:post']);
+const emit = defineEmits<{
+    (e: 'delete:post', postId: string): void;
+    (e: 'update:post', post: BasePost): void;
+}>();
 
 const deleteModal = useTemplateRef('deleteModal');
 const form = useForm({});
 const deleteProcessing = ref(false);
+
+function showTimeButtons(): boolean {
+    const post = props.post;
+    if (!isApiTransportPost(post)) {
+        return false;
+    }
+
+    const originDeparture = post.originStop.departureTime
+        ? DateTime.fromISO(post.originStop.departureTime)
+        : null;
+    const originArrival = post.originStop.arrivalTime
+        ? DateTime.fromISO(post.originStop.arrivalTime)
+        : null;
+    const destinationDeparture = post.destinationStop.departureTime
+        ? DateTime.fromISO(post.destinationStop.departureTime)
+        : null;
+    const destinationArrival = post.destinationStop.arrivalTime
+        ? DateTime.fromISO(post.destinationStop.arrivalTime)
+        : null;
+
+    // Show buttons if current time is 1 hour before or after any of the times
+    const now = DateTime.now();
+    const oneHourBefore = now.minus({ hours: 1 });
+    const oneHourAfter = now.plus({ hours: 1 });
+    const times = [
+        originDeparture,
+        originArrival,
+        destinationDeparture,
+        destinationArrival,
+    ];
+    for (const time of times) {
+        if (time) {
+            if (time >= oneHourBefore && time <= oneHourAfter) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+function departNow(): void {
+    const post = props.post;
+    if (!isApiTransportPost(post)) {
+        return;
+    }
+
+    const now = DateTime.now();
+    submit(now.toISO(), undefined);
+}
+
+function arriveNow(): void {
+    const post = props.post;
+    if (!isApiTransportPost(post)) {
+        return;
+    }
+    const now = DateTime.now();
+    submit(undefined, now.toISO());
+}
+
+function submit(
+    departure: string | undefined,
+    arrival: string | undefined,
+): void {
+    blur();
+    const post = props.post;
+    if (!isApiTransportPost(post)) {
+        return;
+    }
+    const data = {
+        manualDepartureTime: departure,
+        manualArrivalTime: arrival,
+    };
+
+    api.posts
+        .updateTransportTimes(post.id, data)
+        .then((response) => {
+            emit('update:post', response.data);
+        })
+        .catch((error_) => {
+            alert(error_.response.data.message);
+        });
+}
 
 function deletePost() {
     deleteProcessing.value = true;
@@ -127,29 +215,47 @@ function blur() {
                         {{ t('verbs.edit') }}
                     </Link>
                 </li>
-                <li v-if="isApiTransportPost(post)">
-                    <Link :href="route('posts.edit.transport-times', post.id)">
-                        <ClockPlus class="size-4" />
-                        {{ t('posts.edit.change_times') }}
-                    </Link>
-                </li>
-                <li v-if="isApiTransportPost(post)">
-                    <Link
-                        :href="
-                            route('posts.edit.transport-post', {
-                                postId: post.id,
-                                tripId: post.trip.foreignId,
-                                startId: post.originStop.id,
-                                startTime:
-                                    post.originStop.arrivalTime ||
-                                    post.originStop.departureTime,
-                            })
-                        "
-                    >
-                        <Route class="size-4" />
-                        {{ t('posts.edit.change_exit') }}
-                    </Link>
-                </li>
+                <template v-if="isApiTransportPost(post)">
+                    <li>
+                        <Link
+                            :href="route('posts.edit.transport-times', post.id)"
+                        >
+                            <ClockPlus class="size-4" />
+                            {{ t('posts.edit.change_times') }}
+                        </Link>
+                    </li>
+                    <li>
+                        <Link
+                            :href="
+                                route('posts.edit.transport-post', {
+                                    postId: post.id,
+                                    tripId: post.trip.foreignId,
+                                    startId: post.originStop.id,
+                                    startTime:
+                                        post.originStop.arrivalTime ||
+                                        post.originStop.departureTime,
+                                })
+                            "
+                        >
+                            <Route class="size-4" />
+                            {{ t('posts.edit.change_exit') }}
+                        </Link>
+                    </li>
+                    <template v-if="showTimeButtons()">
+                        <li>
+                            <a href="#" @click="departNow()">
+                                <PlaneTakeoff class="size-5" />
+                                {{ t('edit_transport_times.depart_now') }}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" @click="arriveNow()">
+                                <PlaneLanding class="size-5" />
+                                {{ t('edit_transport_times.arrive_now') }}
+                            </a>
+                        </li>
+                    </template>
+                </template>
                 <li class="mx-0 border-b-1"></li>
                 <li>
                     <a

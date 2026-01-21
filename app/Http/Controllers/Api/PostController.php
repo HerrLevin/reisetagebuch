@@ -6,6 +6,7 @@ use App\Dto\FilteredPostPaginationDto;
 use App\Dto\PostPaginationDto;
 use App\Enums\PostMetaInfo\TravelReason;
 use App\Enums\Visibility;
+use App\Exceptions\NegativePeriodException;
 use App\Http\Requests\BasePostRequest;
 use App\Http\Requests\FilterPostsRequest;
 use App\Http\Requests\LocationBasePostRequest;
@@ -489,6 +490,10 @@ class PostController extends Controller
     )]
     public function updateTimesTransport(string $postId, TransportTimesUpdateRequest $request): TransportPost
     {
-        return $this->postController->updateTimesTransport($postId, $request);
+        try {
+            return $this->postController->updateTimesTransport($postId, $request);
+        } catch (NegativePeriodException $exception) {
+            abort(400, $exception->getMessage());
+        }
     }
 }

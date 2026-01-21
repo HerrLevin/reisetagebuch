@@ -13,14 +13,16 @@ use OpenApi\Attributes as OA;
             description: 'The manually set departure time for the transport post.',
             type: 'string',
             format: 'date-time',
-            example: '2024-08-01T10:00:00Z'
+            example: '2024-08-01T10:00:00Z',
+            nullable: true
         ),
         new OA\Property(
             property: 'manualArrivalTime',
             description: 'The manually set arrival time for the transport post.',
             type: 'string',
             format: 'date-time',
-            example: '2024-08-01T12:00:00Z'
+            example: '2024-08-01T12:00:00Z',
+            nullable: true
         ),
     ],
     type: 'object'

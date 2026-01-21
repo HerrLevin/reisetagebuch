@@ -360,13 +360,13 @@ export interface TransportTimesUpdateRequest {
      * @format date-time
      * @example "2024-08-01T10:00:00Z"
      */
-    manualDepartureTime?: string;
+    manualDepartureTime?: string | null;
     /**
      * The manually set arrival time for the transport post.
      * @format date-time
      * @example "2024-08-01T12:00:00Z"
      */
-    manualArrivalTime?: string;
+    manualArrivalTime?: string | null;
 }
 
 /** Request to update user profile */
@@ -513,17 +513,17 @@ export interface BasePost {
      * Post published at timestamp
      * @format date-time
      */
-    publishedAt?: string;
+    publishedAt: string;
     /**
      * Post created at timestamp
      * @format date-time
      */
-    createdAt?: string;
+    createdAt: string;
     /**
      * Post updated at timestamp
      * @format date-time
      */
-    updatedAt?: string;
+    updatedAt: string;
     /** List of hashtags associated with the post */
     hashTags: string[];
     /** Number of likes on the post */

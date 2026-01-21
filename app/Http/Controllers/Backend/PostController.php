@@ -8,6 +8,7 @@ use App\Dto\PostPaginationDto;
 use App\Enums\PostMetaInfo\TravelReason;
 use App\Enums\PostMetaInfo\TravelRole;
 use App\Enums\Visibility;
+use App\Exceptions\NegativePeriodException;
 use App\Exceptions\OriginAfterDestinationException;
 use App\Exceptions\StationNotOnTripException;
 use App\Http\Controllers\Controller;
@@ -33,6 +34,7 @@ use App\Repositories\PostRepository;
 use App\Repositories\TransportTripRepository;
 use Auth;
 use Illuminate\Auth\Access\AuthorizationException;
+use Throwable;
 
 class PostController extends Controller
 {
@@ -197,6 +199,8 @@ class PostController extends Controller
 
     /**
      * @throws AuthorizationException
+     * @throws NegativePeriodException
+     * @throws Throwable
      */
     public function updateTimesTransport(string $postId, TransportTimesUpdateRequest $request): TransportPost
     {
@@ -210,7 +214,9 @@ class PostController extends Controller
         $post = $this->postRepository->updateTransportTimes(
             $post,
             $request->manualDepartureTime,
-            $request->manualArrivalTime
+            $request->has('manualDepartureTime'),
+            $request->manualArrivalTime,
+            $request->has('manualArrivalTime')
         );
 
         TraewellingEditPostJob::dispatch($post);

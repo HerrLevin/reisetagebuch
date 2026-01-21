@@ -11,12 +11,12 @@ import { getVisibilityIcon } from '@/Services/VisibilityMapping';
 import { isApiLocationPost, isApiTransportPost } from '@/types/PostTypes';
 import { Link } from '@inertiajs/vue3';
 import { DateTime } from 'luxon';
-import { PropType } from 'vue';
+import { computed, PropType, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { BasePost, LocationPost, TransportPost } from '../../../types/Api.gen';
 
 const { t } = useI18n();
-const emit = defineEmits(['delete:post']);
+const emit = defineEmits(['delete:post', 'update:post']);
 
 const props = defineProps({
     post: {
@@ -25,45 +25,70 @@ const props = defineProps({
     },
 });
 
-let relativeCreatedAt;
-const date = DateTime.fromISO(props.post?.createdAt);
+// Local reactive post state
+const localPost = ref(props.post);
 
-if (date.diffNow('days').days < -1) {
-    relativeCreatedAt = date.toLocaleString();
-} else {
-    relativeCreatedAt = date.toRelative() || '';
+// Watch for prop changes (in case parent updates post prop)
+watch(
+    () => props.post,
+    (newPost) => {
+        localPost.value = newPost;
+    },
+);
+
+// Listen for update:post event and update localPost
+function onUpdatePost(newPost: BasePost | TransportPost | LocationPost) {
+    localPost.value = newPost;
 }
+
+const relativeCreatedAt = computed(() => {
+    if (!localPost.value?.createdAt) {
+        return '';
+    }
+    const date = DateTime.fromISO(localPost.value!.createdAt);
+
+    if (date.diffNow('days').days < -1) {
+        return date.toLocaleString();
+    } else {
+        return date.toRelative() || '';
+    }
+});
 </script>
 
-<template v-show="!deleted">
+<template v-show="!deleted" v-if="localPost">
     <div class="avatar">
         <div class="bg-primary size-10 rounded-xl">
             <img
-                v-if="post.user.avatar"
-                :src="post.user.avatar"
-                :alt="t('posts.profile_picture_alt', { name: post.user.name })"
+                v-if="localPost.user.avatar"
+                :src="localPost.user.avatar"
+                :alt="
+                    t('posts.profile_picture_alt', {
+                        name: localPost.user.name,
+                    })
+                "
             />
         </div>
     </div>
     <div class="list-col-grow">
         <div class="mb-1 text-xs">
             <Link
-                :href="route('profile.show', post.user.username)"
+                :href="route('profile.show', localPost.user.username)"
                 class="opacity-60"
             >
-                {{ post.user.name }}
+                {{ localPost.user.name }}
             </Link>
             <div
                 v-if="
-                    (isApiLocationPost(post) || isApiTransportPost(post)) &&
-                    post.travelReason
+                    (isApiLocationPost(localPost) ||
+                        isApiTransportPost(localPost)) &&
+                    localPost.travelReason
                 "
                 class="inline text-xs"
             >
                 ·
                 <div class="dropdown dropdown-hover">
                     <component
-                        :is="getTravelReasonIcon(post.travelReason)"
+                        :is="getTravelReasonIcon(localPost.travelReason)"
                         class="iconSize inline opacity-60"
                         role="button"
                         tabindex="0"
@@ -74,7 +99,9 @@ if (date.diffNow('days').days < -1) {
                     >
                         <div tabindex="-1" class="card-body">
                             <h3 class="card-title">
-                                {{ getTravelReasonLabel(post.travelReason) }}
+                                {{
+                                    getTravelReasonLabel(localPost.travelReason)
+                                }}
                             </h3>
                         </div>
                     </div>
@@ -83,31 +110,38 @@ if (date.diffNow('days').days < -1) {
             ·
             <span class="text-xs opacity-60">
                 <component
-                    :is="getVisibilityIcon(post.visibility)"
+                    :is="getVisibilityIcon(localPost.visibility)"
                     class="iconSize inline"
                 />
                 {{ relativeCreatedAt }}
             </span>
-            <span v-if="isApiTransportPost(post)" class="text-xs opacity-60">
-                · {{ DateTime.fromISO(post.publishedAt).toLocaleString() }}
+            <span
+                v-if="isApiTransportPost(localPost)"
+                class="text-xs opacity-60"
+            >
+                · {{ DateTime.fromISO(localPost.publishedAt).toLocaleString() }}
             </span>
         </div>
         <p
-            v-if="post.body"
+            v-if="localPost.body"
             class="list-col-wrap my-2 ps-3 text-xs whitespace-pre-wrap"
         >
-            {{ post.body }}
+            {{ localPost.body }}
         </p>
         <LocationDisplay
-            v-if="isApiLocationPost(post)"
-            :post="post as LocationPost"
+            v-if="isApiLocationPost(localPost)"
+            :post="localPost as LocationPost"
         />
         <RouteDisplay
-            v-else-if="isApiTransportPost(post)"
-            :post="post as TransportPost"
+            v-else-if="isApiTransportPost(localPost)"
+            :post="localPost as TransportPost"
         />
-        <HashTags :hash-tags="post.hashTags" />
-        <Interactions :post @delete:post="emit('delete:post')" />
+        <HashTags :hash-tags="localPost.hashTags" />
+        <Interactions
+            :post="localPost"
+            @delete:post="emit('delete:post')"
+            @update:post="onUpdatePost"
+        />
     </div>
 </template>
 

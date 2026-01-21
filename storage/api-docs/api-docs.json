@@ -2344,13 +2344,15 @@
                         "description": "The manually set departure time for the transport post.",
                         "type": "string",
                         "format": "date-time",
-                        "example": "2024-08-01T10:00:00Z"
+                        "example": "2024-08-01T10:00:00Z",
+                        "nullable": true
                     },
                     "manualArrivalTime": {
                         "description": "The manually set arrival time for the transport post.",
                         "type": "string",
                         "format": "date-time",
-                        "example": "2024-08-01T12:00:00Z"
+                        "example": "2024-08-01T12:00:00Z",
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -2581,9 +2583,9 @@
                     "user",
                     "body",
                     "visibility",
-                    "published_at",
-                    "created_at",
-                    "updated_at",
+                    "publishedAt",
+                    "createdAt",
+                    "updatedAt",
                     "likesCount",
                     "likedByUser",
                     "metaInfos",
