@@ -21,7 +21,8 @@
         "laravel/socialite": "^5.23",
         "laravel/tinker": "^2.10.1",
         "predis/predis": "^3.1",
-        "tightenco/ziggy": "^2.0"
+        "tightenco/ziggy": "^2.0",
+        "ext-pdo": "*"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.5",

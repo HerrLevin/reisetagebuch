@@ -23,6 +23,8 @@ export default defineConfigWithVueTs(
             'bootstrap/ssr',
             'tailwind.config.js',
             'resources/js/components/ui/*',
+            'docs/.vitepress/cache/**',
+            'docs/.vitepress/dist/**',
         ],
     },
     {
