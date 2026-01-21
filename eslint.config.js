@@ -25,6 +25,7 @@ export default defineConfigWithVueTs(
             'resources/js/components/ui/*',
             'docs/.vitepress/cache/**',
             'docs/.vitepress/dist/**',
+            'resources/types/Api.gen.ts',
         ],
     },
     {
