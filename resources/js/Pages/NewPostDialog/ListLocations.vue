@@ -4,13 +4,16 @@ import Loading from '@/Components/Loading.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import LocationListEntry from '@/Pages/NewPostDialog/Partials/LocationListEntry.vue';
 import { LocationService } from '@/Services/LocationService';
+import { useUserStore } from '@/stores/user';
 import { LocationEntry, RequestLocationDto } from '@/types';
-import { Head, usePage } from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
 import { Search } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
+
+const user = useUserStore();
 
 const showStartButton = ref(false);
 showStartButton.value = route().current('posts.create.start');
@@ -23,7 +26,7 @@ const currentPosition = ref<GeolocationPosition | null>(null);
 const loading = ref<boolean>(false);
 
 function fetchRequestLocation() {
-    LocationService.getPosition(!!usePage().props.auth.user)
+    LocationService.getPosition(!!user.user)
         .then((position) => {
             currentPosition.value = position;
             api.location

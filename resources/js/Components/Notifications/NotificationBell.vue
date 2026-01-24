@@ -1,23 +1,27 @@
 <script setup lang="ts">
 import { useNotificationStore } from '@/stores/notifications';
+import { useUserStore } from '@/stores/user';
 import { Bell } from 'lucide-vue-next';
 import { storeToRefs } from 'pinia';
 import { onMounted } from 'vue';
 
 const store = useNotificationStore();
+const user = useUserStore();
 const { unreadCount } = storeToRefs(store);
 
 onMounted(() => {
-    store.fetchUnreadCount();
-
-    setInterval(() => {
+    if (user.user) {
         store.fetchUnreadCount();
-    }, 30000);
+
+        setInterval(() => {
+            store.fetchUnreadCount();
+        }, 30000);
+    }
 });
 </script>
 
 <template>
-    <div class="indicator" @click="store.fetchNotifications()">
+    <div v-if="user.user" class="indicator" @click="store.fetchNotifications()">
         <Bell class="size-5" />
         <span
             v-show="unreadCount > 0"

@@ -67,6 +67,11 @@ export enum TravelReason {
   Other = "other",
 }
 
+export enum Feature {
+  Registration = "registration",
+  Invite = "invite",
+}
+
 /** Enumeration of notification types */
 export enum NotificationType {
   PostLikedNotification = "PostLikedNotification",
@@ -76,6 +81,67 @@ export enum MotisLocationType {
   ADDRESS = "ADDRESS",
   PLACE = "PLACE",
   STOP = "STOP",
+}
+
+export interface AppConfigurationDto {
+  /**
+   * The name of the application
+   * @example "Reisetagebuch"
+   */
+  appName: string;
+  /** List of feature flags and their statuses */
+  featureFlags: FeatureFlag[];
+}
+
+/**
+ * Authenticated User DTO
+ * Data Transfer Object representing the authenticated user
+ */
+export interface AuthenticatedUserDto {
+  /**
+   * The unique identifier of the user
+   * @format uuid
+   */
+  id: string;
+  /**
+   * The full name of the user
+   * @example "John Doe"
+   */
+  name: string;
+  /**
+   * The username of the user
+   * @example "john_doe"
+   */
+  username: string;
+  /**
+   * The email address of the user
+   * @format email
+   * @example "user@reisetagebu.ch"
+   */
+  email: string;
+  /**
+   * The URL of the user avatar image
+   * @format uri
+   * @example "https://example.com/avatars/john_doe.png"
+   */
+  avatar: string | null;
+  /**
+   * Indicates whether the user must verify their email address
+   * @example false
+   */
+  mustVerifyEmail: boolean;
+  /**
+   * Indicates whether the user has permission to invite other users
+   * @example true
+   */
+  canInviteUsers: boolean;
+  /**
+   * Indicates whether the user has connected their Traewelling account
+   * @example false
+   */
+  traewellingConnected: boolean;
+  /** Data Transfer Object representing user settings */
+  settings: UserSettingsDto;
 }
 
 /** Data Transfer Object for Departures at a Stop */
@@ -109,6 +175,15 @@ export interface DeparturesResponseDto {
    * @format float
    */
   requestLongitude: number;
+}
+
+export interface FeatureFlag {
+  name: Feature;
+  /**
+   * Indicates if the feature flag is enabled
+   * @example true
+   */
+  enabled: boolean;
 }
 
 /** Pagination DTO specifically for posts */
@@ -308,6 +383,18 @@ export interface TripCreationResponseDto {
 }
 
 /**
+ * User Settings DTO
+ * Data Transfer Object representing user settings
+ */
+export interface UserSettingsDto {
+  /**
+   * Radius for Motis suggestions in meters
+   * @example 500
+   */
+  motisRadius: number | null;
+}
+
+/**
  * Profile Update Request
  * Request schema for updating user profile information
  */
@@ -335,8 +422,11 @@ export interface ProfileUpdateRequest {
 
 /** Request to update user settings */
 export interface SettingsUpdateRequest {
-  /** Radius for Motis suggestions in meters (allowed values: 50, 100, 200, 500) */
-  motisRadius?: number | null;
+  /**
+   * Radius for Motis suggestions in meters (allowed values: 50, 100, 200, 300, 400, 500)
+   * @example 100
+   */
+  motisRadius?: 50 | 100 | 200 | 300 | 400 | 500 | null;
 }
 
 export interface StoreInviteCodeRequest {
@@ -1018,6 +1108,42 @@ export class Api<
         body: data,
         secure: true,
         type: ContentType.Json,
+        ...params,
+      }),
+  };
+  app = {
+    /**
+     * No description
+     *
+     * @tags App Configuration
+     * @name GetAppConfiguration
+     * @summary Get application configuration
+     * @request GET:/app/configuration
+     */
+    getAppConfiguration: (params: RequestParams = {}) =>
+      this.request<AppConfigurationDto, any>({
+        path: `/app/configuration`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+  };
+  auth = {
+    /**
+     * @description Get the currently authenticated user
+     *
+     * @tags Authentication
+     * @name GetAuthenticatedUser
+     * @summary Get authenticated user
+     * @request GET:/auth/user
+     * @secure
+     */
+    getAuthenticatedUser: (params: RequestParams = {}) =>
+      this.request<AuthenticatedUserDto, any>({
+        path: `/auth/user`,
+        method: "GET",
+        secure: true,
+        format: "json",
         ...params,
       }),
   };

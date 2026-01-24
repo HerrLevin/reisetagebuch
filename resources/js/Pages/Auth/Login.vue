@@ -3,7 +3,8 @@ import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
 import AuthLayout from '@/Layouts/AuthLayout.vue';
-import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import { useAppConfigurationStore } from '@/stores/appConfiguration';
+import { Head, Link, useForm } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -18,6 +19,9 @@ const form = useForm({
     password: '',
     remember: false,
 });
+
+const config = useAppConfigurationStore();
+config.fetchConfig();
 
 const submit = () => {
     form.post(route('login'), {
@@ -102,7 +106,7 @@ const submit = () => {
                 {{ t('auth.login.title') }}
             </button>
         </form>
-        <div v-if="usePage().props.canRegister" class="mt-4 text-center">
+        <div v-if="config.canRegister()" class="mt-4 text-center">
             {{ t('auth.login.no_account') }}
             <Link :href="route('register')" class="link">
                 {{ t('auth.register.title') }}

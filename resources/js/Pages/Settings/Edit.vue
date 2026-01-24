@@ -3,6 +3,7 @@ import { api } from '@/api';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import UpdateAccountSettingsForm from '@/Pages/Settings/Partials/UpdateAccountSettingsForm.vue';
 import UpdateDeviceSettingsForm from '@/Pages/Settings/Partials/UpdateDeviceSettingsForm.vue';
+import { useUserStore } from '@/stores/user';
 import { Head } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -12,11 +13,12 @@ import UpdatePasswordForm from './Partials/UpdatePasswordForm.vue';
 
 const { t } = useI18n();
 
-const props = defineProps<{
-    mustVerifyEmail?: boolean;
+defineProps<{
     status?: string;
-    traewellingConnected?: boolean;
 }>();
+
+const user = useUserStore();
+user.fetchUser(true);
 
 const processingTraewelling = ref(false);
 
@@ -53,17 +55,16 @@ function disconnectTraewelling() {
             </h2>
         </template>
 
-        <div class="min-w-full space-y-6">
+        <div v-if="user.user" class="min-w-full space-y-6">
             <div class="card bg-base-100 min-w-full p-8 shadow-md">
-                <UpdateDeviceSettingsForm :status="status" class="max-w-xl" />
+                <UpdateDeviceSettingsForm :user="user.user" class="max-w-xl" />
             </div>
             <div class="card bg-base-100 min-w-full p-8 shadow-md">
-                <UpdateAccountSettingsForm :status="status" class="max-w-xl" />
+                <UpdateAccountSettingsForm :user="user.user" class="max-w-xl" />
             </div>
             <div class="card bg-base-100 min-w-full p-8 shadow-md">
                 <UpdateAccountInformationForm
-                    :must-verify-email="mustVerifyEmail"
-                    :status="status"
+                    :user="user.user"
                     class="max-w-xl"
                 />
             </div>
@@ -74,7 +75,7 @@ function disconnectTraewelling() {
 
             <div class="card bg-base-100 min-w-full p-8 shadow-md">
                 <div
-                    v-if="props.traewellingConnected"
+                    v-if="user.user.traewellingConnected"
                     class="flex items-center gap-2"
                 >
                     <span class="text-success">

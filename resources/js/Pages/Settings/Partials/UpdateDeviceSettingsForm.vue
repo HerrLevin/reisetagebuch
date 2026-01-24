@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { AuthenticatedUserDto } from '../../../../types/Api.gen';
 
 const { t } = useI18n();
 
 defineProps<{
-    status?: string;
+    user: AuthenticatedUserDto;
 }>();
 
 const trackLocation = ref(null as boolean | null);

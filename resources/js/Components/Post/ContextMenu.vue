@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { api } from '@/api';
 import { getOwnShareText, getShareText } from '@/Services/ApiPostTextService';
+import { useUserStore } from '@/stores/user';
 import { isApiTransportPost } from '@/types/PostTypes';
-import { Link, useForm, usePage } from '@inertiajs/vue3';
+import { Link, useForm } from '@inertiajs/vue3';
 import {
     ClockPlus,
     Ellipsis,
@@ -20,6 +21,8 @@ import { useI18n } from 'vue-i18n';
 import { BasePost, TransportPost } from '../../../types/Api.gen';
 
 const { t } = useI18n();
+
+const user = useUserStore();
 
 const props = defineProps({
     post: {
@@ -136,7 +139,7 @@ function deletePost() {
 }
 
 const isSameUser = () => {
-    return props.post.user.id === usePage().props.auth?.user?.id;
+    return props.post.user.id === user.user?.id;
 };
 
 function sharePost(): void {

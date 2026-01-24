@@ -12,8 +12,9 @@ import {
     getDepartureDelay,
     getDepartureTime,
 } from '@/Services/TripTimeService';
+import { useUserStore } from '@/stores/user';
 import { isApiLocationPost, isApiTransportPost } from '@/types/PostTypes';
-import { Head, usePage } from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
 import { GeometryCollection } from 'geojson';
 import { ArrowLeft } from 'lucide-vue-next';
 import { LngLat } from 'maplibre-gl';
@@ -22,6 +23,8 @@ import { useI18n } from 'vue-i18n';
 import { BasePost, LocationPost, TransportPost } from '../../types/Api.gen';
 
 const { t } = useI18n();
+
+const user = useUserStore();
 
 const props = defineProps({
     postId: {
@@ -209,9 +212,7 @@ function deleted() {
                 :end-point="endPoint"
                 :line-string="lineString"
                 :stop-overs="stopovers"
-                :show-geo-position="
-                    usePage().props.auth.user?.id === post.user.id
-                "
+                :show-geo-position="user.user?.id === post.user.id"
                 :line-color="
                     isApiTransportPost(post) ? getColorForPost(post) : undefined
                 "
