@@ -3,14 +3,14 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PostLikedNotification from '@/Pages/Notifications/Partials/PostLikedNotification.vue';
 import { useNotificationStore } from '@/stores/notifications';
 import {
-    getTypedNotification,
+    getTypedNotificationData,
     isPostLikedNotification,
-    Notification,
 } from '@/types/notifications';
 import { Head } from '@inertiajs/vue3';
 import { storeToRefs } from 'pinia';
 import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { NotificationWrapper } from '../../../types/Api.gen';
 
 const { t } = useI18n();
 
@@ -18,15 +18,15 @@ const loadingNotifications = ref(false);
 const store = useNotificationStore();
 const { notifications, unreadCount, loading } = storeToRefs(store);
 
-const getNotificationComponent = (notification: Notification) => {
+const getNotificationComponent = (notification: NotificationWrapper) => {
     if (isPostLikedNotification(notification)) {
         return PostLikedNotification;
     }
     return null;
 };
 
-const handleNotificationClick = (notification: Notification) => {
-    if (!notification.read_at) {
+const handleNotificationClick = (notification: NotificationWrapper) => {
+    if (!notification.readAt) {
         store.markAsRead(notification.id);
     }
 };
@@ -74,8 +74,10 @@ onMounted(() => {
                     >
                         <component
                             :is="getNotificationComponent(notification)"
-                            v-if="getTypedNotification(notification) !== null"
-                            :notification="getTypedNotification(notification)"
+                            v-if="
+                                getTypedNotificationData(notification) !== null
+                            "
+                            :notification="notification"
                             @click="handleNotificationClick(notification)"
                         ></component>
                     </template>

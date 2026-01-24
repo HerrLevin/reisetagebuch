@@ -22,11 +22,21 @@ class NotificationController extends Controller
         description: 'List notifications for authenticated user',
         summary: 'List notifications',
         tags: ['Notifications'],
-        responses: [new OA\Response(response: 200, description: Controller::OA_DESC_SUCCESS)]
+        responses: [new OA\Response(
+            response: 200,
+            description: Controller::OA_DESC_SUCCESS,
+            content: new OA\MediaType(
+                mediaType: 'application/json', // array of notifications
+                schema: new OA\Schema(
+                    type: 'array',
+                    items: new OA\Items(ref: '#/components/schemas/NotificationWrapper')
+                )
+            )
+        )]
     )]
     public function index(Request $request)
     {
-        return $this->notificationController->index($request); // todo: implement DTOs
+        return $this->notificationController->index($request);
     }
 
     #[OA\Get(

@@ -24,7 +24,7 @@ class PostLiked extends Notification
     public function databaseType(object $notifiable): DatabaseNotificationType
     {
 
-        return DatabaseNotificationType::POST_LIKED;
+        return DatabaseNotificationType::PostLiked;
 
     }
 

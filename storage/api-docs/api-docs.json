@@ -745,7 +745,17 @@
                 "operationId": "listNotifications",
                 "responses": {
                     "200": {
-                        "description": "successful operation"
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/NotificationWrapper"
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -1975,6 +1985,104 @@
                 },
                 "type": "object"
             },
+            "NotificationWrapper": {
+                "description": "A wrapper for notification data",
+                "required": [
+                    "id",
+                    "type",
+                    "createdAt",
+                    "updatedAt",
+                    "readAt",
+                    "data"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier for the notification",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/NotificationType"
+                    },
+                    "createdAt": {
+                        "description": "Timestamp when the notification was created",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updatedAt": {
+                        "description": "Timestamp when the notification was last updated",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "readAt": {
+                        "description": "Timestamp when the notification was read",
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "data": {
+                        "description": "Additional data associated with the notification",
+                        "type": "object",
+                        "nullable": true,
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/PostLikedData"
+                            }
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "PostLikedData": {
+                "description": "Data for a post liked notification",
+                "required": [
+                    "postId",
+                    "postBody",
+                    "likedByUserId",
+                    "likedByUserName",
+                    "likedByUserDisplayName",
+                    "likedByUserAvatarUrl",
+                    "postSummary"
+                ],
+                "properties": {
+                    "postId": {
+                        "description": "ID of the liked post",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "postBody": {
+                        "description": "Body content of the liked post",
+                        "type": "string",
+                        "format": "text"
+                    },
+                    "likedByUserId": {
+                        "description": "ID of the user who liked the post",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "likedByUserName": {
+                        "description": "Username of the user who liked the post",
+                        "type": "string",
+                        "example": "johndoe"
+                    },
+                    "likedByUserDisplayName": {
+                        "description": "Display name of the user who liked the post",
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "likedByUserAvatarUrl": {
+                        "description": "Avatar URL of the user who liked the post",
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    "postSummary": {
+                        "description": "Optional summary of the liked post",
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
             "PaginationDto": {
                 "description": "A generic pagination DTO",
                 "required": [
@@ -2088,6 +2196,13 @@
                     }
                 },
                 "type": "object"
+            },
+            "NotificationType": {
+                "description": "Enumeration of notification types",
+                "type": "string",
+                "enum": [
+                    "PostLikedNotification"
+                ]
             },
             "TravelReason": {
                 "description": "Reasons for travel associated with transport posts",

@@ -67,6 +67,11 @@ export enum TravelReason {
   Other = "other",
 }
 
+/** Enumeration of notification types */
+export enum NotificationType {
+  PostLikedNotification = "PostLikedNotification",
+}
+
 export enum MotisLocationType {
   ADDRESS = "ADDRESS",
   PLACE = "PLACE",
@@ -187,6 +192,70 @@ export interface MotisStopDto {
   longitude: number;
   /** Distance to the stop in meters */
   distance: number | null;
+}
+
+/** A wrapper for notification data */
+export interface NotificationWrapper {
+  /**
+   * Unique identifier for the notification
+   * @format uuid
+   */
+  id: string;
+  /** Enumeration of notification types */
+  type: NotificationType;
+  /**
+   * Timestamp when the notification was created
+   * @format date-time
+   */
+  createdAt: string;
+  /**
+   * Timestamp when the notification was last updated
+   * @format date-time
+   */
+  updatedAt: string;
+  /**
+   * Timestamp when the notification was read
+   * @format date-time
+   */
+  readAt: string | null;
+  /** Additional data associated with the notification */
+  data: PostLikedData | null;
+}
+
+/** Data for a post liked notification */
+export interface PostLikedData {
+  /**
+   * ID of the liked post
+   * @format uuid
+   */
+  postId: string;
+  /**
+   * Body content of the liked post
+   * @format text
+   */
+  postBody: string;
+  /**
+   * ID of the user who liked the post
+   * @format uuid
+   */
+  likedByUserId: string;
+  /**
+   * Username of the user who liked the post
+   * @example "johndoe"
+   */
+  likedByUserName: string;
+  /**
+   * Display name of the user who liked the post
+   * @example "John Doe"
+   */
+  likedByUserDisplayName: string;
+  /**
+   * Avatar URL of the user who liked the post
+   * @format uri
+   */
+  likedByUserAvatarUrl: string;
+  /** Optional summary of the liked post */
+  postSummary: string | null;
 }
 
 /** A generic pagination DTO */
@@ -1502,9 +1571,10 @@ export class Api<
      * @request GET:/notifications/list
      */
     listNotifications: (params: RequestParams = {}) =>
-      this.request<void, any>({
+      this.request<NotificationWrapper[], any>({
         path: `/notifications/list`,
         method: "GET",
+        format: "json",
         ...params,
       }),
 

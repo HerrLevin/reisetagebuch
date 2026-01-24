@@ -1,18 +1,19 @@
 <script setup lang="ts">
-import { isPostLikedNotification, Notification } from '@/types/notifications';
+import { isPostLikedNotification } from '@/types/notifications';
 import { Link } from '@inertiajs/vue3';
 import { PropType } from 'vue';
+import { NotificationWrapper } from '../../../../types/Api.gen';
 
 defineProps({
     notification: {
-        type: Object as PropType<Notification>,
+        type: Object as PropType<NotificationWrapper>,
         required: true,
     },
 });
 
-const getNotificationLink = (notification: Notification): string => {
+const getNotificationLink = (notification: NotificationWrapper): string => {
     if (isPostLikedNotification(notification)) {
-        return route('posts.show', notification.data.post_id);
+        return route('posts.show', notification.data!.postId);
     }
     return '#';
 };
@@ -22,7 +23,7 @@ const getNotificationLink = (notification: Notification): string => {
         class="list-row hover-list-entry cursor-pointer"
         as="li"
         :class="{
-            'bg-base-200': !notification.read_at,
+            'bg-base-200': !notification.readAt,
         }"
         :href="getNotificationLink(notification)"
     >

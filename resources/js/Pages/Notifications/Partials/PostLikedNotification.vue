@@ -1,18 +1,20 @@
 <script setup lang="ts">
 import NotificationLayout from '@/Pages/Notifications/Partials/NotificationLayout.vue';
-import { PostLikedNotification } from '@/types/notifications';
 import { Heart } from 'lucide-vue-next';
 import { PropType } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { NotificationWrapper, PostLikedData } from '../../../../types/Api.gen';
 
 const { t } = useI18n();
 
-defineProps({
+const props = defineProps({
     notification: {
-        type: Object as PropType<PostLikedNotification>,
+        type: Object as PropType<NotificationWrapper>,
         required: true,
     },
 });
+
+const data = props.notification.data as PostLikedData;
 </script>
 <template>
     <NotificationLayout :notification="notification">
@@ -24,30 +26,27 @@ defineProps({
                 <div class="avatar">
                     <div class="w-4 rounded">
                         <img
-                            v-if="notification.data.liker.avatar"
-                            :src="notification.data.liker.avatar"
-                            :alt="notification.data.liker.username"
+                            v-if="data.likedByUserAvatarUrl"
+                            :src="data.likedByUserAvatarUrl"
+                            :alt="data.likedByUserName"
                         />
                     </div>
                 </div>
                 {{
                     t('notifications.liked.lead', {
-                        user: notification.data.liker.name,
+                        user: data.likedByUserDisplayName,
                     })
                 }}
             </div>
-            <div
-                v-if="notification.data.post_body"
-                class="line-clamp-1 text-xs opacity-60"
-            >
-                {{ notification.data.post_body }}
+            <div v-if="data.postBody" class="line-clamp-1 text-xs opacity-60">
+                {{ data.postBody }}
             </div>
             <div class="mt-1 text-xs opacity-40">
-                {{ new Date(notification.created_at).toLocaleString() }}
+                {{ new Date(notification.createdAt).toLocaleString() }}
             </div>
         </div>
         <div
-            v-if="!notification.read_at"
+            v-if="!notification.readAt"
             class="badge badge-primary badge-xs"
         ></div>
     </NotificationLayout>
