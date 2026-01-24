@@ -58,29 +58,3 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags || 'latest' }}
           labels: ${{ steps.meta.outputs.labels }}
-
-      - name: Deploy via SSH
-        if: github.event_name != 'workflow_dispatch' && !startsWith(github.ref, 'refs/tags/v')
-        uses: appleboy/ssh-action@v1.2.4
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          port: ${{ secrets.SSH_PORT || 22 }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            cd ${{ secrets.PATH_TO_LARAVEL_PROJECT }}
-            docker compose -f compose.yml pull
-            docker compose -f compose.yml up -d
-
-      - name: Deploy Prod via SSH if tag is a production release
-        if: startsWith(github.ref, 'refs/tags/v')
-        uses: appleboy/ssh-action@v1.2.4
-        with:
-          host: ${{ secrets.SSH_HOST_PROD || secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER_PROD || secrets.SSH_USER }}
-          port: ${{ secrets.SSH_PORT_PROD || secrets.SSH_PORT || 22 }}
-          key: ${{ secrets.SSH_KEY_PROD || secrets.SSH_KEY }}
-          script: |
-            cd ${{ secrets.PATH_TO_LARAVEL_PROJECT_PROD }}
-            docker compose -f compose.yml pull
-            docker compose -f compose.yml up -d
