@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
-import { Head, Link, usePage } from '@inertiajs/vue3';
+import { useAppConfigurationStore } from '@/stores/appConfiguration';
+import { useUserStore } from '@/stores/user';
+import { Head, Link } from '@inertiajs/vue3';
 import { CircleAlert } from 'lucide-vue-next';
 
 defineProps<{
@@ -8,6 +10,11 @@ defineProps<{
     laravelVersion: string;
     phpVersion: string;
 }>();
+
+const config = useAppConfigurationStore();
+config.fetchConfig();
+
+const user = useUserStore();
 </script>
 
 <template>
@@ -25,7 +32,7 @@ defineProps<{
                     </div>
                     <nav class="-mx-3 flex flex-1 justify-end">
                         <Link
-                            v-if="$page.props.auth.user"
+                            v-if="user.user"
                             :href="route('dashboard')"
                             class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
                         >
@@ -41,7 +48,7 @@ defineProps<{
                             </Link>
 
                             <Link
-                                v-if="usePage().props.canRegister"
+                                v-if="config.canRegister()"
                                 :href="route('register')"
                                 class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
                             >

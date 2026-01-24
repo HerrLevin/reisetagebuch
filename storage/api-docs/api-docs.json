@@ -119,6 +119,57 @@
                 ]
             }
         },
+        "/app/configuration": {
+            "get": {
+                "tags": [
+                    "App Configuration"
+                ],
+                "summary": "Get application configuration",
+                "operationId": "getAppConfiguration",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AppConfigurationDto"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/user": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Get authenticated user",
+                "description": "Get the currently authenticated user",
+                "operationId": "getAuthenticatedUser",
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticatedUserDto"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "oauth2_security_example": [
+                            "write:projects",
+                            "read:projects"
+                        ]
+                    }
+                ]
+            }
+        },
         "/invites": {
             "get": {
                 "tags": [
@@ -1693,6 +1744,91 @@
     },
     "components": {
         "schemas": {
+            "AppConfigurationDto": {
+                "required": [
+                    "appName",
+                    "featureFlags"
+                ],
+                "properties": {
+                    "appName": {
+                        "description": "The name of the application",
+                        "type": "string",
+                        "example": "Reisetagebuch"
+                    },
+                    "featureFlags": {
+                        "description": "List of feature flags and their statuses",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/FeatureFlag"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "AuthenticatedUserDto": {
+                "title": "Authenticated User DTO",
+                "description": "Data Transfer Object representing the authenticated user",
+                "required": [
+                    "id",
+                    "name",
+                    "username",
+                    "email",
+                    "mustVerifyEmail",
+                    "canInviteUsers",
+                    "traewellingConnected",
+                    "settings",
+                    "avatar"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "The unique identifier of the user",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "description": "The full name of the user",
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "username": {
+                        "description": "The username of the user",
+                        "type": "string",
+                        "example": "john_doe"
+                    },
+                    "email": {
+                        "description": "The email address of the user",
+                        "type": "string",
+                        "format": "email",
+                        "example": "user@reisetagebu.ch"
+                    },
+                    "avatar": {
+                        "description": "The URL of the user avatar image",
+                        "type": "string",
+                        "format": "uri",
+                        "example": "https://example.com/avatars/john_doe.png",
+                        "nullable": true
+                    },
+                    "mustVerifyEmail": {
+                        "description": "Indicates whether the user must verify their email address",
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "canInviteUsers": {
+                        "description": "Indicates whether the user has permission to invite other users",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "traewellingConnected": {
+                        "description": "Indicates whether the user has connected their Traewelling account",
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "settings": {
+                        "$ref": "#/components/schemas/UserSettingsDto"
+                    }
+                },
+                "type": "object"
+            },
             "DeparturesDto": {
                 "description": "Data Transfer Object for Departures at a Stop",
                 "required": [
@@ -1753,6 +1889,23 @@
                         "description": "Longitude of the request location",
                         "type": "number",
                         "format": "float"
+                    }
+                },
+                "type": "object"
+            },
+            "FeatureFlag": {
+                "required": [
+                    "name",
+                    "enabled"
+                ],
+                "properties": {
+                    "name": {
+                        "$ref": "#/components/schemas/Feature"
+                    },
+                    "enabled": {
+                        "description": "Indicates if the feature flag is enabled",
+                        "type": "boolean",
+                        "example": true
                     }
                 },
                 "type": "object"
@@ -2197,11 +2350,34 @@
                 },
                 "type": "object"
             },
+            "UserSettingsDto": {
+                "title": "User Settings DTO",
+                "description": "Data Transfer Object representing user settings",
+                "required": [
+                    "motisRadius"
+                ],
+                "properties": {
+                    "motisRadius": {
+                        "description": "Radius for Motis suggestions in meters",
+                        "type": "integer",
+                        "example": 500,
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
             "NotificationType": {
                 "description": "Enumeration of notification types",
                 "type": "string",
                 "enum": [
                     "PostLikedNotification"
+                ]
+            },
+            "Feature": {
+                "type": "string",
+                "enum": [
+                    "registration",
+                    "invite"
                 ]
             },
             "TravelReason": {
@@ -2304,8 +2480,17 @@
                 "description": "Request to update user settings",
                 "properties": {
                     "motisRadius": {
-                        "description": "Radius for Motis suggestions in meters (allowed values: 50, 100, 200, 500)",
+                        "description": "Radius for Motis suggestions in meters (allowed values: 50, 100, 200, 300, 400, 500)",
                         "type": "integer",
+                        "enum": [
+                            50,
+                            100,
+                            200,
+                            300,
+                            400,
+                            500
+                        ],
+                        "example": 100,
                         "nullable": true
                     }
                 },
@@ -3077,6 +3262,14 @@
         {
             "name": "Account",
             "description": "Account"
+        },
+        {
+            "name": "App Configuration",
+            "description": "App Configuration"
+        },
+        {
+            "name": "Authentication",
+            "description": "Authentication"
         },
         {
             "name": "Invites",

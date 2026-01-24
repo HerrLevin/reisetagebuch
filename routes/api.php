@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\AccountController;
+use App\Http\Controllers\Api\AppConfigurationController;
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\InviteController;
 use App\Http\Controllers\Api\LikeController;
 use App\Http\Controllers\Api\LocationController as ApiLocationController;
@@ -24,7 +26,12 @@ Route::prefix('users')->group(function () {
 Route::get('posts/{post}', [PostController::class, 'show'])
     ->name('api.posts.show');
 
+route::get('app/configuration', [AppConfigurationController::class, 'index'])
+    ->name('app.configuration');
+
 Route::middleware('auth:api')->group(function () {
+    Route::get('/auth/user', [AuthController::class, 'user'])
+        ->name('auth.user');
     Route::get('/timeline', [PostController::class, 'timeline'])
         ->name('posts.timeline');
 

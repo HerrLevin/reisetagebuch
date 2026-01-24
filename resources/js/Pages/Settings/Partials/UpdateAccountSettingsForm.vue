@@ -2,22 +2,21 @@
 import { api } from '@/api';
 import InputLabel from '@/Components/InputLabel.vue';
 import SelectInput from '@/Components/SelectInput.vue';
-import { usePage } from '@inertiajs/vue3';
 import { reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { AuthenticatedUserDto } from '../../../../types/Api.gen';
 
 const { t } = useI18n();
 
-defineProps<{
-    status?: string;
+const props = defineProps<{
+    user: AuthenticatedUserDto;
 }>();
 
-const user = usePage().props.auth.user;
 const processing = ref(false);
 const recentlySuccessful = ref(false);
 
 const form = reactive({
-    motisRadius: user.settings?.motis_radius || null,
+    motisRadius: props.user.settings.motisRadius,
 });
 
 function formSubmit() {

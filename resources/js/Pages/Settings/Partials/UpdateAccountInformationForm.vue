@@ -2,26 +2,25 @@
 import { api } from '@/api';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
-import { Link, usePage } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3';
 import { reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { AuthenticatedUserDto } from '../../../../types/Api.gen';
 
 const { t } = useI18n();
 
-defineProps<{
-    mustVerifyEmail?: boolean;
-    status?: string;
+const props = defineProps<{
+    user: AuthenticatedUserDto;
 }>();
+
+const form = reactive({
+    name: props.user.name || '',
+    username: props.user.username || '',
+    email: props.user.email || '',
+});
 
 const processing = ref(false);
 const recentlySuccessful = ref(false);
-const user = usePage().props.auth.user;
-
-const form = reactive({
-    name: user.name,
-    username: user.username,
-    email: user.email,
-});
 
 function submitForm() {
     processing.value = true;
@@ -103,7 +102,7 @@ function submitForm() {
                 />
             </div>
 
-            <div v-if="mustVerifyEmail && user.email_verified_at === null">
+            <div v-if="user.user?.mustVerifyEmail">
                 <p class="mt-2 text-sm">
                     {{ t('settings.account_information.email_not_verified') }}
                     <Link
@@ -119,15 +118,6 @@ function submitForm() {
                         }}
                     </Link>
                 </p>
-
-                <div
-                    v-show="status === 'verification-link-sent'"
-                    class="text-success mt-2 text-sm font-medium"
-                >
-                    {{
-                        t('settings.account_information.verification_link_sent')
-                    }}
-                </div>
             </div>
 
             <div class="flex items-center gap-4">

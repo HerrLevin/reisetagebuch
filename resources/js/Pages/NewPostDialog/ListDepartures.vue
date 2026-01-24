@@ -5,7 +5,8 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import DeparturesFilter from '@/Pages/NewPostDialog/Partials/DeparturesFilter.vue';
 import DeparturesListEntry from '@/Pages/NewPostDialog/Partials/DeparturesListEntry.vue';
 import { LocationService } from '@/Services/LocationService';
-import { Head, usePage } from '@inertiajs/vue3';
+import { useUserStore } from '@/stores/user';
+import { Head } from '@inertiajs/vue3';
 import { DateTime } from 'luxon';
 import { onMounted, onUnmounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -16,6 +17,8 @@ import {
 } from '../../../types/Api.gen';
 
 const { t } = useI18n();
+
+const user = useUserStore();
 
 const urlParams = new URLSearchParams(window.location.search);
 const requestIdentifier = ref<string | null>(urlParams.get('identifier'));
@@ -40,7 +43,6 @@ const time = ref<DateTime | null>(null);
 const latitude = ref(requestLatitude.value);
 const longitude = ref(requestLongitude.value);
 
-const user = usePage().props.auth.user ?? null;
 const intervalId = ref<number | null>(null);
 
 async function loadDepartures() {
@@ -83,7 +85,7 @@ onUnmounted(() => {
 });
 
 function updateLocation() {
-    LocationService.getPosition(!!user)
+    LocationService.getPosition(!!user.user)
         .then((position) => {
             latitude.value = position.coords.latitude;
             longitude.value = position.coords.longitude;

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import NotificationBell from '@/Components/Notifications/NotificationBell.vue';
 import { LocationService } from '@/Services/LocationService';
-import { Link, usePage } from '@inertiajs/vue3';
+import { useUserStore } from '@/stores/user';
+import { Link } from '@inertiajs/vue3';
 import {
     Filter,
     House,
@@ -16,9 +17,10 @@ import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
 
+const user = useUserStore();
+
 const latitude = ref(0);
 const longitude = ref(0);
-const user = usePage().props.auth.user ?? null;
 const intervalId = ref<number | null>(null);
 
 onMounted(() => {
@@ -34,7 +36,7 @@ onUnmounted(() => {
 });
 
 function updateLocation() {
-    LocationService.getPosition(!!user)
+    LocationService.getPosition(!!user.user)
         .then((position) => {
             latitude.value = position.coords.latitude;
             longitude.value = position.coords.longitude;
@@ -128,7 +130,7 @@ const isFilterRoute = () => {
                 <House class="size-[1.2em]" />
                 <span class="dock-label">{{ t('app.home') }}</span>
             </Link>
-            <template v-if="user">
+            <template v-if="user.user">
                 <Link
                     :href="route('trips.create')"
                     as="button"

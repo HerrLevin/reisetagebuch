@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import ProfileEditModal from '@/Pages/Profile/Partials/ProfileEditModal.vue';
+import { useUserStore } from '@/stores/user';
 import type { UserDto } from '@/types';
-import { usePage } from '@inertiajs/vue3';
 import { EllipsisVertical } from 'lucide-vue-next';
 import { PropType } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
 
-const authUser = usePage().props.auth.user ?? null;
+const authUser = useUserStore();
+
 defineProps({
     user: {
         type: Object as PropType<UserDto>,
@@ -31,7 +32,7 @@ defineProps({
             </div>
         </div>
         <div class="flex items-center gap-2">
-            <ProfileEditModal v-if="authUser" :user="user" />
+            <ProfileEditModal v-if="authUser.user" :user="user" />
             <button class="btn btn-circle" type="button">
                 <EllipsisVertical />
             </button>

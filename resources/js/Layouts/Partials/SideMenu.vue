@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import NotificationBell from '@/Components/Notifications/NotificationBell.vue';
 import { LocationService } from '@/Services/LocationService';
-import { Link, usePage } from '@inertiajs/vue3';
+import { useUserStore } from '@/stores/user';
+import { Link } from '@inertiajs/vue3';
 import {
     CirclePlus,
     Filter,
@@ -19,7 +20,7 @@ const { t } = useI18n();
 const latitude = ref(0);
 const longitude = ref(0);
 
-const user = usePage().props.auth.user ?? null;
+const user = useUserStore();
 const intervalId = ref<number | null>(null);
 
 onMounted(() => {
@@ -34,7 +35,7 @@ onUnmounted(() => {
 });
 
 function updateLocation() {
-    LocationService.getPosition(!!user)
+    LocationService.getPosition(!!user.user)
         .then((position) => {
             latitude.value = position.coords.latitude;
             longitude.value = position.coords.longitude;
@@ -70,7 +71,7 @@ const isFilterRoute = () => {
                 {{ t('pages.timeline.title') }}
             </Link>
         </li>
-        <template v-if="user">
+        <template v-if="user.user">
             <li class="dropdown">
                 <div
                     tabindex="0"

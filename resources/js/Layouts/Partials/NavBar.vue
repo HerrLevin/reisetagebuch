@@ -2,11 +2,20 @@
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import SideMenu from '@/Layouts/Partials/SideMenu.vue';
 import ThemeSelector from '@/Layouts/Partials/ThemeSelector.vue';
-import { Link, usePage } from '@inertiajs/vue3';
+import { useAppConfigurationStore } from '@/stores/appConfiguration';
+import { useUserStore } from '@/stores/user';
+import { Link } from '@inertiajs/vue3';
 import { Handshake, History, LogOut, Settings, User } from 'lucide-vue-next';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
+
+const appConfig = useAppConfigurationStore();
+appConfig.fetchConfig();
+const user = useUserStore();
+if (!user.user) {
+    user.fetchUser();
+}
 </script>
 
 <template>
@@ -32,12 +41,9 @@ const { t } = useI18n();
                     <div class="avatar">
                         <div class="bg-primary size-10 rounded-full">
                             <img
-                                v-if="usePage().props.auth.user.profile?.avatar"
-                                :src="
-                                    `/files/` +
-                                    usePage().props.auth.user.profile?.avatar
-                                "
-                                :alt="usePage().props.auth.user.name"
+                                v-if="user.user?.avatar"
+                                :src="`/files/` + user.user?.avatar"
+                                :alt="user.user?.name"
                             />
                         </div>
                     </div>
@@ -49,42 +55,58 @@ const { t } = useI18n();
                     <li>
                         <ThemeSelector />
                     </li>
-                    <li>
-                        <Link
-                            :href="
-                                route(
-                                    'profile.show',
-                                    usePage().props.auth.user.username,
-                                )
-                            "
-                        >
-                            <User class="size-5" />
-                            {{ t('profile.title') }}
-                        </Link>
-                    </li>
-                    <li>
-                        <Link :href="route('account.edit')">
-                            <Settings class="size-4" />
-                            {{ t('settings.title') }}
-                        </Link>
-                    </li>
-                    <li v-if="usePage()?.props?.canInvite">
-                        <Link :href="route('invites.index')">
-                            <Handshake class="size-4" />
-                            {{ t('app.invite_users') }}
-                        </Link>
-                    </li>
-                    <li>
-                        <Link :href="route('location-history.index')">
-                            <History class="size-4" />
-                            {{ t('app.location_history') }}
-                        </Link>
-                    </li>
-                    <li>
-                        <Link :href="route('logout')" method="post" as="button">
-                            <LogOut class="size-4" /> {{ t('app.logout') }}
-                        </Link>
-                    </li>
+                    <template v-if="user.user">
+                        <li v-if="user.user">
+                            <Link
+                                :href="
+                                    route('profile.show', user.user?.username)
+                                "
+                            >
+                                <User class="size-5" />
+                                {{ t('profile.title') }}
+                            </Link>
+                        </li>
+                        <li>
+                            <Link :href="route('account.edit')">
+                                <Settings class="size-4" />
+                                {{ t('settings.title') }}
+                            </Link>
+                        </li>
+                        <li v-if="user.user?.canInviteUsers">
+                            <Link :href="route('invites.index')">
+                                <Handshake class="size-4" />
+                                {{ t('app.invite_users') }}
+                            </Link>
+                        </li>
+                        <li>
+                            <Link :href="route('location-history.index')">
+                                <History class="size-4" />
+                                {{ t('app.location_history') }}
+                            </Link>
+                        </li>
+                        <li>
+                            <Link
+                                :href="route('logout')"
+                                method="post"
+                                as="button"
+                                @click="user.invalidateUser()"
+                            >
+                                <LogOut class="size-4" /> {{ t('app.logout') }}
+                            </Link>
+                        </li>
+                    </template>
+                    <template v-else>
+                        <li>
+                            <Link :href="route('login')">
+                                {{ t('auth.login.title') }}
+                            </Link>
+                        </li>
+                        <li v-if="appConfig.canRegister()">
+                            <Link :href="route('register')">
+                                {{ t('auth.register.title') }}
+                            </Link>
+                        </li>
+                    </template>
                 </ul>
             </div>
         </div>

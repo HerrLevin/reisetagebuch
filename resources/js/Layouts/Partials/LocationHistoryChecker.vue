@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { usePage } from '@inertiajs/vue3';
+import { useUserStore } from '@/stores/user';
 import { onMounted, useTemplateRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
+
+const user = useUserStore();
 
 const deleteModal = useTemplateRef('confirmLocationTrackingModal');
 
@@ -23,7 +25,7 @@ onMounted(() => {
     if (
         !document.cookie.includes('rtb_allow_history') &&
         !document.cookie.includes('rtb_disallow_history') &&
-        !!usePage().props.auth.user
+        !!user.user
     ) {
         deleteModal.value?.showModal();
     }
