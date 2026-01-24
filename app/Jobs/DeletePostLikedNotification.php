@@ -28,7 +28,7 @@ class DeletePostLikedNotification implements ShouldQueue
     {
         $this->notificationRepository->deleteReferencedNotification(
             $this->userId,
-            DatabaseNotificationType::POST_LIKED,
+            DatabaseNotificationType::PostLiked,
             $this->likeId
         );
     }

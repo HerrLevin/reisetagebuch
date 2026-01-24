@@ -1,18 +1,18 @@
-import { Notification } from '@/types/notifications';
-import axios from 'axios';
+import { api } from '@/api';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
+import { NotificationWrapper } from '../../types/Api.gen';
 
 export const useNotificationStore = defineStore('notifications', () => {
-    const notifications = ref<Notification[]>([]);
+    const notifications = ref<NotificationWrapper[]>([]);
     const unreadCount = ref(0);
     const loadingMarkAllRead = ref(false);
     const loadingNotifications = ref(false);
 
     const fetchNotifications = async () => {
         loadingNotifications.value = true;
-        axios
-            .get(route('notifications.index'))
+        api.notifications
+            .listNotifications()
             .then((response) => {
                 notifications.value = response.data;
                 loadingNotifications.value = false;
@@ -24,8 +24,8 @@ export const useNotificationStore = defineStore('notifications', () => {
     };
 
     const fetchUnreadCount = async () => {
-        axios
-            .get('/api/notifications/unread-count')
+        api.notifications
+            .unreadNotificationCount()
             .then((response) => {
                 unreadCount.value = response.data.count;
             })
@@ -36,11 +36,11 @@ export const useNotificationStore = defineStore('notifications', () => {
 
     const markAsRead = async (id: string) => {
         try {
-            await axios.post(route('notifications.read', id));
+            await api.notifications.markNotificationAsRead(id);
 
             const notification = notifications.value.find((n) => n.id === id);
             if (notification) {
-                notification.read_at = new Date().toISOString();
+                notification.readAt = new Date().toISOString();
                 unreadCount.value = Math.max(0, unreadCount.value - 1);
             }
         } catch (error) {
@@ -51,10 +51,10 @@ export const useNotificationStore = defineStore('notifications', () => {
     const markAllAsRead = async () => {
         loadingMarkAllRead.value = true;
         try {
-            await axios.post(route('notifications.read-all'));
+            await api.notifications.markAllNotificationsAsRead();
 
             notifications.value.forEach((n) => {
-                n.read_at = new Date().toISOString();
+                n.readAt = new Date().toISOString();
             });
             unreadCount.value = 0;
         } catch (error) {

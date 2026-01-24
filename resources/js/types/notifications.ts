@@ -1,41 +1,23 @@
-import { UserDto } from '@/types/index';
+import {
+    NotificationType,
+    NotificationWrapper,
+    PostLikedData,
+} from '../../types/Api.gen';
 
-export type Notification = {
-    id: string;
-    type: NotificationType;
-    data: object;
-    read_at: string | null;
-    created_at: string;
-    updated_at: string;
-};
-
-export type PostLikedNotification = Notification & {
-    type: NotificationType.PostLiked;
-    data: {
-        liker: UserDto;
-        post_id: string;
-        post_body: string | null;
-    };
-};
-
-export enum NotificationType {
-    PostLiked = 'post-liked',
-}
-
-export const isPostLikedNotification = (
-    notification: Notification,
-): notification is PostLikedNotification => {
+export const isPostLikedNotification = (notification: NotificationWrapper) => {
+    const data = notification.data;
     return (
-        notification.type === NotificationType.PostLiked &&
-        (notification as PostLikedNotification).data.liker !== undefined
+        notification.data !== null &&
+        notification.type === NotificationType.PostLikedNotification &&
+        (data as PostLikedData).likedByUserId !== undefined
     );
 };
 
-export const getTypedNotification = (
-    notification: Notification,
-): PostLikedNotification | null => {
+export const getTypedNotificationData = (
+    notification: NotificationWrapper,
+): PostLikedData | null => {
     if (isPostLikedNotification(notification)) {
-        return notification;
+        return notification.data;
     }
     return null;
 };
