@@ -174,7 +174,7 @@ const isFilterRoute = () => {
     inset: 0;
     background: radial-gradient(
         circle at bottom right,
-        rgb(0, 0, 0),
+        var(--color-base-100),
         transparent 70%
     );
     pointer-events: none;
