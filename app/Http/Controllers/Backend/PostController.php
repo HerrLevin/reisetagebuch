@@ -141,22 +141,26 @@ class PostController extends Controller
     /**
      * @throws AuthorizationException
      */
-    public function show(string $postId): BasePost|LocationPost|TransportPost
+    public function show(string $postId, ?User $visitingUser = null): BasePost|LocationPost|TransportPost
     {
-        $post = $this->postRepository->getById($postId, Auth::user());
+        $post = $this->postRepository->getById($postId, $visitingUser);
 
-        $this->authorize('view', $post);
+        if ($visitingUser?->can('view', $post)) {
+            return $post;
+        }
 
-        return $post;
+        throw new AuthorizationException('This post is not visible to you.');
     }
 
     /**
      * @throws AuthorizationException
      */
-    public function updatePost(string $postId, BasePostRequest $request): BasePost|LocationPost|TransportPost
+    public function updatePost(string $postId, BasePostRequest $request, User $visitingUser): BasePost|LocationPost|TransportPost
     {
         $post = $this->postRepository->getById($postId, Auth::user());
-        $this->authorize('update', $post);
+        if ($visitingUser->cannot('update', $post)) {
+            throw new AuthorizationException('You do not have permission to update this post.');
+        }
 
         $reason = null;
         if ($post instanceof LocationPost || $post instanceof TransportPost) {
@@ -184,11 +188,12 @@ class PostController extends Controller
     /**
      * @throws AuthorizationException
      */
-    public function destroy(string $postId): void
+    public function destroy(string $postId, User $user): void
     {
-        $post = $this->postRepository->getById($postId, Auth::user());
-
-        $this->authorize('delete', $post);
+        $post = $this->postRepository->getById($postId, $user);
+        if ($user->cannot('delete', $post)) {
+            throw new AuthorizationException('You do not have permission to delete this post.');
+        }
 
         if ($post instanceof TransportPost) {
             TraewellingDeletePostJob::dispatch($post);
@@ -202,10 +207,12 @@ class PostController extends Controller
      * @throws NegativePeriodException
      * @throws Throwable
      */
-    public function updateTimesTransport(string $postId, TransportTimesUpdateRequest $request): TransportPost
+    public function updateTimesTransport(string $postId, TransportTimesUpdateRequest $request, User $user): TransportPost
     {
         $post = $this->postRepository->getById($postId, Auth::user());
-        $this->authorize('update', $post);
+        if ($user->cannot('update', $post)) {
+            throw new AuthorizationException('You do not have permission to update this post.');
+        }
 
         if (! $post instanceof TransportPost) {
             abort(422, 'Not a transport post');
@@ -227,10 +234,12 @@ class PostController extends Controller
     /**
      * @throws AuthorizationException
      */
-    public function updateTransportPostExit(string $postId, TransportPostExitUpdateRequest $request): BasePost|LocationPost|TransportPost
+    public function updateTransportPostExit(string $postId, TransportPostExitUpdateRequest $request, User $user): BasePost|LocationPost|TransportPost
     {
         $post = $this->postRepository->getById($postId, Auth::user());
-        $this->authorize('update', $post);
+        if ($user->cannot('update', $post)) {
+            throw new AuthorizationException('You do not have permission to update this post.');
+        }
 
         if (! $post instanceof TransportPost) {
             abort(422, 'Not a transport post');
