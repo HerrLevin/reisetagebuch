@@ -25,9 +25,14 @@ class BrouterRequestService
      * @throws BrouterProfileCreationFailed
      * @throws ConnectionException
      */
-    public function __construct(?VersionService $versionService = null)
-    {
+    public function __construct(
+        ?VersionService $versionService = null,
+        ?Client $client = null
+    ) {
         $this->versionService = $versionService ?? new VersionService;
+        if ($client !== null) {
+            $this->client = $client;
+        }
     }
 
     private function initClient(): void
