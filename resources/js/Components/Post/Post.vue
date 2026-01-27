@@ -39,6 +39,7 @@ watch(
 // Listen for update:post event and update localPost
 function onUpdatePost(newPost: BasePost | TransportPost | LocationPost) {
     localPost.value = newPost;
+    emit('update:post', newPost);
 }
 
 const relativeCreatedAt = computed(() => {
