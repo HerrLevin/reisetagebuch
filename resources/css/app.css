@@ -31,3 +31,7 @@ select {
 .hover-list-entry:hover {
     background-color: var(--color-base-200);
 }
+
+.dropdown {
+    z-index: 2;
+}
