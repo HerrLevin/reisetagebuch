@@ -146,7 +146,7 @@ class PostController extends Controller
     )]
     public function show(string $postId): BasePost|TransportPost|LocationPost
     {
-        return $this->postController->show($postId);
+        return $this->postController->show($postId, $this->auth->user());
     }
 
     #[OA\Get(
@@ -283,7 +283,7 @@ class PostController extends Controller
     )]
     public function destroy(string $postId): Response
     {
-        $this->postController->destroy($postId);
+        $this->postController->destroy($postId, $this->auth->user());
 
         return response()->noContent();
     }
@@ -412,7 +412,7 @@ class PostController extends Controller
     )]
     public function update(string $postId, BasePostRequest $request): BasePost|TransportPost|LocationPost
     {
-        return $this->postController->updatePost($postId, $request);
+        return $this->postController->updatePost($postId, $request, $this->auth->user());
     }
 
     /**
@@ -451,7 +451,7 @@ class PostController extends Controller
     )]
     public function updateTransportPostExit(string $postId, TransportPostExitUpdateRequest $request): TransportPost
     {
-        return $this->postController->updateTransportPostExit($postId, $request);
+        return $this->postController->updateTransportPostExit($postId, $request, $this->auth->user());
     }
 
     /**
@@ -491,7 +491,7 @@ class PostController extends Controller
     public function updateTimesTransport(string $postId, TransportTimesUpdateRequest $request): TransportPost
     {
         try {
-            return $this->postController->updateTimesTransport($postId, $request);
+            return $this->postController->updateTimesTransport($postId, $request, $this->auth->user());
         } catch (NegativePeriodException $exception) {
             abort(400, $exception->getMessage());
         }
