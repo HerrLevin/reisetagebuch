@@ -7,8 +7,7 @@ import {
     MglLineLayer,
     MglMap,
     MglNavigationControl,
-    MglRasterLayer,
-    MglRasterSource,
+    useMap,
 } from '@indoorequal/vue-maplibre-gl';
 import type {
     Feature,
@@ -16,12 +15,7 @@ import type {
     GeometryCollection,
     MultiPoint,
 } from 'geojson';
-import {
-    LngLat,
-    LngLatBounds,
-    LngLatBoundsLike,
-    StyleSpecification,
-} from 'maplibre-gl';
+import { LngLat, LngLatBounds, LngLatBoundsLike } from 'maplibre-gl';
 import { computed, PropType, ref, watch } from 'vue';
 
 const props = defineProps({
@@ -63,16 +57,30 @@ const props = defineProps({
     },
 });
 
-const style = {
-    version: 8,
-    projection: { type: 'globe' },
-    sources: {},
-    layers: [],
-} as StyleSpecification;
+const storedTheme = localStorage.getItem('theme');
+const lightStyleUrl = 'https://tiles.openfreemap.org/styles/positron';
+const darkStyleUrl = 'https://tiles.openfreemap.org/styles/fiord';
+const style = ref(lightStyleUrl);
 
-const osmTiles = ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'];
-const osmAttribution =
-    'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors';
+if (storedTheme) {
+    style.value = storedTheme === 'light' ? lightStyleUrl : darkStyleUrl;
+} else {
+    // get theme from system preference
+    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
+        .matches
+        ? 'dark'
+        : 'light';
+    style.value = systemTheme === 'light' ? lightStyleUrl : darkStyleUrl;
+}
+
+watch(
+    () => localStorage.getItem('theme'),
+    (newTheme) => {
+        if (newTheme) {
+            style.value = newTheme === 'light' ? lightStyleUrl : darkStyleUrl;
+        }
+    },
+);
 
 const zoom = 14;
 const bounds = ref(undefined as LngLatBoundsLike | undefined);
@@ -306,6 +314,16 @@ const animatedPointSource = computed(() => {
         ],
     } as FeatureCollection;
 });
+
+const map = useMap();
+watch(
+    () => map.isLoaded,
+    () => {
+        map.map?.setProjection({
+            type: 'globe',
+        });
+    },
+);
 </script>
 
 <template>
@@ -336,6 +354,7 @@ const animatedPointSource = computed(() => {
             :track-user-location="true"
             :show-user-location="true"
         />
+        <!--
         <mgl-raster-source
             source-id="raster-source"
             :tiles="osmTiles"
@@ -345,6 +364,7 @@ const animatedPointSource = computed(() => {
         >
             <mgl-raster-layer layer-id="raster-layer" />
         </mgl-raster-source>
+        -->
         <mgl-geo-json-source
             v-if="geoJsonSource"
             :data="geoJsonSource"
