@@ -136,6 +136,12 @@ function getPageTitle() {
     }
 }
 
+function updatePost(updatedPost: BasePost | TransportPost | LocationPost) {
+    post.value = updatedPost;
+    getPageTitle();
+    mapPostDetails();
+}
+
 const currentTime = ref(Date.now());
 let intervalId: number | null = null;
 
@@ -222,7 +228,12 @@ function deleted() {
                 <ul class="list">
                     <li class="list-row">
                         <Loading v-if="loading" class="mx-auto my-4" />
-                        <Post v-if="post" :post @delete:post="deleted()" />
+                        <Post
+                            v-if="post"
+                            :post
+                            @delete:post="deleted()"
+                            @update:post="updatePost"
+                        />
                     </li>
                 </ul>
             </div>
