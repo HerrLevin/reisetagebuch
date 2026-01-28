@@ -1,22 +1,15 @@
 <script setup lang="ts">
+import BaseMapWrapper from '@/Components/Maps/BaseMapWrapper.vue';
 import { LocationHistoryDto, TripHistoryEntryDto, UserDto } from '@/types';
 import {
     MglCircleLayer,
     MglFullscreenControl,
     MglGeoJsonSource,
     MglLineLayer,
-    MglMap,
     MglNavigationControl,
-    MglRasterLayer,
-    MglRasterSource,
 } from '@indoorequal/vue-maplibre-gl';
-import type { FeatureCollection, GeometryCollection } from 'geojson';
-import {
-    LngLat,
-    LngLatBounds,
-    LngLatBoundsLike,
-    StyleSpecification,
-} from 'maplibre-gl';
+import type { FeatureCollection, Geometry, GeometryCollection } from 'geojson';
+import { LngLat, LngLatBounds, LngLatBoundsLike } from 'maplibre-gl';
 import { PropType, ref } from 'vue';
 
 const props = defineProps({
@@ -33,17 +26,6 @@ const props = defineProps({
         default: () => [],
     },
 });
-
-const style = {
-    version: 8,
-    projection: { type: 'globe' },
-    sources: {},
-    layers: [],
-} as StyleSpecification;
-
-const osmTiles = ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'];
-const osmAttribution =
-    'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors';
 
 const zoom = 8;
 const center = new LngLat(8.403, 49);
@@ -73,7 +55,7 @@ for (const location of props.locations) {
             timestamp: location.timestamp,
             name: location.name,
         },
-    };
+    } as Geometry;
 
     if (location.name && location.name.length > 0) {
         postsJson.value?.geometries.push(point);
@@ -97,14 +79,29 @@ for (const trip of props.trips) {
             properties: {},
             geometry: trip.geometry,
         });
-        for (const geometry of trip.geometry.geometries || []) {
-            if (geometry.type === 'LineString') {
-                for (const coordinate of geometry.coordinates || []) {
-                    mapBounds.extend(coordinate as [number, number]);
-                }
-            } else if (geometry.type === 'Point') {
-                mapBounds.extend(geometry.coordinates as [number, number]);
+        pushTripToBounds(trip.geometry);
+    }
+}
+
+function pushTripToBounds(geometry: Geometry) {
+    if (geometry.type === 'LineString') {
+        for (const coordinate of geometry.coordinates as [number, number][]) {
+            mapBounds.extend(coordinate);
+        }
+    } else if (geometry.type === 'Point') {
+        mapBounds.extend(geometry.coordinates as [number, number]);
+    } else if (
+        geometry.type === 'MultiPoint' ||
+        geometry.type === 'MultiLineString'
+    ) {
+        for (const coords of geometry.coordinates as [number, number][][]) {
+            for (const coordinate of coords) {
+                mapBounds.extend(coordinate);
             }
+        }
+    } else if (geometry.type === 'GeometryCollection') {
+        for (const geom of geometry.geometries) {
+            pushTripToBounds(geom);
         }
     }
 }
@@ -113,17 +110,11 @@ bounds.value = mapBounds;
 </script>
 
 <template>
-    <mgl-map
-        :map-style="style"
+    <BaseMapWrapper
         :zoom="zoom"
-        :max-zoom="18"
         height="50vh"
         :center="center"
         :bounds="bounds"
-        :fit-bounds-options="{
-            padding: 20,
-            maxZoom: 16,
-        }"
     >
         <mgl-fullscreen-control />
         <mgl-navigation-control
@@ -131,15 +122,6 @@ bounds.value = mapBounds;
             :show-zoom="false"
             :show-compass="true"
         />
-        <mgl-raster-source
-            source-id="raster-source"
-            :tiles="osmTiles"
-            :tile-size="256"
-            :maxzoom="18"
-            :attribution="osmAttribution"
-        >
-            <mgl-raster-layer layer-id="raster-layer" />
-        </mgl-raster-source>
         <mgl-geo-json-source
             v-if="postsJson"
             source-id="posts"
@@ -187,5 +169,5 @@ bounds.value = mapBounds;
                 }"
             />
         </mgl-geo-json-source>
-    </mgl-map>
+    </BaseMapWrapper>
 </template>

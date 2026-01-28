@@ -1,13 +1,12 @@
 <script setup lang="ts">
+import BaseMapWrapper from '@/Components/Maps/BaseMapWrapper.vue';
 import {
     MglCircleLayer,
     MglFullscreenControl,
     MglGeoJsonSource,
     MglGeolocateControl,
     MglLineLayer,
-    MglMap,
     MglNavigationControl,
-    useMap,
 } from '@indoorequal/vue-maplibre-gl';
 import type {
     Feature,
@@ -56,31 +55,6 @@ const props = defineProps({
         validator: (value: number) => value >= 0 && value <= 100,
     },
 });
-
-const storedTheme = localStorage.getItem('theme');
-const lightStyleUrl = 'https://tiles.openfreemap.org/styles/positron';
-const darkStyleUrl = 'https://tiles.openfreemap.org/styles/fiord';
-const style = ref(lightStyleUrl);
-
-if (storedTheme) {
-    style.value = storedTheme === 'light' ? lightStyleUrl : darkStyleUrl;
-} else {
-    // get theme from system preference
-    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
-        .matches
-        ? 'dark'
-        : 'light';
-    style.value = systemTheme === 'light' ? lightStyleUrl : darkStyleUrl;
-}
-
-watch(
-    () => localStorage.getItem('theme'),
-    (newTheme) => {
-        if (newTheme) {
-            style.value = newTheme === 'light' ? lightStyleUrl : darkStyleUrl;
-        }
-    },
-);
 
 const zoom = 14;
 const bounds = ref(undefined as LngLatBoundsLike | undefined);
@@ -175,11 +149,7 @@ function fallbackLinestring() {
 
         if (props.stopOvers) {
             for (const coord of props.stopOvers.coordinates) {
-                coordinates.splice(
-                    coordinates.length - 1,
-                    0,
-                    coord as number[],
-                );
+                coordinates.splice(-1, 0, coord as number[]);
             }
         }
 
@@ -206,10 +176,7 @@ watch(
     (newStopOvers) => {
         if (newStopOvers) {
             // remove first and last point (start and end)
-            newStopOvers.coordinates = newStopOvers.coordinates.slice(
-                1,
-                newStopOvers.coordinates.length - 1,
-            );
+            newStopOvers.coordinates = newStopOvers.coordinates.slice(1, -1);
             stopOverSource.value = {
                 type: 'FeatureCollection',
                 features: [
@@ -314,30 +281,14 @@ const animatedPointSource = computed(() => {
         ],
     } as FeatureCollection;
 });
-
-const map = useMap();
-watch(
-    () => map.isLoaded,
-    () => {
-        map.map?.setProjection({
-            type: 'globe',
-        });
-    },
-);
 </script>
 
 <template>
-    <mgl-map
-        :map-style="style"
+    <BaseMapWrapper
         :center="startPoint"
         :zoom="zoom"
-        :max-zoom="18"
         height="50vh"
         :bounds="bounds"
-        :fit-bounds-options="{
-            padding: 40,
-            maxZoom: 16,
-        }"
     >
         <mgl-fullscreen-control />
         <mgl-navigation-control
@@ -354,17 +305,6 @@ watch(
             :track-user-location="true"
             :show-user-location="true"
         />
-        <!--
-        <mgl-raster-source
-            source-id="raster-source"
-            :tiles="osmTiles"
-            :tile-size="256"
-            :maxzoom="18"
-            :attribution="osmAttribution"
-        >
-            <mgl-raster-layer layer-id="raster-layer" />
-        </mgl-raster-source>
-        -->
         <mgl-geo-json-source
             v-if="geoJsonSource"
             :data="geoJsonSource"
@@ -430,5 +370,5 @@ watch(
             >
             </mgl-circle-layer>
         </mgl-geo-json-source>
-    </mgl-map>
+    </BaseMapWrapper>
 </template>
