@@ -573,11 +573,37 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * @property-read \App\Models\User|null $user
+ * @property int $id
+ * @property string $user_id
+ * @property int $posts_count
+ * @property int $transport_posts_count
+ * @property int $location_posts_count
+ * @property int $followers_count
+ * @property int $following_count
+ * @property int $travelled_distance in meters
+ * @property int $travelled_duration in minutes
+ * @property int $visited_countries_count
+ * @property int $visited_locations_count
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\User $user
  * @method static \Database\Factories\UserStatisticsFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserStatistics newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserStatistics newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserStatistics query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserStatistics whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserStatistics whereFollowersCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserStatistics whereFollowingCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserStatistics whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserStatistics whereLocationPostsCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserStatistics wherePostsCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserStatistics whereTransportPostsCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserStatistics whereTravelledDistance($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserStatistics whereTravelledDuration($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserStatistics whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserStatistics whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserStatistics whereVisitedCountriesCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserStatistics whereVisitedLocationsCount($value)
  */
 	class UserStatistics extends \Eloquent {}
 }

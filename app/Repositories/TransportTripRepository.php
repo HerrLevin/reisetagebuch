@@ -38,7 +38,7 @@ class TransportTripRepository
             if ($provider !== null && $stop->transportTrip->provider !== $provider) {
                 continue;
             }
-            if ($stop->transportTrip->last_refreshed_at === null ||
+            if ($stop->transportTrip->last_refreshed_at !== null &&
                 $stop->transportTrip->last_refreshed_at > Carbon::now()->subMinutes(config('app.transit.refresh_interval'))) {
                 continue;
             }

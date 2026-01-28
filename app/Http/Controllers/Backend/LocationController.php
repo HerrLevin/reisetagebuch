@@ -269,7 +269,7 @@ class LocationController extends Controller
 
         $dto = $this->transitousRequestService->getStopTimes($foreignTripId);
 
-        if (! $dto->legs[0]->realTime) {
+        if (! $dto || ! $dto?->legs[0]?->realTime) {
             Log::debug('No real-time data for trip '.$foreignTripId);
 
             return;
