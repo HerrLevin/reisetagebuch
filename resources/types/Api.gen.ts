@@ -816,11 +816,62 @@ export interface UserDto {
    * @format uri
    */
   website: string | null;
+  /** User Statistics Data Object */
+  statistics: UserStatisticsDto;
   /**
    * Account creation timestamp
    * @format date-time
    */
   createdAt: string;
+}
+
+/** User Statistics Data Object */
+export interface UserStatisticsDto {
+  /**
+   * Total number of posts by the user
+   * @format int32
+   */
+  postsCount: number;
+  /**
+   * Number of transport-related posts by the user
+   * @format int32
+   */
+  transportPostsCount: number;
+  /**
+   * Number of location-related posts by the user
+   * @format int32
+   */
+  locationPostsCount: number;
+  /**
+   * Number of followers the user has
+   * @format int32
+   */
+  followersCount: number;
+  /**
+   * Number of users the user is following
+   * @format int32
+   */
+  followingCount: number;
+  /**
+   * Total distance travelled by the user in meters
+   * @format int32
+   */
+  travelledDistance: number;
+  /**
+   * Total duration of travel by the user in minutes
+   * @format int32
+   */
+  travelledDuration: number;
+  /**
+   * Number of distinct countries visited by the user
+   * @format int32
+   */
+  visitedCountriesCount: number;
+  /**
+   * Number of distinct locations visited by the user
+   * @format int32
+   */
+  visitedLocationsCount: number;
 }
 
 import type {

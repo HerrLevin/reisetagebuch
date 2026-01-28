@@ -50,4 +50,9 @@ class TransportPost extends Model
     {
         return $this->belongsTo(TransportTripStop::class, 'destination_stop_id');
     }
+
+    public function post(): BelongsTo
+    {
+        return $this->belongsTo(Post::class, 'post_id');
+    }
 }

@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import type { UserDto } from '@/types';
+import DurationStats from '@/Pages/Profile/Partials/DurationStats.vue';
 import { PropType } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { UserDto } from '../../../../types/Api.gen';
 
 const { t } = useI18n();
 
@@ -22,30 +23,41 @@ defineProps({
             </span>
         </a>
         <a class="link link-hover flex cursor-pointer">
-            <b>3.207</b>&nbsp;<span class="opacity-65">
-                {{ t('profile.stats.locations', 1234) }}
+            <b>{{ user.statistics.visitedLocationsCount }}</b>
+            &nbsp;
+            <span class="opacity-65">
+                {{
+                    t(
+                        'profile.stats.locations',
+                        user.statistics.visitedLocationsCount,
+                    )
+                }}
             </span>
         </a>
         <a class="link link-hover flex cursor-pointer">
-            <b>12</b>&nbsp;<span class="opacity-65">
-                {{ t('profile.stats.trips', 12) }}
+            <b>{{ user.statistics.transportPostsCount }}</b>
+            &nbsp;
+            <span class="opacity-65">
+                {{
+                    t(
+                        'profile.stats.trips',
+                        user.statistics.transportPostsCount,
+                    )
+                }}
             </span>
         </a>
     </div>
-    <!-- todo: add statistics -->
     <div class="flex flex-wrap gap-x-3">
         <span class="flex">
-            <b>1.234</b>&nbsp;<span class="opacity-65">
-                {{ t('profile.stats.posts', 1234) }}
+            <b>{{ user.statistics.postsCount }}</b>
+            &nbsp;<span class="opacity-65">
+                {{ t('profile.stats.posts', user.statistics.postsCount) }}
             </span>
         </span>
         <span class="flex">
-            <b>129.182</b>&nbsp;<span class="opacity-65">km</span>
+            <b>{{ (user.statistics.travelledDistance / 1000).toFixed(2) }}</b>
+            &nbsp;<span class="opacity-65">km</span>
         </span>
-        <span class="flex">
-            <b>64</b>&nbsp;<span class="opacity-65">d</span>&nbsp;
-            <b>21</b>&nbsp;<span class="opacity-65">h</span>&nbsp;
-            <b>28</b>&nbsp;<span class="opacity-65">m</span>
-        </span>
+        <DurationStats :duration="user.statistics.travelledDuration" />
     </div>
 </template>

@@ -404,6 +404,7 @@ namespace App\Models{
  * @property-read \App\Models\TransportTripStop $destinationStop
  * @property-read \App\Models\Location|null $origin
  * @property-read \App\Models\TransportTripStop $originStop
+ * @property-read \App\Models\Post $post
  * @property-read \App\Models\TransportTrip $transportTrip
  * @method static \Database\Factories\TransportPostFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost newModelQuery()
@@ -527,6 +528,7 @@ namespace App\Models{
  * @property-read \App\Models\UserSettings|null $settings
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SocialAccount> $socialAccounts
  * @property-read int|null $social_accounts_count
+ * @property-read \App\Models\UserStatistics|null $statistics
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Sanctum\PersonalAccessToken> $tokens
  * @property-read int|null $tokens_count
  * @property-read \App\Models\SocialAccount|null $traewellingAccount
@@ -567,5 +569,16 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings whereUserId($value)
  */
 	class UserSettings extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property-read \App\Models\User|null $user
+ * @method static \Database\Factories\UserStatisticsFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserStatistics newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserStatistics newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserStatistics query()
+ */
+	class UserStatistics extends \Eloquent {}
 }
 
