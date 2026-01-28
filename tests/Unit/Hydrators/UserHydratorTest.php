@@ -5,6 +5,7 @@ namespace Tests\Unit\Hydrators;
 use App\Hydrators\UserHydrator;
 use App\Models\Profile;
 use App\Models\User;
+use App\Models\UserStatistics;
 use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 
@@ -24,14 +25,18 @@ class UserHydratorTest extends TestCase
             };
         });
 
+        // Mock the statistics model
+        $stats = UserStatistics::factory()->make();
+
         // Mock the User model
         $user = $this->createMock(User::class);
-        $user->method('__get')->willReturnCallback(function ($property) use ($profile) {
+        $user->method('__get')->willReturnCallback(function ($property) use ($profile, $stats) {
             return match ($property) {
                 'id' => '12345',
                 'name' => 'John Doe',
                 'username' => 'johndoe',
                 'profile' => $profile,
+                'statistics' => $stats,
                 'created_at' => new Carbon('2023-01-01'),
                 default => null,
             };
@@ -67,6 +72,7 @@ class UserHydratorTest extends TestCase
                 'name' => 'John Doe',
                 'username' => 'johndoe',
                 'profile' => null,
+                'statistics' => UserStatistics::factory()->make(),
                 'created_at' => new Carbon('2023-01-01'),
                 default => null,
             };

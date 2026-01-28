@@ -3183,7 +3183,8 @@
                     "header",
                     "bio",
                     "website",
-                    "createdAt"
+                    "createdAt",
+                    "statistics"
                 ],
                 "properties": {
                     "id": {
@@ -3222,10 +3223,75 @@
                         "format": "uri",
                         "nullable": true
                     },
+                    "statistics": {
+                        "$ref": "#/components/schemas/UserStatisticsDto"
+                    },
                     "createdAt": {
                         "description": "Account creation timestamp",
                         "type": "string",
                         "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "UserStatisticsDto": {
+                "description": "User Statistics Data Object",
+                "required": [
+                    "postsCount",
+                    "transportPostsCount",
+                    "locationPostsCount",
+                    "followersCount",
+                    "followingCount",
+                    "travelledDistance",
+                    "travelledDuration",
+                    "visitedCountriesCount",
+                    "visitedLocationsCount"
+                ],
+                "properties": {
+                    "postsCount": {
+                        "description": "Total number of posts by the user",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "transportPostsCount": {
+                        "description": "Number of transport-related posts by the user",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "locationPostsCount": {
+                        "description": "Number of location-related posts by the user",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "followersCount": {
+                        "description": "Number of followers the user has",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "followingCount": {
+                        "description": "Number of users the user is following",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "travelledDistance": {
+                        "description": "Total distance travelled by the user in meters",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "travelledDuration": {
+                        "description": "Total duration of travel by the user in minutes",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "visitedCountriesCount": {
+                        "description": "Number of distinct countries visited by the user",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "visitedLocationsCount": {
+                        "description": "Number of distinct locations visited by the user",
+                        "type": "integer",
+                        "format": "int32"
                     }
                 },
                 "type": "object"

@@ -10,7 +10,7 @@ use OpenApi\Attributes as OA;
 #[OA\Schema(
     schema: 'UserDto',
     description: 'User Data Object',
-    required: ['id', 'name', 'username', 'avatar', 'header', 'bio', 'website', 'createdAt'],
+    required: ['id', 'name', 'username', 'avatar', 'header', 'bio', 'website', 'createdAt', 'statistics'],
     type: 'object'
 )]
 class UserDto
@@ -37,6 +37,9 @@ class UserDto
 
     #[OA\Property('website', description: 'Website URL of the user', type: 'string', format: 'uri', nullable: true)]
     public ?string $website = null;
+
+    #[OA\Property(ref: '#/components/schemas/UserStatisticsDto')]
+    public UserStatisticsDto $statistics;
 
     #[OA\Property('createdAt', description: 'Account creation timestamp', type: 'string', format: 'date-time')]
     public string $createdAt;
