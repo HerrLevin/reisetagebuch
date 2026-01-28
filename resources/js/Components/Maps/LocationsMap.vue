@@ -1,20 +1,13 @@
 <script setup lang="ts">
 import { api } from '@/api';
+import BaseMapWrapper from '@/Components/Maps/BaseMapWrapper.vue';
 import {
     MglCircleLayer,
     MglGeoJsonSource,
     MglHeatmapLayer,
-    MglMap,
-    MglRasterLayer,
-    MglRasterSource,
 } from '@indoorequal/vue-maplibre-gl';
 import type { GeometryCollection } from 'geojson';
-import {
-    LngLat,
-    LngLatBounds,
-    LngLatBoundsLike,
-    StyleSpecification,
-} from 'maplibre-gl';
+import { LngLat, LngLatBounds, LngLatBoundsLike } from 'maplibre-gl';
 import { PropType, ref } from 'vue';
 import { UserDto } from '../../../types/Api.gen';
 
@@ -24,16 +17,6 @@ const props = defineProps({
         required: true,
     },
 });
-
-const style = {
-    version: 8,
-    sources: {},
-    layers: [],
-} as StyleSpecification;
-
-const osmTiles = ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'];
-const osmAttribution =
-    'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors';
 
 const zoom = 8;
 const center = new LngLat(8.403, 49);
@@ -49,7 +32,9 @@ api.users
         geoJson.value?.geometries.forEach((geometry: any) => {
             mapBounds.extend(geometry.coordinates);
         });
-        bounds.value = mapBounds;
+        if (!mapBounds.isEmpty()) {
+            bounds.value = mapBounds;
+        }
     })
     .catch((error) => {
         console.error('Error fetching data:', error);
@@ -57,27 +42,14 @@ api.users
 </script>
 
 <template>
-    <mgl-map
-        :map-style="style"
+    <BaseMapWrapper
+        :globe-projection="false"
         :zoom="zoom"
-        :max-zoom="18"
         height="100vh"
         :center="center"
         :bounds="bounds"
-        :fit-bounds-options="{
-            padding: 20,
-            maxZoom: 16,
-        }"
+        :cooperative-gestures="true"
     >
-        <mgl-raster-source
-            source-id="raster-source"
-            :tiles="osmTiles"
-            :tile-size="256"
-            :maxzoom="18"
-            :attribution="osmAttribution"
-        >
-            <mgl-raster-layer layer-id="raster-layer" />
-        </mgl-raster-source>
         <mgl-geo-json-source
             v-if="geoJson"
             source-id="locations"
@@ -153,5 +125,5 @@ api.users
             >
             </mgl-heatmap-layer>
         </mgl-geo-json-source>
-    </mgl-map>
+    </BaseMapWrapper>
 </template>
