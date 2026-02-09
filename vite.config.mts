@@ -28,7 +28,7 @@ export default defineConfig({
                 short_name: 'Reisetagebuch',
                 theme_color: '#47b3a5',
                 background_color: '#47b3a5',
-                display: 'standalone',
+                display: 'minimal-ui',
                 scope: '/',
                 start_url: '/home',
                 icons: [

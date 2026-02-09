@@ -30,9 +30,9 @@ class NotificationHydrator
         return new NotificationWrapper(
             id: $notification->id,
             type: $type,
-            createdAt: $notification->created_at->toDateTimeString(),
-            updatedAt: $notification->updated_at->toDateTimeString(),
-            readAt: $notification->read_at?->toDateTimeString(),
+            createdAt: $notification->created_at->toIso8601String(),
+            updatedAt: $notification->updated_at->toIso8601String(),
+            readAt: $notification->read_at?->toIso8601String(),
             data: $this->hydrateData($notification),
         );
     }
