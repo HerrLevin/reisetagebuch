@@ -323,6 +323,7 @@ namespace App\Models{
  * @property \Clickbar\Magellan\Data\Geometries\LineString $geometry Geospatial data representing the route segment
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property bool $interpolated
  * @property-read \App\Models\Location $fromLocation
  * @property-read \App\Models\Location $toLocation
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RouteSegment newModelQuery()
@@ -334,6 +335,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RouteSegment whereFromLocationId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RouteSegment whereGeometry($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RouteSegment whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RouteSegment whereInterpolated($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RouteSegment wherePathType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RouteSegment whereToLocationId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RouteSegment whereUpdatedAt($value)
