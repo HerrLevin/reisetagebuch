@@ -92,6 +92,7 @@ class RegisteredUserController extends Controller
         ]);
         $user->profile()->create();
         $user->settings()->create();
+        $user->statistics()->create();
         $invite?->update([
             'used_by' => $user->id,
             'used_at' => now(),
