@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { api } from '@/api';
+import Loading from '@/Components/Loading.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import TransitousSearch from '@/Pages/NewPostDialog/Partials/TransitousSearch.vue';
 import AirportSearch from '@/Pages/NewRoute/Partials/AirportSearch.vue';
@@ -33,6 +34,8 @@ const providers: Providers = {
         icon: PlaneTakeoff,
     },
 };
+
+const loading = ref(false);
 
 const model = ref<CreateTripForm>({
     startLocation: null,
@@ -132,6 +135,8 @@ function submit() {
         return;
     }
 
+    loading.value = true;
+
     form.mode = model.value.transportMode;
     form.origin =
         model.value.startLocation.id || model.value.startLocation.identifier;
@@ -173,13 +178,16 @@ function submit() {
                 startId: response.data.startId,
                 startTime: response.data.startTime,
             });
+            loading.value = false;
         })
         .catch((response) => {
+            loading.value = false;
             if (response.status === 422) {
                 alert(response.data.message || 'Failed to create trip');
             }
         })
         .catch((error) => {
+            loading.value = false;
             if (error.response && error.response.status === 422) {
                 alert(
                     'Validation error: ' +
@@ -308,7 +316,8 @@ watch(
             </div>
         </div>
         <div class="mt-4 flex justify-end">
-            <button class="btn btn-primary" @click="submit">
+            <Loading v-if="loading" class="me-2" />
+            <button class="btn btn-primary" :disabled="loading" @click="submit">
                 {{ t('new_route.create_route') }}
             </button>
         </div>

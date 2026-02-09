@@ -170,7 +170,8 @@ class TransportTripRepository
         Location $toLocation,
         ?int $duration = null,
         ?string $pathType = null,
-        ?Geometry $geometry = null
+        ?Geometry $geometry = null,
+        ?bool $interpolated = false
     ): RouteSegment {
         $segment = new RouteSegment;
         $segment->from_location_id = $fromLocation->id;
@@ -178,6 +179,7 @@ class TransportTripRepository
         $segment->distance = ST::distanceSphere($fromLocation->location, $toLocation->location);
         $segment->duration = $duration;
         $segment->path_type = $pathType;
+        $segment->interpolated = $interpolated;
         if (! $geometry->getDimension()->hasZDimension()) {
             $points = [];
             foreach ($geometry->getPoints() as $point) {
@@ -205,12 +207,14 @@ class TransportTripRepository
         TransportTripStop $start,
         TransportTripStop $end,
         int $duration,
-        string $pathType = 'rail'
+        string $pathType = 'rail',
+        bool $interpolated = false
     ): ?RouteSegment {
         return RouteSegment::where('from_location_id', $start->location_id)
             ->where('to_location_id', $end->location_id)
             ->where('duration', $duration)
             ->where('path_type', $pathType)
+            ->where('interpolated', $interpolated)
             ->first();
     }
 
