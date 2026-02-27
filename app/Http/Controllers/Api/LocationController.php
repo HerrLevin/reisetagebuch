@@ -208,7 +208,7 @@ class LocationController extends Controller
     )]
     public function departures(DeparturesRequest $request): DeparturesResponseDto
     {
-        $filter = $request->modes ? explode(',', $request->modes) : [];
+        $filter = $request->modes ?? [];
         $time = $request->when ? Carbon::parse($request->when) : now()->subMinutes(2);
         $request->user()->load('settings');
         /** @var User $user */
