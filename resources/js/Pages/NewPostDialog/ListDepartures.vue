@@ -111,6 +111,7 @@ showStartButton.value = route().current('posts.create.start');
             :longitude="longitude"
             :filter="modes"
             :request-time="requestTime"
+            :request-identifier="requestIdentifier"
             :location="stop"
         />
         <Loading v-if="loading" class="mx-auto my-4"></Loading>

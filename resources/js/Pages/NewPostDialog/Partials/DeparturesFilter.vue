@@ -10,7 +10,7 @@ import { TransportMode } from '@/types/enums';
 import { Link } from '@inertiajs/vue3';
 import { Clock, X } from 'lucide-vue-next';
 import { DateTime } from 'luxon';
-import { PropType, ref } from 'vue';
+import { computed, PropType, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -23,6 +23,11 @@ const props = defineProps({
     requestTime: {
         type: String,
         default: '',
+    },
+    requestIdentifier: {
+        type: String,
+        nullable: true,
+        default: null,
     },
     latitude: {
         type: Number,
@@ -71,16 +76,20 @@ function selectTime(time: EventTarget | null) {
     }
 }
 
-function submitTypeahead(identifier: string | null) {
-    if (identifier) {
+function submitTypeahead(submittedIdentifier: string | null) {
+    if (submittedIdentifier) {
         window.location.href = route('posts.create.departures', {
             latitude: props.latitude,
             longitude: props.longitude,
-            identifier: identifier,
+            identifier: submittedIdentifier,
             when: selectedTime.value?.toISO(),
         });
     }
 }
+
+const identifier = computed(() => {
+    return props.requestIdentifier || props.location?.stopId;
+});
 </script>
 
 <template>
@@ -142,7 +151,7 @@ function submitTypeahead(identifier: string | null) {
                                 latitude: latitude,
                                 longitude: longitude,
                                 when: selectedTime?.toISO(),
-                                identifier: location?.stopId,
+                                identifier: identifier,
                                 filter: filter.join(','),
                             })
                         "
@@ -161,7 +170,7 @@ function submitTypeahead(identifier: string | null) {
                         route('posts.create.departures', {
                             latitude: latitude,
                             longitude: longitude,
-                            identifier: location?.stopId,
+                            identifier: identifier,
                         })
                     "
                 >
@@ -181,7 +190,7 @@ function submitTypeahead(identifier: string | null) {
                             latitude: latitude,
                             longitude: longitude,
                             filter: mode.join(','),
-                            identifier: location?.stopId,
+                            identifier: identifier,
                             when: selectedTime?.toISO(),
                         })
                     "
