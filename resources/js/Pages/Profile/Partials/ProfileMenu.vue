@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { UserDto } from '@/types';
-import { Link } from '@inertiajs/vue3';
 import { PropType } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { RouterLink } from 'vue-router';
 
 const { t } = useI18n();
 
@@ -17,14 +17,14 @@ defineProps({
 <template>
     <ul class="menu menu-horizontal bg-base-200 rounded-box">
         <li>
-            <Link :href="route('profile.show', user.username)">
+            <RouterLink :to="`/profile/${user.username}`">
                 {{ t('profile.menu.posts') }}
-            </Link>
+            </RouterLink>
         </li>
         <li>
-            <Link :href="route('profile.map', user.username)">
+            <RouterLink :to="`/profile/${user.username}/map`">
                 {{ t('profile.menu.map') }}
-            </Link>
+            </RouterLink>
         </li>
     </ul>
 </template>

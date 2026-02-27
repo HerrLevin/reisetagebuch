@@ -3,7 +3,6 @@ import { api } from '@/api';
 import { getOwnShareText, getShareText } from '@/Services/ApiPostTextService';
 import { useUserStore } from '@/stores/user';
 import { isApiTransportPost } from '@/types/PostTypes';
-import { Link, useForm } from '@inertiajs/vue3';
 import {
     ClockPlus,
     Ellipsis,
@@ -18,6 +17,7 @@ import {
 import { DateTime } from 'luxon';
 import { PropType, ref, useTemplateRef } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { RouterLink } from 'vue-router';
 import { BasePost, TransportPost } from '../../../types/Api.gen';
 
 const { t } = useI18n();
@@ -37,7 +37,6 @@ const emit = defineEmits<{
 }>();
 
 const deleteModal = useTemplateRef('deleteModal');
-const form = useForm({});
 const deleteProcessing = ref(false);
 
 function showTimeButtons(): boolean {
@@ -150,7 +149,7 @@ function sharePost(): void {
         text: isSameUser()
             ? getOwnShareText(props.post)
             : getShareText(props.post),
-        url: route('posts.show', props.post.id),
+        url: `${window.location.origin}/posts/${props.post.id}`,
     };
 
     if (navigator.canShare && navigator.canShare(shareData)) {
@@ -181,7 +180,8 @@ function redirectCreatePost(): void {
         stopMode: post.trip.mode,
         lineName: post.trip.displayName || post.trip.lineName,
     };
-    window.location.href = route('posts.create.transport-post', params);
+    const searchParams = new URLSearchParams(params as Record<string, string>);
+    window.location.href = `/posts/transport/create?${searchParams.toString()}`;
 }
 
 function blur() {
@@ -213,36 +213,27 @@ function blur() {
             <template v-if="isSameUser()">
                 <li class="mx-0 border-b-1"></li>
                 <li>
-                    <Link :href="route('posts.edit', post.id)">
+                    <RouterLink :to="`/posts/${post.id}/edit`">
                         <SquarePen class="size-4" />
                         {{ t('verbs.edit') }}
-                    </Link>
+                    </RouterLink>
                 </li>
                 <template v-if="isApiTransportPost(post)">
                     <li>
-                        <Link
-                            :href="route('posts.edit.transport-times', post.id)"
+                        <RouterLink
+                            :to="`/posts/transport/${post.id}/times/edit`"
                         >
                             <ClockPlus class="size-4" />
                             {{ t('posts.edit.change_times') }}
-                        </Link>
+                        </RouterLink>
                     </li>
                     <li>
-                        <Link
-                            :href="
-                                route('posts.edit.transport-post', {
-                                    postId: post.id,
-                                    tripId: post.trip.foreignId,
-                                    startId: post.originStop.id,
-                                    startTime:
-                                        post.originStop.arrivalTime ||
-                                        post.originStop.departureTime,
-                                })
-                            "
+                        <RouterLink
+                            :to="`/posts/transport/exit/edit?postId=${post.id}&tripId=${post.trip.foreignId}&startId=${post.originStop.id}&startTime=${post.originStop.arrivalTime || post.originStop.departureTime}`"
                         >
                             <Route class="size-4" />
                             {{ t('posts.edit.change_exit') }}
-                        </Link>
+                        </RouterLink>
                     </li>
                     <template v-if="showTimeButtons()">
                         <li>
@@ -291,7 +282,6 @@ function blur() {
 
                 <button
                     class="btn btn-error"
-                    :class="{ 'opacity-25': form.processing }"
                     :disabled="deleteProcessing"
                     @click.prevent="deletePost()"
                 >

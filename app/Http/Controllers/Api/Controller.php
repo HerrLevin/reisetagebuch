@@ -33,6 +33,8 @@ class Controller extends \App\Http\Controllers\Controller
 {
     public const string OA_DESC_SUCCESS = 'successful operation';
 
+    public const string OA_DESC_VALIDATION_ERROR = 'validation error';
+
     public const string OA_DESC_NO_CONTENT = 'No Content';
 
     protected Guard|StatefulGuard $auth;

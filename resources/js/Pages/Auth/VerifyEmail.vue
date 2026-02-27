@@ -1,30 +1,49 @@
 <script setup lang="ts">
+import { api } from '@/api';
+import { useTitle } from '@/composables/useTitle';
 import AuthLayout from '@/Layouts/AuthLayout.vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { useAuthStore } from '@/stores/auth';
+import { useUserStore } from '@/stores/user';
+import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 
 const { t } = useI18n();
+useTitle(t('auth.verify_email.title'));
 
-const props = defineProps<{
-    status?: string;
-}>();
+const router = useRouter();
+const authStore = useAuthStore();
+const userStore = useUserStore();
 
-const form = useForm({});
+const processing = ref(false);
+const verificationLinkSent = ref(false);
 
-const submit = () => {
-    form.post(route('verification.send'));
+const submit = async () => {
+    processing.value = true;
+    api.auth
+        .resendVerificationEmail()
+        .then((response) => {
+            if (response.status === 200) {
+                verificationLinkSent.value = true;
+            }
+        })
+        .catch(() => {
+            // ignore
+        })
+        .finally(() => {
+            processing.value = false;
+        });
 };
 
-const verificationLinkSent = computed(
-    () => props.status === 'verification-link-sent',
-);
+const logout = async () => {
+    await authStore.logout();
+    userStore.invalidateUser();
+    router.push({ name: 'login' });
+};
 </script>
 
 <template>
     <AuthLayout>
-        <Head :title="t('auth.verify_email.title')" />
-
         <div class="mb-4 text-sm">
             {{ t('auth.verify_email.message') }}
         </div>
@@ -40,20 +59,15 @@ const verificationLinkSent = computed(
             <div class="mt-4 flex items-center justify-between">
                 <button
                     class="btn btn-primary"
-                    :class="{ 'opacity-25': form.processing }"
-                    :disabled="form.processing"
+                    :class="{ 'opacity-25': processing }"
+                    :disabled="processing"
                 >
                     {{ t('auth.verify_email.resend') }}
                 </button>
 
-                <Link
-                    :href="route('logout')"
-                    method="post"
-                    as="button"
-                    class="btn btn-link"
-                >
+                <button type="button" class="btn btn-link" @click="logout">
                     {{ t('auth.verify_email.logout') }}
-                </Link>
+                </button>
             </div>
         </form>
     </AuthLayout>

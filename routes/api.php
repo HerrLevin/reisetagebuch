@@ -14,6 +14,15 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\UserSettingsController;
 use Illuminate\Support\Facades\Route;
 
+// Public auth routes
+Route::prefix('auth')->group(function () {
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+    Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+    Route::get('/invite/{code}', [AuthController::class, 'validateInvite']);
+});
+
 Route::get('profile/{username}', [UserController::class, 'show']);
 
 Route::prefix('users')->group(function () {
@@ -30,8 +39,15 @@ route::get('app/configuration', [AppConfigurationController::class, 'index'])
     ->name('app.configuration');
 
 Route::middleware('auth:api')->group(function () {
-    Route::get('/auth/user', [AuthController::class, 'user'])
-        ->name('auth.user');
+    // Auth routes (authenticated)
+    Route::prefix('auth')->group(function () {
+        Route::get('/user', [AuthController::class, 'user'])->name('auth.user');
+        Route::post('/logout', [AuthController::class, 'logout']);
+        Route::put('/password', [AuthController::class, 'updatePassword']);
+        Route::post('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail']);
+        Route::post('/email/resend', [AuthController::class, 'resendVerificationEmail']);
+    });
+
     Route::get('/timeline', [PostController::class, 'timeline'])
         ->name('posts.timeline');
 
@@ -105,6 +121,7 @@ Route::middleware('auth:api')->group(function () {
     });
 
     Route::prefix('account')->group(function () {
+        Route::get('/', [AccountController::class, 'show'])->name('account.show');
         Route::patch('/settings', [UserSettingsController::class, 'update'])->name('account.settings.update');
         Route::post('/profile', [UserController::class, 'update'])->name('profile.update'); // needs to be post b/c of file upload
         Route::patch('/', [AccountController::class, 'update'])->name('account.update');

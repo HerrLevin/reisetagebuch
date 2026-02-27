@@ -29,6 +29,9 @@ readonly class AppConfigurationDto
 
     public function __construct(
         public string $appName,
+        public string $reisetagebuchVersion,
+        public string $laravelVersion,
+        public string $phpVersion,
         public array $featureFlags,
     ) {}
 }

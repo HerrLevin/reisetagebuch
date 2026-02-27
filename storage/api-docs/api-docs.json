@@ -20,6 +20,46 @@
     ],
     "paths": {
         "/account": {
+            "get": {
+                "tags": [
+                    "Account"
+                ],
+                "summary": "Get account",
+                "description": "Get account details",
+                "operationId": "getAccount",
+                "responses": {
+                    "200": {
+                        "description": "Account details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "mustVerifyEmail": {
+                                            "description": "Indicates if the user must verify their email address",
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "traewellingConnected": {
+                                            "description": "Indicates if the user has connected their Traewelling account",
+                                            "type": "boolean",
+                                            "example": false
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            },
             "delete": {
                 "tags": [
                     "Account"
@@ -54,10 +94,7 @@
                 },
                 "security": [
                     {
-                        "oauth2_security_example": [
-                            "write:projects",
-                            "read:projects"
-                        ]
+                        "passport": []
                     }
                 ]
             },
@@ -85,10 +122,7 @@
                 },
                 "security": [
                     {
-                        "oauth2_security_example": [
-                            "write:projects",
-                            "read:projects"
-                        ]
+                        "passport": []
                     }
                 ]
             }
@@ -111,10 +145,7 @@
                 },
                 "security": [
                     {
-                        "oauth2_security_example": [
-                            "write:projects",
-                            "read:projects"
-                        ]
+                        "passport": []
                     }
                 ]
             }
@@ -162,12 +193,380 @@
                 },
                 "security": [
                     {
-                        "oauth2_security_example": [
-                            "write:projects",
-                            "read:projects"
-                        ]
+                        "passport": []
                     }
                 ]
+            }
+        },
+        "/auth/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "User login",
+                "description": "Authenticate a user and return an access token",
+                "operationId": "login",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "mail@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "secret"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TokenResponseDto"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "validation error"
+                    }
+                }
+            }
+        },
+        "/auth/register": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "User registration",
+                "description": "Register a new user and return an access token",
+                "operationId": "register",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "username",
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "username": {
+                                        "type": "string",
+                                        "example": "john_doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "mail@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "secret"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "secret"
+                                    },
+                                    "invite": {
+                                        "description": "Optional invite code required if open registration is disabled",
+                                        "type": "string",
+                                        "example": "INVITE_CODE_123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TokenResponseDto"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Registration disabled"
+                    },
+                    "422": {
+                        "description": "validation error"
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "User logout",
+                "description": "Logout the authenticated user by revoking their access token",
+                "operationId": "logout",
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/auth/forgot-password": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Forgot password",
+                "description": "Send a password reset link to the user's email address",
+                "operationId": "forgotPassword",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "mail@example.com"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    },
+                    "422": {
+                        "description": "validation error"
+                    }
+                }
+            }
+        },
+        "/auth/reset-password": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Reset password",
+                "description": "Reset the user's password using the provided token and new password",
+                "operationId": "resetPassword",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "token",
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "token": {
+                                        "type": "string",
+                                        "example": "RESET_TOKEN_123"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "mail@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "new_secret"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "new_secret"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    },
+                    "422": {
+                        "description": "validation error"
+                    }
+                }
+            }
+        },
+        "/auth/password": {
+            "put": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Update password",
+                "description": "Update the authenticated user's password by providing the current password and a new password",
+                "operationId": "updatePassword",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "current_password",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "current_password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "current_secret"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "new_secret"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "new_secret"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    },
+                    "422": {
+                        "description": "validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/auth/email/verify/{id}/{hash}": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Verify email",
+                "description": "Verify the user's email address using the provided verification link parameters",
+                "operationId": "verifyEmail",
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    },
+                    "403": {
+                        "description": "Invalid verification link"
+                    },
+                    "422": {
+                        "description": "validation error"
+                    }
+                }
+            }
+        },
+        "/auth/email/resend": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Resend email verification",
+                "description": "Resend the email verification link to the authenticated user if their email address is not yet verified",
+                "operationId": "resendVerificationEmail",
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    },
+                    "403": {
+                        "description": "Email already verified"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/auth/invite/{code}": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Validate invite code",
+                "description": "Validate an invite code and return information about the invite if it is valid",
+                "operationId": "validateInvite",
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "valid": {
+                                            "description": "Indicates whether the invite code is valid",
+                                            "type": "boolean"
+                                        },
+                                        "invitedBy": {
+                                            "description": "The name of the user who created the invite, or null if the inviter user no longer exists",
+                                            "type": "string",
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/invites": {
@@ -198,10 +597,7 @@
                 },
                 "security": [
                     {
-                        "oauth2_security_example": [
-                            "write:projects",
-                            "read:projects"
-                        ]
+                        "passport": []
                     }
                 ]
             },
@@ -232,10 +628,7 @@
                 },
                 "security": [
                     {
-                        "oauth2_security_example": [
-                            "write:projects",
-                            "read:projects"
-                        ]
+                        "passport": []
                     }
                 ]
             }
@@ -268,10 +661,7 @@
                 },
                 "security": [
                     {
-                        "oauth2_security_example": [
-                            "write:projects",
-                            "read:projects"
-                        ]
+                        "passport": []
                     }
                 ]
             }
@@ -345,7 +735,7 @@
             }
         },
         "/location/prefetch": {
-            "post": {
+            "get": {
                 "tags": [
                     "Location"
                 ],
@@ -921,10 +1311,7 @@
                 },
                 "security": [
                     {
-                        "oauth2_security_example": [
-                            "write:projects",
-                            "read:projects"
-                        ]
+                        "passport": []
                     }
                 ]
             }
@@ -978,10 +1365,7 @@
                 },
                 "security": [
                     {
-                        "oauth2_security_example": [
-                            "write:projects",
-                            "read:projects"
-                        ]
+                        "passport": []
                     }
                 ]
             }
@@ -1036,10 +1420,7 @@
                 },
                 "security": [
                     {
-                        "oauth2_security_example": [
-                            "write:projects",
-                            "read:projects"
-                        ]
+                        "passport": []
                     }
                 ]
             },
@@ -1078,10 +1459,7 @@
                 },
                 "security": [
                     {
-                        "oauth2_security_example": [
-                            "write:projects",
-                            "read:projects"
-                        ]
+                        "passport": []
                     }
                 ]
             },
@@ -1147,10 +1525,7 @@
                 },
                 "security": [
                     {
-                        "oauth2_security_example": [
-                            "write:projects",
-                            "read:projects"
-                        ]
+                        "passport": []
                     }
                 ]
             }
@@ -1250,10 +1625,7 @@
                 },
                 "security": [
                     {
-                        "oauth2_security_example": [
-                            "write:projects",
-                            "read:projects"
-                        ]
+                        "passport": []
                     }
                 ]
             }
@@ -1299,10 +1671,7 @@
                 },
                 "security": [
                     {
-                        "oauth2_security_example": [
-                            "write:projects",
-                            "read:projects"
-                        ]
+                        "passport": []
                     }
                 ]
             }
@@ -1345,10 +1714,7 @@
                 },
                 "security": [
                     {
-                        "oauth2_security_example": [
-                            "write:projects",
-                            "read:projects"
-                        ]
+                        "passport": []
                     }
                 ]
             }
@@ -1391,10 +1757,7 @@
                 },
                 "security": [
                     {
-                        "oauth2_security_example": [
-                            "write:projects",
-                            "read:projects"
-                        ]
+                        "passport": []
                     }
                 ]
             }
@@ -1437,10 +1800,7 @@
                 },
                 "security": [
                     {
-                        "oauth2_security_example": [
-                            "write:projects",
-                            "read:projects"
-                        ]
+                        "passport": []
                     }
                 ]
             }
@@ -1499,10 +1859,7 @@
                 },
                 "security": [
                     {
-                        "oauth2_security_example": [
-                            "write:projects",
-                            "read:projects"
-                        ]
+                        "passport": []
                     }
                 ]
             }
@@ -1561,10 +1918,7 @@
                 },
                 "security": [
                     {
-                        "oauth2_security_example": [
-                            "write:projects",
-                            "read:projects"
-                        ]
+                        "passport": []
                     }
                 ]
             }
@@ -1604,10 +1958,7 @@
                 },
                 "security": [
                     {
-                        "oauth2_security_example": [
-                            "write:projects",
-                            "read:projects"
-                        ]
+                        "passport": []
                     }
                 ]
             }
@@ -1733,10 +2084,7 @@
                 },
                 "security": [
                     {
-                        "oauth2_security_example": [
-                            "write:projects",
-                            "read:projects"
-                        ]
+                        "passport": []
                     }
                 ]
             }
@@ -2320,6 +2668,25 @@
                     "tripId": {
                         "description": "Unique identifier for the trip",
                         "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "TokenResponseDto": {
+                "title": "Authenticated User Token DTO",
+                "description": "Data Transfer Object representing the authenticated user",
+                "required": [
+                    "token",
+                    "user"
+                ],
+                "properties": {
+                    "token": {
+                        "description": "The access token for the authenticated user",
+                        "type": "string",
+                        "example": "eyJ"
+                    },
+                    "user": {
+                        "$ref": "#/components/schemas/AuthenticatedUserDto"
                     }
                 },
                 "type": "object"
@@ -3311,12 +3678,6 @@
                         "scopes": []
                     }
                 }
-            },
-            "sanctum": {
-                "type": "apiKey",
-                "description": "Enter token in format (Bearer <token>)",
-                "name": "Authorization",
-                "in": "header"
             }
         }
     },
@@ -3364,6 +3725,11 @@
         {
             "name": "Profile",
             "description": "Profile"
+        }
+    ],
+    "security": [
+        {
+            "passport": []
         }
     ]
 }

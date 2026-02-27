@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { api } from '@/api';
 import Loading from '@/Components/Loading.vue';
+import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import TransitousSearch from '@/Pages/NewPostDialog/Partials/TransitousSearch.vue';
 import AirportSearch from '@/Pages/NewRoute/Partials/AirportSearch.vue';
@@ -13,7 +14,6 @@ import {
     Providers,
     TripLocation,
 } from '@/types/TripCreation';
-import { Head } from '@inertiajs/vue3';
 import { PlaneTakeoff, TrainFront } from 'lucide-vue-next';
 import { DateTime } from 'luxon';
 import { reactive, ref, watch } from 'vue';
@@ -21,6 +21,8 @@ import { useI18n } from 'vue-i18n';
 import { StoreTripRequest, TransportMode } from '../../../types/Api.gen';
 
 const { t } = useI18n();
+
+useTitle(t('new_route.title'));
 
 const provider = ref<ProviderKey>('transitous');
 
@@ -173,11 +175,12 @@ function submit() {
                 routeColor: null,
                 routeTextColor: null,
             };
-            window.location.href = route('posts.create.stopovers', {
+            const searchParams = new URLSearchParams({
                 tripId: response.data.tripId,
                 startId: response.data.startId,
                 startTime: response.data.startTime,
             });
+            window.location.href = `/posts/transport/stopovers?${searchParams.toString()}`;
             loading.value = false;
         })
         .catch((response) => {
@@ -230,8 +233,6 @@ watch(
 </script>
 
 <template>
-    <Head :title="t('new_route.title')" />
-
     <AuthenticatedLayout>
         <template #header>
             <h2 class="text-xl leading-tight font-semibold">

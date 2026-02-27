@@ -1,22 +1,26 @@
 <script setup lang="ts">
 import { api } from '@/api';
 import Loading from '@/Components/Loading.vue';
+import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import LocationListEntry from '@/Pages/NewPostDialog/Partials/LocationListEntry.vue';
 import { LocationService } from '@/Services/LocationService';
 import { useUserStore } from '@/stores/user';
 import { LocationEntry, RequestLocationDto } from '@/types';
-import { Head } from '@inertiajs/vue3';
 import { Search } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRoute } from 'vue-router';
 
 const { t } = useI18n();
 
+useTitle(t('new_post.title'));
+
 const user = useUserStore();
 
+const currentRoute = useRoute();
 const showStartButton = ref(false);
-showStartButton.value = route().current('posts.create.start');
+showStartButton.value = currentRoute.name === 'posts.create.start';
 
 const locations = ref<LocationEntry[]>([]);
 const filteredLocations = ref<LocationEntry[]>([]);
@@ -136,8 +140,6 @@ fetchLocations();
 </script>
 
 <template>
-    <Head :title="t('new_post.title')" />
-
     <AuthenticatedLayout>
         <template #header>
             <h2 class="text-xl leading-tight font-semibold">

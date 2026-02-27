@@ -3,29 +3,39 @@ import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import SideMenu from '@/Layouts/Partials/SideMenu.vue';
 import ThemeSelector from '@/Layouts/Partials/ThemeSelector.vue';
 import { useAppConfigurationStore } from '@/stores/appConfiguration';
+import { useAuthStore } from '@/stores/auth';
 import { useUserStore } from '@/stores/user';
-import { Link } from '@inertiajs/vue3';
 import { Handshake, History, LogOut, Settings, User } from 'lucide-vue-next';
 import { useI18n } from 'vue-i18n';
+import { RouterLink, useRouter } from 'vue-router';
 
 const { t } = useI18n();
 
 const appConfig = useAppConfigurationStore();
 appConfig.fetchConfig();
 const user = useUserStore();
+const authStore = useAuthStore();
+const router = useRouter();
+
 if (!user.user) {
     user.fetchUser();
+}
+
+async function logout() {
+    await authStore.logout();
+    user.invalidateUser();
+    router.push({ name: 'login' });
 }
 </script>
 
 <template>
     <div class="navbar bg-base-100 rounded-box shadow-sm">
         <div class="navbar-start">
-            <Link as="div" :href="route('dashboard')">
+            <RouterLink to="/home">
                 <ApplicationLogo
                     class="h-10 w-10 cursor-pointer md:inline-block"
                 />
-            </Link>
+            </RouterLink>
         </div>
         <div class="navbar-center">
             <SideMenu class="hidden md:flex" />
@@ -57,54 +67,45 @@ if (!user.user) {
                     </li>
                     <template v-if="user.user">
                         <li v-if="user.user">
-                            <Link
-                                :href="
-                                    route('profile.show', user.user?.username)
-                                "
-                            >
+                            <RouterLink :to="`/profile/${user.user?.username}`">
                                 <User class="size-5" />
                                 {{ t('profile.title') }}
-                            </Link>
+                            </RouterLink>
                         </li>
                         <li>
-                            <Link :href="route('account.edit')">
+                            <RouterLink to="/account">
                                 <Settings class="size-4" />
                                 {{ t('settings.title') }}
-                            </Link>
+                            </RouterLink>
                         </li>
                         <li v-if="user.user?.canInviteUsers">
-                            <Link :href="route('invites.index')">
+                            <RouterLink to="/invites">
                                 <Handshake class="size-4" />
                                 {{ t('app.invite_users') }}
-                            </Link>
+                            </RouterLink>
                         </li>
                         <li>
-                            <Link :href="route('location-history.index')">
+                            <RouterLink to="/location-history">
                                 <History class="size-4" />
                                 {{ t('app.location_history') }}
-                            </Link>
+                            </RouterLink>
                         </li>
                         <li>
-                            <Link
-                                :href="route('logout')"
-                                method="post"
-                                as="button"
-                                @click="user.invalidateUser()"
-                            >
+                            <button @click="logout()">
                                 <LogOut class="size-4" /> {{ t('app.logout') }}
-                            </Link>
+                            </button>
                         </li>
                     </template>
                     <template v-else>
                         <li>
-                            <Link :href="route('login')">
+                            <RouterLink to="/login">
                                 {{ t('auth.login.title') }}
-                            </Link>
+                            </RouterLink>
                         </li>
                         <li v-if="appConfig.canRegister()">
-                            <Link :href="route('register')">
+                            <RouterLink to="/register">
                                 {{ t('auth.register.title') }}
-                            </Link>
+                            </RouterLink>
                         </li>
                     </template>
                 </ul>

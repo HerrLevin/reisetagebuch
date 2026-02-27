@@ -2,9 +2,9 @@
 import { api } from '@/api';
 import Loading from '@/Components/Loading.vue';
 import Post from '@/Components/Post/Post.vue';
-import { Link } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { RouterLink } from 'vue-router';
 import { BasePost, LocationPost, TransportPost } from '../../../types/Api.gen';
 
 const { t } = useI18n();
@@ -50,13 +50,12 @@ loadPosts();
             {{ t('pages.timeline.your_timeline') }}
         </li>
         <li v-for="post in posts" :key="post.id">
-            <Link
+            <RouterLink
                 class="list-row hover-list-entry cursor-pointer"
-                as="div"
-                :href="route('posts.show', post.id)"
+                :to="`/posts/${post.id}`"
             >
                 <Post :post="post" @delete:post="removePost(post.id)"></Post>
-            </Link>
+            </RouterLink>
         </li>
         <li v-show="!loading && !!nextCursor" class="p-4 text-center">
             <button class="btn btn-ghost w-full" @click="loadPosts()">

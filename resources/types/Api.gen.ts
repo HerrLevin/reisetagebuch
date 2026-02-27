@@ -363,6 +363,20 @@ export interface StopoversResponseDto {
   tripId: string;
 }
 
+/**
+ * Authenticated User Token DTO
+ * Data Transfer Object representing the authenticated user
+ */
+export interface TokenResponseDto {
+  /**
+   * The access token for the authenticated user
+   * @example "eyJ"
+   */
+  token: string;
+  /** Data Transfer Object representing the authenticated user */
+  user: AuthenticatedUserDto;
+}
+
 /** Data Transfer Object for Trip Creation Response */
 export interface TripCreationResponseDto {
   /**
@@ -1062,6 +1076,38 @@ export class Api<
 > extends HttpClient<SecurityDataType> {
   account = {
     /**
+     * @description Get account details
+     *
+     * @tags Account
+     * @name GetAccount
+     * @summary Get account
+     * @request GET:/account
+     * @secure
+     */
+    getAccount: (params: RequestParams = {}) =>
+      this.request<
+        {
+          /**
+           * Indicates if the user must verify their email address
+           * @example true
+           */
+          mustVerifyEmail?: boolean;
+          /**
+           * Indicates if the user has connected their Traewelling account
+           * @example false
+           */
+          traewellingConnected?: boolean;
+        },
+        void
+      >({
+        path: `/account`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
      * @description Delete the authenticated account
      *
      * @tags Account
@@ -1132,12 +1178,14 @@ export class Api<
      * @name UpdateProfile
      * @summary Update profile
      * @request POST:/account/profile
+     * @secure
      */
     updateProfile: (data: UpdateProfileRequest, params: RequestParams = {}) =>
       this.request<UserDto, any>({
         path: `/account/profile`,
         method: "POST",
         body: data,
+        secure: true,
         type: ContentType.FormData,
         format: "json",
         ...params,
@@ -1170,11 +1218,13 @@ export class Api<
      * @name GetAppConfiguration
      * @summary Get application configuration
      * @request GET:/app/configuration
+     * @secure
      */
     getAppConfiguration: (params: RequestParams = {}) =>
       this.request<AppConfigurationDto, any>({
         path: `/app/configuration`,
         method: "GET",
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -1192,6 +1242,271 @@ export class Api<
     getAuthenticatedUser: (params: RequestParams = {}) =>
       this.request<AuthenticatedUserDto, any>({
         path: `/auth/user`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Authenticate a user and return an access token
+     *
+     * @tags Authentication
+     * @name Login
+     * @summary User login
+     * @request POST:/auth/login
+     * @secure
+     */
+    login: (
+      data: {
+        /**
+         * @format email
+         * @example "mail@example.com"
+         */
+        email: string;
+        /**
+         * @format password
+         * @example "secret"
+         */
+        password: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<TokenResponseDto, void>({
+        path: `/auth/login`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Register a new user and return an access token
+     *
+     * @tags Authentication
+     * @name Register
+     * @summary User registration
+     * @request POST:/auth/register
+     * @secure
+     */
+    register: (
+      data: {
+        /** @example "John Doe" */
+        name: string;
+        /** @example "john_doe" */
+        username: string;
+        /**
+         * @format email
+         * @example "mail@example.com"
+         */
+        email: string;
+        /**
+         * @format password
+         * @example "secret"
+         */
+        password: string;
+        /**
+         * @format password
+         * @example "secret"
+         */
+        password_confirmation: string;
+        /**
+         * Optional invite code required if open registration is disabled
+         * @example "INVITE_CODE_123"
+         */
+        invite?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<TokenResponseDto, void>({
+        path: `/auth/register`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Logout the authenticated user by revoking their access token
+     *
+     * @tags Authentication
+     * @name Logout
+     * @summary User logout
+     * @request POST:/auth/logout
+     * @secure
+     */
+    logout: (params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/auth/logout`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Send a password reset link to the user's email address
+     *
+     * @tags Authentication
+     * @name ForgotPassword
+     * @summary Forgot password
+     * @request POST:/auth/forgot-password
+     * @secure
+     */
+    forgotPassword: (
+      data: {
+        /**
+         * @format email
+         * @example "mail@example.com"
+         */
+        email: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<void, void>({
+        path: `/auth/forgot-password`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description Reset the user's password using the provided token and new password
+     *
+     * @tags Authentication
+     * @name ResetPassword
+     * @summary Reset password
+     * @request POST:/auth/reset-password
+     * @secure
+     */
+    resetPassword: (
+      data: {
+        /** @example "RESET_TOKEN_123" */
+        token: string;
+        /**
+         * @format email
+         * @example "mail@example.com"
+         */
+        email: string;
+        /**
+         * @format password
+         * @example "new_secret"
+         */
+        password: string;
+        /**
+         * @format password
+         * @example "new_secret"
+         */
+        password_confirmation: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<void, void>({
+        path: `/auth/reset-password`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description Update the authenticated user's password by providing the current password and a new password
+     *
+     * @tags Authentication
+     * @name UpdatePassword
+     * @summary Update password
+     * @request PUT:/auth/password
+     * @secure
+     */
+    updatePassword: (
+      data: {
+        /**
+         * @format password
+         * @example "current_secret"
+         */
+        current_password: string;
+        /**
+         * @format password
+         * @example "new_secret"
+         */
+        password: string;
+        /**
+         * @format password
+         * @example "new_secret"
+         */
+        password_confirmation: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<void, void>({
+        path: `/auth/password`,
+        method: "PUT",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description Verify the user's email address using the provided verification link parameters
+     *
+     * @tags Authentication
+     * @name VerifyEmail
+     * @summary Verify email
+     * @request POST:/auth/email/verify/{id}/{hash}
+     * @secure
+     */
+    verifyEmail: (id: string, hash: string, params: RequestParams = {}) =>
+      this.request<void, void>({
+        path: `/auth/email/verify/${id}/${hash}`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Resend the email verification link to the authenticated user if their email address is not yet verified
+     *
+     * @tags Authentication
+     * @name ResendVerificationEmail
+     * @summary Resend email verification
+     * @request POST:/auth/email/resend
+     * @secure
+     */
+    resendVerificationEmail: (params: RequestParams = {}) =>
+      this.request<void, void>({
+        path: `/auth/email/resend`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Validate an invite code and return information about the invite if it is valid
+     *
+     * @tags Authentication
+     * @name ValidateInvite
+     * @summary Validate invite code
+     * @request GET:/auth/invite/{code}
+     * @secure
+     */
+    validateInvite: (code: string, params: RequestParams = {}) =>
+      this.request<
+        {
+          /** Indicates whether the invite code is valid */
+          valid?: boolean;
+          /** The name of the user who created the invite, or null if the inviter user no longer exists */
+          invitedBy?: string | null;
+        },
+        any
+      >({
+        path: `/auth/invite/${code}`,
         method: "GET",
         secure: true,
         format: "json",
@@ -1261,11 +1576,13 @@ export class Api<
      * @name LikePost
      * @summary Like post
      * @request POST:/posts/{post}/likes
+     * @secure
      */
     likePost: (post: string, params: RequestParams = {}) =>
       this.request<LikeResponseDto, void>({
         path: `/posts/${post}/likes`,
         method: "POST",
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -1277,11 +1594,13 @@ export class Api<
      * @name UnlikePost
      * @summary Unlike post
      * @request DELETE:/posts/{post}/likes
+     * @secure
      */
     unlikePost: (post: string, params: RequestParams = {}) =>
       this.request<LikeResponseDto, void>({
         path: `/posts/${post}/likes`,
         method: "DELETE",
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -1517,7 +1836,8 @@ export class Api<
      * @tags Location
      * @name PrefetchLocation
      * @summary Prefetch location
-     * @request POST:/location/prefetch
+     * @request GET:/location/prefetch
+     * @secure
      */
     prefetchLocation: (
       query: {
@@ -1530,8 +1850,9 @@ export class Api<
     ) =>
       this.request<void, any>({
         path: `/location/prefetch`,
-        method: "POST",
+        method: "GET",
         query: query,
+        secure: true,
         ...params,
       }),
 
@@ -1542,6 +1863,7 @@ export class Api<
      * @name GetRecentRequestLocation
      * @summary Get recent request location
      * @request GET:/location/request-location
+     * @secure
      */
     getRecentRequestLocation: (
       query: {
@@ -1556,6 +1878,7 @@ export class Api<
         path: `/location/request-location`,
         method: "GET",
         query: query,
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -1568,6 +1891,7 @@ export class Api<
      * @name SearchLocations
      * @summary Search locations
      * @request GET:/locations/nearby
+     * @secure
      */
     searchLocations: (
       query: {
@@ -1583,6 +1907,7 @@ export class Api<
         path: `/locations/nearby`,
         method: "GET",
         query: query,
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -1594,6 +1919,7 @@ export class Api<
      * @name LocationHistory
      * @summary Location history
      * @request GET:/locations/history
+     * @secure
      */
     locationHistory: (
       query?: {
@@ -1606,6 +1932,7 @@ export class Api<
         path: `/locations/history`,
         method: "GET",
         query: query,
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -1617,6 +1944,7 @@ export class Api<
      * @name Departures
      * @summary Departures
      * @request GET:/locations/departures
+     * @secure
      */
     departures: (
       query?: {
@@ -1635,6 +1963,7 @@ export class Api<
         path: `/locations/departures`,
         method: "GET",
         query: query,
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -1646,6 +1975,7 @@ export class Api<
      * @name Stopovers
      * @summary Stopovers
      * @request GET:/locations/stopovers
+     * @secure
      */
     stopovers: (
       query: {
@@ -1659,6 +1989,7 @@ export class Api<
         path: `/locations/stopovers`,
         method: "GET",
         query: query,
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -1671,6 +2002,7 @@ export class Api<
      * @name Geocode
      * @summary Geocode
      * @request GET:/geocode
+     * @secure
      */
     geocode: (
       query: {
@@ -1687,6 +2019,7 @@ export class Api<
         path: `/geocode`,
         method: "GET",
         query: query,
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -1699,6 +2032,7 @@ export class Api<
      * @name GetLineStringBetween
      * @summary Get linestring
      * @request GET:/map/linestring
+     * @secure
      */
     getLineStringBetween: (
       query: {
@@ -1711,6 +2045,7 @@ export class Api<
         path: `/map/linestring`,
         method: "GET",
         query: query,
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -1722,6 +2057,7 @@ export class Api<
      * @name GetStopsBetween
      * @summary Get stopovers
      * @request GET:/map/stopovers
+     * @secure
      */
     getStopsBetween: (
       query: {
@@ -1734,6 +2070,7 @@ export class Api<
         path: `/map/stopovers`,
         method: "GET",
         query: query,
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -1746,11 +2083,13 @@ export class Api<
      * @name ListNotifications
      * @summary List notifications
      * @request GET:/notifications/list
+     * @secure
      */
     listNotifications: (params: RequestParams = {}) =>
       this.request<NotificationWrapper[], any>({
         path: `/notifications/list`,
         method: "GET",
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -1762,6 +2101,7 @@ export class Api<
      * @name UnreadNotificationCount
      * @summary Unread count
      * @request GET:/notifications/unread-count
+     * @secure
      */
     unreadNotificationCount: (params: RequestParams = {}) =>
       this.request<
@@ -1773,6 +2113,7 @@ export class Api<
       >({
         path: `/notifications/unread-count`,
         method: "GET",
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -1784,11 +2125,13 @@ export class Api<
      * @name MarkNotificationAsRead
      * @summary Mark as read
      * @request POST:/notifications/{id}/read
+     * @secure
      */
     markNotificationAsRead: (id: string, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/notifications/${id}/read`,
         method: "POST",
+        secure: true,
         ...params,
       }),
 
@@ -1799,11 +2142,13 @@ export class Api<
      * @name MarkAllNotificationsAsRead
      * @summary Mark all as read
      * @request POST:/notifications/read-all
+     * @secure
      */
     markAllNotificationsAsRead: (params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/notifications/read-all`,
         method: "POST",
+        secure: true,
         ...params,
       }),
   };
@@ -1867,11 +2212,13 @@ export class Api<
      * @name GetProfileMapData
      * @summary Profile map data
      * @request GET:/users/{userId}/map-data
+     * @secure
      */
     getProfileMapData: (userId: string, params: RequestParams = {}) =>
       this.request<object, any>({
         path: `/users/${userId}/map-data`,
         method: "GET",
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -1905,11 +2252,13 @@ export class Api<
      * @name GetProfile
      * @summary Get profile
      * @request GET:/profile/{username}
+     * @secure
      */
     getProfile: (username: string, params: RequestParams = {}) =>
       this.request<UserDto, any>({
         path: `/profile/${username}`,
         method: "GET",
+        secure: true,
         format: "json",
         ...params,
       }),

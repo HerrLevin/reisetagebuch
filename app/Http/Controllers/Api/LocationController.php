@@ -47,7 +47,7 @@ class LocationController extends Controller
         return false;
     }
 
-    #[OA\Post(
+    #[OA\Get(
         path: '/location/prefetch',
         operationId: 'prefetchLocation',
         description: 'Prefetch location data and optionally store user history',

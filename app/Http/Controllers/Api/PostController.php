@@ -38,7 +38,7 @@ class PostController extends Controller
         summary: 'Get timeline posts',
         security: [
             [
-                'oauth2_security_example' => ['write:projects', 'read:projects'],
+                'passport' => [],
             ],
         ],
         tags: ['Posts'],
@@ -73,7 +73,7 @@ class PostController extends Controller
         summary: 'Get posts for a specific user',
         security: [
             [
-                'oauth2_security_example' => ['write:projects', 'read:projects'],
+                'passport' => [],
             ],
         ],
         tags: ['Posts'],
@@ -115,7 +115,7 @@ class PostController extends Controller
         summary: 'Get post by ID',
         security: [
             [
-                'oauth2_security_example' => ['write:projects', 'read:projects'],
+                'passport' => [],
             ],
         ],
         tags: ['Posts'],
@@ -156,7 +156,7 @@ class PostController extends Controller
         summary: 'Filter posts',
         security: [
             [
-                'oauth2_security_example' => ['write:projects', 'read:projects'],
+                'passport' => [],
             ],
         ],
         tags: ['Posts'],
@@ -235,7 +235,7 @@ class PostController extends Controller
         summary: 'Mass edit posts',
         security: [
             [
-                'oauth2_security_example' => ['write:projects', 'read:projects'],
+                'passport' => [],
             ],
         ],
         requestBody: new OA\RequestBody(
@@ -261,7 +261,7 @@ class PostController extends Controller
         summary: 'Delete post',
         security: [
             [
-                'oauth2_security_example' => ['write:projects', 'read:projects'],
+                'passport' => [],
             ],
         ],
         tags: ['Posts'],
@@ -295,7 +295,7 @@ class PostController extends Controller
         summary: 'Create transport post',
         security: [
             [
-                'oauth2_security_example' => ['write:projects', 'read:projects'],
+                'passport' => [],
             ],
         ],
         requestBody: new OA\RequestBody(
@@ -321,7 +321,7 @@ class PostController extends Controller
         summary: 'Create text post',
         security: [
             [
-                'oauth2_security_example' => ['write:projects', 'read:projects'],
+                'passport' => [],
             ],
         ],
         requestBody: new OA\RequestBody(
@@ -347,7 +347,7 @@ class PostController extends Controller
         summary: 'Create location post',
         security: [
             [
-                'oauth2_security_example' => ['write:projects', 'read:projects'],
+                'passport' => [],
             ],
         ],
         requestBody: new OA\RequestBody(
@@ -376,7 +376,7 @@ class PostController extends Controller
         summary: 'Update post',
         security: [
             [
-                'oauth2_security_example' => ['write:projects', 'read:projects'],
+                'passport' => [],
             ],
         ],
         requestBody: new OA\RequestBody(
@@ -425,7 +425,7 @@ class PostController extends Controller
         summary: 'Update transport post',
         security: [
             [
-                'oauth2_security_example' => ['write:projects', 'read:projects'],
+                'passport' => [],
             ],
         ],
         requestBody: new OA\RequestBody(
@@ -464,7 +464,7 @@ class PostController extends Controller
         summary: 'Update transport times',
         security: [
             [
-                'oauth2_security_example' => ['write:projects', 'read:projects'],
+                'passport' => [],
             ],
         ],
         requestBody: new OA\RequestBody(

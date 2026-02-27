@@ -21,7 +21,7 @@ class UserSettingsController extends Controller
         operationId: 'updateSettings',
         description: 'Update user settings',
         summary: 'Update settings',
-        security: [['oauth2_security_example' => ['write:projects', 'read:projects']]],
+        security: [['passport' => []]],
         requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(ref: SettingsUpdateRequest::class)),
         tags: ['Account'],
         responses: [new OA\Response(response: 204, description: 'No Content')]

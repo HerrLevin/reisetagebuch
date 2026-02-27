@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { isPostLikedNotification } from '@/types/notifications';
-import { Link } from '@inertiajs/vue3';
 import { PropType } from 'vue';
+import { RouterLink } from 'vue-router';
 import { NotificationWrapper } from '../../../../types/Api.gen';
 
 defineProps({
@@ -13,20 +13,26 @@ defineProps({
 
 const getNotificationLink = (notification: NotificationWrapper): string => {
     if (isPostLikedNotification(notification)) {
-        return route('posts.show', notification.data!.postId);
+        return `/posts/${notification.data!.postId}`;
     }
     return '#';
 };
 </script>
 <template>
-    <Link
+    <RouterLink
+        v-slot="{ navigate }"
         class="list-row hover-list-entry cursor-pointer"
-        as="li"
-        :class="{
-            'bg-base-200': !notification.readAt,
-        }"
-        :href="getNotificationLink(notification)"
+        custom
+        :to="getNotificationLink(notification)"
     >
-        <slot></slot>
-    </Link>
+        <li
+            :class="{
+                'bg-base-200': !notification.readAt,
+            }"
+            class="list-row hover-list-entry cursor-pointer"
+            @click="navigate"
+        >
+            <slot></slot>
+        </li>
+    </RouterLink>
 </template>

@@ -7,8 +7,8 @@ import {
 } from '@/Services/LineNameFormattingService';
 import MotisTimeService from '@/Services/MotisTimeService';
 import { StopDto, StopTime } from '@/types';
-import { Link } from '@inertiajs/vue3';
 import { defineProps, PropType, ref } from 'vue';
+import { RouterLink } from 'vue-router';
 
 const props = defineProps({
     stopTime: {
@@ -34,10 +34,15 @@ const delay = ref(timeService.delay);
 
 emoji.value = getEmoji(props.stopTime.mode);
 
-const linkData = ref({
-    tripId: props.stopTime.tripId,
-    startId: props.stopTime.place.stopId,
-    startTime: timeService.plannedTime?.toISO(),
+const stopoversUrl = ref(() => {
+    const params = new URLSearchParams({
+        tripId: props.stopTime.tripId,
+        startId: props.stopTime.place.stopId,
+    });
+    if (timeService.plannedTime) {
+        params.set('startTime', timeService.plannedTime.toISO()!);
+    }
+    return `/posts/transport/stopovers?${params.toString()}`;
 });
 
 function getRouteTextColor(stopTime: StopTime) {
@@ -76,46 +81,46 @@ function getRouteColor(stopTime: StopTime) {
 </script>
 
 <template>
-    <Link
-        :href="route('posts.create.stopovers')"
-        :data="linkData"
-        as="li"
-        class="list-row hover:bg-base-200 cursor-pointer grid-cols-11 items-center"
-    >
-        <div class="col text-center text-2xl">
-            {{ emoji }}
-        </div>
-        <div class="col col-span-2 text-center">
-            <div
-                class="badge min-w-[3em] px-[0.5]"
-                :style="`background-color: ${getRouteColor(stopTime)}; color: ${getRouteTextColor(stopTime)}`"
-            >
-                {{ getDepartureLineName(stopTime) }}
+    <RouterLink v-slot="{ navigate }" :to="stopoversUrl()" custom>
+        <li
+            class="list-row hover:bg-base-200 cursor-pointer grid-cols-11 items-center"
+            @click="navigate"
+        >
+            <div class="col text-center text-2xl">
+                {{ emoji }}
             </div>
-            <div class="mt-0.5 text-xs font-medium">
-                {{ getDepartureTripNumber(stopTime) }}
+            <div class="col col-span-2 text-center">
+                <div
+                    class="badge min-w-[3em] px-[0.5]"
+                    :style="`background-color: ${getRouteColor(stopTime)}; color: ${getRouteTextColor(stopTime)}`"
+                >
+                    {{ getDepartureLineName(stopTime) }}
+                </div>
+                <div class="mt-0.5 text-xs font-medium">
+                    {{ getDepartureTripNumber(stopTime) }}
+                </div>
             </div>
-        </div>
-        <div class="col col-span-6">
-            <div>
-                {{ stopTime.headSign }}
+            <div class="col col-span-6">
+                <div>
+                    {{ stopTime.headSign }}
+                </div>
+                <div
+                    v-if="stopTime.place.name !== stop.name"
+                    class="overflow-x-hidden text-xs uppercase opacity-60"
+                >
+                    {{ stopTime.place.name }}
+                </div>
             </div>
-            <div
-                v-if="stopTime.place.name !== stop.name"
-                class="overflow-x-hidden text-xs uppercase opacity-60"
-            >
-                {{ stopTime.place.name }}
+            <div class="col col-span-2 text-right">
+                <TimeDisplay
+                    :planned-time="plannedTime"
+                    :time="time"
+                    :delay="delay"
+                    :real-time="props.stopTime.realTime"
+                />
             </div>
-        </div>
-        <div class="col col-span-2 text-right">
-            <TimeDisplay
-                :planned-time="plannedTime"
-                :time="time"
-                :delay="delay"
-                :real-time="props.stopTime.realTime"
-            />
-        </div>
-    </Link>
+        </li>
+    </RouterLink>
 </template>
 
 <style scoped>

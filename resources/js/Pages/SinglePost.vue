@@ -4,6 +4,7 @@ import Loading from '@/Components/Loading.vue';
 import Map from '@/Components/Map.vue';
 import Post from '@/Components/Post/Post.vue';
 import PostMetaInfo from '@/Components/Post/PostMetaInfo.vue';
+import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { getColorForPost } from '@/Services/ApiDepartureTypeService';
 import {
@@ -14,15 +15,16 @@ import {
 } from '@/Services/TripTimeService';
 import { useUserStore } from '@/stores/user';
 import { isApiLocationPost, isApiTransportPost } from '@/types/PostTypes';
-import { Head } from '@inertiajs/vue3';
 import { GeometryCollection } from 'geojson';
 import { ArrowLeft } from 'lucide-vue-next';
 import { LngLat } from 'maplibre-gl';
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 import { BasePost, LocationPost, TransportPost } from '../../types/Api.gen';
 
 const { t } = useI18n();
+const vueRouter = useRouter();
 
 const user = useUserStore();
 
@@ -187,14 +189,18 @@ const progress = computed(() => {
     return Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
 });
 
+watchEffect(() => {
+    if (pageTitle.value) {
+        useTitle(pageTitle.value);
+    }
+});
+
 function deleted() {
-    window.location.href = route('dashboard');
+    vueRouter.push({ name: 'dashboard' });
 }
 </script>
 
 <template>
-    <Head :title="pageTitle" />
-
     <AuthenticatedLayout>
         <template #header>
             <h2 class="text-xl leading-tight font-semibold">

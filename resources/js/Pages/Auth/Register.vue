@@ -2,47 +2,80 @@
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
+import { useTitle } from '@/composables/useTitle';
 import AuthLayout from '@/Layouts/AuthLayout.vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import { useAuthStore } from '@/stores/auth';
+import { useUserStore } from '@/stores/user';
+import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { RouterLink, useRoute, useRouter } from 'vue-router';
 
 const { t } = useI18n();
+useTitle(t('auth.register.title'));
 
-const form = useForm({
+const router = useRouter();
+const route = useRoute();
+const authStore = useAuthStore();
+const userStore = useUserStore();
+
+const inviteCode = (route.query.invite as string) || null;
+const invitedBy = ref<string | null>(null);
+
+// Validate invite code if present
+if (inviteCode) {
+    fetch(`/api/auth/invite/${inviteCode}`)
+        .then((r) => r.json())
+        .then((data) => {
+            if (data.valid) {
+                invitedBy.value = data.invitedBy;
+            }
+        })
+        .catch(() => {});
+}
+
+const form = ref({
     name: '',
     username: '',
     email: '',
     password: '',
     password_confirmation: '',
-    invite: '',
+    invite: inviteCode || '',
 });
 
-const props = defineProps({
-    inviteCode: {
-        type: String,
-        default: null,
-    },
-    invitedBy: {
-        type: String,
-        default: null,
-    },
-});
+const errors = ref<Record<string, string>>({});
+const processing = ref(false);
 
-form.invite = props.inviteCode;
-
-const submit = () => {
-    form.post(route('register'), {
-        onFinish: () => {
-            form.reset('password', 'password_confirmation');
-        },
-    });
+const submit = async () => {
+    processing.value = true;
+    errors.value = {};
+    try {
+        await authStore.register({
+            name: form.value.name,
+            username: form.value.username,
+            email: form.value.email,
+            password: form.value.password,
+            password_confirmation: form.value.password_confirmation,
+            invite: form.value.invite || undefined,
+        });
+        await userStore.fetchUser(true);
+        router.push({ name: 'dashboard' });
+    } catch (error) {
+        if (error.response?.status === 422) {
+            const responseErrors = error.response.data.errors || {};
+            for (const key in responseErrors) {
+                errors.value[key] = responseErrors[key][0];
+            }
+        }
+        form.value.password = '';
+        form.value.password_confirmation = '';
+    } finally {
+        processing.value = false;
+    }
 };
 </script>
 
 <template>
     <AuthLayout>
-        <Head :title="t('auth.register.title')" />
-
         <form @submit.prevent="submit">
             <div>
                 <InputLabel for="name" :value="t('auth.register.name')" />
@@ -52,13 +85,13 @@ const submit = () => {
                     v-model="form.name"
                     type="text"
                     class="mt-1 block w-full"
-                    :error="form.errors.name"
+                    :error="errors.name"
                     required
                     autofocus
                     autocomplete="name"
                 />
 
-                <InputError class="mt-2" :message="form.errors.name" />
+                <InputError class="mt-2" :message="errors.name" />
             </div>
 
             <div>
@@ -72,13 +105,13 @@ const submit = () => {
                     v-model="form.username"
                     type="text"
                     class="mt-1 block w-full"
-                    :error="form.errors.username"
+                    :error="errors.username"
                     required
                     autofocus
                     autocomplete="name"
                 />
 
-                <InputError class="mt-2" :message="form.errors.username" />
+                <InputError class="mt-2" :message="errors.username" />
             </div>
 
             <div class="mt-4">
@@ -93,7 +126,7 @@ const submit = () => {
                     autocomplete="username"
                 />
 
-                <InputError class="mt-2" :message="form.errors.email" />
+                <InputError class="mt-2" :message="errors.email" />
             </div>
 
             <div class="mt-4">
@@ -111,7 +144,7 @@ const submit = () => {
                     autocomplete="new-password"
                 />
 
-                <InputError class="mt-2" :message="form.errors.password" />
+                <InputError class="mt-2" :message="errors.password" />
             </div>
 
             <div class="mt-4">
@@ -131,20 +164,20 @@ const submit = () => {
 
                 <InputError
                     class="mt-2"
-                    :message="form.errors.password_confirmation"
+                    :message="errors.password_confirmation"
                 />
-                <InputError class="mt-2" :message="form.errors.invite" />
+                <InputError class="mt-2" :message="errors.invite" />
             </div>
 
             <div class="mt-4 flex items-center justify-end">
-                <Link :href="route('login')" class="link">
+                <RouterLink to="/login" class="link">
                     {{ t('auth.register.have_account') }}
-                </Link>
+                </RouterLink>
 
                 <button
                     class="btn btn-primary ms-4"
-                    :class="{ 'opacity-25': form.processing }"
-                    :disabled="form.processing"
+                    :class="{ 'opacity-25': processing }"
+                    :disabled="processing"
                 >
                     {{ t('auth.register.title') }}
                 </button>

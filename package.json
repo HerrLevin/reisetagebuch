@@ -3,7 +3,6 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "build:ssr": "vite build && vite build --ssr",
         "dev": "vite",
         "format": "prettier --write resources/",
         "format:check": "prettier --check resources/",
@@ -15,7 +14,6 @@
     },
     "devDependencies": {
         "@eslint/js": "^10.0.0",
-        "@inertiajs/vue3": "^2.0.0",
         "@rushstack/eslint-patch": "^1.12.0",
         "@tailwindcss/forms": "^0.5.3",
         "@tailwindcss/vite": "^4.0.14",
@@ -23,7 +21,6 @@
         "@vitejs/plugin-vue": "^6.0.0",
         "@vue/eslint-config-prettier": "^10.0.0",
         "@vue/eslint-config-typescript": "^14.0.0",
-        "@vue/server-renderer": "^3.4.0",
         "autoprefixer": "^10.4.12",
         "axios": "^1.8.2",
         "concurrently": "^9.0.1",
@@ -53,6 +50,7 @@
         "pinia-plugin-persistedstate": "^4.7.1",
         "vite-plugin-pwa": "^1.0.0",
         "vue-debounce": "^5.0.1",
-        "vue-i18n": "^11.1.12"
+        "vue-i18n": "^11.1.12",
+        "vue-router": "^5.0.3"
     }
 }

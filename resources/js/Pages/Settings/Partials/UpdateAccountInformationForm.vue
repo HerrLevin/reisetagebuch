@@ -2,7 +2,6 @@
 import { api } from '@/api';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
-import { Link } from '@inertiajs/vue3';
 import { reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { AuthenticatedUserDto } from '../../../../types/Api.gen';
@@ -21,6 +20,10 @@ const form = reactive({
 
 const processing = ref(false);
 const recentlySuccessful = ref(false);
+
+function resendVerification() {
+    api.auth.resendVerificationEmail();
+}
 
 function submitForm() {
     processing.value = true;
@@ -105,18 +108,17 @@ function submitForm() {
             <div v-if="user.user?.mustVerifyEmail">
                 <p class="mt-2 text-sm">
                     {{ t('settings.account_information.email_not_verified') }}
-                    <Link
-                        :href="route('verification.send')"
-                        method="post"
-                        as="button"
+                    <button
+                        type="button"
                         class="link"
+                        @click="resendVerification()"
                     >
                         {{
                             t(
                                 'settings.account_information.resend_verification',
                             )
                         }}
-                    </Link>
+                    </button>
                 </p>
             </div>
 

@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { api } from '@/api';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
-import { useForm } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -11,29 +11,51 @@ const { t } = useI18n();
 const passwordInput = ref<HTMLInputElement | null>(null);
 const currentPasswordInput = ref<HTMLInputElement | null>(null);
 
-const form = useForm({
+const form = reactive({
     current_password: '',
     password: '',
     password_confirmation: '',
 });
 
+const errors = ref<Record<string, string>>({});
+const processing = ref(false);
+const recentlySuccessful = ref(false);
+
 const updatePassword = () => {
-    form.put(route('password.update'), {
-        preserveScroll: true,
-        onSuccess: () => {
-            form.reset();
-        },
-        onError: () => {
-            if (form.errors.password) {
-                form.reset('password', 'password_confirmation');
+    processing.value = true;
+    errors.value = {};
+    api.auth
+        .updatePassword(form)
+        .then(() => {
+            form.current_password = '';
+            form.password = '';
+            form.password_confirmation = '';
+            recentlySuccessful.value = true;
+            setTimeout(() => {
+                recentlySuccessful.value = false;
+            }, 2000);
+        })
+        .catch((error) => {
+            if (error.response?.data?.errors) {
+                errors.value = Object.fromEntries(
+                    Object.entries(error.response.data.errors).map(
+                        ([key, val]) => [key, (val as string[])[0]],
+                    ),
+                );
+            }
+            if (errors.value.password) {
+                form.password = '';
+                form.password_confirmation = '';
                 passwordInput.value?.focus();
             }
-            if (form.errors.current_password) {
-                form.reset('current_password');
+            if (errors.value.current_password) {
+                form.current_password = '';
                 currentPasswordInput.value?.focus();
             }
-        },
-    });
+        })
+        .finally(() => {
+            processing.value = false;
+        });
 };
 </script>
 
@@ -60,16 +82,13 @@ const updatePassword = () => {
                     id="current_password"
                     ref="currentPasswordInput"
                     v-model="form.current_password"
-                    :error="form.errors.current_password"
+                    :error="errors.current_password"
                     type="password"
                     class="mt-1 block w-full"
                     autocomplete="current-password"
                 />
 
-                <InputError
-                    :message="form.errors.current_password"
-                    class="mt-2"
-                />
+                <InputError :message="errors.current_password" class="mt-2" />
             </div>
 
             <div>
@@ -82,13 +101,13 @@ const updatePassword = () => {
                     id="password"
                     ref="passwordInput"
                     v-model="form.password"
-                    :error="form.errors.password"
+                    :error="errors.password"
                     type="password"
                     class="mt-1 block w-full"
                     autocomplete="new-password"
                 />
 
-                <InputError :message="form.errors.password" class="mt-2" />
+                <InputError :message="errors.password" class="mt-2" />
             </div>
 
             <div>
@@ -100,20 +119,20 @@ const updatePassword = () => {
                 <TextInput
                     id="password_confirmation"
                     v-model="form.password_confirmation"
-                    :error="form.errors.password_confirmation"
+                    :error="errors.password_confirmation"
                     type="password"
                     class="mt-1 block w-full"
                     autocomplete="new-password"
                 />
 
                 <InputError
-                    :message="form.errors.password_confirmation"
+                    :message="errors.password_confirmation"
                     class="mt-2"
                 />
             </div>
 
             <div class="flex items-center gap-4">
-                <button class="btn btn-primary" :disabled="form.processing">
+                <button class="btn btn-primary" :disabled="processing">
                     {{ t('verbs.save') }}
                 </button>
 
@@ -123,10 +142,7 @@ const updatePassword = () => {
                     leave-active-class="transition ease-in-out"
                     leave-to-class="opacity-0"
                 >
-                    <p
-                        v-if="form.recentlySuccessful"
-                        class="text-sm opacity-65"
-                    >
+                    <p v-if="recentlySuccessful" class="text-sm opacity-65">
                         {{ t('verbs.saved') }}
                     </p>
                 </Transition>

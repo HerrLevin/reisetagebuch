@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { api } from '@/api';
+import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import UpdateAccountSettingsForm from '@/Pages/Settings/Partials/UpdateAccountSettingsForm.vue';
 import UpdateDeviceSettingsForm from '@/Pages/Settings/Partials/UpdateDeviceSettingsForm.vue';
 import { useUserStore } from '@/stores/user';
-import { Head } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import DeleteUserForm from './Partials/DeleteUserForm.vue';
@@ -12,10 +12,7 @@ import UpdateAccountInformationForm from './Partials/UpdateAccountInformationFor
 import UpdatePasswordForm from './Partials/UpdatePasswordForm.vue';
 
 const { t } = useI18n();
-
-defineProps<{
-    status?: string;
-}>();
+useTitle('Settings');
 
 const user = useUserStore();
 user.fetchUser(true);
@@ -23,7 +20,7 @@ user.fetchUser(true);
 const processingTraewelling = ref(false);
 
 function connectTraewelling() {
-    window.location.href = route('traewelling.connect');
+    window.location.href = '/socialite/traewelling/connect';
 }
 
 function disconnectTraewelling() {
@@ -46,8 +43,6 @@ function disconnectTraewelling() {
 </script>
 
 <template>
-    <Head title="Settings" />
-
     <AuthenticatedLayout>
         <template #header>
             <h2 class="text-xl leading-tight font-semibold">

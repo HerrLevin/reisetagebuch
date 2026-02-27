@@ -74,13 +74,13 @@ function getRouteColor(trip: TripDto) {
 
 function selectStation(location: LocationEntry) {
     const identifier = location.identifiers.find((id) => id.origin === 'motis');
-
-    window.location.href = route('posts.create.departures', {
-        latitude: location.latitude,
-        longitude: location.longitude,
+    const params = new URLSearchParams({
+        latitude: String(location.latitude),
+        longitude: String(location.longitude),
         identifier: identifier?.identifier || '',
-        when: DateTime.now().toISO(),
+        when: DateTime.now().toISO()!,
     });
+    window.location.href = `/posts/transport/departures?${params.toString()}`;
 }
 </script>
 

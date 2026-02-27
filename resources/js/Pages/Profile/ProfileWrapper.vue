@@ -7,7 +7,6 @@ import BottomInfo from '@/Pages/Profile/Partials/BottomInfo.vue';
 import ProfileMenu from '@/Pages/Profile/Partials/ProfileMenu.vue';
 import Statistics from '@/Pages/Profile/Partials/Statistics.vue';
 import type { UserDto } from '@/types';
-import { Head } from '@inertiajs/vue3';
 import type { PropType } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -22,8 +21,6 @@ defineProps({
 </script>
 
 <template>
-    <Head title="Profile" />
-
     <AuthenticatedLayout>
         <template #header>
             <h2 class="text-xl leading-tight font-semibold">

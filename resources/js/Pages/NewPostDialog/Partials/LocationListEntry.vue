@@ -2,9 +2,9 @@
 import LocationListEntryInfo from '@/Pages/NewPostDialog/Partials/LocationListEntryInfo.vue';
 import { getEmojiFromTags, getName } from '@/Services/LocationTypeService';
 import { LocationEntry } from '@/types';
-import { Link } from '@inertiajs/vue3';
 import { CircleQuestionMark } from 'lucide-vue-next';
 import { defineProps, ref } from 'vue';
+import { RouterLink } from 'vue-router';
 
 const props = defineProps({
     location: {
@@ -27,47 +27,45 @@ const emoji = ref('');
 emoji.value = getEmojiFromTags(props.location.tags);
 name.value = getName(props.location as LocationEntry);
 
-const linkData = ref({
-    location: {
-        emoji: emoji.value,
-        name: name.value,
-        id: props.location.id,
-    },
-});
+const createPostUrl = (() => {
+    const params = new URLSearchParams({
+        'location[emoji]': emoji.value,
+        'location[name]': name.value,
+        'location[id]': props.location.id,
+    });
+    return `/posts/create?${params.toString()}`;
+})();
 </script>
 
 <template>
-    <Link
-        :href="route('posts.create.post')"
-        :data="linkData"
-        as="li"
-        class="list-row hover:bg-base-200 cursor-pointer"
-    >
-        <div class="text-3xl">{{ emoji }}</div>
-        <div>
-            <div>{{ name }}</div>
-            <div
-                v-if="location?.distance && location?.distance < 1000"
-                class="text-xs uppercase opacity-60"
-            >
-                {{ location!.distance }} m
-            </div>
-            <div
-                v-else-if="location?.distance"
-                class="text-xs uppercase opacity-60"
-            >
-                {{ (location!.distance / 1000).toFixed(1) }} km
-            </div>
-        </div>
-        <LocationListEntryInfo :location>
-            <template #activator="{ onClick }">
-                <button
-                    class="btn btn-square btn-ghost"
-                    @click.prevent="onClick"
+    <RouterLink v-slot="{ navigate }" :to="createPostUrl" custom>
+        <li class="list-row hover:bg-base-200 cursor-pointer" @click="navigate">
+            <div class="text-3xl">{{ emoji }}</div>
+            <div>
+                <div>{{ name }}</div>
+                <div
+                    v-if="location?.distance && location?.distance < 1000"
+                    class="text-xs uppercase opacity-60"
                 >
-                    <CircleQuestionMark class="size-5" />
-                </button>
-            </template>
-        </LocationListEntryInfo>
-    </Link>
+                    {{ location!.distance }} m
+                </div>
+                <div
+                    v-else-if="location?.distance"
+                    class="text-xs uppercase opacity-60"
+                >
+                    {{ (location!.distance / 1000).toFixed(1) }} km
+                </div>
+            </div>
+            <LocationListEntryInfo :location>
+                <template #activator="{ onClick }">
+                    <button
+                        class="btn btn-square btn-ghost"
+                        @click.prevent="onClick"
+                    >
+                        <CircleQuestionMark class="size-5" />
+                    </button>
+                </template>
+            </LocationListEntryInfo>
+        </li>
+    </RouterLink>
 </template>

@@ -1,38 +1,52 @@
 <script setup lang="ts">
+import { api } from '@/api';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
+import { useTitle } from '@/composables/useTitle';
 import AuthLayout from '@/Layouts/AuthLayout.vue';
-import { Head, useForm } from '@inertiajs/vue3';
+import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRoute } from 'vue-router';
 
 const { t } = useI18n();
+useTitle(t('auth.reset_password.title'));
 
-const props = defineProps<{
-    email: string;
-    token: string;
-}>();
+const route = useRoute();
 
-const form = useForm({
-    token: props.token,
-    email: props.email,
+const form = ref({
+    token: route.params.token as string,
+    email: (route.query.email as string) || '',
     password: '',
     password_confirmation: '',
 });
 
-const submit = () => {
-    form.post(route('password.store'), {
-        onFinish: () => {
-            form.reset('password', 'password_confirmation');
-        },
-    });
+const errors = ref<Record<string, string>>({});
+const processing = ref(false);
+
+const submit = async () => {
+    processing.value = true;
+    errors.value = {};
+    api.auth
+        .resetPassword(form.value)
+        .catch((error) => {
+            if (error.response?.status === 422) {
+                const responseErrors = error.response.data.errors || {};
+                for (const key in responseErrors) {
+                    errors.value[key] = responseErrors[key][0];
+                }
+            }
+            form.value.password = '';
+            form.value.password_confirmation = '';
+        })
+        .finally(() => {
+            processing.value = false;
+        });
 };
 </script>
 
 <template>
     <AuthLayout>
-        <Head :title="t('auth.reset_password.title')" />
-
         <form @submit.prevent="submit">
             <div>
                 <InputLabel
@@ -50,7 +64,7 @@ const submit = () => {
                     autocomplete="username"
                 />
 
-                <InputError class="mt-2" :message="form.errors.email" />
+                <InputError class="mt-2" :message="errors.email" />
             </div>
 
             <div class="mt-4">
@@ -68,7 +82,7 @@ const submit = () => {
                     autocomplete="new-password"
                 />
 
-                <InputError class="mt-2" :message="form.errors.password" />
+                <InputError class="mt-2" :message="errors.password" />
             </div>
 
             <div class="mt-4">
@@ -88,15 +102,15 @@ const submit = () => {
 
                 <InputError
                     class="mt-2"
-                    :message="form.errors.password_confirmation"
+                    :message="errors.password_confirmation"
                 />
             </div>
 
             <div class="mt-4 flex items-center justify-end">
                 <button
                     class="btn btn-primary"
-                    :class="{ 'opacity-25': form.processing }"
-                    :disabled="form.processing"
+                    :class="{ 'opacity-25': processing }"
+                    :disabled="processing"
                 >
                     {{ t('auth.reset_password.title') }}
                 </button>

@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import { api } from '@/api';
 import Loading from '@/Components/Loading.vue';
+import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import DeparturesFilter from '@/Pages/NewPostDialog/Partials/DeparturesFilter.vue';
 import DeparturesListEntry from '@/Pages/NewPostDialog/Partials/DeparturesListEntry.vue';
 import { LocationService } from '@/Services/LocationService';
 import { useUserStore } from '@/stores/user';
-import { Head } from '@inertiajs/vue3';
 import { DateTime } from 'luxon';
 import { onMounted, onUnmounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRoute } from 'vue-router';
 import {
     DeparturesDto,
     MotisStopDto,
@@ -17,6 +18,8 @@ import {
 } from '../../../types/Api.gen';
 
 const { t } = useI18n();
+
+useTitle(t('new_post.title'));
 
 const user = useUserStore();
 
@@ -93,13 +96,12 @@ function updateLocation() {
         .catch(() => {});
 }
 
+const currentRoute = useRoute();
 const showStartButton = ref(false);
-showStartButton.value = route().current('posts.create.start');
+showStartButton.value = currentRoute.name === 'posts.create.start';
 </script>
 
 <template>
-    <Head :title="`${departures?.stop.name}: departures`" />
-
     <AuthenticatedLayout>
         <template #header>
             <h2 class="text-xl leading-tight font-semibold">

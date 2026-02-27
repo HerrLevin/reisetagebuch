@@ -1,20 +1,22 @@
 <script setup lang="ts">
 import { api } from '@/api';
+import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { getBaseText, prettyDates } from '@/Services/ApiPostTextService';
 import { getDepartureDelay } from '@/Services/TripTimeService';
 import { isApiTransportPost } from '@/types/PostTypes';
-import { Head, router } from '@inertiajs/vue3';
 import { CircleX, PlaneLanding, PlaneTakeoff } from 'lucide-vue-next';
 import { DateTime } from 'luxon';
-import { ref, watch } from 'vue';
+import { ref, watch, watchEffect } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 import {
     TransportPost,
     TransportTimesUpdateRequest,
 } from '../../../types/Api.gen';
 
 const { t } = useI18n();
+const vueRouter = useRouter();
 
 const props = defineProps({
     postId: {
@@ -30,6 +32,12 @@ const manualArrival = ref<DateTime | null>(null);
 const subtitle = ref('');
 const title = t('edit_transport_times.title');
 const fullTitle = ref('');
+
+watchEffect(() => {
+    if (fullTitle.value) {
+        useTitle(fullTitle.value);
+    }
+});
 
 function fetchPost() {
     api.posts
@@ -75,7 +83,7 @@ function submit() {
                 : null,
         } as TransportTimesUpdateRequest)
         .then(() => {
-            router.visit(`/posts/${post.value?.id}`);
+            vueRouter.push(`/posts/${post.value?.id}`);
         });
 }
 
@@ -195,8 +203,6 @@ watch(() => props.postId, fetchPost, { immediate: true });
 </script>
 
 <template>
-    <Head :title="fullTitle" />
-
     <AuthenticatedLayout>
         <template #header>
             <h2 class="text-xl leading-tight font-semibold">{{ title }}</h2>

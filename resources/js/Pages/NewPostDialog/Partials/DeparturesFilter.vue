@@ -7,11 +7,11 @@ import {
 } from '@/Services/DepartureTypeService';
 import { StopDto } from '@/types';
 import { TransportMode } from '@/types/enums';
-import { Link } from '@inertiajs/vue3';
 import { Clock, X } from 'lucide-vue-next';
 import { DateTime } from 'luxon';
 import { computed, PropType, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { RouterLink } from 'vue-router';
 
 const { t } = useI18n();
 
@@ -76,13 +76,25 @@ function selectTime(time: EventTarget | null) {
     }
 }
 
+function buildDeparturesUrl(
+    params: Record<string, string | undefined>,
+): string {
+    const query = new URLSearchParams();
+    for (const [key, value] of Object.entries(params)) {
+        if (value !== undefined && value !== null && value !== '') {
+            query.set(key, value);
+        }
+    }
+    return `/posts/transport/departures?${query.toString()}`;
+}
+
 function submitTypeahead(submittedIdentifier: string | null) {
     if (submittedIdentifier) {
-        window.location.href = route('posts.create.departures', {
-            latitude: props.latitude,
-            longitude: props.longitude,
+        window.location.href = buildDeparturesUrl({
+            latitude: String(props.latitude),
+            longitude: String(props.longitude),
             identifier: submittedIdentifier,
-            when: selectedTime.value?.toISO(),
+            when: selectedTime.value?.toISO() ?? undefined,
         });
     }
 }
@@ -144,40 +156,40 @@ const identifier = computed(() => {
                             {{ t('new_post.departures_filter.clear') }}
                         </button>
                     </div>
-                    <Link
+                    <RouterLink
                         class="btn btn-primary mt-2 w-full"
-                        :href="
-                            route('posts.create.departures', {
-                                latitude: latitude,
-                                longitude: longitude,
-                                when: selectedTime?.toISO(),
+                        :to="
+                            buildDeparturesUrl({
+                                latitude: String(latitude),
+                                longitude: String(longitude),
+                                when: selectedTime?.toISO() ?? undefined,
                                 identifier: identifier,
-                                filter: filter.join(','),
+                                filter: filter.join(',') || undefined,
                             })
                         "
                     >
                         {{ t('new_post.departures_filter.set_datetime') }}
-                    </Link>
+                    </RouterLink>
                 </div>
             </li>
             <li
                 class="flex gap-1 overflow-x-scroll p-4 pb-2 text-xs tracking-wide"
             >
-                <Link
+                <RouterLink
                     v-if="filter.length > 0"
                     class="btn btn-sm btn-neutral"
-                    :href="
-                        route('posts.create.departures', {
-                            latitude: latitude,
-                            longitude: longitude,
+                    :to="
+                        buildDeparturesUrl({
+                            latitude: String(latitude),
+                            longitude: String(longitude),
                             identifier: identifier,
                         })
                     "
                 >
                     <X class="h-4 w-4" />
-                </Link>
+                </RouterLink>
 
-                <Link
+                <RouterLink
                     v-for="(mode, name) in FilterGroups"
                     :key="name"
                     class="btn btn-sm text-white"
@@ -185,13 +197,13 @@ const identifier = computed(() => {
                         'opacity-60':
                             filter.length > 0 && mode[0] !== filter[0],
                     }"
-                    :href="
-                        route('posts.create.departures', {
-                            latitude: latitude,
-                            longitude: longitude,
+                    :to="
+                        buildDeparturesUrl({
+                            latitude: String(latitude),
+                            longitude: String(longitude),
                             filter: mode.join(','),
                             identifier: identifier,
-                            when: selectedTime?.toISO(),
+                            when: selectedTime?.toISO() ?? undefined,
                         })
                     "
                     :style="`background-color: ${getColor(mode[0])}`"
@@ -199,7 +211,7 @@ const identifier = computed(() => {
                     {{ getEmoji(mode[0]) }}
 
                     {{ t(`transport_group.${name}`) }}
-                </Link>
+                </RouterLink>
             </li>
         </ul>
     </div>

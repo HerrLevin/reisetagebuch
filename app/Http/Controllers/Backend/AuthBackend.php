@@ -12,13 +12,12 @@ use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Laravel\Passport\Guards\TokenGuard;
-use Laravel\Sanctum\Guard;
 
 class AuthBackend extends Controller
 {
-    public function getAuthenticatedUser(Guard|StatefulGuard|TokenGuard $guard)
+    public function getAuthenticatedUser(StatefulGuard|TokenGuard|User $guardOrUser)
     {
-        $user = $guard->user();
+        $user = $guardOrUser instanceof User ? $guardOrUser : $guardOrUser->user();
 
         return new AuthenticatedUserDto(
             id: $user->id,
@@ -36,7 +35,7 @@ class AuthBackend extends Controller
     private function getSettings(User $user): UserSettingsDto
     {
         return new UserSettingsDto(
-            motisRadius: $user->settings->motis_radius,
+            motisRadius: $user->settings?->motis_radius,
         );
     }
 }

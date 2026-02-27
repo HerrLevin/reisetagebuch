@@ -24,7 +24,7 @@ class TripController extends Controller
         summary: 'Store trip',
         security: [
             [
-                'oauth2_security_example' => ['write:projects', 'read:projects'],
+                'passport' => [],
             ],
         ],
         requestBody: new OA\RequestBody(

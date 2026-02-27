@@ -25,7 +25,7 @@ class InviteController extends Controller
         summary: 'List invites',
         security: [
             [
-                'oauth2_security_example' => ['write:projects', 'read:projects'],
+                'passport' => [],
             ],
         ],
         tags: ['Invites'],
@@ -51,7 +51,7 @@ class InviteController extends Controller
         summary: 'Create invite',
         security: [
             [
-                'oauth2_security_example' => ['write:projects', 'read:projects'],
+                'passport' => [],
             ],
         ],
         requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(ref: StoreInviteCodeRequest::class)),
@@ -80,7 +80,7 @@ class InviteController extends Controller
         summary: 'Delete invite',
         security: [
             [
-                'oauth2_security_example' => ['write:projects', 'read:projects'],
+                'passport' => [],
             ],
         ],
         tags: ['Invites'],
