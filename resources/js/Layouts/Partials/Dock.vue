@@ -2,7 +2,6 @@
 import NotificationBell from '@/Components/Notifications/NotificationBell.vue';
 import { LocationService } from '@/Services/LocationService';
 import { useUserStore } from '@/stores/user';
-import { Link } from '@inertiajs/vue3';
 import {
     Filter,
     House,
@@ -14,10 +13,12 @@ import {
 } from 'lucide-vue-next';
 import { onMounted, onUnmounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { RouterLink, useRoute } from 'vue-router';
 
 const { t } = useI18n();
 
 const user = useUserStore();
+const currentRoute = useRoute();
 
 const latitude = ref(0);
 const longitude = ref(0);
@@ -25,7 +26,7 @@ const intervalId = ref<number | null>(null);
 
 onMounted(() => {
     updateLocation();
-    // Update location every 5 minutes
+    // Update location every minute
     intervalId.value = setInterval(updateLocation, 60 * 1000);
 });
 
@@ -49,22 +50,22 @@ function updateLocation() {
 }
 
 const isNotificationsRoute = () => {
-    return route().current('notifications');
+    return currentRoute.name === 'notifications';
 };
 const isTripsCreateRoute = () => {
-    return route().current()?.startsWith('trips.create');
+    return (currentRoute.name as string)?.startsWith('trips.create');
 };
 const isDashboardRoute = () => {
-    return route().current('dashboard');
+    return currentRoute.name === 'dashboard';
 };
 const isVenueRoute = () => {
-    return route().current('posts.create.start');
+    return currentRoute.name === 'posts.create.start';
 };
 const isDeparturesRoute = () => {
-    return route().current('posts.create.departures');
+    return currentRoute.name === 'posts.create.departures';
 };
 const isFilterRoute = () => {
-    return route().current('posts.filter');
+    return currentRoute.name === 'posts.filter';
 };
 </script>
 
@@ -88,77 +89,60 @@ const isFilterRoute = () => {
             </div>
             <div>
                 {{ t('posts.departures') }}
-                <Link
-                    :href="
-                        route('posts.create.departures', {
-                            latitude: latitude,
-                            longitude: longitude,
-                        })
-                    "
+                <RouterLink
+                    :to="`/posts/transport/departures?latitude=${latitude}&longitude=${longitude}`"
                     class="btn btn-lg btn-circle"
-                    as="button"
                 >
                     <List />
-                </Link>
+                </RouterLink>
             </div>
             <div>
                 {{ t('posts.locations') }}
-                <Link
-                    :href="route('posts.create.start')"
-                    as="button"
-                    class="btn btn-lg btn-circle"
-                >
+                <RouterLink to="/posts/location" class="btn btn-lg btn-circle">
                     <MapPin />
-                </Link>
+                </RouterLink>
             </div>
             <div>
                 {{ t('posts.text') }}
-                <Link
-                    :href="route('posts.create.text')"
-                    class="btn btn-lg btn-circle"
-                >
+                <RouterLink to="/posts/new" class="btn btn-lg btn-circle">
                     <SquarePen />
-                </Link>
+                </RouterLink>
             </div>
         </div>
         <div class="dock">
-            <Link
-                :href="route('dashboard')"
+            <RouterLink
+                to="/home"
                 :class="{ 'dock-active': isDashboardRoute() }"
-                as="button"
             >
                 <House class="size-[1.2em]" />
                 <span class="dock-label">{{ t('app.home') }}</span>
-            </Link>
+            </RouterLink>
             <template v-if="user.user">
-                <Link
-                    :href="route('trips.create')"
-                    as="button"
+                <RouterLink
+                    to="/trips/create"
                     :class="{ 'dock-active': isTripsCreateRoute() }"
                 >
                     <Route class="size-[1.2em]" />
                     <span class="dock-label">{{ t('new_route.title') }}</span>
-                </Link>
-                <Link
-                    :href="route('notifications')"
-                    as="button"
+                </RouterLink>
+                <RouterLink
+                    to="/notifications"
                     :class="{ 'dock-active': isNotificationsRoute() }"
                 >
                     <NotificationBell />
                     <span class="dock-label">
                         {{ t('notifications.title') }}
                     </span>
-                </Link>
-                <Link
-                    :href="route('posts.filter')"
-                    as="button"
+                </RouterLink>
+                <RouterLink
+                    to="/posts/filter"
                     :class="{ 'dock-active': isFilterRoute() }"
                 >
                     <Filter class="size-[1.2em]" />
                     <span class="dock-label">
                         {{ t('posts.filter.title') }}
                     </span>
-                </Link>
+                </RouterLink>
             </template>
         </div>
     </div>

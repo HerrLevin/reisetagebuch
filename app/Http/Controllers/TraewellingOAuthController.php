@@ -36,11 +36,11 @@ class TraewellingOAuthController extends Controller
                 ]
             );
 
-            return redirect(route('account.edit'))->with('success', 'Traewelling account connected!');
+            return redirect('/account?traewelling=connected');
         } catch (\Exception $e) {
             Log::error('Traewelling OAuth error: '.$e->getMessage());
 
-            return redirect(route('account.edit'))->with('error', 'Failed to connect Traewelling account.');
+            return redirect('/account?traewelling=error');
         }
     }
 }

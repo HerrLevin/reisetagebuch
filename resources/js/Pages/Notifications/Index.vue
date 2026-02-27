@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PostLikedNotification from '@/Pages/Notifications/Partials/PostLikedNotification.vue';
 import { useNotificationStore } from '@/stores/notifications';
@@ -6,13 +7,14 @@ import {
     getTypedNotificationData,
     isPostLikedNotification,
 } from '@/types/notifications';
-import { Head } from '@inertiajs/vue3';
 import { storeToRefs } from 'pinia';
 import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { NotificationWrapper } from '../../../types/Api.gen';
 
 const { t } = useI18n();
+
+useTitle(t('notifications.title'));
 
 const loadingNotifications = ref(false);
 const store = useNotificationStore();
@@ -37,8 +39,6 @@ onMounted(() => {
 </script>
 
 <template>
-    <Head :title="t('pages.timeline.title')" />
-
     <AuthenticatedLayout>
         <div class="card bg-base-100 min-w-full p-0 shadow-md">
             <div class="card-body">

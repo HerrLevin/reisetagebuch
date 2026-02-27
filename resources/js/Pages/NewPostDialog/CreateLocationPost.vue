@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import { api } from '@/api';
+import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PostCreationForm from '@/Pages/NewPostDialog/Partials/PostCreationForm.vue';
 import { TravelReason, Visibility } from '@/types/enums';
-import { Head, router } from '@inertiajs/vue3';
 import { reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 
 const { t } = useI18n();
+const vueRouter = useRouter();
+
+useTitle(t('new_post.title'));
 
 // get url params
 const urlParams = new URLSearchParams(window.location.search);
@@ -36,7 +40,7 @@ function submitForm() {
         .storeLocationPost(form)
         .then((response) => {
             const postId = response.data.id;
-            router.visit(`/posts/${postId}`);
+            vueRouter.push(`/posts/${postId}`);
         })
         .finally(() => {
             loading.value = false;
@@ -45,8 +49,6 @@ function submitForm() {
 </script>
 
 <template>
-    <Head :title="t('new_post.title')" />
-
     <AuthenticatedLayout>
         <template #header>
             <h2 class="text-xl leading-tight font-semibold">

@@ -2,40 +2,61 @@
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
+import { useTitle } from '@/composables/useTitle';
 import AuthLayout from '@/Layouts/AuthLayout.vue';
 import { useAppConfigurationStore } from '@/stores/appConfiguration';
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import { useAuthStore } from '@/stores/auth';
+import { useUserStore } from '@/stores/user';
+import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { RouterLink, useRouter } from 'vue-router';
 
 const { t } = useI18n();
+useTitle(t('auth.login.title'));
 
-defineProps<{
-    canResetPassword?: boolean;
-    status?: string;
-}>();
+const router = useRouter();
+const authStore = useAuthStore();
+const userStore = useUserStore();
 
-const form = useForm({
+const form = ref({
     email: '',
     password: '',
     remember: false,
 });
 
+const errors = ref<Record<string, string>>({});
+const processing = ref(false);
+const status = ref('');
+
 const config = useAppConfigurationStore();
 config.fetchConfig();
 
-const submit = () => {
-    form.post(route('login'), {
-        onFinish: () => {
-            form.reset('password');
-        },
-    });
+const submit = async () => {
+    processing.value = true;
+    errors.value = {};
+    try {
+        await authStore.login(form.value.email, form.value.password);
+        await userStore.fetchUser(true);
+        router.push({ name: 'dashboard' });
+    } catch (error) {
+        if (error.response?.status === 422) {
+            const responseErrors = error.response.data.errors || {};
+            for (const key in responseErrors) {
+                errors.value[key] = responseErrors[key][0];
+            }
+        } else {
+            errors.value.email =
+                error.response?.data?.message || t('auth.login.failed');
+        }
+        form.value.password = '';
+    } finally {
+        processing.value = false;
+    }
 };
 </script>
 
 <template>
     <AuthLayout>
-        <Head :title="t('auth.login.title')" />
-
         <h2 class="mb-2 text-center text-2xl font-semibold">
             {{ t('auth.login.title') }}
         </h2>
@@ -52,13 +73,13 @@ const submit = () => {
                     v-model="form.email"
                     type="email"
                     class="mt-1 block w-full"
-                    :error="form.errors.email"
+                    :error="errors.email"
                     required
                     autofocus
                     autocomplete="username"
                 />
 
-                <InputError class="mt-2" :message="form.errors.email" />
+                <InputError class="mt-2" :message="errors.email" />
             </div>
 
             <div class="form-control mt-4 w-full">
@@ -69,12 +90,12 @@ const submit = () => {
                     v-model="form.password"
                     type="password"
                     class="mt-1 block w-full"
-                    :error="form.errors.password"
+                    :error="errors.password"
                     required
                     autocomplete="current-password"
                 />
 
-                <InputError class="mt-2" :message="form.errors.password" />
+                <InputError class="mt-2" :message="errors.password" />
             </div>
 
             <div class="mt-4 flex items-center justify-between">
@@ -89,28 +110,24 @@ const submit = () => {
                     </label>
                 </fieldset>
 
-                <Link
-                    v-if="canResetPassword"
-                    :href="route('password.request')"
-                    class="link"
-                >
+                <RouterLink to="/forgot-password" class="link">
                     {{ t('auth.login.forgot_password') }}
-                </Link>
+                </RouterLink>
             </div>
 
             <button
                 class="btn btn-primary mt-12 w-full"
-                :class="{ 'opacity-25': form.processing }"
-                :disabled="form.processing"
+                :class="{ 'opacity-25': processing }"
+                :disabled="processing"
             >
                 {{ t('auth.login.title') }}
             </button>
         </form>
         <div v-if="config.canRegister()" class="mt-4 text-center">
             {{ t('auth.login.no_account') }}
-            <Link :href="route('register')" class="link">
+            <RouterLink to="/register" class="link">
                 {{ t('auth.register.title') }}
-            </Link>
+            </RouterLink>
         </div>
         <div v-else class="mt-4 text-center">
             {{ t('auth.login.no_register') }}

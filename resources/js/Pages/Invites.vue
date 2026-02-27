@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { api } from '@/api';
+import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import type { Invite } from '@/types';
-import { Head } from '@inertiajs/vue3';
 import { DateTime } from 'luxon';
 import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
+
+useTitle(t('invites.title'));
 
 const invites = ref<Invite[]>([]);
 const loading = ref(false);
@@ -52,7 +54,7 @@ function humanTimestamp(timestamp: string | null): string {
 }
 
 function copy(id: string): void {
-    const registerRoute = route('register');
+    const registerRoute = `${window.location.origin}/register`;
     navigator.clipboard
         .writeText(registerRoute + '?invite=' + id)
         .then(() => {
@@ -68,8 +70,6 @@ onMounted(() => {
 });
 </script>
 <template>
-    <Head :title="t('invites.title')" />
-
     <AuthenticatedLayout>
         <template #header>
             <h2 class="text-xl leading-tight font-semibold">

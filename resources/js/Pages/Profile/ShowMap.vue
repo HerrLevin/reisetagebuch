@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { api } from '@/api';
 import LocationsMap from '@/Components/Maps/LocationsMap.vue';
+import { useTitle } from '@/composables/useTitle';
 import ProfileWrapper from '@/Pages/Profile/ProfileWrapper.vue';
 import type { UserDto } from '@/types';
-import { Head } from '@inertiajs/vue3';
-import { PropType, ref } from 'vue';
+import { PropType, ref, watchEffect } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -17,6 +17,12 @@ const props = defineProps({
 });
 const user = ref<UserDto | null>(null);
 const loading = ref(true);
+
+watchEffect(() => {
+    if (user.value) {
+        useTitle(t('profile.profile_of', { name: user.value.name }));
+    }
+});
 
 const loadProfileData = async () => {
     loading.value = true;
@@ -36,8 +42,6 @@ loadProfileData();
 </script>
 
 <template>
-    <Head v-if="user" :title="t('profile.profile_of', { name: user.name })" />
-
     <ProfileWrapper :user="user">
         <div class="card bg-base-100 min-w-full shadow-md">
             <LocationsMap v-if="user" :user />

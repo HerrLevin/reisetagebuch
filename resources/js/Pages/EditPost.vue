@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { api } from '@/api';
+import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PostCreationForm from '@/Pages/NewPostDialog/Partials/PostCreationForm.vue';
 import { getBaseText, prettyDates } from '@/Services/ApiPostTextService';
 import { isApiLocationPost, isApiTransportPost } from '@/types/PostTypes';
-import { Head, router } from '@inertiajs/vue3';
-import { reactive, ref } from 'vue';
+import { reactive, ref, watchEffect } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 import {
     BasePost,
     LocationPost,
@@ -17,6 +18,7 @@ import {
 } from '../../types/Api.gen';
 
 const { t } = useI18n();
+const vueRouter = useRouter();
 
 const props = defineProps({
     postId: {
@@ -74,7 +76,7 @@ function submitForm() {
         .updatePost(props.postId, form)
         .then((response) => {
             const postId = response.data.id;
-            router.visit(`/posts/${postId}`);
+            vueRouter.push(`/posts/${postId}`);
         })
         .finally(() => {
             loading.value = false;
@@ -120,12 +122,16 @@ function prefillForm() {
     fullTitle.value = `${fullTitle.value} · ${subtitle.value}`;
 }
 
+watchEffect(() => {
+    if (fullTitle.value) {
+        useTitle(fullTitle.value);
+    }
+});
+
 fetchPost();
 </script>
 
 <template>
-    <Head :title="fullTitle" />
-
     <AuthenticatedLayout>
         <template #header>
             <h2 class="text-xl leading-tight font-semibold">{{ fullTitle }}</h2>

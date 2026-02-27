@@ -1,6 +1,5 @@
 import { TransportMode } from '@/types/enums';
 import { GeometryCollection } from 'geojson';
-import { Config } from 'ziggy-js';
 
 export interface User {
     id: string;
@@ -23,18 +22,6 @@ export interface UserProfile {
 export interface Settings {
     motis_radius: number | null;
 }
-
-export type PageProps<
-    T extends Record<string, unknown> = Record<string, unknown>,
-> = T & {
-    auth: {
-        user: User;
-        token: string;
-    };
-    ziggy: Config & { location: string };
-    canRegister: boolean;
-    canInvite: boolean;
-};
 
 export type TripDto = {
     duration: number;

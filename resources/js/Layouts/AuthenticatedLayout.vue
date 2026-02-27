@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import FlashMessages from '@/Components/FlashMessages.vue';
 import Dock from '@/Layouts/Partials/Dock.vue';
 import LocationHistoryChecker from '@/Layouts/Partials/LocationHistoryChecker.vue';
 import NavBar from '@/Layouts/Partials/NavBar.vue';
@@ -19,7 +18,6 @@ import NavBar from '@/Layouts/Partials/NavBar.vue';
             <div class="mt-4 md:mt-12">
                 <div class="mx-auto max-w-4xl">
                     <main class="mb-12 w-full pb-12 md:mb-0 md:pb-0">
-                        <FlashMessages />
                         <slot />
                     </main>
                 </div>

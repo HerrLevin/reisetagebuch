@@ -5,13 +5,14 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import StopoversListEntry from '@/Pages/NewPostDialog/Partials/StopoversListEntry.vue';
 import { getEmoji } from '@/Services/DepartureTypeService';
 import { StopPlace, TripDto } from '@/types';
-import { Head, router } from '@inertiajs/vue3';
 import { DateTime } from 'luxon';
 import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 import { TransportPostExitUpdateRequest } from '../../../types/Api.gen';
 
 const { t } = useI18n();
+const vueRouter = useRouter();
 
 const urlParams = new URLSearchParams(window.location.search);
 const tripId = ref<string>(urlParams.get('tripId') || '');
@@ -72,7 +73,7 @@ function submit(stopover: StopPlace) {
                 stopId: stopover.tripStopId,
             } as TransportPostExitUpdateRequest)
             .then(() => {
-                router.visit(`/posts/${postId.value}`);
+                vueRouter.push(`/posts/${postId.value}`);
             });
         return;
     }
@@ -93,7 +94,8 @@ function redirectCreatePost(stopover: StopPlace) {
             trip.value?.legs[0].displayName ||
             trip.value?.legs[0].routeShortName,
     };
-    window.location.href = route('posts.create.transport-post', params);
+    const searchParams = new URLSearchParams(params as Record<string, string>);
+    window.location.href = `/posts/transport/create?${searchParams.toString()}`;
 }
 
 function getTitle() {
@@ -111,8 +113,6 @@ function getTitle() {
 </script>
 
 <template>
-    <Head :title="getTitle()" />
-
     <AuthenticatedLayout>
         <template #header>
             <h2 class="text-xl leading-tight font-semibold">

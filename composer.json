@@ -2,10 +2,10 @@
     "$schema": "https://getcomposer.org/schema.json",
     "name": "herrlevin/reisetagebuch",
     "type": "project",
-    "description": "A self-hosted travel diary application built with Laravel and Inertia.js.",
+    "description": "A self-hosted travel diary application built with Laravel and Vue.js.",
     "keywords": [
         "laravel",
-        "inertiajs",
+        "vue",
         "travel",
         "diary",
         "self-hosted"
@@ -14,14 +14,11 @@
         "php": "^8.4",
         "clickbar/laravel-magellan": "^2.0",
         "darkaonline/l5-swagger": "^10.1",
-        "inertiajs/inertia-laravel": "^2.0",
         "laravel/framework": "^12.0",
         "laravel/passport": "^13.4",
-        "laravel/sanctum": "^4.0",
         "laravel/socialite": "^5.23",
         "laravel/tinker": "^2.10.1",
         "predis/predis": "^3.1",
-        "tightenco/ziggy": "^2.0",
         "ext-pdo": "*"
     },
     "require-dev": {

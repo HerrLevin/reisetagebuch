@@ -2,7 +2,6 @@
 import NotificationBell from '@/Components/Notifications/NotificationBell.vue';
 import { LocationService } from '@/Services/LocationService';
 import { useUserStore } from '@/stores/user';
-import { Link } from '@inertiajs/vue3';
 import {
     CirclePlus,
     Filter,
@@ -14,6 +13,7 @@ import {
 } from 'lucide-vue-next';
 import { onMounted, onUnmounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { RouterLink, useRoute } from 'vue-router';
 
 const { t } = useI18n();
 
@@ -21,6 +21,7 @@ const latitude = ref(0);
 const longitude = ref(0);
 
 const user = useUserStore();
+const currentRoute = useRoute();
 const intervalId = ref<number | null>(null);
 
 onMounted(() => {
@@ -43,33 +44,33 @@ function updateLocation() {
         .catch(() => {});
 }
 const isNotificationRoute = () => {
-    return route().current('notifications');
+    return currentRoute.name === 'notifications';
 };
 const isPostsCreateRoute = () => {
-    return route().current()?.startsWith('posts.create');
+    return (currentRoute.name as string)?.startsWith('posts.create');
 };
 const isDashboardRoute = () => {
-    return route().current('dashboard');
+    return currentRoute.name === 'dashboard';
 };
 const isTripRoute = () => {
-    return route().current('trips.create');
+    return currentRoute.name === 'trips.create';
 };
 const isFilterRoute = () => {
-    return route().current('posts.filter');
+    return currentRoute.name === 'posts.filter';
 };
 </script>
 
 <template>
     <ul class="menu menu-horizontal px-1">
         <li>
-            <Link
-                :href="route('dashboard')"
+            <RouterLink
+                to="/home"
                 :class="{ 'btn-active': isDashboardRoute() }"
                 class="btn btn-ghost"
             >
                 <House class="size-5" />
                 {{ t('pages.timeline.title') }}
-            </Link>
+            </RouterLink>
         </li>
         <template v-if="user.user">
             <li class="dropdown">
@@ -87,68 +88,58 @@ const isFilterRoute = () => {
                     class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
                 >
                     <li>
-                        <Link :href="route('posts.create.start')">
+                        <RouterLink to="/posts/location">
                             <MapPin class="size-5" />
                             {{ t('posts.locations') }}
-                        </Link>
+                        </RouterLink>
                     </li>
                     <li>
-                        <Link
-                            :href="
-                                route('posts.create.departures', {
-                                    latitude: latitude,
-                                    longitude: longitude,
-                                })
-                            "
+                        <RouterLink
+                            :to="`/posts/transport/departures?latitude=${latitude}&longitude=${longitude}`"
                         >
                             <List class="size-5" />
                             {{ t('posts.departures') }}
-                        </Link>
+                        </RouterLink>
                     </li>
                     <li>
-                        <Link
-                            :href="
-                                route('posts.create.text', {
-                                    latitude: latitude,
-                                    longitude: longitude,
-                                })
-                            "
+                        <RouterLink
+                            :to="`/posts/new?latitude=${latitude}&longitude=${longitude}`"
                         >
                             <SquarePen class="size-5" />
                             {{ t('posts.text') }}
-                        </Link>
+                        </RouterLink>
                     </li>
                 </ul>
             </li>
             <li>
-                <Link
-                    :href="route('trips.create')"
+                <RouterLink
+                    to="/trips/create"
                     :class="{ 'btn-active': isTripRoute() }"
                     class="btn btn-ghost"
                 >
                     <Route class="size-5" />
                     {{ t('new_route.title') }}
-                </Link>
+                </RouterLink>
             </li>
             <li>
-                <Link
-                    :href="route('notifications')"
+                <RouterLink
+                    to="/notifications"
                     :class="{ 'btn-active': isNotificationRoute() }"
                     class="btn btn-ghost"
                 >
                     <NotificationBell class="size-5" />
                     {{ t('notifications.title') }}
-                </Link>
+                </RouterLink>
             </li>
             <li>
-                <Link
-                    :href="route('posts.filter')"
+                <RouterLink
+                    to="/posts/filter"
                     :class="{ 'btn-active': isFilterRoute() }"
                     class="btn btn-ghost"
                 >
                     <Filter class="size-5" />
                     {{ t('posts.filter.title') }}
-                </Link>
+                </RouterLink>
             </li>
         </template>
     </ul>

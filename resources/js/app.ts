@@ -1,42 +1,37 @@
 import '../css/app.css';
 import './bootstrap';
 
+import App from '@/App.vue';
 import i18n from '@/i18n';
-import { useUserStore } from '@/stores/user';
-import { createInertiaApp } from '@inertiajs/vue3';
-import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import router from '@/router';
+import { useAuthStore } from '@/stores/auth';
 import { createPinia } from 'pinia';
 import { createPersistedState } from 'pinia-plugin-persistedstate';
-import { createApp, DefineComponent, h } from 'vue';
-import { ZiggyVue } from '../../vendor/tightenco/ziggy';
+import { createApp } from 'vue';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Reisetagebuch';
+const pinia = createPinia();
+pinia.use(createPersistedState());
 
-createInertiaApp({
-    title: (title) => `${title} - ${appName}`,
-    resolve: (name) =>
-        resolvePageComponent(
-            `./Pages/${name}.vue`,
-            import.meta.glob<DefineComponent>('./Pages/**/*.vue'),
-        ),
-    setup({ el, App, props, plugin }) {
-        const pinia = createPinia();
+const app = createApp(App);
 
-        pinia.use(createPersistedState());
+app.use(pinia);
+app.use(i18n);
 
-        const app = createApp({ render: () => h(App, props) })
-            .use(plugin)
-            .use(pinia)
-            .use(i18n)
-            .use(ZiggyVue);
+// Initialize auth (restore token from persisted state to axios headers)
+const authStore = useAuthStore();
+authStore.initializeAuth();
 
-        const userStore = useUserStore();
-
-        app.mount(el);
-
-        userStore.fetchUser();
-    },
-    progress: {
-        color: '#4B5563',
-    },
+// Set up navigation guard after pinia is available
+router.beforeEach((to, _from, next) => {
+    if (to.meta.auth && !authStore.isAuthenticated()) {
+        next({ name: 'login' });
+    } else if (to.meta.guest && authStore.isAuthenticated()) {
+        next({ name: 'dashboard' });
+    } else {
+        next();
+    }
 });
+
+app.use(router);
+
+app.mount('#app');

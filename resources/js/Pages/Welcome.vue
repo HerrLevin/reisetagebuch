@@ -1,24 +1,35 @@
 <script setup lang="ts">
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
+import { useTitle } from '@/composables/useTitle';
 import { useAppConfigurationStore } from '@/stores/appConfiguration';
 import { useUserStore } from '@/stores/user';
-import { Head, Link } from '@inertiajs/vue3';
 import { CircleAlert } from 'lucide-vue-next';
+import { ref } from 'vue';
+import { RouterLink } from 'vue-router';
 
-defineProps<{
-    reisetagebuchVersion: string;
-    laravelVersion: string;
-    phpVersion: string;
-}>();
+useTitle('Welcome');
 
 const config = useAppConfigurationStore();
 config.fetchConfig();
 
 const user = useUserStore();
+
+const reisetagebuchVersion = ref('');
+const laravelVersion = ref('');
+const phpVersion = ref('');
+
+// Fetch version info from app configuration
+fetch('/api/app/configuration')
+    .then((r) => r.json())
+    .then((data) => {
+        reisetagebuchVersion.value = data.reisetagebuchVersion || '';
+        laravelVersion.value = data.laravelVersion || '';
+        phpVersion.value = data.phpVersion || '';
+    })
+    .catch(() => {});
 </script>
 
 <template>
-    <Head title="Welcome" />
     <div class="bg-gray-50 text-black/50 dark:bg-black dark:text-white/50">
         <div
             class="relative flex min-h-screen flex-col items-center justify-center selection:bg-[#FF2D20] selection:text-white"
@@ -31,29 +42,29 @@ const user = useUserStore();
                         <ApplicationLogo class="h-12 w-auto lg:h-16" />
                     </div>
                     <nav class="-mx-3 flex flex-1 justify-end">
-                        <Link
+                        <RouterLink
                             v-if="user.user"
-                            :href="route('dashboard')"
+                            to="/home"
                             class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
                         >
                             {{ $t('pages.timeline.title') }}
-                        </Link>
+                        </RouterLink>
 
                         <template v-else>
-                            <Link
-                                :href="route('login')"
+                            <RouterLink
+                                to="/login"
                                 class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
                             >
                                 {{ $t('app.login') }}
-                            </Link>
+                            </RouterLink>
 
-                            <Link
+                            <RouterLink
                                 v-if="config.canRegister()"
-                                :href="route('register')"
+                                to="/register"
                                 class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
                             >
                                 {{ $t('app.register') }}
-                            </Link>
+                            </RouterLink>
                         </template>
                     </nav>
                 </header>

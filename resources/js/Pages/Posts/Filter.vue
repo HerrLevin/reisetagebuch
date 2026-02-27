@@ -3,13 +3,14 @@ import { api } from '@/api';
 import Loading from '@/Components/Loading.vue';
 import MassEdit from '@/Components/Post/MassEdit.vue';
 import Post from '@/Components/Post/Post.vue';
+import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { getTravelReasonLabel } from '@/Services/TravelReasonMapping';
 import { getVisibilityLabel } from '@/Services/VisibilityMapping';
 import { AllPosts } from '@/types/PostTypes';
-import { Head, router } from '@inertiajs/vue3';
 import { onMounted, PropType, reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 import {
     BasePost,
     LocationPost,
@@ -19,6 +20,9 @@ import {
 } from '../../../types/Api.gen';
 
 const { t } = useI18n();
+const vueRouter = useRouter();
+
+useTitle(t('posts.filter.title'));
 
 const props = defineProps({
     filters: {
@@ -188,7 +192,7 @@ function goToPost(postId: string) {
             togglePostSelection(post);
         }
     } else {
-        router.visit(route('posts.show', postId));
+        vueRouter.push(`/posts/${postId}`);
     }
 }
 
@@ -233,8 +237,6 @@ function deletePost(postId: string): void {
 </script>
 
 <template>
-    <Head :title="t('posts.filter.title')" />
-
     <AuthenticatedLayout>
         <template #header>
             <h2 class="text-xl leading-tight font-semibold">

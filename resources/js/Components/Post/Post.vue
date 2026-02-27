@@ -9,10 +9,10 @@ import {
 } from '@/Services/ApiTravelReasonMapping';
 import { getVisibilityIcon } from '@/Services/VisibilityMapping';
 import { isApiLocationPost, isApiTransportPost } from '@/types/PostTypes';
-import { Link } from '@inertiajs/vue3';
 import { DateTime } from 'luxon';
 import { computed, PropType, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { RouterLink } from 'vue-router';
 import { BasePost, LocationPost, TransportPost } from '../../../types/Api.gen';
 
 const { t } = useI18n();
@@ -72,12 +72,12 @@ const relativeCreatedAt = computed(() => {
     </div>
     <div class="list-col-grow">
         <div class="mb-1 text-xs">
-            <Link
-                :href="route('profile.show', localPost.user.username)"
+            <RouterLink
+                :to="`/profile/${localPost.user.username}`"
                 class="opacity-60"
             >
                 {{ localPost.user.name }}
-            </Link>
+            </RouterLink>
             <div
                 v-if="
                     (isApiLocationPost(localPost) ||

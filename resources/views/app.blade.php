@@ -18,14 +18,11 @@
     <link rel="manifest" href="{{ asset('/build/manifest.webmanifest') }}" />
     <meta name="name" content="{{ config('app.name', 'Reisetagebuch') }}">
 
-    <title inertia>{{ config('app.name', 'Reisetagebuch') }}</title>
+    <title>{{ config('app.name', 'Reisetagebuch') }}</title>
 
-    <!-- Scripts -->
-    @routes
-    @vite(['resources/js/app.ts', "resources/js/Pages/{$page['component']}.vue"])
-    @inertiaHead
+    @vite(['resources/js/app.ts'])
 </head>
 <body class="font-sans antialiased bg-base-200 min-h-screen">
-@inertia
+    <div id="app"></div>
 </body>
 </html>

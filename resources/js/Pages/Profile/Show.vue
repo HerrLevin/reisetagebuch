@@ -2,11 +2,12 @@
 import { api } from '@/api';
 import Loading from '@/Components/Loading.vue';
 import Post from '@/Components/Post/Post.vue';
+import { useTitle } from '@/composables/useTitle';
 import ProfileWrapper from '@/Pages/Profile/ProfileWrapper.vue';
 import type { UserDto } from '@/types';
-import { Head, Link } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { ref, watchEffect } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { RouterLink } from 'vue-router';
 import { BasePost, LocationPost, TransportPost } from '../../../types/Api.gen';
 
 const { t } = useI18n();
@@ -18,6 +19,12 @@ const nextCursor = ref<string | null>(null);
 const user = ref<UserDto | null>(null);
 const loading = ref(true);
 const userLoading = ref(true);
+
+watchEffect(() => {
+    if (user.value) {
+        useTitle(t('profile.profile_of', { name: user.value.name }));
+    }
+});
 
 const loadProfileData = async () => {
     loading.value = true;
@@ -68,22 +75,19 @@ loadProfileData();
 </script>
 
 <template>
-    <Head v-if="user" :title="t('profile.profile_of', { name: user.name })" />
-
     <ProfileWrapper :user="user">
         <div class="card bg-base-100 min-w-full shadow-md">
             <ul v-if="posts.length > 0" class="list">
                 <li v-for="post in posts" :key="post.id">
-                    <Link
+                    <RouterLink
                         class="list-row hover-list-entry cursor-pointer"
-                        as="div"
-                        :href="route('posts.show', post.id)"
+                        :to="`/posts/${post.id}`"
                     >
                         <Post
                             :post="post"
                             @delete:post="deletePost(post.id)"
                         ></Post>
-                    </Link>
+                    </RouterLink>
                 </li>
                 <li v-show="!loading && nextCursor" class="p-4 text-center">
                     <button class="btn btn-ghost w-full" @click="loadPosts()">

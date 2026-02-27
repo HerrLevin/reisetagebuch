@@ -13,6 +13,9 @@ class AppConfigurationBackend extends Controller
     {
         return new AppConfigurationDto(
             appName: config('app.name'),
+            reisetagebuchVersion: config('app.version'),
+            laravelVersion: app()->version(),
+            phpVersion: PHP_VERSION,
             featureFlags: $this->getFeatureFlags(),
         );
     }
