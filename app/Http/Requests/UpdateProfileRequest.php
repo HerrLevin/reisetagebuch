@@ -32,32 +32,6 @@ use OpenApi\Attributes as OA;
             maxLength: 255,
             nullable: true
         ),
-        new OA\Property(
-            property: 'avatar',
-            description: 'Avatar image file upload',
-            type: 'string',
-            format: 'binary',
-            nullable: true
-        ),
-        new OA\Property(
-            property: 'header',
-            description: 'Header image file upload',
-            type: 'string',
-            format: 'binary',
-            nullable: true
-        ),
-        new OA\Property(
-            property: 'deleteAvatar',
-            description: 'Flag to delete existing avatar',
-            type: 'boolean',
-            nullable: true
-        ),
-        new OA\Property(
-            property: 'deleteHeader',
-            description: 'Flag to delete existing header',
-            type: 'boolean',
-            nullable: true
-        ),
     ],
     type: 'object'
 )]
@@ -77,9 +51,7 @@ class UpdateProfileRequest extends FormRequest
     {
         return [
             'avatar' => ['nullable', File::image()->max('2mb')],
-            'deleteAvatar' => 'nullable|boolean',
-            'header' => ['nullable', File::image()->max('2mb')],
-            'deleteHeader' => 'nullable|boolean',
+            'header' => ['nullable', 'file', 'max:2048', 'mimes:jpeg,png,jpg,gif,svg'],
             'name' => 'required|string|max:255',
             'bio' => 'nullable|string|max:500',
             'website' => 'nullable|url|max:255',

@@ -2028,7 +2028,7 @@
             }
         },
         "/account/profile": {
-            "post": {
+            "patch": {
                 "tags": [
                     "Profile"
                 ],
@@ -2038,7 +2038,7 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "multipart/form-data": {
+                        "application/json": {
                             "schema": {
                                 "$ref": "#/components/schemas/UpdateProfileRequest"
                             }
@@ -2055,6 +2055,96 @@
                                 }
                             }
                         }
+                    }
+                }
+            }
+        },
+        "/account/profile/avatar": {
+            "post": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Update avatar",
+                "description": "Update avatar for authenticated user",
+                "operationId": "updateAvatar",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ImageUploadRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserDto"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Delete avatar",
+                "description": "Delete avatar for authenticated user",
+                "operationId": "deleteAvatar",
+                "responses": {
+                    "204": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
+        "/account/profile/header": {
+            "post": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Update header",
+                "description": "Update header for authenticated user",
+                "operationId": "updateHeader",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ImageUploadRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserDto"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Delete header",
+                "description": "Delete header for authenticated user",
+                "operationId": "deleteHeader",
+                "responses": {
+                    "204": {
+                        "description": "successful operation"
                     }
                 }
             }
@@ -2812,6 +2902,21 @@
                     "only-authenticated"
                 ]
             },
+            "ImageUploadRequest": {
+                "description": "Request to upload an image",
+                "required": [
+                    "name"
+                ],
+                "properties": {
+                    "image": {
+                        "description": "Image file to upload (max 2MB)",
+                        "type": "string",
+                        "format": "binary",
+                        "nullable": false
+                    }
+                },
+                "type": "object"
+            },
             "ProfileUpdateRequest": {
                 "title": "Profile Update Request",
                 "description": "Request schema for updating user profile information",
@@ -3046,28 +3151,6 @@
                         "type": "string",
                         "format": "uri",
                         "maxLength": 255,
-                        "nullable": true
-                    },
-                    "avatar": {
-                        "description": "Avatar image file upload",
-                        "type": "string",
-                        "format": "binary",
-                        "nullable": true
-                    },
-                    "header": {
-                        "description": "Header image file upload",
-                        "type": "string",
-                        "format": "binary",
-                        "nullable": true
-                    },
-                    "deleteAvatar": {
-                        "description": "Flag to delete existing avatar",
-                        "type": "boolean",
-                        "nullable": true
-                    },
-                    "deleteHeader": {
-                        "description": "Flag to delete existing header",
-                        "type": "boolean",
                         "nullable": true
                     }
                 },

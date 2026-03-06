@@ -75,7 +75,7 @@ loadProfileData();
 </script>
 
 <template>
-    <ProfileWrapper :user="user">
+    <ProfileWrapper :user="user" @profile-updated="loadProfileData()">
         <div class="card bg-base-100 min-w-full shadow-md">
             <ul v-if="posts.length > 0" class="list">
                 <li v-for="post in posts" :key="post.id">

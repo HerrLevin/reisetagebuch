@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Requests\ImageUploadRequest;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Resources\UserDto;
 use App\Models\Location;
+use App\Models\User;
 use Clickbar\Magellan\Data\Geometries\GeometryCollection;
 use Clickbar\Magellan\IO\Generator\Geojson\GeojsonGenerator;
 use OpenApi\Attributes as OA;
@@ -55,7 +57,7 @@ class UserController extends Controller
         return $this->userController->show($username);
     }
 
-    #[OA\Post(
+    #[OA\Patch(
         path: '/account/profile',
         operationId: 'updateProfile',
         description: 'Update profile for authenticated user',
@@ -63,7 +65,7 @@ class UserController extends Controller
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\MediaType(
-                mediaType: 'multipart/form-data',
+                mediaType: 'application/json',
                 schema: new OA\Schema(ref: UpdateProfileRequest::class)
             )
         ),
@@ -72,9 +74,89 @@ class UserController extends Controller
     )]
     public function update(UpdateProfileRequest $request): UserDto
     {
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = $this->auth->user();
 
         return $this->userController->update($request, $user);
+    }
+
+    #[OA\Post(
+        path: '/account/profile/avatar',
+        operationId: 'updateAvatar',
+        description: 'Update avatar for authenticated user',
+        summary: 'Update avatar',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\MediaType(
+                mediaType: 'multipart/form-data',
+                schema: new OA\Schema(ref: ImageUploadRequest::class)
+            )
+        ),
+        tags: ['Profile'],
+        responses: [new OA\Response(response: 200, description: Controller::OA_DESC_SUCCESS, content: new OA\JsonContent(ref: UserDto::class))],
+    )]
+    public function updateAvatar(ImageUploadRequest $request): UserDto
+    {
+        /** @var User $user */
+        $user = $this->auth->user();
+
+        return $this->userController->updateAvatar($request, $user);
+    }
+
+    #[OA\Delete(
+        path: '/account/profile/avatar',
+        operationId: 'deleteAvatar',
+        description: 'Delete avatar for authenticated user',
+        summary: 'Delete avatar',
+        tags: ['Profile'],
+        responses: [new OA\Response(response: 204, description: Controller::OA_DESC_SUCCESS)],
+    )]
+    public function deleteAvatar(): void
+    {
+        /** @var User $user */
+        $user = $this->auth->user();
+
+        $this->userController->deleteAvatar($user);
+    }
+
+    #[OA\Post(
+        path: '/account/profile/header',
+        operationId: 'updateHeader',
+        description: 'Update header for authenticated user',
+        summary: 'Update header',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\MediaType(
+                mediaType: 'multipart/form-data',
+                schema: new OA\Schema(ref: ImageUploadRequest::class)
+            )
+        ),
+        tags: ['Profile'],
+        responses: [new OA\Response(response: 200, description: Controller::OA_DESC_SUCCESS, content: new OA\JsonContent(ref: UserDto::class))],
+    )]
+    public function updateHeader(ImageUploadRequest $request): UserDto
+    {
+        /** @var User $user */
+        $user = $this->auth->user();
+
+        return $this->userController->updateHeader($request, $user);
+    }
+
+    #[OA\Delete(
+        path: '/account/profile/header',
+        operationId: 'deleteHeader',
+        description: 'Delete header for authenticated user',
+        summary: 'Delete header',
+        tags: ['Profile'],
+        responses: [
+            new OA\Response(response: 204, description: Controller::OA_DESC_SUCCESS),
+        ]
+    )]
+    public function deleteHeader(): void
+    {
+        /** @var User $user */
+        $user = $this->auth->user();
+
+        $this->userController->deleteHeader($user);
     }
 }

@@ -45,12 +45,17 @@ class UserRepositoryTest extends TestCase
         ]);
 
         $repository = new UserRepository;
-        $updatedUser = $repository->updateUser($user, 'New Name', 'New Bio', 'New Website', 'new_avatar.png', 'new_header.png');
+        $updatedUser = $repository->updateUser($user, 'New Name', 'New Bio', 'New Website');
 
         $this->assertEquals('New Name', $updatedUser->name);
         $this->assertEquals('New Bio', $updatedUser->bio);
         $this->assertEquals('New Website', $updatedUser->website);
+
+        $updatedUser = $repository->updateAvatar($user, 'new_avatar.png');
+
         $this->assertEquals(url('/files/new_avatar.png'), $updatedUser->avatar);
+
+        $updatedUser = $repository->updateHeader($user, 'new_header.png');
         $this->assertEquals(url('/files/new_header.png'), $updatedUser->header);
 
         $this->assertEquals($user->id, $updatedUser->id);
@@ -59,6 +64,12 @@ class UserRepositoryTest extends TestCase
         $this->assertEquals('Updated Name', $updatedUser->name);
         $this->assertNull($updatedUser->bio);
         $this->assertNull($updatedUser->website);
+        $this->assertNotNull($updatedUser->avatar);
+        $this->assertNotNull($updatedUser->header);
+
+        $repository->updateAvatar($user, null);
+        $updatedUser = $repository->updateHeader($user, null);
+
         $this->assertNull($updatedUser->avatar);
         $this->assertNull($updatedUser->header);
     }
