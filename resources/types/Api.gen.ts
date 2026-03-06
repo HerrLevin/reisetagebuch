@@ -408,6 +408,15 @@ export interface UserSettingsDto {
   motisRadius: number | null;
 }
 
+/** Request to upload an image */
+export interface ImageUploadRequest {
+  /**
+   * Image file to upload (max 2MB)
+   * @format binary
+   */
+  image?: File;
+}
+
 /**
  * Profile Update Request
  * Request schema for updating user profile information
@@ -560,20 +569,6 @@ export interface UpdateProfileRequest {
    * @maxLength 255
    */
   website?: string | null;
-  /**
-   * Avatar image file upload
-   * @format binary
-   */
-  avatar?: File | null;
-  /**
-   * Header image file upload
-   * @format binary
-   */
-  header?: File | null;
-  /** Flag to delete existing avatar */
-  deleteAvatar?: boolean | null;
-  /** Flag to delete existing header */
-  deleteHeader?: boolean | null;
 }
 
 export interface InviteDto {
@@ -1177,17 +1172,91 @@ export class Api<
      * @tags Profile
      * @name UpdateProfile
      * @summary Update profile
-     * @request POST:/account/profile
+     * @request PATCH:/account/profile
      * @secure
      */
     updateProfile: (data: UpdateProfileRequest, params: RequestParams = {}) =>
       this.request<UserDto, any>({
         path: `/account/profile`,
+        method: "PATCH",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Update avatar for authenticated user
+     *
+     * @tags Profile
+     * @name UpdateAvatar
+     * @summary Update avatar
+     * @request POST:/account/profile/avatar
+     * @secure
+     */
+    updateAvatar: (data: ImageUploadRequest, params: RequestParams = {}) =>
+      this.request<UserDto, any>({
+        path: `/account/profile/avatar`,
         method: "POST",
         body: data,
         secure: true,
         type: ContentType.FormData,
         format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Delete avatar for authenticated user
+     *
+     * @tags Profile
+     * @name DeleteAvatar
+     * @summary Delete avatar
+     * @request DELETE:/account/profile/avatar
+     * @secure
+     */
+    deleteAvatar: (params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/account/profile/avatar`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Update header for authenticated user
+     *
+     * @tags Profile
+     * @name UpdateHeader
+     * @summary Update header
+     * @request POST:/account/profile/header
+     * @secure
+     */
+    updateHeader: (data: ImageUploadRequest, params: RequestParams = {}) =>
+      this.request<UserDto, any>({
+        path: `/account/profile/header`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.FormData,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Delete header for authenticated user
+     *
+     * @tags Profile
+     * @name DeleteHeader
+     * @summary Delete header
+     * @request DELETE:/account/profile/header
+     * @secure
+     */
+    deleteHeader: (params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/account/profile/header`,
+        method: "DELETE",
+        secure: true,
         ...params,
       }),
 

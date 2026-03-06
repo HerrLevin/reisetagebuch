@@ -7,10 +7,13 @@ import { useUserStore } from '@/stores/user';
 import { UserDto } from '@/types';
 import { PropType, reactive, ref, useTemplateRef } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { UpdateProfileRequest } from '../../../../types/Api.gen';
 
 const { t } = useI18n();
 
 const authUser = useUserStore();
+
+const emits = defineEmits(['profile-updated']);
 
 const props = defineProps({
     user: {
@@ -49,13 +52,32 @@ const openModal = () => {
 
 const submit = () => {
     processing.value = true;
+
+    const avatarForm: UpdateProfileRequest = {
+        name: form.name,
+        bio: form.bio,
+        website: form.website,
+    };
+
+    if (form.avatar) {
+        api.account.updateAvatar({ image: form.avatar }).catch((error) => {
+            alert('Error updating avatar: ' + error.response.data.message);
+        });
+    }
+
+    if (form.header) {
+        api.account.updateHeader({ image: form.header }).catch((error) => {
+            alert('Error updating header: ' + error.response.data.message);
+        });
+    }
+
     api.account
-        .updateProfile(form)
-        .then(() => {
+        .updateProfile(avatarForm)
+        .then((data) => {
             // Handle success if needed
             resetModal();
-            // reload the page to reflect changes
-            window.location.reload();
+            emits('profile-updated', data);
+            editModal.value?.close();
         })
         .catch((error) => {
             alert('Error updating profile: ' + error.response.data.message);

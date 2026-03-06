@@ -123,7 +123,11 @@ Route::middleware('auth:api')->group(function () {
     Route::prefix('account')->group(function () {
         Route::get('/', [AccountController::class, 'show'])->name('account.show');
         Route::patch('/settings', [UserSettingsController::class, 'update'])->name('account.settings.update');
-        Route::post('/profile', [UserController::class, 'update'])->name('profile.update'); // needs to be post b/c of file upload
+        Route::patch('/profile', [UserController::class, 'update'])->name('profile.update');
+        Route::post('/profile/avatar', [UserController::class, 'updateAvatar'])->name('profile.update.avatar'); // needs to be post b/c of file upload
+        Route::delete('/profile/avatar', [UserController::class, 'deleteAvatar'])->name('profile.delete.avatar');
+        Route::post('/profile/header', [UserController::class, 'updateHeader'])->name('profile.update.header'); // needs to be post b/c of file upload
+        Route::delete('/profile/header', [UserController::class, 'deleteHeader'])->name('profile.delete.header');
         Route::patch('/', [AccountController::class, 'update'])->name('account.update');
         Route::delete('/', [AccountController::class, 'destroy'])->name('account.destroy');
 

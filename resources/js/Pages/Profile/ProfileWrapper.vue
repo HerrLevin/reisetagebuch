@@ -12,6 +12,8 @@ import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
 
+const emits = defineEmits(['profile-updated']);
+
 defineProps({
     user: {
         type: Object as PropType<UserDto | null>,
@@ -30,7 +32,10 @@ defineProps({
         <Banner :src="user?.header || ''" />
 
         <div v-if="user" class="mb-4 space-y-1 px-5 md:px-0">
-            <AvatarMenu :user="user" />
+            <AvatarMenu
+                :user="user"
+                @profile-updated="emits('profile-updated')"
+            />
             <div class="-mt-1">
                 <div class="flex items-center">
                     <h3 class="truncate text-2xl font-bold">{{ user.name }}</h3>

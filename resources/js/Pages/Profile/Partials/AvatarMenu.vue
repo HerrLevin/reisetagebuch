@@ -9,6 +9,7 @@ import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 
 const authUser = useUserStore();
+const emits = defineEmits(['profile-updated']);
 
 defineProps({
     user: {
@@ -32,7 +33,11 @@ defineProps({
             </div>
         </div>
         <div class="flex items-center gap-2">
-            <ProfileEditModal v-if="authUser.user" :user="user" />
+            <ProfileEditModal
+                v-if="authUser.user"
+                :user="user"
+                @profile-updated="emits('profile-updated')"
+            />
             <button class="btn btn-circle" type="button">
                 <EllipsisVertical />
             </button>

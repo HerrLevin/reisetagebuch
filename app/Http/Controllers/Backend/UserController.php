@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ImageUploadRequest;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Resources\UserDto;
 use App\Models\User;
@@ -28,38 +29,49 @@ class UserController extends Controller
         return $this->userRepository->getUserByUsername($username);
     }
 
+    public function updateAvatar(ImageUploadRequest $request, User $user): UserDto
+    {
+        $upload = $request->file('image');
+        $avatarPath = $user->profile?->avatar;
+        $avatarPath = $this->fileRepository->uploadAndReplaceFile('avatars', $upload, $avatarPath);
+
+        return $this->userRepository->updateAvatar($user, $avatarPath);
+    }
+
+    public function deleteAvatar(User $user): UserDto
+    {
+        if ($user->profile?->avatar) {
+            $this->fileRepository->deleteFile($user->profile->avatar);
+        }
+
+        return $this->userRepository->updateAvatar($user, null);
+    }
+
+    public function updateHeader(ImageUploadRequest $request, User $user): UserDto
+    {
+        $upload = $request->file('image');
+        $headerPath = $user->profile?->header;
+        $headerPath = $this->fileRepository->uploadAndReplaceFile('headers', $upload, $headerPath);
+
+        return $this->userRepository->updateHeader($user, $headerPath);
+    }
+
+    public function deleteHeader(User $user): UserDto
+    {
+        if ($user->profile?->header) {
+            $this->fileRepository->deleteFile($user->profile->header);
+        }
+
+        return $this->userRepository->updateHeader($user, null);
+    }
+
     public function update(UpdateProfileRequest $request, User $user): UserDto
     {
-        $avatarPath = $user->profile?->avatar;
-        $headerPath = $user->profile?->header;
-
-        if ($request->hasFile('avatar')) {
-            $upload = $request->file('avatar');
-            $avatarPath = $this->fileRepository->uploadAndReplaceFile('avatars', $upload, $avatarPath);
-        }
-
-        if ($request->deleteAvatar) {
-            $this->fileRepository->deleteFile($user->profile->avatar);
-            $avatarPath = null;
-        }
-
-        if ($request->hasFile('header')) {
-            $upload = $request->file('header');
-            $headerPath = $this->fileRepository->uploadAndReplaceFile('headers', $upload, $headerPath);
-        }
-
-        if ($request->deleteHeader) {
-            $this->fileRepository->deleteFile($user->profile->header);
-            $headerPath = null;
-        }
-
         return $this->userRepository->updateUser(
             $user,
             $request->name,
             $request->bio,
-            $request->website,
-            $avatarPath,
-            $headerPath
+            $request->website
         );
     }
 }
