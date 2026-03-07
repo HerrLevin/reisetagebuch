@@ -22,10 +22,6 @@ const id = urlParams.get('location[id]');
 
 const loading = ref(false);
 
-function goBack() {
-    window.history.back();
-}
-
 const form = reactive({
     body: '',
     location: id,
@@ -64,7 +60,7 @@ function submitForm() {
                     :emoji="emoji"
                     :show-travel-reason="true"
                     :loading="loading"
-                    @cancel="goBack"
+                    @cancel="useRouter().back()"
                     @select-travel-reason="
                         (travelReason) => (form.travelReason = travelReason)
                     "

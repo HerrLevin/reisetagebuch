@@ -8,9 +8,9 @@ import DeparturesListEntry from '@/Pages/NewPostDialog/Partials/DeparturesListEn
 import { LocationService } from '@/Services/LocationService';
 import { useUserStore } from '@/stores/user';
 import { DateTime } from 'luxon';
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRoute } from 'vue-router';
+import { LocationQueryValue, useRoute } from 'vue-router';
 import {
     DeparturesDto,
     MotisStopDto,
@@ -22,31 +22,46 @@ const { t } = useI18n();
 useTitle(t('new_post.title'));
 
 const user = useUserStore();
+const route = useRoute();
 
-const urlParams = new URLSearchParams(window.location.search);
-const requestIdentifier = ref<string | null>(urlParams.get('identifier'));
-const requestLatitude = ref<number>(
-    Number.parseFloat(urlParams.get('latitude') || '0'),
-);
-const requestLongitude = ref<number>(
-    Number.parseFloat(urlParams.get('longitude') || '0'),
-);
-const requestTime = ref<string>(urlParams.get('when') || '');
-const modes = ref<TransportMode[]>(
-    urlParams.get('filter')
-        ? (urlParams.get('filter')!.split(',') as TransportMode[])
-        : [],
-);
+const requestIdentifier = ref<string | undefined>(undefined);
+const latitude = ref<number>(0);
+const longitude = ref<number>(0);
+const requestTime = ref<string>('');
+const modes = ref<TransportMode[]>([]);
 
 const departures = ref<DeparturesDto | null>(null);
 const stop = ref<MotisStopDto | null>(null);
 const loading = ref(true);
 const time = ref<DateTime | null>(null);
 
-const latitude = ref(requestLatitude.value);
-const longitude = ref(requestLongitude.value);
-
 const intervalId = ref<number | null>(null);
+
+function updateQueryParams() {
+    const urlParams = route.query;
+    requestIdentifier.value = normalizeQueryParam(urlParams.identifier);
+    latitude.value = Number.parseFloat(
+        normalizeQueryParam(urlParams.latitude) || '0',
+    );
+    longitude.value = Number.parseFloat(
+        normalizeQueryParam(urlParams.longitude) || '0',
+    );
+    requestTime.value = normalizeQueryParam(urlParams.when) || '';
+    modes.value = urlParams.filter
+        ? (normalizeQueryParam(urlParams.filter)!.split(',') as TransportMode[])
+        : [];
+
+    loadDepartures();
+}
+
+function normalizeQueryParam(
+    param: string | LocationQueryValue[] | LocationQueryValue | undefined,
+): string | undefined {
+    if (Array.isArray(param)) {
+        return param[0] || undefined;
+    }
+    return param || undefined;
+}
 
 async function loadDepartures() {
     loading.value = true;
@@ -65,8 +80,8 @@ async function loadDepartures() {
             requestIdentifier.value === null
                 ? null
                 : response.data.departures?.stop;
-        requestLatitude.value = response.data.requestLatitude;
-        requestLongitude.value = response.data.requestLongitude;
+        latitude.value = response.data.requestLatitude;
+        longitude.value = response.data.requestLongitude;
         time.value = DateTime.fromISO(response.data.requestTime);
     } catch (error) {
         console.error('Error loading departures:', error);
@@ -77,9 +92,16 @@ async function loadDepartures() {
 
 onMounted(() => {
     updateLocation();
+    updateQueryParams();
     intervalId.value = setInterval(updateLocation, 60 * 1000);
-    loadDepartures();
 });
+
+watch(
+    () => route.query,
+    () => {
+        updateQueryParams();
+    },
+);
 
 onUnmounted(() => {
     if (intervalId.value) {

@@ -1,162 +1,187 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 
+import ConfirmPassword from '@/Pages/Auth/ConfirmPassword.vue';
+import ForgotPassword from '@/Pages/Auth/ForgotPassword.vue';
+import Login from '@/Pages/Auth/Login.vue';
+import Register from '@/Pages/Auth/Register.vue';
+import ResetPassword from '@/Pages/Auth/ResetPassword.vue';
+import VerifyEmail from '@/Pages/Auth/VerifyEmail.vue';
+import Dashboard from '@/Pages/Dashboard.vue';
+import EditPost from '@/Pages/EditPost.vue';
+import Invites from '@/Pages/Invites.vue';
+import LocationHistoryIndex from '@/Pages/LocationHistory/Index.vue';
+import CreateLocationPost from '@/Pages/NewPostDialog/CreateLocationPost.vue';
+import CreateTextPost from '@/Pages/NewPostDialog/CreateTextPost.vue';
+import CreateTransportPost from '@/Pages/NewPostDialog/CreateTransportPost.vue';
+import EditTransportTimes from '@/Pages/NewPostDialog/EditTransportTimes.vue';
+import ListDepartures from '@/Pages/NewPostDialog/ListDepartures.vue';
+import ListLocations from '@/Pages/NewPostDialog/ListLocations.vue';
+import ListStopovers from '@/Pages/NewPostDialog/ListStopovers.vue';
+import NotificationsIndex from '@/Pages/Notifications/Index.vue';
+import PostsFilter from '@/Pages/Posts/Filter.vue';
+import ProfileShow from '@/Pages/Profile/Show.vue';
+import ProfileShowMap from '@/Pages/Profile/ShowMap.vue';
+import EditSettings from '@/Pages/Settings/Edit.vue';
+import SinglePost from '@/Pages/SinglePost.vue';
+import CreateTrip from '@/Pages/Trips/Create.vue';
+import Welcome from '@/Pages/Welcome.vue';
+
 const routes: RouteRecordRaw[] = [
     {
         path: '/',
         name: 'welcome',
-        component: () => import('@/Pages/Welcome.vue'),
+        component: Welcome,
     },
     {
         path: '/login',
         name: 'login',
-        component: () => import('@/Pages/Auth/Login.vue'),
+        component: Login,
         meta: { guest: true },
     },
     {
         path: '/register',
         name: 'register',
-        component: () => import('@/Pages/Auth/Register.vue'),
+        component: Register,
         meta: { guest: true },
     },
     {
         path: '/forgot-password',
         name: 'forgot-password',
-        component: () => import('@/Pages/Auth/ForgotPassword.vue'),
+        component: ForgotPassword,
         meta: { guest: true },
     },
     {
         path: '/reset-password/:token',
         name: 'reset-password',
-        component: () => import('@/Pages/Auth/ResetPassword.vue'),
+        component: ResetPassword,
         meta: { guest: true },
     },
     {
         path: '/verify-email',
         name: 'verify-email',
-        component: () => import('@/Pages/Auth/VerifyEmail.vue'),
+        component: VerifyEmail,
         meta: { auth: true },
     },
     {
         path: '/confirm-password',
         name: 'confirm-password',
-        component: () => import('@/Pages/Auth/ConfirmPassword.vue'),
+        component: ConfirmPassword,
         meta: { auth: true },
     },
     {
         path: '/home',
         name: 'dashboard',
-        component: () => import('@/Pages/Dashboard.vue'),
+        component: Dashboard,
         meta: { auth: true },
     },
     {
         path: '/account',
         name: 'account.edit',
-        component: () => import('@/Pages/Settings/Edit.vue'),
+        component: EditSettings,
         meta: { auth: true },
     },
     {
         path: '/location-history',
         name: 'location-history.index',
-        component: () => import('@/Pages/LocationHistory/Index.vue'),
+        component: LocationHistoryIndex,
         meta: { auth: true },
     },
     {
         path: '/posts/filter',
         name: 'posts.filter',
-        component: () => import('@/Pages/Posts/Filter.vue'),
+        component: PostsFilter,
         meta: { auth: true },
     },
     {
         path: '/posts/create',
         name: 'posts.create.post',
-        component: () => import('@/Pages/NewPostDialog/CreateLocationPost.vue'),
+        component: CreateLocationPost,
         meta: { auth: true },
     },
     {
         path: '/posts/new',
         name: 'posts.create.text',
-        component: () => import('@/Pages/NewPostDialog/CreateTextPost.vue'),
+        component: CreateTextPost,
         meta: { auth: true },
     },
     {
         path: '/posts/:postId/edit',
         name: 'posts.edit',
-        component: () => import('@/Pages/EditPost.vue'),
+        component: EditPost,
         meta: { auth: true },
         props: true,
     },
     {
         path: '/posts/transport/departures',
         name: 'posts.create.departures',
-        component: () => import('@/Pages/NewPostDialog/ListDepartures.vue'),
+        component: ListDepartures,
         meta: { auth: true },
     },
     {
         path: '/posts/transport/stopovers',
         name: 'posts.create.stopovers',
-        component: () => import('@/Pages/NewPostDialog/ListStopovers.vue'),
+        component: ListStopovers,
         meta: { auth: true },
     },
     {
         path: '/posts/transport/create',
         name: 'posts.create.transport-post',
-        component: () =>
-            import('@/Pages/NewPostDialog/CreateTransportPost.vue'),
+        component: CreateTransportPost,
         meta: { auth: true },
     },
     {
         path: '/posts/transport/exit/edit',
         name: 'posts.edit.transport-post',
-        component: () => import('@/Pages/NewPostDialog/ListStopovers.vue'),
+        component: ListStopovers,
         meta: { auth: true },
     },
     {
         path: '/posts/transport/:postId/times/edit',
         name: 'posts.edit.transport-times',
-        component: () => import('@/Pages/NewPostDialog/EditTransportTimes.vue'),
+        component: EditTransportTimes,
         meta: { auth: true },
         props: true,
     },
     {
         path: '/posts/location',
         name: 'posts.create.start',
-        component: () => import('@/Pages/NewPostDialog/ListLocations.vue'),
+        component: ListLocations,
         meta: { auth: true },
     },
     {
         path: '/posts/:postId',
         name: 'posts.show',
-        component: () => import('@/Pages/SinglePost.vue'),
+        component: SinglePost,
         props: true,
     },
     {
         path: '/trips/create',
         name: 'trips.create',
-        component: () => import('@/Pages/Trips/Create.vue'),
+        component: CreateTrip,
         meta: { auth: true },
     },
     {
         path: '/invites',
         name: 'invites.index',
-        component: () => import('@/Pages/Invites.vue'),
+        component: Invites,
         meta: { auth: true },
     },
     {
         path: '/notifications',
         name: 'notifications',
-        component: () => import('@/Pages/Notifications/Index.vue'),
+        component: NotificationsIndex,
         meta: { auth: true },
     },
     {
         path: '/profile/:username',
         name: 'profile.show',
-        component: () => import('@/Pages/Profile/Show.vue'),
+        component: ProfileShow,
         props: true,
     },
     {
         path: '/profile/:username/map',
         name: 'profile.map',
-        component: () => import('@/Pages/Profile/ShowMap.vue'),
+        component: ProfileShowMap,
         props: true,
     },
 ];

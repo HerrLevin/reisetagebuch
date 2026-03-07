@@ -132,9 +132,7 @@ watch(
     <Typeahead
         v-model="search"
         :placeholder="placeholder || t('transitous_search.search_placeholder')"
-        class="input input-bordered w-full"
         name="departure-search"
-        :required="false"
         :suggestions="suggestions"
         :loading="loading"
         @submit="submitTypeahead($event)"

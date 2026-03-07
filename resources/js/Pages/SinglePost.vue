@@ -20,7 +20,7 @@ import { ArrowLeft } from 'lucide-vue-next';
 import { LngLat } from 'maplibre-gl';
 import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { BasePost, LocationPost, TransportPost } from '../../types/Api.gen';
 
 const { t } = useI18n();
@@ -35,9 +35,6 @@ const props = defineProps({
     },
 });
 
-const goBack = () => {
-    window.history.back();
-};
 const startPoint = ref(null as LngLat | null);
 const endPoint = ref(null as LngLat | null);
 const lineString = ref(null as GeometryCollection | null);
@@ -213,7 +210,7 @@ function deleted() {
                 <button
                     class="btn btn-ghost btn-sm btn-circle text-base-content normal-case"
                     type="button"
-                    @click="goBack"
+                    @click="vueRouter.back()"
                 >
                     <ArrowLeft class="size-6" />
                 </button>
