@@ -8,9 +8,9 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { getTravelReasonLabel } from '@/Services/TravelReasonMapping';
 import { getVisibilityLabel } from '@/Services/VisibilityMapping';
 import { AllPosts } from '@/types/PostTypes';
-import { onMounted, PropType, reactive, ref, watch } from 'vue';
+import { onMounted, reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import {
     BasePost,
     LocationPost,
@@ -23,19 +23,9 @@ const { t } = useI18n();
 const vueRouter = useRouter();
 
 useTitle(t('posts.filter.title'));
+const route = useRoute();
 
-const props = defineProps({
-    filters: {
-        type: Object as PropType<{
-            dateFrom: string | null;
-            dateTo: string | null;
-            visibility: Visibility[];
-            travelReason: TravelReason[];
-            tags: string[];
-        }>,
-        required: true,
-    },
-});
+useTitle(t('posts.filter.title'));
 
 type AllPosts = TransportPost | BasePost | LocationPost;
 
@@ -44,12 +34,19 @@ const availableTags = ref<string[]>([]);
 const loading = ref(false);
 const nextCursor = ref<string | null>(null);
 
+// Initialize filterForm from query params
 const filterForm = reactive({
-    dateFrom: props.filters.dateFrom || '',
-    dateTo: props.filters.dateTo || '',
-    visibility: props.filters.visibility || ([] as Visibility[]),
-    travelReason: props.filters.travelReason || ([] as TravelReason[]),
-    tags: props.filters.tags || ([] as string[]),
+    dateFrom: (route.query.dateFrom as string) || '',
+    dateTo: (route.query.dateTo as string) || '',
+    visibility: Array.isArray(route.query.visibility)
+        ? (route.query.visibility as string[]).map((v) => v as Visibility)
+        : ([] as Visibility[]),
+    travelReason: Array.isArray(route.query.travelReason)
+        ? (route.query.travelReason as string[]).map((r) => r as TravelReason)
+        : ([] as TravelReason[]),
+    tags: Array.isArray(route.query.tags)
+        ? (route.query.tags as string[])
+        : ([] as string[]),
 });
 
 const buildFilterParams = () => {
@@ -94,17 +91,15 @@ const fetchPosts = (cursor: string | null = null, append = false) => {
 };
 
 const updateUrl = () => {
-    const params = new URLSearchParams();
-    if (filterForm.dateFrom) params.set('dateFrom', filterForm.dateFrom);
-    if (filterForm.dateTo) params.set('dateTo', filterForm.dateTo);
-    filterForm.visibility.forEach((v) => params.append('visibility[]', v));
-    filterForm.travelReason.forEach((r) => params.append('travelReason[]', r));
-    filterForm.tags.forEach((tag) => params.append('tags[]', tag));
+    const params = {
+        dateFrom: filterForm.dateFrom || undefined,
+        dateTo: filterForm.dateTo || undefined,
+        visibility: filterForm.visibility,
+        travelReason: filterForm.travelReason,
+        tags: filterForm.tags,
+    };
 
-    const url = params.toString()
-        ? `${window.location.pathname}?${params.toString()}`
-        : window.location.pathname;
-    window.history.replaceState({}, '', url);
+    vueRouter.replace({ query: params });
 };
 
 const applyFilters = () => {

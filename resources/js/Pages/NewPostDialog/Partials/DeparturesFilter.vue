@@ -16,6 +16,7 @@ import { RouterLink } from 'vue-router';
 
 const { t } = useI18n();
 
+const departuresPath = '/posts/transport/departures';
 const props = defineProps({
     filter: {
         type: Array as PropType<TransportMode[]>,
@@ -44,6 +45,10 @@ const props = defineProps({
         default: () => null,
     },
 });
+
+function blur() {
+    (document.activeElement as HTMLElement)?.blur();
+}
 
 const selectedTime = ref<DateTime | null>(null);
 if (props.requestTime) {
@@ -77,28 +82,17 @@ function selectTime(time: EventTarget | null) {
     }
 }
 
-function buildDeparturesUrl(
-    params: Record<string, string | undefined>,
-): string {
-    const query = new URLSearchParams();
-    for (const [key, value] of Object.entries(params)) {
-        if (value !== undefined && value !== null && value !== '') {
-            query.set(key, value);
-        }
-    }
-    return `/posts/transport/departures?${query.toString()}`;
-}
-
 function submitTypeahead(submittedIdentifier: string | null) {
     if (submittedIdentifier) {
-        router.push(
-            buildDeparturesUrl({
+        router.push({
+            path: departuresPath,
+            query: {
                 latitude: String(props.latitude),
                 longitude: String(props.longitude),
                 identifier: submittedIdentifier,
                 when: selectedTime.value?.toISO() ?? undefined,
-            }),
-        );
+            },
+        });
     }
 }
 
@@ -120,59 +114,56 @@ const identifier = computed(() => {
                         @select-identifier="submitTypeahead"
                     />
                 </div>
-                <button
-                    id="cally1"
-                    popovertarget="datetime-picker"
-                    class="btn btn-neutral"
-                >
-                    <Clock class="h-4 w-4" />
-                </button>
-                <div
-                    id="datetime-picker"
-                    popover
-                    class="dropdown bg-base-100 rounded-box p-3 shadow-lg"
-                    style="position-anchor: --cally1"
-                >
-                    <input
-                        type="date"
-                        class="input input-bordered w-full"
-                        :value="selectedTime?.toFormat('yyyy-MM-dd')"
-                        @change="selectDate($event.target)"
-                    />
-                    <input
-                        type="time"
-                        class="input input-bordered mt-2 w-full"
-                        :value="selectedTime?.toFormat('HH:mm')"
-                        @change="selectTime($event.target)"
-                    />
-                    <div class="mt-2 grid grid-cols-2 gap-2">
-                        <button
-                            class="btn btn-secondary w-full"
-                            @click="selectedTime = DateTime.now()"
-                        >
-                            {{ t('new_post.departures_filter.now') }}
-                        </button>
-                        <button
-                            class="btn btn-secondary w-full"
-                            @click="selectedTime = null"
-                        >
-                            {{ t('new_post.departures_filter.clear') }}
-                        </button>
+                <div class="dropdown dropdown-end">
+                    <div tabindex="0" role="button" class="btn btn-neutral">
+                        <Clock class="h-4 w-4" />
                     </div>
-                    <RouterLink
-                        class="btn btn-primary mt-2 w-full"
-                        :to="
-                            buildDeparturesUrl({
-                                latitude: String(latitude),
-                                longitude: String(longitude),
-                                when: selectedTime?.toISO() ?? undefined,
-                                identifier: identifier,
-                                filter: filter.join(',') || undefined,
-                            })
-                        "
+                    <div
+                        tabindex="-1"
+                        class="dropdown-content bg-base-100 rounded-box p-3 shadow-lg"
                     >
-                        {{ t('new_post.departures_filter.set_datetime') }}
-                    </RouterLink>
+                        <input
+                            type="date"
+                            class="input input-bordered w-full"
+                            :value="selectedTime?.toFormat('yyyy-MM-dd')"
+                            @change="selectDate($event.target)"
+                        />
+                        <input
+                            type="time"
+                            class="input input-bordered mt-2 w-full"
+                            :value="selectedTime?.toFormat('HH:mm')"
+                            @change="selectTime($event.target)"
+                        />
+                        <div class="mt-2 grid grid-cols-2 gap-2">
+                            <button
+                                class="btn btn-secondary w-full"
+                                @click="selectedTime = DateTime.now()"
+                            >
+                                {{ t('new_post.departures_filter.now') }}
+                            </button>
+                            <button
+                                class="btn btn-secondary w-full"
+                                @click="selectedTime = null"
+                            >
+                                {{ t('new_post.departures_filter.clear') }}
+                            </button>
+                        </div>
+                        <RouterLink
+                            class="btn btn-primary mt-2 w-full"
+                            :to="{
+                                path: departuresPath,
+                                query: {
+                                    latitude: String(latitude),
+                                    longitude: String(longitude),
+                                    identifier: identifier,
+                                    when: selectedTime?.toISO() ?? undefined,
+                                },
+                            }"
+                            @click="blur()"
+                        >
+                            {{ t('new_post.departures_filter.set_datetime') }}
+                        </RouterLink>
+                    </div>
                 </div>
             </li>
             <li
@@ -181,13 +172,14 @@ const identifier = computed(() => {
                 <RouterLink
                     v-if="filter.length > 0"
                     class="btn btn-sm btn-neutral"
-                    :to="
-                        buildDeparturesUrl({
+                    :to="{
+                        path: departuresPath,
+                        query: {
                             latitude: String(latitude),
                             longitude: String(longitude),
                             identifier: identifier,
-                        })
-                    "
+                        },
+                    }"
                 >
                     <X class="h-4 w-4" />
                 </RouterLink>
@@ -200,15 +192,16 @@ const identifier = computed(() => {
                         'opacity-60':
                             filter.length > 0 && mode[0] !== filter[0],
                     }"
-                    :to="
-                        buildDeparturesUrl({
+                    :to="{
+                        path: departuresPath,
+                        query: {
                             latitude: String(latitude),
                             longitude: String(longitude),
                             filter: mode.join(','),
                             identifier: identifier,
                             when: selectedTime?.toISO() ?? undefined,
-                        })
-                    "
+                        },
+                    }"
                     :style="`background-color: ${getColor(mode[0])}`"
                 >
                     {{ getEmoji(mode[0]) }}

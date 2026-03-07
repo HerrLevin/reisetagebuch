@@ -18,9 +18,11 @@ import { PlaneTakeoff, TrainFront } from 'lucide-vue-next';
 import { DateTime } from 'luxon';
 import { reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 import { StoreTripRequest, TransportMode } from '../../../types/Api.gen';
 
 const { t } = useI18n();
+const vueRouter = useRouter();
 
 useTitle(t('new_route.title'));
 
@@ -175,12 +177,16 @@ function submit() {
                 routeColor: null,
                 routeTextColor: null,
             };
-            const searchParams = new URLSearchParams({
+            const searchParams = {
                 tripId: response.data.tripId,
                 startId: response.data.startId,
                 startTime: response.data.startTime,
+            };
+
+            vueRouter.push({
+                path: '/posts/transport/stopovers',
+                query: searchParams,
             });
-            window.location.href = `/posts/transport/stopovers?${searchParams.toString()}`;
             loading.value = false;
         })
         .catch((response) => {

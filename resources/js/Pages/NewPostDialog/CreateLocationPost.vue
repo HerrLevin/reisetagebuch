@@ -6,19 +6,19 @@ import PostCreationForm from '@/Pages/NewPostDialog/Partials/PostCreationForm.vu
 import { TravelReason, Visibility } from '@/types/enums';
 import { reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 const { t } = useI18n();
 const vueRouter = useRouter();
+const route = useRoute();
 
 useTitle(t('new_post.title'));
 
 // get url params
-const urlParams = new URLSearchParams(window.location.search);
 
-const emoji = urlParams.get('location[emoji]') || '📍';
-const name = urlParams.get('location[name]') || '';
-const id = urlParams.get('location[id]');
+const emoji = (route.query.emoji as string | undefined) || '📍';
+const name = (route.query.name as string | undefined) || '';
+const id = route.query.id as string | undefined;
 
 const loading = ref(false);
 

@@ -34,17 +34,6 @@ const delay = ref(timeService.delay);
 
 emoji.value = getEmoji(props.stopTime.mode);
 
-const stopoversUrl = ref(() => {
-    const params = new URLSearchParams({
-        tripId: props.stopTime.tripId,
-        startId: props.stopTime.place.stopId,
-    });
-    if (timeService.plannedTime) {
-        params.set('startTime', timeService.plannedTime.toISO()!);
-    }
-    return `/posts/transport/stopovers?${params.toString()}`;
-});
-
 function getRouteTextColor(stopTime: StopTime) {
     if (stopTime.routeTextColor) {
         return '#' + stopTime.routeTextColor;
@@ -81,7 +70,17 @@ function getRouteColor(stopTime: StopTime) {
 </script>
 
 <template>
-    <RouterLink v-slot="{ navigate }" :to="stopoversUrl()" custom>
+    <RouterLink
+        v-slot="{ navigate }"
+        :to="{
+            path: '/posts/transport/stopovers',
+            query: {
+                tripId: stopTime.tripId,
+                startId: stopTime.place.stopId,
+                startTime: timeService.plannedTime?.toISO() || undefined,
+            },
+        }"
+    >
         <li
             class="list-row hover:bg-base-200 cursor-pointer grid-cols-11 items-center"
             @click="navigate"

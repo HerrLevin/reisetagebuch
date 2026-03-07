@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Delay from '@/Components/Post/Partials/Delay.vue';
+import router from '@/router';
 import {
     getPostLineName,
     getPostTripNumber,
@@ -74,13 +75,16 @@ function getRouteColor(trip: TripDto) {
 
 function selectStation(location: LocationEntry) {
     const identifier = location.identifiers.find((id) => id.origin === 'motis');
-    const params = new URLSearchParams({
+    const params = {
         latitude: String(location.latitude),
         longitude: String(location.longitude),
         identifier: identifier?.identifier || '',
         when: DateTime.now().toISO()!,
+    };
+    router.push({
+        path: `/posts/transport/departures`,
+        query: params,
     });
-    window.location.href = `/posts/transport/departures?${params.toString()}`;
 }
 </script>
 
@@ -89,7 +93,7 @@ function selectStation(location: LocationEntry) {
         <div class="grid grid-cols-2 gap-0 pb-0">
             <div class="text-left">
                 <div
-                    class="mb-2 line-clamp-2 leading-none font-semibold overflow-ellipsis"
+                    class="mb-2 line-clamp-2 cursor-pointer leading-none font-semibold overflow-ellipsis"
                     @click.prevent="
                         selectStation(localPost.originStop.location)
                     "
@@ -99,7 +103,7 @@ function selectStation(location: LocationEntry) {
             </div>
             <div class="text-right">
                 <div
-                    class="mb-2 line-clamp-2 leading-none font-semibold overflow-ellipsis"
+                    class="mb-2 line-clamp-2 cursor-pointer leading-none font-semibold overflow-ellipsis"
                     @click.prevent="
                         selectStation(localPost.destinationStop.location)
                     "

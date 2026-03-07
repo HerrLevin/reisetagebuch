@@ -7,19 +7,17 @@ import { getEmoji } from '@/Services/DepartureTypeService';
 import { TransportMode, TravelReason, Visibility } from '@/types/enums';
 import { reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 const { t } = useI18n();
 const vueRouter = useRouter();
+const route = useRoute();
 
 useTitle(t('new_post.title'));
 
-// get url params
-const urlParams = new URLSearchParams(window.location.search);
-
-const mode = urlParams.get('stopMode');
-const name = urlParams.get('stopName') || '';
-const line = urlParams.get('lineName') || '';
+const mode = route.query.stopMode as string | undefined;
+const name = (route.query.stopName as string | undefined) || '';
+const line = (route.query.lineName as string | undefined) || '';
 const title = line ? `${line} ➜ ${name}` : name;
 let emoji = '';
 
@@ -27,11 +25,11 @@ if (mode) {
     emoji = getEmoji(mode as TransportMode);
 }
 
-const tripId = urlParams.get('tripId');
-const startId = urlParams.get('startId');
-const startTime = urlParams.get('startTime');
-const stopId = urlParams.get('stopId');
-const stopTime = urlParams.get('stopTime');
+const tripId = route.query.tripId as string | undefined;
+const startId = route.query.startId as string | undefined;
+const startTime = route.query.startTime as string | undefined;
+const stopId = route.query.stopId as string | undefined;
+const stopTime = route.query.stopTime as string | undefined;
 const loading = ref(false);
 
 const form = reactive({

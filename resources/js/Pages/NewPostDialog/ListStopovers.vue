@@ -3,22 +3,35 @@ import { api } from '@/api';
 import Loading from '@/Components/Loading.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import StopoversListEntry from '@/Pages/NewPostDialog/Partials/StopoversListEntry.vue';
+import router from '@/router';
 import { getEmoji } from '@/Services/DepartureTypeService';
+import { normalizeQueryParam } from '@/Services/QueryParamService';
 import { StopPlace, TripDto } from '@/types';
 import { DateTime } from 'luxon';
 import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { TransportPostExitUpdateRequest } from '../../../types/Api.gen';
 
 const { t } = useI18n();
 const vueRouter = useRouter();
+const route = useRoute();
 
-const urlParams = new URLSearchParams(window.location.search);
-const tripId = ref<string>(urlParams.get('tripId') || '');
-const startId = ref<string>(urlParams.get('startId') || '');
-const startTime = ref<string>(urlParams.get('startTime') || '');
-const postId = ref<string>(urlParams.get('postId') || '');
+const tripId = ref<string>('');
+const startId = ref<string>('');
+const startTime = ref<string>('');
+const postId = ref<string>('');
+
+function updateUrlParams() {
+    const queryParams = route.query;
+    tripId.value = normalizeQueryParam(queryParams.tripId) || '';
+    startId.value = normalizeQueryParam(queryParams.startId) || '';
+    startTime.value = normalizeQueryParam(queryParams.startTime) || '';
+    postId.value = normalizeQueryParam(queryParams.postId) || '';
+    startTime.value = startTime.value.replaceAll(' ', '+');
+
+    loadStopovers();
+}
 
 const trip = ref<TripDto | null>(null);
 const stopovers = ref<StopPlace[]>([]);
@@ -63,7 +76,7 @@ async function loadStopovers() {
 }
 
 onMounted(() => {
-    loadStopovers();
+    updateUrlParams();
 });
 
 function submit(stopover: StopPlace) {
@@ -82,20 +95,25 @@ function submit(stopover: StopPlace) {
 }
 
 function redirectCreatePost(stopover: StopPlace) {
-    const params = {
+    const params: Record<string, string | undefined> = {
         tripId: tripId.value,
         startId: startId.value,
         startTime: startTime.value,
         stopId: stopover.stopId,
-        stopTime: stopover.scheduledDeparture || stopover.scheduledArrival,
+        stopTime:
+            stopover.scheduledDeparture ||
+            stopover.scheduledArrival ||
+            undefined,
         stopName: stopover.name,
         stopMode: trip.value?.legs[0].mode,
         lineName:
             trip.value?.legs[0].displayName ||
             trip.value?.legs[0].routeShortName,
     };
-    const searchParams = new URLSearchParams(params as Record<string, string>);
-    window.location.href = `/posts/transport/create?${searchParams.toString()}`;
+    router.push({
+        path: '/posts/transport/create',
+        query: params,
+    });
 }
 
 function getTitle() {
