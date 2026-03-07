@@ -15,10 +15,6 @@ useTitle(t('new_post.title'));
 
 const loading = ref(false);
 
-function goBack() {
-    window.history.back();
-}
-
 const form = reactive({
     body: '',
     visibility: Visibility.PUBLIC,
@@ -53,7 +49,7 @@ function submitForm() {
                     v-model="form.body"
                     :name="t('new_post.title')"
                     emoji="✍"
-                    @cancel="goBack"
+                    @cancel="vueRouter.back()"
                     @select-visibility="
                         (visibility) => (form.visibility = visibility)
                     "

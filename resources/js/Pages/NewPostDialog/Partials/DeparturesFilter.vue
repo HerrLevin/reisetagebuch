@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import TransitousSearch from '@/Pages/NewPostDialog/Partials/TransitousSearch.vue';
+import router from '@/router';
 import {
     FilterGroups,
     getColor,
@@ -90,12 +91,14 @@ function buildDeparturesUrl(
 
 function submitTypeahead(submittedIdentifier: string | null) {
     if (submittedIdentifier) {
-        window.location.href = buildDeparturesUrl({
-            latitude: String(props.latitude),
-            longitude: String(props.longitude),
-            identifier: submittedIdentifier,
-            when: selectedTime.value?.toISO() ?? undefined,
-        });
+        router.push(
+            buildDeparturesUrl({
+                latitude: String(props.latitude),
+                longitude: String(props.longitude),
+                identifier: submittedIdentifier,
+                when: selectedTime.value?.toISO() ?? undefined,
+            }),
+        );
     }
 }
 

@@ -34,10 +34,6 @@ const stopId = urlParams.get('stopId');
 const stopTime = urlParams.get('stopTime');
 const loading = ref(false);
 
-function goBack() {
-    window.history.back();
-}
-
 const form = reactive({
     body: '',
     tripId: tripId,
@@ -85,7 +81,7 @@ function submitForm() {
                     :show-vehicle-id="true"
                     :vehicle-ids="form.vehicleIds"
                     :loading="loading"
-                    @cancel="goBack"
+                    @cancel="vueRouter.back()"
                     @select-travel-reason="
                         (travelReason) => (form.travelReason = travelReason)
                     "

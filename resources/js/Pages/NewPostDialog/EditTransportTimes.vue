@@ -95,10 +95,6 @@ function getTitles() {
     fullTitle.value = `${title} · ${subtitle.value}`;
 }
 
-function goBack() {
-    window.history.back();
-}
-
 function departNow() {
     if (!post.value) {
         return;
@@ -346,7 +342,7 @@ watch(() => props.postId, fetchPost, { immediate: true });
                     <div class="flex w-full justify-end gap-4 pt-8">
                         <button
                             class="btn btn-secondary"
-                            @click.prevent="goBack()"
+                            @click.prevent="vueRouter.back()"
                         >
                             {{ t('verbs.cancel') }}
                         </button>

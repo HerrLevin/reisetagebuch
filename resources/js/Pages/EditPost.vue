@@ -33,10 +33,6 @@ const subtitle = ref<string>('');
 const fullTitle = ref<string>(t('edit_post.title'));
 const loading = ref<boolean>(false);
 
-function goBack() {
-    window.history.back();
-}
-
 function fetchPost() {
     api.posts
         .showPost(props.postId)
@@ -158,7 +154,7 @@ fetchPost();
                     @select-travel-reason="
                         (reason) => (form.travelReason = reason)
                     "
-                    @cancel="goBack"
+                    @cancel="vueRouter.back()"
                     @select-visibility="(vis) => (form.visibility = vis)"
                     @update:tags="(tags) => (form.tags = tags)"
                     @update:vehicle-ids="(ids) => (form.vehicleIds = ids)"
