@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { api } from '@/api';
+import router from '@/router';
 import { getOwnShareText, getShareText } from '@/Services/ApiPostTextService';
 import { useUserStore } from '@/stores/user';
 import { isApiTransportPost } from '@/types/PostTypes';
@@ -168,20 +169,26 @@ function sharePost(): void {
 function redirectCreatePost(): void {
     const post = props.post as TransportPost;
 
-    const params = {
+    const params: Record<string, string | undefined> = {
         tripId: post.trip.foreignId || post.trip.id,
         startId: post.originStop.location.id,
-        startTime: post.originStop.departureTime || post.originStop.arrivalTime,
+        startTime:
+            post.originStop.departureTime ||
+            post.originStop.arrivalTime ||
+            undefined,
         stopId: post.destinationStop.location.id,
         stopTime:
             post.destinationStop.arrivalTime ||
-            post.destinationStop.departureTime,
+            post.destinationStop.departureTime ||
+            undefined,
         stopName: post.destinationStop.name,
         stopMode: post.trip.mode,
-        lineName: post.trip.displayName || post.trip.lineName,
+        lineName: post.trip.displayName || post.trip.lineName || undefined,
     };
-    const searchParams = new URLSearchParams(params as Record<string, string>);
-    window.location.href = `/posts/transport/create?${searchParams.toString()}`;
+    router.push({
+        path: `/posts/transport/create`,
+        query: params,
+    });
 }
 
 function blur() {
@@ -199,13 +206,13 @@ function blur() {
             class="menu dropdown-content bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
         >
             <li>
-                <a @click.prevent="sharePost()">
+                <a href="#" @click="sharePost()">
                     <Share class="size-4" />
                     {{ t('verbs.share') }}
                 </a>
             </li>
             <li v-if="!isSameUser() && isApiTransportPost(props.post)">
-                <a @click.prevent="redirectCreatePost()">
+                <a href="#" @click="redirectCreatePost()">
                     <UserRoundPlus class="size-4" />
                     {{ t('posts.ride_along') }}
                 </a>

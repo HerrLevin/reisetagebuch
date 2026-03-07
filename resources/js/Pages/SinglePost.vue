@@ -20,7 +20,7 @@ import { ArrowLeft } from 'lucide-vue-next';
 import { LngLat } from 'maplibre-gl';
 import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRoute, useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 import { BasePost, LocationPost, TransportPost } from '../../types/Api.gen';
 
 const { t } = useI18n();

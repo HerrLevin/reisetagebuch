@@ -27,18 +27,18 @@ const emoji = ref('');
 emoji.value = getEmojiFromTags(props.location.tags);
 name.value = getName(props.location as LocationEntry);
 
-const createPostUrl = (() => {
-    const params = new URLSearchParams({
-        'location[emoji]': emoji.value,
-        'location[name]': name.value,
-        'location[id]': props.location.id,
-    });
-    return `/posts/create?${params.toString()}`;
-})();
+const params = {
+    emoji: emoji.value,
+    name: name.value,
+    id: props.location.id,
+};
 </script>
 
 <template>
-    <RouterLink v-slot="{ navigate }" :to="createPostUrl" custom>
+    <RouterLink
+        v-slot="{ navigate }"
+        :to="{ path: '/posts/create', query: params }"
+    >
         <li class="list-row hover:bg-base-200 cursor-pointer" @click="navigate">
             <div class="text-3xl">{{ emoji }}</div>
             <div>

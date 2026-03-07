@@ -6,11 +6,13 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import DeparturesFilter from '@/Pages/NewPostDialog/Partials/DeparturesFilter.vue';
 import DeparturesListEntry from '@/Pages/NewPostDialog/Partials/DeparturesListEntry.vue';
 import { LocationService } from '@/Services/LocationService';
+import { normalizeQueryParam } from '@/Services/QueryParamService';
 import { useUserStore } from '@/stores/user';
+import { TriangleAlert } from 'lucide-vue-next';
 import { DateTime } from 'luxon';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { LocationQueryValue, useRoute } from 'vue-router';
+import { useRoute } from 'vue-router';
 import {
     DeparturesDto,
     MotisStopDto,
@@ -54,15 +56,6 @@ function updateQueryParams() {
     loadDepartures();
 }
 
-function normalizeQueryParam(
-    param: string | LocationQueryValue[] | LocationQueryValue | undefined,
-): string | undefined {
-    if (Array.isArray(param)) {
-        return param[0] || undefined;
-    }
-    return param || undefined;
-}
-
 async function loadDepartures() {
     loading.value = true;
     try {
@@ -83,8 +76,9 @@ async function loadDepartures() {
         latitude.value = response.data.requestLatitude;
         longitude.value = response.data.requestLongitude;
         time.value = DateTime.fromISO(response.data.requestTime);
-    } catch (error) {
-        console.error('Error loading departures:', error);
+    } catch {
+        departures.value = null;
+        loading.value = false;
     } finally {
         loading.value = false;
     }
@@ -162,6 +156,14 @@ showStartButton.value = currentRoute.name === 'posts.create.start';
                     :stop="departures!.stop"
                 />
             </ul>
+            <div
+                v-if="departures === null && !loading"
+                role="alert"
+                class="alert alert-warning m-4 shadow-lg"
+            >
+                <TriangleAlert class="h-6 w-6 shrink-0 stroke-current" />
+                <span>{{ t('new_post.no_departures') }}</span>
+            </div>
         </div>
     </AuthenticatedLayout>
 </template>
