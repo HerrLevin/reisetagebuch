@@ -20,6 +20,7 @@ use App\Models\TransportTrip;
 use App\Models\TransportTripStop;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -247,17 +248,57 @@ class PostRepository
         return $this->postHydrator->modelToDto($post);
     }
 
-    public function getDashboardForUser(User $user): PostPaginationDto
+    private function basePostQuery(): Builder
     {
-        $posts = Post::with([
+        return Post::with([
             'user', 'locationPost.location', 'locationPost.location.tags', 'transportPost', 'transportPost.origin', 'transportPost.destination',
             'transportPost.originStop.location', 'transportPost.destinationStop.location', 'transportPost.transportTrip', 'hashTags',
         ])
-            ->withCount('likes')
+            ->withCount('likes');
+    }
+
+    private function timelineQueryForUser(User $user): Builder
+    {
+        return $this->basePostQuery()
             ->withExists(['likes as liked_by_user' => function ($query) use ($user) {
                 $query->where('user_id', $user->id);
             }])
-            ->where('user_id', '=', $user->id)
+            ->where('user_id', '=', $user->id);
+    }
+
+    public function getTimelineForUser(User $user): PostPaginationDto
+    {
+        $posts = $this->timelineQueryForUser($user)
+            ->orWhere(function ($query) use ($user) {
+                $query->whereIn('user_id', $user->followings()->pluck('target_user_id'))
+                    ->whereIn('visibility', [Visibility::PUBLIC->value, Visibility::ONLY_AUTHENTICATED->value]);
+            })
+            ->orderByDesc('published_at')
+            ->cursorPaginate(50);
+
+        $mapped = $posts->map(function (Post $post) {
+            return $this->postHydrator->modelToDto($post);
+        });
+
+        return new PostPaginationDto(
+            perPage: $posts->perPage(),
+            nextCursor: $posts->nextCursor()?->encode(),
+            previousCursor: $posts->previousCursor()?->encode(),
+            items: $mapped,
+        );
+    }
+
+    public function getGlobalTimeline(?User $user = null): PostPaginationDto
+    {
+        $query = $this->basePostQuery();
+        if ($user) {
+            $query = $this->timelineQueryForUser($user)
+                ->orWhere(function ($query) use ($user) {
+                    $query->whereIn('user_id', $user->followings()->pluck('target_user_id'))
+                        ->whereIn('visibility', [Visibility::PUBLIC->value, Visibility::ONLY_AUTHENTICATED->value]);
+                });
+        }
+        $posts = $query
             ->orWhereIn('visibility', [Visibility::PUBLIC->value, Visibility::ONLY_AUTHENTICATED->value])
             ->orderByDesc('published_at')
             ->cursorPaginate(50);

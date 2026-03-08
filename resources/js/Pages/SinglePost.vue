@@ -193,7 +193,7 @@ watchEffect(() => {
 });
 
 function deleted() {
-    vueRouter.push({ name: 'dashboard' });
+    vueRouter.push({ name: 'timeline' });
 }
 </script>
 

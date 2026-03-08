@@ -38,6 +38,7 @@ class UserHydratorTest extends TestCase
                 'profile' => $profile,
                 'statistics' => $stats,
                 'created_at' => new Carbon('2023-01-01'),
+                'is_followed' => true,
                 default => null,
             };
         });
@@ -60,6 +61,7 @@ class UserHydratorTest extends TestCase
         $this->assertEquals('/files/test_header.png', $dto->header);
         $this->assertEquals('This is a bio.', $dto->bio);
         $this->assertEquals('https://example.com', $dto->website);
+        $this->assertTrue($dto->isFollowed);
     }
 
     public function test_model_to_dto_without_profile()
@@ -74,6 +76,7 @@ class UserHydratorTest extends TestCase
                 'profile' => null,
                 'statistics' => UserStatistics::factory()->make(),
                 'created_at' => new Carbon('2023-01-01'),
+                'is_followed' => true,
                 default => null,
             };
         });

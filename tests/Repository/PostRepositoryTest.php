@@ -119,7 +119,7 @@ class PostRepositoryTest extends TestCase
         $ownUnlistedPost = Post::factory()->create(['user_id' => $owner2->id, 'visibility' => Visibility::UNLISTED->value]);
         $ownPublicPost = Post::factory()->create(['user_id' => $owner2->id, 'visibility' => Visibility::PUBLIC->value]);
 
-        $result = $repo->getDashboardForUser($owner2);
+        $result = $repo->getGlobalTimeline($owner2);
         $ids = collect($result->items)->pluck('id')->all();
 
         $this->assertContains($publicPost->id, $ids);
@@ -130,6 +130,41 @@ class PostRepositoryTest extends TestCase
         $this->assertContains($ownPrivatePost->id, $ids);
         $this->assertContains($ownUnlistedPost->id, $ids);
         $this->assertContains($ownPublicPost->id, $ids);
+    }
+
+    public function test_unauthenticated_user_cannot_access_private_post()
+    {
+        $owner = User::factory()->create();
+        $repo = new PostRepository;
+
+        $privatePost = Post::factory()->create(['user_id' => $owner->id, 'visibility' => Visibility::PRIVATE->value]);
+
+        $this->expectException(HttpException::class);
+        $repo->getById($privatePost->id, null);
+    }
+
+    public function test_timeline_has_only_followed_users_posts()
+    {
+        $owner = User::factory()->create();
+        $followedUser = User::factory()->create();
+        $notFollowedUser = User::factory()->create();
+        $repo = new PostRepository;
+
+        $ownPost = Post::factory()->create(['user_id' => $owner->id, 'visibility' => Visibility::PUBLIC->value]);
+        $followedPost = Post::factory()->create(['user_id' => $followedUser->id, 'visibility' => Visibility::PUBLIC->value]);
+        $privateFollowedPost = Post::factory()->create(['user_id' => $followedUser->id, 'visibility' => Visibility::PRIVATE->value]);
+        $notFollowedPost = Post::factory()->create(['user_id' => $notFollowedUser->id, 'visibility' => Visibility::PUBLIC->value]);
+
+        // Simulate following the followed user
+        $owner->followings()->create(['target_user_id' => $followedUser->id]);
+
+        $result = $repo->getTimelineForUser($owner);
+        $ids = collect($result->items)->pluck('id')->all();
+
+        $this->assertContains($followedPost->id, $ids);
+        $this->assertcontains($ownPost->id, $ids);
+        $this->assertNotContains($notFollowedPost->id, $ids);
+        $this->assertNotContains($privateFollowedPost->id, $ids);
     }
 
     public function test_unauthenticated_user_cannot_access_only_authenticated_post()

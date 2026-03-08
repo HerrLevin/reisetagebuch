@@ -61,6 +61,9 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/timeline', [PostController::class, 'timeline'])
         ->name('posts.timeline');
 
+    Route::get('/timeline/global', [PostController::class, 'globalTimeline'])
+        ->name('posts.timeline.global');
+
     Route::post('/trips', [TripController::class, 'store'])
         ->name('trips.store');
 

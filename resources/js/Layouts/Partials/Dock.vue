@@ -56,7 +56,7 @@ const isTripsCreateRoute = () => {
     return (currentRoute.name as string)?.startsWith('trips.create');
 };
 const isDashboardRoute = () => {
-    return currentRoute.name === 'dashboard';
+    return currentRoute.name === 'timeline';
 };
 const isVenueRoute = () => {
     return currentRoute.name === 'posts.create.start';
