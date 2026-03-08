@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backend;
 use App\Exceptions\ConflictException;
 use App\Exceptions\InsufficientRightsException;
 use App\Http\Controllers\Controller;
+use App\Jobs\CalculateStatisticsForUser;
 use App\Models\User;
 use App\Notifications\UserFollowedNotification;
 use App\Repositories\FollowRepository;
@@ -56,6 +57,9 @@ class FollowController extends Controller
 
         $reference = $this->followRepository->createFollow($originUser, $targetUser);
         $this->notificationRepository->notifyUser($targetUser, new UserFollowedNotification($originUser, $reference));
+
+        CalculateStatisticsForUser::dispatch($originUser->id);
+        CalculateStatisticsForUser::dispatch($targetUser->id);
     }
 
     /**
@@ -69,5 +73,8 @@ class FollowController extends Controller
 
         $reference = $this->followRepository->deleteFollow($originUserId, $targetUserId);
         $this->notificationRepository->deleteNotificationByReferenceId($reference);
+
+        CalculateStatisticsForUser::dispatch($actingUser->id);
+        CalculateStatisticsForUser::dispatch($targetUserId);
     }
 }

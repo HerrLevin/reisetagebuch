@@ -40,10 +40,10 @@ class CalculateStatisticsForUser implements ShouldQueue
             'transport_posts_count' => $transportPosts,
             'location_posts_count' => $locationPosts,
             'visited_locations_count' => $visitedLocations,
+            'followers_count' => $user->followers()->count(),
+            'following_count' => $user->followings()->count(),
 
             // todo: implement these statistics later
-            // 'followers_count' => $user->followers()->count(),
-            // 'following_count' => $user->following()->count(),
             // 'travelled_distance' => $user->trips()->sum('distance'),
             // 'travelled_duration' => $user->trips()->sum('duration'),
             // 'visited_countries_count' => $user->trips()->distinct('country')->count('country'),
