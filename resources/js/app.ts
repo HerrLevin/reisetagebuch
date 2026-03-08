@@ -26,7 +26,7 @@ router.beforeEach((to, _from, next) => {
     if (to.meta.auth && !authStore.isAuthenticated()) {
         next({ name: 'login' });
     } else if (to.meta.guest && authStore.isAuthenticated()) {
-        next({ name: 'dashboard' });
+        next({ name: 'home' });
     } else {
         next();
     }

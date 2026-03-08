@@ -32,12 +32,12 @@ Route::prefix('users')->group(function () {
         Route::get('posts', [PostController::class, 'postsForUser'])->name('profile.posts');
         Route::prefix('followers')->group(function () {
             Route::get('/', [FollowController::class, 'getFollowers'])->name('profile.followers');
-            Route::post('/{targetId}', [FollowController::class, 'createFollow'])->name('profile.followings');
+            Route::post('/{targetId}', [FollowController::class, 'createFollow'])->name('profile.follow');
             Route::delete('/{targetId}', [FollowController::class, 'deleteFollow'])->name('profile.unfollow');
         });
         Route::prefix('followings')->group(function () {
             Route::get('/', [FollowController::class, 'getFollowings'])->name('profile.followings');
-            Route::delete('/{targetId}', [FollowController::class, 'deleteFollow'])->name('profile.unfollow');
+            Route::delete('/{targetId}', [FollowController::class, 'deleteFollow'])->name('profile.remove-follower');
         });
     });
 });

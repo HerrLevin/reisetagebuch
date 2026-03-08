@@ -49,23 +49,11 @@ function updateLocation() {
         .catch(() => {});
 }
 
-const isNotificationsRoute = () => {
-    return currentRoute.name === 'notifications';
-};
-const isTripsCreateRoute = () => {
-    return (currentRoute.name as string)?.startsWith('trips.create');
-};
-const isDashboardRoute = () => {
-    return currentRoute.name === 'timeline';
-};
 const isVenueRoute = () => {
     return currentRoute.name === 'posts.create.start';
 };
 const isDeparturesRoute = () => {
     return currentRoute.name === 'posts.create.departures';
-};
-const isFilterRoute = () => {
-    return currentRoute.name === 'posts.filter';
 };
 </script>
 
@@ -90,7 +78,10 @@ const isFilterRoute = () => {
             <div>
                 {{ t('posts.departures') }}
                 <RouterLink
-                    :to="`/posts/transport/departures?latitude=${latitude}&longitude=${longitude}`"
+                    :to="{
+                        name: 'posts.create.departures',
+                        query: { latitude, longitude },
+                    }"
                     class="btn btn-lg btn-circle"
                 >
                     <List />
@@ -98,36 +89,39 @@ const isFilterRoute = () => {
             </div>
             <div>
                 {{ t('posts.locations') }}
-                <RouterLink to="/posts/location" class="btn btn-lg btn-circle">
+                <RouterLink
+                    :to="{ name: 'posts.create.start' }"
+                    class="btn btn-lg btn-circle"
+                >
                     <MapPin />
                 </RouterLink>
             </div>
             <div>
                 {{ t('posts.text') }}
-                <RouterLink to="/posts/new" class="btn btn-lg btn-circle">
+                <RouterLink
+                    :to="{ name: 'posts.create.text' }"
+                    class="btn btn-lg btn-circle"
+                >
                     <SquarePen />
                 </RouterLink>
             </div>
         </div>
         <div class="dock">
-            <RouterLink
-                to="/home"
-                :class="{ 'dock-active': isDashboardRoute() }"
-            >
+            <RouterLink :to="{ name: 'home' }" active-class="dock-active">
                 <House class="size-[1.2em]" />
                 <span class="dock-label">{{ t('app.home') }}</span>
             </RouterLink>
             <template v-if="user.user">
                 <RouterLink
-                    to="/trips/create"
-                    :class="{ 'dock-active': isTripsCreateRoute() }"
+                    :to="{ name: 'trips.create' }"
+                    active-class="dock-active"
                 >
                     <Route class="size-[1.2em]" />
                     <span class="dock-label">{{ t('new_route.title') }}</span>
                 </RouterLink>
                 <RouterLink
-                    to="/notifications"
-                    :class="{ 'dock-active': isNotificationsRoute() }"
+                    :to="{ name: 'notifications' }"
+                    active-class="dock-active"
                 >
                     <NotificationBell />
                     <span class="dock-label">
@@ -135,8 +129,8 @@ const isFilterRoute = () => {
                     </span>
                 </RouterLink>
                 <RouterLink
-                    to="/posts/filter"
-                    :class="{ 'dock-active': isFilterRoute() }"
+                    :to="{ name: 'posts.filter' }"
+                    active-class="dock-active"
                 >
                     <Filter class="size-[1.2em]" />
                     <span class="dock-label">

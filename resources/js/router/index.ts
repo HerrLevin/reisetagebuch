@@ -6,8 +6,8 @@ import Login from '@/Pages/Auth/Login.vue';
 import Register from '@/Pages/Auth/Register.vue';
 import ResetPassword from '@/Pages/Auth/ResetPassword.vue';
 import VerifyEmail from '@/Pages/Auth/VerifyEmail.vue';
-import Dashboard from '@/Pages/Dashboard.vue';
 import EditPost from '@/Pages/EditPost.vue';
+import Home from '@/Pages/Home.vue';
 import Invites from '@/Pages/Invites.vue';
 import LocationHistoryIndex from '@/Pages/LocationHistory/Index.vue';
 import CreateLocationPost from '@/Pages/NewPostDialog/CreateLocationPost.vue';
@@ -71,8 +71,14 @@ const routes: RouteRecordRaw[] = [
     },
     {
         path: '/home',
-        name: 'dashboard',
-        component: Dashboard,
+        name: 'home',
+        component: Home,
+        meta: { auth: true },
+    },
+    {
+        path: '/home/global',
+        name: 'home.global',
+        component: Home,
         meta: { auth: true },
     },
     {
