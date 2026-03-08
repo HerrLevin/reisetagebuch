@@ -38,8 +38,9 @@ const submit = async () => {
     try {
         await authStore.login(form.value.email, form.value.password);
         await userStore.fetchUser(true);
-        router.push({ name: 'timeline' });
+        router.push({ name: 'home' });
     } catch (error) {
+        console.error(error);
         if (error.response?.status === 422) {
             const responseErrors = error.response.data.errors || {};
             for (const key in responseErrors) {
