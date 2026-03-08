@@ -46,6 +46,7 @@ function unfollow() {
 
 <template>
     <button
+        v-if="authUser.user && authUser.user.id !== user.id"
         class="btn rounded-full"
         :class="{ 'btn-primary': !user.isFollowed }"
         @click="toggleFollow"

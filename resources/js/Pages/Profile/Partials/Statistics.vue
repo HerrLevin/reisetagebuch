@@ -18,8 +18,24 @@ defineProps({
     <!-- todo: add statistics -->
     <div class="flex flex-wrap gap-x-3">
         <a class="link link-hover flex cursor-pointer">
-            <b>0</b>&nbsp;<span class="opacity-65">
-                {{ t('profile.stats.friends', 0) }}
+            <b>{{ user.statistics.followersCount }}</b>
+            &nbsp;
+            <span class="opacity-65">
+                {{
+                    t('profile.stats.followers', user.statistics.followersCount)
+                }}
+            </span>
+        </a>
+        <a class="link link-hover flex cursor-pointer">
+            <b>{{ user.statistics.followingCount }}</b>
+            &nbsp;
+            <span class="opacity-65">
+                {{
+                    t(
+                        'profile.stats.followings',
+                        user.statistics.followingCount,
+                    )
+                }}
             </span>
         </a>
         <a class="link link-hover flex cursor-pointer">
