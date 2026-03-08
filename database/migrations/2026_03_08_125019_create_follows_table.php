@@ -10,7 +10,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('follows', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->foreignIdFor(User::class, 'origin_user_id')->constrained()->cascadeOnDelete();
             $table->foreignIdFor(User::class, 'target_user_id')->constrained()->cascadeOnDelete();
             $table->timestamps();

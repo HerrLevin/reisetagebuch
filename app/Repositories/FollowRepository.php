@@ -46,22 +46,24 @@ class FollowRepository
     /**
      * @throws ModelNotFoundException<User>
      */
-    public function createFollow(string $originUserId, string $targetUserId): void
+    public function createFollow(UserDto $originUser, UserDto $targetUser): string
     {
-        $originUser = User::findOrFail($originUserId);
-        $targetUser = User::findOrFail($targetUserId);
-        Follow::create([
+        return Follow::create([
             'origin_user_id' => $originUser->id,
             'target_user_id' => $targetUser->id,
-        ]);
+        ])->id;
     }
 
-    public function deleteFollow(string $originUserId, string $targetUserId): void
+    public function deleteFollow(string $originUserId, string $targetUserId): string
     {
         $originUser = User::findOrFail($originUserId);
         $targetUser = User::findOrFail($targetUserId);
-        Follow::where('origin_user_id', $originUser->id)
+        $follow = Follow::where('origin_user_id', $originUser->id)
             ->where('target_user_id', $targetUser->id)
-            ->delete();
+            ->firstOrFail();
+
+        $follow->delete();
+
+        return $follow->id;
     }
 }

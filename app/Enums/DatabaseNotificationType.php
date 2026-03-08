@@ -3,7 +3,9 @@
 namespace App\Enums;
 
 use App\Hydrators\Notifications\PostLikedDataHydrator;
+use App\Hydrators\Notifications\UserFollowedHydrator;
 use App\Notifications\PostLiked;
+use App\Notifications\UserFollowedNotification;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema(
@@ -15,11 +17,13 @@ use OpenApi\Attributes as OA;
 enum DatabaseNotificationType: string
 {
     case PostLiked = 'PostLikedNotification';
+    case UserFollowed = 'UserFollowedNotification';
 
     public function getClassName(): string
     {
         return match ($this) {
             self::PostLiked => PostLiked::class,
+            self::UserFollowed => UserFollowedNotification::class,
         };
     }
 
@@ -27,6 +31,7 @@ enum DatabaseNotificationType: string
     {
         return match ($this) {
             self::PostLiked => PostLikedDataHydrator::class,
+            self::UserFollowed => UserFollowedHydrator::class,
         };
     }
 }

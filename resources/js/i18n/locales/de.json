@@ -11,7 +11,10 @@
         "none": "Keine Benachrichtigungen",
         "fallback": "Du hast eine neue Benachrichtigung",
         "liked": {
-            "lead": ":user hat deinen Post geliked"
+            "lead": "{user} hat deinen Post geliked"
+        },
+        "follower": {
+            "lead": "{user} folgt dir jetzt"
         }
     },
     "trip_details": {

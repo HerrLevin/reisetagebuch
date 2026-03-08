@@ -75,6 +75,7 @@ export enum Feature {
 /** Enumeration of notification types */
 export enum NotificationType {
   PostLikedNotification = "PostLikedNotification",
+  UserFollowedNotification = "UserFollowedNotification",
 }
 
 export enum MotisLocationType {
@@ -294,7 +295,7 @@ export interface NotificationWrapper {
    */
   readAt: string | null;
   /** Additional data associated with the notification */
-  data: PostLikedData | null;
+  data: PostLikedData | UserFollowedData | null;
 }
 
 /** Data for a post liked notification */
@@ -331,6 +332,32 @@ export interface PostLikedData {
   likedByUserAvatarUrl: string;
   /** Optional summary of the liked post */
   postSummary: string | null;
+}
+
+/** Data for a user followed notification */
+export interface UserFollowedData {
+  /**
+   * ID of the user who followed you
+   * @format uuid
+   */
+  followerUserId: string;
+  /**
+   * Username of the user who followed you
+   * @example "johndoe"
+   */
+  followerUserName: string;
+  /**
+   * Display name of the user who followed you
+   * @example "John Doe"
+   */
+  followerUserDisplayName: string;
+  /**
+   * Avatar URL of the user who followed you
+   * @format uri
+   */
+  followerUserAvatarUrl: string;
+  /** Optional summary of the liked post */
+  postSummary?: string | null;
 }
 
 /** A generic pagination DTO */
@@ -2371,6 +2398,31 @@ export class Api<
     ) =>
       this.request<PostPaginationDto, void>({
         path: `/timeline`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Returns paginated posts for the authenticated user / global public timeline
+     *
+     * @tags Posts
+     * @name GetGlobalTimeline
+     * @summary Get timeline posts
+     * @request GET:/timeline/global
+     * @secure
+     */
+    getGlobalTimeline: (
+      query?: {
+        /** Pagination cursor */
+        cursor?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<PostPaginationDto, void>({
+        path: `/timeline/global`,
         method: "GET",
         query: query,
         secure: true,

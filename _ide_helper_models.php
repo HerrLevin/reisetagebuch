@@ -13,7 +13,7 @@
 
 namespace App\Models{
 /**
- * @property int $id
+ * @property string $id
  * @property string $origin_user_id
  * @property string $target_user_id
  * @property \Illuminate\Support\Carbon|null $created_at
