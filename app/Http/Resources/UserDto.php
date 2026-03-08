@@ -38,6 +38,9 @@ class UserDto
     #[OA\Property('website', description: 'Website URL of the user', type: 'string', format: 'uri', nullable: true)]
     public ?string $website = null;
 
+    #[OA\Property('isFollowed', description: 'Indicates if the current user is following this user', type: 'boolean')]
+    public bool $isFollowed = false;
+
     #[OA\Property(ref: '#/components/schemas/UserStatisticsDto')]
     public UserStatisticsDto $statistics;
 

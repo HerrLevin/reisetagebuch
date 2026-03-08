@@ -167,6 +167,8 @@
         "profile_picture": "Profilbild",
         "max_size": "Maximale Dateigröße: 2 MB",
         "header_image": "Kopfzeilenbild",
+        "follow": "Folgen",
+        "unfollow": "Entfolgen",
         "menu": {
             "posts": "Beiträge",
             "map": "Karte"

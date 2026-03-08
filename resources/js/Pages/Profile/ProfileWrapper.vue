@@ -6,9 +6,9 @@ import BioText from '@/Pages/Profile/Partials/BioText.vue';
 import BottomInfo from '@/Pages/Profile/Partials/BottomInfo.vue';
 import ProfileMenu from '@/Pages/Profile/Partials/ProfileMenu.vue';
 import Statistics from '@/Pages/Profile/Partials/Statistics.vue';
-import type { UserDto } from '@/types';
 import type { PropType } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { UserDto } from '../../../types/Api.gen';
 
 const { t } = useI18n();
 

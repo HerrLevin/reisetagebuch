@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import FollowButton from '@/Pages/Profile/Partials/FollowButton.vue';
 import ProfileEditModal from '@/Pages/Profile/Partials/ProfileEditModal.vue';
 import { useUserStore } from '@/stores/user';
 import type { UserDto } from '@/types';
@@ -33,11 +34,16 @@ defineProps({
             </div>
         </div>
         <div class="flex items-center gap-2">
-            <ProfileEditModal
-                v-if="authUser.user"
-                :user="user"
-                @profile-updated="emits('profile-updated')"
-            />
+            <template v-if="authUser.user">
+                <ProfileEditModal
+                    :user="user"
+                    @profile-updated="emits('profile-updated')"
+                />
+                <FollowButton
+                    :user="user"
+                    @follow-updated="emits('profile-updated')"
+                />
+            </template>
             <button class="btn btn-circle" type="button">
                 <EllipsisVertical />
             </button>

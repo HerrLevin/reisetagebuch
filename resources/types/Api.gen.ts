@@ -831,6 +831,8 @@ export interface UserDto {
    * @format uri
    */
   website: string | null;
+  /** Indicates if the current user is following this user */
+  isFollowed?: boolean;
   /** User Statistics Data Object */
   statistics: UserStatisticsDto;
   /**
@@ -1588,6 +1590,129 @@ export class Api<
         ...params,
       }),
   };
+  users = {
+    /**
+     * @description Return the users, that follow a user
+     *
+     * @tags Follows
+     * @name GetFollowers
+     * @summary Get followers data
+     * @request GET:/users/{userId}/followers
+     * @secure
+     */
+    getFollowers: (userId: string, params: RequestParams = {}) =>
+      this.request<UserDto[], any>({
+        path: `/users/${userId}/followers`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Return the users, that a user follows
+     *
+     * @tags Follows
+     * @name GetFollowings
+     * @summary Get followings data
+     * @request GET:/users/{userId}/followings
+     * @secure
+     */
+    getFollowings: (userId: string, params: RequestParams = {}) =>
+      this.request<UserDto[], any>({
+        path: `/users/${userId}/followings`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Create a follow relationship between two users
+     *
+     * @tags Follows
+     * @name CreateFollow
+     * @summary Create follow relationship
+     * @request POST:/users/{userId}/followers/{targetId}
+     * @secure
+     */
+    createFollow: (
+      userId: string,
+      targetId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, void>({
+        path: `/users/${userId}/followers/${targetId}`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Delete a follow relationship between two users
+     *
+     * @tags Follows
+     * @name DeleteFollow
+     * @summary Delete follow relationship
+     * @request DELETE:/users/{userId}/followers/{targetId}
+     * @secure
+     */
+    deleteFollow: (
+      userId: string,
+      targetId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, void>({
+        path: `/users/${userId}/followers/${targetId}`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Returns paginated posts for a specific user
+     *
+     * @tags Posts
+     * @name PostsForUser
+     * @summary Get posts for a specific user
+     * @request GET:/users/{userId}/posts
+     * @secure
+     */
+    postsForUser: (
+      userId: string,
+      query?: {
+        /** Pagination cursor */
+        cursor?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<PostPaginationDto, void>({
+        path: `/users/${userId}/posts`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Return GeoJSON map data for a user
+     *
+     * @tags Profile
+     * @name GetProfileMapData
+     * @summary Profile map data
+     * @request GET:/users/{userId}/map-data
+     * @secure
+     */
+    getProfileMapData: (userId: string, params: RequestParams = {}) =>
+      this.request<object, any>({
+        path: `/users/${userId}/map-data`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
   invites = {
     /**
      * @description List invite codes for the authenticated user
@@ -2248,51 +2373,6 @@ export class Api<
         path: `/timeline`,
         method: "GET",
         query: query,
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-  };
-  users = {
-    /**
-     * @description Returns paginated posts for a specific user
-     *
-     * @tags Posts
-     * @name PostsForUser
-     * @summary Get posts for a specific user
-     * @request GET:/users/{userId}/posts
-     * @secure
-     */
-    postsForUser: (
-      userId: string,
-      query?: {
-        /** Pagination cursor */
-        cursor?: string;
-      },
-      params: RequestParams = {},
-    ) =>
-      this.request<PostPaginationDto, void>({
-        path: `/users/${userId}/posts`,
-        method: "GET",
-        query: query,
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Return GeoJSON map data for a user
-     *
-     * @tags Profile
-     * @name GetProfileMapData
-     * @summary Profile map data
-     * @request GET:/users/{userId}/map-data
-     * @secure
-     */
-    getProfileMapData: (userId: string, params: RequestParams = {}) =>
-      this.request<object, any>({
-        path: `/users/${userId}/map-data`,
-        method: "GET",
         secure: true,
         format: "json",
         ...params,

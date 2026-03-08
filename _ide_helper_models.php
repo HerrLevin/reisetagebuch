@@ -13,6 +13,28 @@
 
 namespace App\Models{
 /**
+ * @property int $id
+ * @property string $origin_user_id
+ * @property string $target_user_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\User $originUser
+ * @property-read \App\Models\User $targetUser
+ * @method static \Database\Factories\FollowFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Follow newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Follow newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Follow query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Follow whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Follow whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Follow whereOriginUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Follow whereTargetUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Follow whereUpdatedAt($value)
+ */
+	class Follow extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
  * @property string $id
  * @property string $user_id
  * @property string $value
@@ -516,6 +538,12 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Passport\Client> $clients
  * @property-read int|null $clients_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Follow> $followers
+ * @property-read int|null $followers_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Follow> $followings
+ * @property-read int|null $followings_count
+ * @property-read bool $is_followed
+ * @property-read bool $is_following
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\HashTag> $hashTags
  * @property-read int|null $hash_tags_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Invite> $invites

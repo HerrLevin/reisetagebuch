@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AccountController;
 use App\Http\Controllers\Api\AppConfigurationController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\FollowController;
 use App\Http\Controllers\Api\InviteController;
 use App\Http\Controllers\Api\LikeController;
 use App\Http\Controllers\Api\LocationController as ApiLocationController;
@@ -26,9 +27,18 @@ Route::prefix('auth')->group(function () {
 Route::get('profile/{username}', [UserController::class, 'show']);
 
 Route::prefix('users')->group(function () {
-    route::prefix('{userId}')->group(function () {
+    Route::prefix('{userId}')->group(function () {
         Route::get('map-data', [UserController::class, 'mapData'])->name('profile.mapdata');
         Route::get('posts', [PostController::class, 'postsForUser'])->name('profile.posts');
+        Route::prefix('followers')->group(function () {
+            Route::get('/', [FollowController::class, 'getFollowers'])->name('profile.followers');
+            Route::post('/{targetId}', [FollowController::class, 'createFollow'])->name('profile.followings');
+            Route::delete('/{targetId}', [FollowController::class, 'deleteFollow'])->name('profile.unfollow');
+        });
+        Route::prefix('followings')->group(function () {
+            Route::get('/', [FollowController::class, 'getFollowings'])->name('profile.followings');
+            Route::delete('/{targetId}', [FollowController::class, 'deleteFollow'])->name('profile.unfollow');
+        });
     });
 });
 

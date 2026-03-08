@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Auth;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -32,6 +33,11 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+    ];
+
+    protected $appends = [
+        'is_followed',
+        'is_following',
     ];
 
     protected function casts(): array
@@ -95,5 +101,25 @@ class User extends Authenticatable
     public function statistics(): HasOne
     {
         return $this->hasOne(UserStatistics::class);
+    }
+
+    public function followings(): HasMany
+    {
+        return $this->hasMany(Follow::class, 'origin_user_id');
+    }
+
+    public function followers(): HasMany
+    {
+        return $this->hasMany(Follow::class, 'target_user_id');
+    }
+
+    public function getIsFollowedAttribute(): bool
+    {
+        return $this->followers()->where('origin_user_id', Auth::guard('api')->user()->id)->exists();
+    }
+
+    public function getIsFollowingAttribute(): bool
+    {
+        return $this->followings()->where('target_user_id', Auth::guard('api')->user()->id)->exists();
     }
 }
