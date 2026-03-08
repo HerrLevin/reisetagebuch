@@ -2,10 +2,12 @@
 import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PostLikedNotification from '@/Pages/Notifications/Partials/PostLikedNotification.vue';
+import UserFollowedNotification from '@/Pages/Notifications/Partials/UserFollowedNotification.vue';
 import { useNotificationStore } from '@/stores/notifications';
 import {
     getTypedNotificationData,
     isPostLikedNotification,
+    isUserFollowedNotification,
 } from '@/types/notifications';
 import { storeToRefs } from 'pinia';
 import { onMounted, ref } from 'vue';
@@ -23,6 +25,9 @@ const { notifications, unreadCount, loading } = storeToRefs(store);
 const getNotificationComponent = (notification: NotificationWrapper) => {
     if (isPostLikedNotification(notification)) {
         return PostLikedNotification;
+    }
+    if (isUserFollowedNotification(notification)) {
+        return UserFollowedNotification;
     }
     return null;
 };

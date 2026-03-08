@@ -24,6 +24,13 @@ class UserRepository
         return $this->userHydrator->modelToDto($user);
     }
 
+    public function getUserById(string $userId): UserDto
+    {
+        $user = User::with('profile')->findOrFail($userId);
+
+        return $this->userHydrator->modelToDto($user);
+    }
+
     public function updateAvatar(User $user, ?string $avatarPath): UserDto
     {
         if (! $user->profile) {

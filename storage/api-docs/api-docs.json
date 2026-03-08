@@ -1465,6 +1465,45 @@
                 ]
             }
         },
+        "/timeline/global": {
+            "get": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Get timeline posts",
+                "description": "Returns paginated posts for the authenticated user / global public timeline",
+                "operationId": "getGlobalTimeline",
+                "parameters": [
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "description": "Pagination cursor",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PostPaginationDto"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    }
+                }
+            }
+        },
         "/users/{userId}/posts": {
             "get": {
                 "tags": [
@@ -2767,6 +2806,9 @@
                         "oneOf": [
                             {
                                 "$ref": "#/components/schemas/PostLikedData"
+                            },
+                            {
+                                "$ref": "#/components/schemas/UserFollowedData"
                             }
                         ]
                     }
@@ -2812,6 +2854,43 @@
                     },
                     "likedByUserAvatarUrl": {
                         "description": "Avatar URL of the user who liked the post",
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    "postSummary": {
+                        "description": "Optional summary of the liked post",
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "UserFollowedData": {
+                "description": "Data for a user followed notification",
+                "required": [
+                    "followerUserId",
+                    "followerUserName",
+                    "followerUserDisplayName",
+                    "followerUserAvatarUrl"
+                ],
+                "properties": {
+                    "followerUserId": {
+                        "description": "ID of the user who followed you",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "followerUserName": {
+                        "description": "Username of the user who followed you",
+                        "type": "string",
+                        "example": "johndoe"
+                    },
+                    "followerUserDisplayName": {
+                        "description": "Display name of the user who followed you",
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "followerUserAvatarUrl": {
+                        "description": "Avatar URL of the user who followed you",
                         "type": "string",
                         "format": "uri"
                     },
@@ -2982,7 +3061,8 @@
                 "description": "Enumeration of notification types",
                 "type": "string",
                 "enum": [
-                    "PostLikedNotification"
+                    "PostLikedNotification",
+                    "UserFollowedNotification"
                 ]
             },
             "Feature": {

@@ -3,9 +3,13 @@
 namespace App\Repositories;
 
 use App\Enums\DatabaseNotificationType;
+use App\Http\Resources\UserDto;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Notifications\Notification as NotificationObject;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 class NotificationRepository
 {
@@ -52,6 +56,27 @@ class NotificationRepository
             ->where('type', $notificationType)
             ->whereJsonContains('data', ['reference_id' => $reference]);
         $query
+            ->delete();
+    }
+
+    public function notifyUser(UserDto $user, NotificationObject $notification): void
+    {
+        $userModel = User::findOrFail($user->id);
+
+        Notification::send($userModel, $notification);
+    }
+
+    public function notifyUserById(string $userId, NotificationObject $notification): void
+    {
+        $user = User::findOrFail($userId);
+
+        Notification::send($user, $notification);
+    }
+
+    public function deleteNotificationByReferenceId(string $referenceId): void
+    {
+        DB::table('notifications')
+            ->whereLike('data', '%"reference_id":"'.$referenceId.'"%')
             ->delete();
     }
 }

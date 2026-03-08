@@ -12,6 +12,9 @@
         "fallback": "You have a new notification",
         "liked": {
             "lead": "{user} liked your post"
+        },
+        "follower": {
+            "lead": "{user} started following you"
         }
     },
     "trip_details": {

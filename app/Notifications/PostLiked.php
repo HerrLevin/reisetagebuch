@@ -23,9 +23,7 @@ class PostLiked extends Notification
 
     public function databaseType(object $notifiable): DatabaseNotificationType
     {
-
         return DatabaseNotificationType::PostLiked;
-
     }
 
     public function via(object $notifiable): array

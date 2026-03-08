@@ -6,16 +6,25 @@ use App\Exceptions\ConflictException;
 use App\Exceptions\InsufficientRightsException;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Notifications\UserFollowedNotification;
 use App\Repositories\FollowRepository;
+use App\Repositories\NotificationRepository;
+use App\Repositories\UserRepository;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class FollowController extends Controller
 {
     private FollowRepository $followRepository;
 
-    public function __construct(FollowRepository $followRepository)
+    private UserRepository $userRepository;
+
+    private NotificationRepository $notificationRepository;
+
+    public function __construct(FollowRepository $followRepository, UserRepository $userRepository, NotificationRepository $notificationRepository)
     {
         $this->followRepository = $followRepository;
+        $this->userRepository = $userRepository;
+        $this->notificationRepository = $notificationRepository;
     }
 
     public function getFollowings(string $userId): array
@@ -42,7 +51,11 @@ class FollowController extends Controller
             throw new ConflictException('Users cannot follow themselves');
         }
 
-        $this->followRepository->createFollow($originUserId, $targetUserId);
+        $originUser = $this->userRepository->getUserById($originUserId);
+        $targetUser = $this->userRepository->getUserById($targetUserId);
+
+        $reference = $this->followRepository->createFollow($originUser, $targetUser);
+        $this->notificationRepository->notifyUser($targetUser, new UserFollowedNotification($originUser, $reference));
     }
 
     /**
@@ -54,6 +67,7 @@ class FollowController extends Controller
             throw new InsufficientRightsException('You don\'t have permission to delete this follow relationship');
         }
 
-        $this->followRepository->deleteFollow($originUserId, $targetUserId);
+        $reference = $this->followRepository->deleteFollow($originUserId, $targetUserId);
+        $this->notificationRepository->deleteNotificationByReferenceId($reference);
     }
 }
