@@ -29,6 +29,7 @@ class UserHydrator
         $dto->header = $user->profile?->header ? $this->urlGenerator->to('/files/'.$user->profile?->header) : null;
         $dto->bio = $user->profile?->bio;
         $dto->website = $user->profile?->website;
+        $dto->isFollowed = $user->is_followed;
         $dto->statistics = $this->statisticsToDto($user->statistics);
         $dto->createdAt = $user->created_at->toIso8601String();
 

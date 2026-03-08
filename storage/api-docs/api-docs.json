@@ -569,6 +569,155 @@
                 }
             }
         },
+        "/users/{userId}/followers": {
+            "get": {
+                "tags": [
+                    "Follows"
+                ],
+                "summary": "Get followers data",
+                "description": "Return the users, that follow a user",
+                "operationId": "getFollowers",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/UserDto"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{userId}/followings": {
+            "get": {
+                "tags": [
+                    "Follows"
+                ],
+                "summary": "Get followings data",
+                "description": "Return the users, that a user follows",
+                "operationId": "getFollowings",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/UserDto"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{userId}/followers/{targetId}": {
+            "post": {
+                "tags": [
+                    "Follows"
+                ],
+                "summary": "Create follow relationship",
+                "description": "Create a follow relationship between two users",
+                "operationId": "createFollow",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "targetId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "successful operation"
+                    },
+                    "400": {
+                        "description": "Bad request, e.g. when trying to follow yourself"
+                    },
+                    "403": {
+                        "description": "Forbidden, e.g. when trying to follow on behalf of another user"
+                    },
+                    "404": {
+                        "description": "Not found, e.g. when the user or target user does not exist"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Follows"
+                ],
+                "summary": "Delete follow relationship",
+                "description": "Delete a follow relationship between two users",
+                "operationId": "deleteFollow",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "targetId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "successful operation"
+                    },
+                    "403": {
+                        "description": "Forbidden, e.g. when trying to follow on behalf of another user"
+                    },
+                    "404": {
+                        "description": "Not found, e.g. when the user or target user does not exist"
+                    }
+                }
+            }
+        },
         "/invites": {
             "get": {
                 "tags": [
@@ -3679,6 +3828,10 @@
                         "format": "uri",
                         "nullable": true
                     },
+                    "isFollowed": {
+                        "description": "Indicates if the current user is following this user",
+                        "type": "boolean"
+                    },
                     "statistics": {
                         "$ref": "#/components/schemas/UserStatisticsDto"
                     },
@@ -3786,6 +3939,10 @@
         {
             "name": "Authentication",
             "description": "Authentication"
+        },
+        {
+            "name": "Follows",
+            "description": "Follows"
         },
         {
             "name": "Invites",

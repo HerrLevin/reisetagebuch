@@ -169,6 +169,8 @@
         "profile_picture": "Profile Picture",
         "max_size": "Maximum size: 2MB",
         "header_image": "Header Image",
+        "follow": "Follow",
+        "unfollow": "Unfollow",
         "menu": {
             "posts": "Posts",
             "map": "Map"
