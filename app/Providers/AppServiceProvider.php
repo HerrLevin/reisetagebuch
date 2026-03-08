@@ -13,12 +13,14 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Passport\Passport;
 use Laravel\Socialite\Facades\Socialite;
 
 class AppServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
+        Passport::loadKeysFrom(__DIR__.'/../../storage/oauth-keys');
         JsonResource::withoutWrapping();
         Vite::prefetch(concurrency: 3);
 
