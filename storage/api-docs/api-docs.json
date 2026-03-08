@@ -2777,6 +2777,12 @@
                     },
                     "user": {
                         "$ref": "#/components/schemas/AuthenticatedUserDto"
+                    },
+                    "expiresAt": {
+                        "description": "The expiration time of the token",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-12-31T23:59:59Z"
                     }
                 },
                 "type": "object"

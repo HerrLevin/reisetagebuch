@@ -6,6 +6,7 @@ use App\Dto\TokenResponseDto;
 use App\Http\Controllers\Backend\AuthBackend;
 use App\Models\User;
 use App\Repositories\InviteRepository;
+use Carbon\Carbon;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Events\Verified;
@@ -85,11 +86,12 @@ class AuthController extends Controller
 
         /** @var User $user */
         $user = Auth::user();
-        $token = $user->createToken('spa')->accessToken;
+        $token = $user->createToken('spa');
 
         return new TokenResponseDto(
-            token: $token,
+            token: $token->accessToken,
             user: $this->backend->getAuthenticatedUser($user),
+            expiresAt: Carbon::now()->addSeconds($token->expiresIn)
         );
     }
 
@@ -167,12 +169,13 @@ class AuthController extends Controller
 
         event(new Registered($user));
 
-        $token = $user->createToken('spa')->accessToken;
+        $token = $user->createToken('spa');
 
         return response()->json(
             new TokenResponseDto(
-                token: $token,
+                token: $token->accessToken,
                 user: $this->backend->getAuthenticatedUser($user),
+                expiresAt: Carbon::now()->addSeconds($token->expiresIn)
             ),
             201
         );

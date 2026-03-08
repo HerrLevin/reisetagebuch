@@ -24,7 +24,7 @@ if (!user.user) {
 async function logout() {
     await authStore.logout();
     user.invalidateUser();
-    router.push({ name: 'login' });
+    router.push({ name: 'login', query: { loggedOut: 'true' } });
 }
 </script>
 

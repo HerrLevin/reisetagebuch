@@ -7,6 +7,7 @@ import AuthLayout from '@/Layouts/AuthLayout.vue';
 import { useAppConfigurationStore } from '@/stores/appConfiguration';
 import { useAuthStore } from '@/stores/auth';
 import { useUserStore } from '@/stores/user';
+import { Info } from 'lucide-vue-next';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { RouterLink, useRouter } from 'vue-router';
@@ -62,6 +63,13 @@ const submit = async () => {
         </h2>
         <div v-if="status" class="text-success mb-4 text-sm font-medium">
             {{ status }}
+        </div>
+        <div
+            v-if="router.currentRoute.value.query.loggedOut === 'true'"
+            class="alert alert-info my-4"
+        >
+            <Info class="size-4" />
+            {{ t('auth.logged_out') }}
         </div>
 
         <form @submit.prevent="submit">

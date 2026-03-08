@@ -38,7 +38,7 @@ const submit = async () => {
 const logout = async () => {
     await authStore.logout();
     userStore.invalidateUser();
-    router.push({ name: 'login' });
+    router.push({ name: 'login', query: { loggedOut: 'true' } });
 };
 </script>
 

@@ -375,6 +375,12 @@ export interface TokenResponseDto {
   token: string;
   /** Data Transfer Object representing the authenticated user */
   user: AuthenticatedUserDto;
+  /**
+   * The expiration time of the token
+   * @format date-time
+   * @example "2024-12-31T23:59:59Z"
+   */
+  expiresAt?: string;
 }
 
 /** Data Transfer Object for Trip Creation Response */
