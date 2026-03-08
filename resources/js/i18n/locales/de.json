@@ -178,7 +178,8 @@
             "map": "Karte"
         },
         "stats": {
-            "friends": "Freund | Freunde",
+            "followers": "Follower | Follower",
+            "followings": "Following | Followings",
             "locations": "Ort | Orte",
             "trips": "Trip | Trips",
             "posts": "Beitrag | Beiträge"

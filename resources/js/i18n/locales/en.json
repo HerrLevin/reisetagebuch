@@ -180,7 +180,8 @@
             "map": "Map"
         },
         "stats": {
-            "friends": "Friend | Friends",
+            "followers": "Follower | Followers",
+            "followings": "Following | Followings",
             "locations": "Location | Locations",
             "trips": "Trip | Trips",
             "posts": "Post | Posts"
