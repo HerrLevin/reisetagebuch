@@ -28,8 +28,8 @@ php artisan migrate --force
 echo "Clearing caches..."
 php artisan optimize
 
-echo "Seeding api keys..."
-php artisan passport:keys --silent
+echo "Generating Passport keys (skipped if they already exist)..."
+php artisan passport:keys || true
 
 echo "Restart queue workers..."
 php artisan queue:restart
