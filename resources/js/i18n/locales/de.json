@@ -51,6 +51,7 @@
         "confirm_password_title": "Passwort bestätigen",
         "confirm_password": "Dies ist ein sicherer Bereich der Anwendung. Bitte bestätige dein Passwort, bevor du fortfahren kannst.",
         "password": "Passwort",
+        "logged_out": "Du wurdest abgemeldet.",
         "forgot_password": {
             "title": "Passwort vergessen",
             "message": "Passwort vergessen? Kein Problem. Teile uns einfach deine E-Mail-Adresse mit und wir senden dir einen Link, mit dem zu dein Passwort zurücksetzen kannst.",

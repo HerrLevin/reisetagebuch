@@ -37,6 +37,7 @@ const routes: RouteRecordRaw[] = [
         name: 'login',
         component: Login,
         meta: { guest: true },
+        props: true,
     },
     {
         path: '/register',

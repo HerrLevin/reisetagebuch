@@ -6,9 +6,14 @@ export const useAuthStore = defineStore(
     'auth',
     () => {
         const token = ref<string | null>(null);
+        const expiresAt = ref<string | null>(null);
 
-        function setToken(newToken: string | null) {
+        function setToken(
+            newToken: string | null,
+            newExpiresAt: string | null = null,
+        ) {
             token.value = newToken;
+            expiresAt.value = newExpiresAt;
             setupApiAuth(newToken);
         }
 
@@ -23,7 +28,7 @@ export const useAuthStore = defineStore(
                 email,
                 password,
             });
-            setToken(response.data.token);
+            setToken(response.data.token, response.data.expiresAt);
             return response.data;
         }
 
@@ -36,7 +41,7 @@ export const useAuthStore = defineStore(
             invite?: string;
         }) {
             const response = await api.auth.register(data);
-            setToken(response.data.token);
+            setToken(response.data.token, response.data.expiresAt);
             return response.data;
         }
 
@@ -53,6 +58,7 @@ export const useAuthStore = defineStore(
 
         return {
             token,
+            expiresAt,
             setToken,
             initializeAuth,
             login,

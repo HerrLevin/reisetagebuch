@@ -53,6 +53,7 @@
         "confirm_password_title": "Confirm Password",
         "confirm_password": "This is a secure area of the application. Please confirm your password before continuing.",
         "password": "Password",
+        "logged_out": "You have been logged out.",
         "forgot_password": {
             "title": "Forgot Password",
             "message": "Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.",
