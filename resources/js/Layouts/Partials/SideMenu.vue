@@ -50,7 +50,7 @@ const isPostsCreateRoute = () => {
     return (currentRoute.name as string)?.startsWith('posts.create');
 };
 const isDashboardRoute = () => {
-    return currentRoute.name === 'dashboard';
+    return currentRoute.name === 'timeline';
 };
 const isTripRoute = () => {
     return currentRoute.name === 'trips.create';

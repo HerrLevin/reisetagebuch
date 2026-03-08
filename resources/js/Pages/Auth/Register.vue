@@ -58,7 +58,7 @@ const submit = async () => {
             invite: form.value.invite || undefined,
         });
         await userStore.fetchUser(true);
-        router.push({ name: 'dashboard' });
+        router.push({ name: 'timeline' });
     } catch (error) {
         if (error.response?.status === 422) {
             const responseErrors = error.response.data.errors || {};

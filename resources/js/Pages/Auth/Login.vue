@@ -38,7 +38,7 @@ const submit = async () => {
     try {
         await authStore.login(form.value.email, form.value.password);
         await userStore.fetchUser(true);
-        router.push({ name: 'dashboard' });
+        router.push({ name: 'timeline' });
     } catch (error) {
         if (error.response?.status === 422) {
             const responseErrors = error.response.data.errors || {};

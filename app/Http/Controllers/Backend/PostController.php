@@ -128,9 +128,14 @@ class PostController extends Controller
         return $post;
     }
 
-    public function dashboard(User $user): PostPaginationDto
+    public function timeline(User $user): PostPaginationDto
     {
-        return $this->postRepository->getDashboardForUser($user);
+        return $this->postRepository->getTimelineForUser($user);
+    }
+
+    public function globalTimeline(?User $user = null): PostPaginationDto
+    {
+        return $this->postRepository->getGlobalTimeline($user);
     }
 
     public function postsForUser(string $userId, ?User $visitingUser = null): PostPaginationDto

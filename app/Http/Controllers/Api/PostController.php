@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Dto\FilteredPostPaginationDto;
+use App\Dto\PaginationDto;
 use App\Dto\PostPaginationDto;
 use App\Enums\PostMetaInfo\TravelReason;
 use App\Enums\Visibility;
@@ -63,7 +64,37 @@ class PostController extends Controller
     )]
     public function timeline(): PostPaginationDto
     {
-        return $this->postController->dashboard($this->auth->user());
+        return $this->postController->timeline($this->auth->user());
+    }
+
+    #[OA\Get(
+        path: '/timeline/global',
+        operationId: 'getGlobalTimeline',
+        description: 'Returns paginated posts for the authenticated user / global public timeline',
+        summary: 'Get timeline posts',
+        tags: ['Posts'],
+        parameters: [
+            new OA\Parameter(
+                name: 'cursor',
+                description: 'Pagination cursor',
+                in: 'query',
+                required: false,
+                schema: new OA\Schema(type: 'string')
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'successful operation',
+                content: new OA\JsonContent(ref: PostPaginationDto::class)
+            ),
+            new OA\Response(response: 400, description: 'Bad request'),
+            new OA\Response(response: 404, description: 'Resource Not Found'),
+        ]
+    )]
+    public function globalTimeline(): PaginationDto
+    {
+        return $this->postController->globalTimeline($this->auth->user());
     }
 
     #[OA\Get(
