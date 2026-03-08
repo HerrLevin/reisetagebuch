@@ -2,6 +2,7 @@
 import { api } from '@/api';
 import Loading from '@/Components/Loading.vue';
 import Post from '@/Components/Post/Post.vue';
+import TimelineSelect from '@/Pages/Home/TimelineSelect.vue';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { RouterLink } from 'vue-router';
@@ -20,7 +21,7 @@ function loadPosts() {
 
     loading.value = true;
     api.timeline
-        .timeline({ cursor: nextCursor.value || undefined })
+        .getGlobalTimeline({ cursor: nextCursor.value || undefined })
         .then((response) => {
             posts.value.push(...response.data.items);
             if (response.data.nextCursor === nextCursor.value) {
@@ -46,8 +47,10 @@ loadPosts();
 
 <template>
     <ul class="list">
-        <li class="p-4 pb-2 text-xs tracking-wide opacity-60">
-            {{ t('pages.timeline.your_timeline') }}
+        <li class="p-4 pb-2 text-xs tracking-wide">
+            <TimelineSelect>
+                {{ t('pages.timeline.global_timeline') }}
+            </TimelineSelect>
         </li>
         <li v-for="post in posts" :key="post.id">
             <RouterLink
@@ -63,6 +66,5 @@ loadPosts();
             </button>
         </li>
         <Loading v-show="loading" class="m-4 mx-auto" />
-        <!--        <InfiniteScroller :only="['posts']" />-->
     </ul>
 </template>

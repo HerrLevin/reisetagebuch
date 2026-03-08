@@ -33,7 +33,8 @@
     "pages": {
         "timeline": {
             "title": "Timeline",
-            "your_timeline": "Deine Timeline"
+            "your_timeline": "Deine Timeline",
+            "global_timeline": "Globale Timeline"
         },
         "location_history": {
             "title": "Standortverlauf",

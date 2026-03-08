@@ -35,7 +35,8 @@
     "pages": {
         "timeline": {
             "title": "Timeline",
-            "your_timeline": "Your Timeline"
+            "your_timeline": "Your Timeline",
+            "global_timeline": "Global Timeline"
         },
         "location_history": {
             "title": "Location History",

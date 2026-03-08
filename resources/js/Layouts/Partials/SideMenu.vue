@@ -49,7 +49,7 @@ const isNotificationRoute = () => {
 const isPostsCreateRoute = () => {
     return (currentRoute.name as string)?.startsWith('posts.create');
 };
-const isDashboardRoute = () => {
+const ishomeRoute = () => {
     return currentRoute.name === 'timeline';
 };
 const isTripRoute = () => {
@@ -65,7 +65,7 @@ const isFilterRoute = () => {
         <li>
             <RouterLink
                 to="/home"
-                :class="{ 'btn-active': isDashboardRoute() }"
+                :class="{ 'btn-active': ishomeRoute() }"
                 class="btn btn-ghost"
             >
                 <House class="size-5" />
