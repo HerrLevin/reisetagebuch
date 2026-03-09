@@ -192,6 +192,11 @@
     },
     "settings": {
         "title": "Settings",
+        "traewelling_callback": {
+            "missing_code": "Authorization code is missing from the callback URL.",
+            "success": "Your Träwelling account has been successfully connected!",
+            "error": "An error occurred while connecting your Träwelling account. Please try again."
+        },
         "connect_traewelling": "Connect Träwelling Account",
         "connected_to_traewelling": "Connected to Träwelling",
         "disconnect_traewelling": "Disconnect Träwelling",

@@ -82,7 +82,7 @@ const routes: RouteRecordRaw[] = [
         meta: { auth: true },
     },
     {
-        path: '/account',
+        path: '/settings',
         name: 'account.edit',
         component: EditSettings,
         meta: { auth: true },
@@ -190,6 +190,11 @@ const routes: RouteRecordRaw[] = [
         name: 'profile.map',
         component: ProfileShowMap,
         props: true,
+    },
+    {
+        path: '/socialite/traewelling/callback',
+        name: 'socialite.traewelling.callback',
+        component: EditSettings,
     },
 ];
 
