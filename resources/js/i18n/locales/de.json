@@ -34,7 +34,10 @@
         "timeline": {
             "title": "Timeline",
             "your_timeline": "Deine Timeline",
-            "global_timeline": "Globale Timeline"
+            "global_timeline": "Globale Timeline",
+            "no_posts": "Keine Beiträge vorhanden. Beginne mit dem Teilen deiner Reisen, indem du einen neuen Beitrag erstellst!",
+            "no_followings": "Du folgst noch niemandem. Folge anderen Reisenden, um deren Beiträge in deiner Timeline zu sehen!",
+            "discover_followings": "Du kannst andere Personen in der globalen Timeline entdecken, indem du auf die Schaltfläche oben auf der Seite klickst."
         },
         "location_history": {
             "title": "Standortverlauf",

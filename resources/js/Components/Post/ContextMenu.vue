@@ -197,7 +197,7 @@ function blur() {
 </script>
 
 <template>
-    <div class="dropdown dropdown-top dropdown-end" @click.prevent>
+    <div class="dropdown dropdown-top dropdown-end" @click.stop>
         <div tabindex="0" role="button" class="btn btn-ghost btn-sm btn-circle">
             <Ellipsis />
         </div>
