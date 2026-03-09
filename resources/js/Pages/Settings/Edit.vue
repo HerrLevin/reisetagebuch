@@ -35,7 +35,7 @@ function disconnectTraewelling() {
     api.account
         .disconnectTraewelling()
         .then(() => {
-            window.location.reload();
+            user.fetchUser(true);
         })
         .catch((error) => {
             alert(

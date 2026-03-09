@@ -282,7 +282,7 @@ function blur() {
 
             <div class="modal-action">
                 <form method="dialog">
-                    <button class="btn" @click.prevent="deleteModal?.close()">
+                    <button class="btn" @click.stop="deleteModal?.close()">
                         {{ t('verbs.cancel') }}
                     </button>
                 </form>
@@ -290,7 +290,7 @@ function blur() {
                 <button
                     class="btn btn-error"
                     :disabled="deleteProcessing"
-                    @click.prevent="deletePost()"
+                    @click.stop="deletePost()"
                 >
                     {{ t('verbs.delete') }}
                 </button>
