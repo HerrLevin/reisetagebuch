@@ -73,7 +73,7 @@ async function logout() {
                             </RouterLink>
                         </li>
                         <li>
-                            <RouterLink to="/account">
+                            <RouterLink :to="{ name: 'account.edit' }">
                                 <Settings class="size-4" />
                                 {{ t('settings.title') }}
                             </RouterLink>

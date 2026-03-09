@@ -7,6 +7,7 @@ use App\Models\Invite;
 use App\Policies\InvitePolicy;
 use App\Policies\PostPolicy;
 use App\Services\Socialite\TraewellingProvider;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Gate;
@@ -43,6 +44,8 @@ class AppServiceProvider extends ServiceProvider
         Socialite::extend('traewelling', function ($app) {
             $config = $app['config']['services.traewelling'];
             $redirectUri = $config['redirect'] ?? config('app.url').'/socialite/traewelling/callback';
+
+            // create empty request with session to avoid "Session store not set on request" error
 
             return new TraewellingProvider(
                 $app['request'],

@@ -2111,6 +2111,86 @@
                 ]
             }
         },
+        "/socialite/traewelling/connect": {
+            "get": {
+                "tags": [
+                    "Socialite"
+                ],
+                "summary": "Redirects the user to Traewelling for OAuth authentication",
+                "operationId": "connectTraewelling",
+                "responses": {
+                    "200": {
+                        "description": "Redirect to Traewelling for authentication",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "required": [
+                                        "url"
+                                    ],
+                                    "properties": {
+                                        "url": {
+                                            "description": "The URL to redirect the user to for Traewelling authentication",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - user must be authenticated to connect Traewelling account"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/socialite/traewelling/callback": {
+            "get": {
+                "tags": [
+                    "Socialite"
+                ],
+                "summary": "Handles the callback from Traewelling after OAuth authentication",
+                "operationId": "handleTraewellingCallback",
+                "parameters": [
+                    {
+                        "name": "code",
+                        "in": "query",
+                        "description": "The authorization code returned by Traewelling after successful authentication",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "state",
+                        "in": "query",
+                        "description": "The state parameter to prevent CSRF attacks (optional)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Traewelling account connected successfully"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - failed to connect Traewelling account"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
         "/trips": {
             "post": {
                 "tags": [
@@ -4043,6 +4123,10 @@
         {
             "name": "TransportPosts",
             "description": "TransportPosts"
+        },
+        {
+            "name": "Socialite",
+            "description": "Socialite"
         },
         {
             "name": "Trips",

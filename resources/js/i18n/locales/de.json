@@ -190,6 +190,11 @@
     },
     "settings": {
         "title": "Einstellungen",
+        "traewelling_callback": {
+            "missing_code": "Autirisierungs-Code fehlt in der callback-URL.",
+            "success": "Dein Träwelling-Account wurde erfolgreich verbunden!",
+            "error": "Es gab einen Fehler bei der Verbindung deines Träwelling-Accounts. Bitte versuche es erneut."
+        },
         "connect_traewelling": "Träwelling-Account verbinden",
         "connected_to_traewelling": "Mit Träwelling verbunden",
         "disconnect_traewelling": "Träwelling-Verbindung trennen",

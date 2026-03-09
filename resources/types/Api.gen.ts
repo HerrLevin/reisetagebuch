@@ -2430,6 +2430,57 @@ export class Api<
         ...params,
       }),
   };
+  socialite = {
+    /**
+     * No description
+     *
+     * @tags Socialite
+     * @name ConnectTraewelling
+     * @summary Redirects the user to Traewelling for OAuth authentication
+     * @request GET:/socialite/traewelling/connect
+     * @secure
+     */
+    connectTraewelling: (params: RequestParams = {}) =>
+      this.request<
+        {
+          /** The URL to redirect the user to for Traewelling authentication */
+          url: string;
+        },
+        void
+      >({
+        path: `/socialite/traewelling/connect`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Socialite
+     * @name HandleTraewellingCallback
+     * @summary Handles the callback from Traewelling after OAuth authentication
+     * @request GET:/socialite/traewelling/callback
+     * @secure
+     */
+    handleTraewellingCallback: (
+      query: {
+        /** The authorization code returned by Traewelling after successful authentication */
+        code: string;
+        /** The state parameter to prevent CSRF attacks (optional) */
+        state?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<void, void>({
+        path: `/socialite/traewelling/callback`,
+        method: "GET",
+        query: query,
+        secure: true,
+        ...params,
+      }),
+  };
   trips = {
     /**
      * @description Create a new trip

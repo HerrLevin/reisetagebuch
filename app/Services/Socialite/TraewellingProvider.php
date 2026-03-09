@@ -10,6 +10,8 @@ class TraewellingProvider extends AbstractProvider implements ProviderInterface
 {
     protected $scopes = ['write-statuses', 'read-statuses'];
 
+    protected $scopeSeparator = ' ';
+
     /**
      * {@inheritdoc}
      */
@@ -24,11 +26,6 @@ class TraewellingProvider extends AbstractProvider implements ProviderInterface
     protected function getTokenUrl(): string
     {
         return config('services.traewelling.base_uri').'/oauth/token';
-    }
-
-    protected function formatScopes(array $scopes, $scopeSeparator)
-    {
-        return $scopes;
     }
 
     /**

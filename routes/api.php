@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\LocationController as ApiLocationController;
 use App\Http\Controllers\Api\MapController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PostController;
+use App\Http\Controllers\Api\TraewellingOAuthController;
 use App\Http\Controllers\Api\TripController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\UserSettingsController;
@@ -49,6 +50,11 @@ route::get('app/configuration', [AppConfigurationController::class, 'index'])
     ->name('app.configuration');
 
 Route::middleware('auth:api')->group(function () {
+    Route::prefix('socialite')->group(function () {
+        Route::get('/traewelling/connect', [TraewellingOAuthController::class, 'redirectToProvider'])->name('traewelling.connect');
+        Route::get('/traewelling/callback', [TraewellingOAuthController::class, 'handleProviderCallback'])->name('traewelling.callback');
+    });
+
     // Auth routes (authenticated)
     Route::prefix('auth')->group(function () {
         Route::get('/user', [AuthController::class, 'user'])->name('auth.user');
