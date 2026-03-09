@@ -2,7 +2,7 @@
 import { api } from '@/api';
 import Loading from '@/Components/Loading.vue';
 import Post from '@/Components/Post/Post.vue';
-import TimelineSelect from '@/Pages/Home/TimelineSelect.vue';
+import { ChevronsUpDown } from 'lucide-vue-next';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { RouterLink } from 'vue-router';
@@ -48,9 +48,10 @@ loadPosts();
 <template>
     <ul class="list">
         <li class="p-4 pb-2 text-xs tracking-wide">
-            <TimelineSelect>
+            <RouterLink :to="{ name: 'home' }" class="btn btn-sm">
                 {{ t('pages.timeline.global_timeline') }}
-            </TimelineSelect>
+                <ChevronsUpDown class="ml-1 h-4 w-4" />
+            </RouterLink>
         </li>
         <li v-for="post in posts" :key="post.id">
             <RouterLink

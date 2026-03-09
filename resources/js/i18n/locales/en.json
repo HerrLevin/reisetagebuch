@@ -36,7 +36,10 @@
         "timeline": {
             "title": "Timeline",
             "your_timeline": "Your Timeline",
-            "global_timeline": "Global Timeline"
+            "global_timeline": "Global Timeline",
+            "no_posts": "No posts to show. Start sharing your travels by creating a new post!",
+            "no_followings": "You are not following anyone yet. Follow other travelers to see their posts in your timeline!",
+            "discover_followings": "You can discover other peoople on the global timeline, by pressing the button at the top of the page."
         },
         "location_history": {
             "title": "Location History",
