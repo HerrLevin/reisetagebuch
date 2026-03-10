@@ -7,6 +7,7 @@ import Register from '@/Pages/Auth/Register.vue';
 import ResetPassword from '@/Pages/Auth/ResetPassword.vue';
 import VerifyEmail from '@/Pages/Auth/VerifyEmail.vue';
 import EditPost from '@/Pages/EditPost.vue';
+import NotFound from '@/Pages/Errors/NotFound.vue';
 import Home from '@/Pages/Home.vue';
 import Invites from '@/Pages/Invites.vue';
 import LocationHistoryIndex from '@/Pages/LocationHistory/Index.vue';
@@ -196,6 +197,7 @@ const routes: RouteRecordRaw[] = [
         name: 'socialite.traewelling.callback',
         component: EditSettings,
     },
+    { path: '/:pathMatch(.*)*', name: 'not-found', component: NotFound },
 ];
 
 const router = createRouter({

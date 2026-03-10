@@ -17,7 +17,7 @@ const user = useUserStore();
 const authStore = useAuthStore();
 const router = useRouter();
 
-if (!user.user) {
+if (!user.user && authStore.isAuthenticated()) {
     user.fetchUser();
 }
 

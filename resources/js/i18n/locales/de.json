@@ -242,7 +242,17 @@
     "errors": {
         "network_nok": "Die Netzwerkantwort war nicht in Ordnung",
         "form_error_count": "Es gibt {0} Formularfehler.",
-        "failed_delete_account": "Fehler beim Löschen des Accounts. Bitte versuche es später erneut."
+        "failed_delete_account": "Fehler beim Löschen des Accounts. Bitte versuche es später erneut.",
+        "404": {
+            "title": "Seite nicht gefunden",
+            "message": "Die Seite, die du suchst, existiert nicht oder wurde verschoben.",
+            "link_text": "Zur Startseite zurückkehren"
+        },
+        "403": {
+            "title": "Nicht berechtigt",
+            "message": "Du hast keine Berechtigung, diese Seite zu sehen.",
+            "link_text": "Zur Startseite zurückkehren"
+        }
     },
     "share": {
         "post_title": "Beitrag teilen",
