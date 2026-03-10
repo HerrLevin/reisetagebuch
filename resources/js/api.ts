@@ -4,6 +4,7 @@ import { useUserStore } from '@/stores/user';
 import { Api } from '../types/Api.gen';
 
 const apiBaseUrl = '/api';
+
 const api = new Api({ baseURL: apiBaseUrl });
 
 export function setupApiAuth(token: string | null) {
@@ -20,8 +21,13 @@ api.instance.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            console.log('middleware: clearing token and user on 401');
-            useAuthStore().setToken(null);
+            const auth = useAuthStore();
+
+            if (!auth.isAuthenticated()) {
+                return;
+            }
+
+            auth.setToken(null);
             setupApiAuth(null);
             useUserStore().invalidateUser();
             router
@@ -30,6 +36,22 @@ api.instance.interceptors.response.use(
                     query: {
                         loggedOut: 'true',
                     },
+                })
+                .then((r) => r);
+        }
+
+        if (error.response?.status === 403) {
+            router
+                .push({
+                    name: 'forbidden',
+                })
+                .then((r) => r);
+        }
+
+        if (error.response?.status === 404) {
+            router
+                .push({
+                    name: 'not-found',
                 })
                 .then((r) => r);
         }

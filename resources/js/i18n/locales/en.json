@@ -246,7 +246,17 @@
     "errors": {
         "network_nok": "Network response was not ok",
         "form_error_count": "There are {0} form errors.",
-        "failed_delete_account": "Failed to delete account. Please try again."
+        "failed_delete_account": "Failed to delete account. Please try again.",
+        "404": {
+            "title": "Page Not Found",
+            "message": "Sorry, the page you are looking for could not be found.",
+            "link_text": "Go back home"
+        },
+        "403": {
+            "title": "Forbidden",
+            "message": "You don't have permission to access this page.",
+            "link_text": "Go back home"
+        }
     },
     "share": {
         "post_title": "Share Post",

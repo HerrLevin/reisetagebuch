@@ -10,7 +10,7 @@ const { t } = useI18n();
 
 const user = useUserStore();
 
-if (!user.user) {
+if (!user.user && authStore.isAuthenticated()) {
     user.fetchUser();
 }
 </script>

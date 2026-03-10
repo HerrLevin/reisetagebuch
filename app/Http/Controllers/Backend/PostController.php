@@ -148,13 +148,7 @@ class PostController extends Controller
      */
     public function show(string $postId, ?User $visitingUser = null): BasePost|LocationPost|TransportPost
     {
-        $post = $this->postRepository->getById($postId, $visitingUser);
-
-        if ($visitingUser?->can('view', $post)) {
-            return $post;
-        }
-
-        throw new AuthorizationException('This post is not visible to you.');
+        return $this->postRepository->getById($postId, $visitingUser);
     }
 
     /**
