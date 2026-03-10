@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { UserDto } from '@/types';
 import { PropType } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { RouterLink } from 'vue-router';
+import { UserDto } from '../../../../types/Api.gen';
 
 const { t } = useI18n();
 

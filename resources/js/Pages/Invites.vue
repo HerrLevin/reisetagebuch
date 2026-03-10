@@ -2,16 +2,16 @@
 import { api } from '@/api';
 import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import type { Invite } from '@/types';
 import { DateTime } from 'luxon';
 import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { InviteDto } from '../../types/Api.gen';
 
 const { t } = useI18n();
 
 useTitle(t('invites.title'));
 
-const invites = ref<Invite[]>([]);
+const invites = ref<InviteDto[]>([]);
 const loading = ref(false);
 
 async function fetchInvites(): Promise<void> {

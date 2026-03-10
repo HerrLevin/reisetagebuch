@@ -3,10 +3,15 @@ import { api } from '@/api';
 import SelectInput from '@/Components/SelectInput.vue';
 import TagsInput from '@/Pages/NewPostDialog/Partials/TagsInput.vue';
 import { getVisibilityLabel } from '@/Services/VisibilityMapping';
-import { TravelReason, Visibility } from '@/types/enums';
 import { computed, PropType, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { BasePost, LocationPost, TransportPost } from '../../../types/Api.gen';
+import {
+    BasePost,
+    LocationPost,
+    TransportPost,
+    TravelReason,
+    Visibility,
+} from '../../../types/Api.gen';
 
 const { t } = useI18n();
 

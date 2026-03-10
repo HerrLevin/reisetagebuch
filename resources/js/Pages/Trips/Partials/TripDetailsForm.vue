@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { getEmoji, getName } from '@/Services/DepartureTypeService';
-import { TransportMode } from '@/types/enums';
 import { CreateTripForm } from '@/types/TripCreation';
 import { DateTime } from 'luxon';
 import { useI18n } from 'vue-i18n';
+import { TransportMode } from '../../../../types/Api.gen';
 
 const { t } = useI18n();
 

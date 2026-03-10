@@ -3,8 +3,8 @@ import { api } from '@/api';
 import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PostCreationForm from '@/Pages/NewPostDialog/Partials/PostCreationForm.vue';
-import { getBaseText, prettyDates } from '@/Services/ApiPostTextService';
-import { isApiLocationPost, isApiTransportPost } from '@/types/PostTypes';
+import { getBaseText, prettyDates } from '@/Services/PostTextService';
+import { isLocationPost, isTransportPost } from '@/types/PostTypes';
 import { reactive, ref, watchEffect } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
@@ -145,9 +145,9 @@ fetchPost();
                     :tags="form.tags"
                     :travel-reason="form.travelReason"
                     :show-travel-reason="
-                        isApiTransportPost(post) || isApiLocationPost(post)
+                        isTransportPost(post) || isLocationPost(post)
                     "
-                    :show-vehicle-id="isApiTransportPost(post)"
+                    :show-vehicle-id="isTransportPost(post)"
                     :vehicle-ids="form.vehicleIds"
                     :travel-role="form.travelRole"
                     :meta-trip-id="form.metaTripId"

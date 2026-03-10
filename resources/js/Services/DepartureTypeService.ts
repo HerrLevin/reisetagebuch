@@ -1,6 +1,5 @@
 import i18n from '@/i18n';
-import { TransportMode } from '@/types/enums';
-import { TransportPost } from '@/types/PostTypes';
+import { TransportMode, TransportPost } from '../../types/Api.gen';
 
 const { t } = i18n.global;
 

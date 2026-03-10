@@ -4,11 +4,15 @@ import Loading from '@/Components/Loading.vue';
 import Post from '@/Components/Post/Post.vue';
 import { useTitle } from '@/composables/useTitle';
 import ProfileWrapper from '@/Pages/Profile/ProfileWrapper.vue';
-import type { UserDto } from '@/types';
 import { ref, watchEffect } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { RouterLink } from 'vue-router';
-import { BasePost, LocationPost, TransportPost } from '../../../types/Api.gen';
+import {
+    BasePost,
+    LocationPost,
+    TransportPost,
+    UserDto,
+} from '../../../types/Api.gen';
 
 const { t } = useI18n();
 

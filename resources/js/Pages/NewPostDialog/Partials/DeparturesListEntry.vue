@@ -6,14 +6,14 @@ import {
     getDepartureTripNumber,
 } from '@/Services/LineNameFormattingService';
 import MotisTimeService from '@/Services/MotisTimeService';
-import { StopDto, StopTime } from '@/types';
 import { defineProps, PropType, ref } from 'vue';
 import { RouterLink } from 'vue-router';
+import { StopDto, StopTimeDto } from '../../../../types/Api.gen';
 
 const props = defineProps({
     stopTime: {
-        type: Object as PropType<StopTime>,
-        default: () => ({}) as StopTime,
+        type: Object as PropType<StopTimeDto>,
+        default: () => ({}) as StopTimeDto,
     },
     showStartButton: {
         type: Boolean,
@@ -34,7 +34,7 @@ const delay = ref(timeService.delay);
 
 emoji.value = getEmoji(props.stopTime.mode);
 
-function getRouteTextColor(stopTime: StopTime) {
+function getRouteTextColor(stopTime: StopTimeDto) {
     if (stopTime.routeTextColor) {
         return '#' + stopTime.routeTextColor;
     }
@@ -60,7 +60,7 @@ function getContrastTextColor(hexColor: string) {
     return luminance > 0.5 ? '#000000' : '#FFFFFF';
 }
 
-function getRouteColor(stopTime: StopTime) {
+function getRouteColor(stopTime: StopTimeDto) {
     if (stopTime.routeColor) {
         return '#' + stopTime.routeColor;
     }

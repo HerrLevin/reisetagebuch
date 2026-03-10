@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { UserDto } from '@/types';
 import { Calendar, Link } from 'lucide-vue-next';
 import { DateTime } from 'luxon';
 import { PropType } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { UserDto } from '../../../../types/Api.gen';
 
 const { t } = useI18n();
 

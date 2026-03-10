@@ -4,10 +4,9 @@ import InputLabel from '@/Components/InputLabel.vue';
 import TextArea from '@/Components/TextArea.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { useUserStore } from '@/stores/user';
-import { UserDto } from '@/types';
 import { PropType, reactive, ref, useTemplateRef } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { UpdateProfileRequest } from '../../../../types/Api.gen';
+import { UpdateProfileRequest, UserDto } from '../../../../types/Api.gen';
 
 const { t } = useI18n();
 

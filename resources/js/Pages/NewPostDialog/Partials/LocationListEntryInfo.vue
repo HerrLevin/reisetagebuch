@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { defineProps, ref } from 'vue';
-import { LocationEntry, LocationIdentifier } from '@/types';
 import { ExternalLink } from 'lucide-vue-next';
 import { useI18n } from 'vue-i18n';
+import { LocationDto, LocationIdentifierDto } from '../../../../types/Api.gen';
 
 const { t } = useI18n();
 
 const props = defineProps({
     location: {
         type: Object,
-        default: () => ({}) as LocationEntry,
+        default: () => ({}) as LocationDto,
     },
     showStartButton: {
         type: Boolean,
@@ -24,13 +24,13 @@ const props = defineProps({
 const tagModal = ref<HTMLDialogElement | null>(null);
 const modalBox = ref<HTMLElement | null>(null);
 
-const osmIdentifier = ref<LocationIdentifier | null>(null);
+const osmIdentifier = ref<LocationIdentifierDto | null>(null);
 
 osmIdentifier.value = props.location.identifiers.find(
-    (id: LocationIdentifier) => id.origin === 'osm',
+    (id: LocationIdentifierDto) => id.origin === 'osm',
 );
 
-function getOsmLink(identifier: LocationIdentifier): string {
+function getOsmLink(identifier: LocationIdentifierDto): string {
     return `https://www.openstreetmap.org/${identifier.type}/${identifier.identifier}`;
 }
 

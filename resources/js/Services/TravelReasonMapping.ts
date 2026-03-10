@@ -1,5 +1,4 @@
 import i18n from '@/i18n';
-import { TravelReason } from '@/types/enums';
 import {
     BriefcaseBusinessIcon,
     BuildingIcon,
@@ -9,6 +8,7 @@ import {
     TreePalm,
 } from 'lucide-vue-next';
 import * as vue from 'vue';
+import { TravelReason } from '../../types/Api.gen';
 
 const { t } = i18n.global;
 
@@ -20,32 +20,32 @@ export interface TravelReasonMapping {
 }
 
 const travelReasonMappings: Record<TravelReason, TravelReasonMapping> = {
-    [TravelReason.BUSINESS]: {
+    [TravelReason.Business]: {
         description: t('travel_reason.business_description'),
         label: t('travel_reason.business'),
         icon: BriefcaseBusinessIcon,
     },
-    [TravelReason.COMMUTE]: {
+    [TravelReason.Commute]: {
         description: t('travel_reason.commute_description'),
         label: t('travel_reason.commute'),
         icon: BuildingIcon,
     },
-    [TravelReason.ERRAND]: {
+    [TravelReason.Errand]: {
         description: t('travel_reason.errand_description'),
         label: t('travel_reason.errand'),
         icon: ShoppingBasketIcon,
     },
-    [TravelReason.CREW]: {
+    [TravelReason.Crew]: {
         description: t('travel_reason.crew_description'),
         label: t('travel_reason.crew'),
         icon: ShipWheel,
     },
-    [TravelReason.LEISURE]: {
+    [TravelReason.Leisure]: {
         description: t('travel_reason.leisure_description'),
         label: t('travel_reason.leisure'),
         icon: TreePalm,
     },
-    [TravelReason.OTHER]: {
+    [TravelReason.Other]: {
         description: t('travel_reason.other_description'),
         label: t('travel_reason.other'),
         icon: null,

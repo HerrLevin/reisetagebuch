@@ -6,7 +6,7 @@ import Post from '@/Components/Post/Post.vue';
 import PostMetaInfo from '@/Components/Post/PostMetaInfo.vue';
 import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { getColorForPost } from '@/Services/ApiDepartureTypeService';
+import { getColorForPost } from '@/Services/DepartureTypeService';
 import {
     getArrivalDelay,
     getArrivalTime,
@@ -14,7 +14,7 @@ import {
     getDepartureTime,
 } from '@/Services/TripTimeService';
 import { useUserStore } from '@/stores/user';
-import { isApiLocationPost, isApiTransportPost } from '@/types/PostTypes';
+import { isLocationPost, isTransportPost } from '@/types/PostTypes';
 import { GeometryCollection } from 'geojson';
 import { ArrowLeft } from 'lucide-vue-next';
 import { LngLat } from 'maplibre-gl';
@@ -70,12 +70,12 @@ function fetchPost() {
 }
 
 function mapPostDetails() {
-    if (isApiLocationPost(post.value)) {
+    if (isLocationPost(post.value)) {
         startPoint.value = new LngLat(
             (post.value as LocationPost).location?.longitude ?? 9,
             (post.value as LocationPost).location?.latitude ?? 49,
         );
-    } else if (isApiTransportPost(post.value)) {
+    } else if (isTransportPost(post.value)) {
         const tPost = post.value as TransportPost;
         startPoint.value = new LngLat(
             tPost.originStop.location.longitude ?? 9,
@@ -117,12 +117,12 @@ function mapPostDetails() {
 
 function getPageTitle() {
     pageTitle.value = heading.value;
-    if (isApiLocationPost(post.value)) {
+    if (isLocationPost(post.value)) {
         pageTitle.value = t('posts.name_location_post', {
             name: post.value.user.name,
             location: post.value.location.name,
         });
-    } else if (isApiTransportPost(post.value)) {
+    } else if (isTransportPost(post.value)) {
         const tPost = post.value as TransportPost;
         pageTitle.value = t('posts.name_transport_post', {
             name: tPost.user.name,
@@ -159,7 +159,7 @@ onUnmounted(() => {
 watch(() => props.postId, fetchPost, { immediate: true });
 
 const progress = computed(() => {
-    if (!isApiTransportPost(post.value)) return 0;
+    if (!isTransportPost(post.value)) return 0;
 
     const transportPost = post.value as TransportPost;
     const departureDelay = getDepartureDelay(transportPost) || 0;
@@ -223,7 +223,7 @@ function deleted() {
                 :stop-overs="stopovers"
                 :show-geo-position="user.user?.id === post.user.id"
                 :line-color="
-                    isApiTransportPost(post) ? getColorForPost(post) : undefined
+                    isTransportPost(post) ? getColorForPost(post) : undefined
                 "
                 :progress="progress"
             ></Map>

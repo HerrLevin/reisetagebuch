@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { UserDto } from '@/types';
 import { PropType } from 'vue';
+import { UserDto } from '../../../../types/Api.gen';
 
 defineProps({
     user: {

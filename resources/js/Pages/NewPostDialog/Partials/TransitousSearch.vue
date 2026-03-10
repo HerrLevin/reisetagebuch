@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { api } from '@/api';
 import Typeahead, { Suggestion } from '@/Components/Typeahead.vue';
-import { Area, StopDto } from '@/types';
 import { PropType, ref, watch } from 'vue';
 import { debounce } from 'vue-debounce';
 import { useI18n } from 'vue-i18n';
-import { MotisGeocodeResponseEntry } from '../../../../types/Api.gen';
+import {
+    AreaDto,
+    GeocodeResponseEntry,
+    StopDto,
+} from '../../../../types/Api.gen';
 
 const { t } = useI18n();
 
@@ -70,16 +73,16 @@ function fetchSuggestions() {
 }
 const modelChange = debounce(() => fetchSuggestions(), 300);
 
-function getArea(areas: Array<Area>) {
+function getArea(areas: Array<AreaDto>) {
     if (areas.length === 0) {
         return '';
     }
 
-    const defaultArea: undefined | Area = areas.find(
-        (area: Area) => area.default,
+    const defaultArea: undefined | AreaDto = areas.find(
+        (area: AreaDto) => area.default,
     );
-    const country: undefined | Area = areas.find(
-        (area: Area) => area.adminLevel === 2,
+    const country: undefined | AreaDto = areas.find(
+        (area: AreaDto) => area.adminLevel === 2,
     );
 
     if (defaultArea) {
@@ -116,7 +119,7 @@ function submitTypeahead(element: Suggestion) {
     }
 
     if (element?.value && typeof element.value === 'object') {
-        emit('select', element.value as MotisGeocodeResponseEntry);
+        emit('select', element.value as GeocodeResponseEntry);
     }
 }
 

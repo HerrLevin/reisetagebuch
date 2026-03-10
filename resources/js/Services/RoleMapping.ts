@@ -1,5 +1,5 @@
 import i18n from '@/i18n';
-import { TravelRole } from '@/types/enums';
+import { TravelRole } from '../../types/Api.gen';
 
 const { t } = i18n.global;
 
@@ -9,15 +9,15 @@ export interface TravelRoleMapping {
 }
 
 const travelRoleMapping: Record<TravelRole, TravelRoleMapping> = {
-    [TravelRole.DEADHEAD]: {
+    [TravelRole.Deadhead]: {
         description: t('travel_role.deadhead_description'),
         label: t('travel_role.deadhead'),
     },
-    [TravelRole.OPERATOR]: {
+    [TravelRole.Operator]: {
         description: t('travel_role.operator_description'),
         label: t('travel_role.operator'),
     },
-    [TravelRole.CATERING]: {
+    [TravelRole.Catering]: {
         description: t('travel_role.catering_description'),
         label: t('travel_role.catering'),
     },

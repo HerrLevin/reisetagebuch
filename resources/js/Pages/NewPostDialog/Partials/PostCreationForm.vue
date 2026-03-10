@@ -5,7 +5,7 @@ import {
     getTravelReasonDescription,
     getTravelReasonIcon,
     getTravelReasonLabel,
-} from '@/Services/ApiTravelReasonMapping';
+} from '@/Services/TravelReasonMapping';
 import {
     getVisibilityDescription,
     getVisibilityIcon,

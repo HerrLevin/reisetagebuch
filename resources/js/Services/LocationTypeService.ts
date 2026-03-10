@@ -1,5 +1,5 @@
 import i18n from '@/i18n';
-import { LocationEntry, LocationTag } from '@/types';
+import { LocationDto, LocationTagDto } from '../../types/Api.gen';
 const { t } = i18n.global;
 
 const osmCategoryToEmoji: Record<string, Record<string, string>> = {
@@ -192,7 +192,7 @@ export function getFallbackEmoji(category: string): string {
     return '📍';
 }
 
-export function getEmojiFromTags(tags: LocationTag[]): string {
+export function getEmojiFromTags(tags: LocationTagDto[]): string {
     for (const tag of tags) {
         const icon = osmCategoryToEmojiMapper(tag.key, tag.value);
         if (icon !== '📍') {
@@ -208,7 +208,7 @@ export function getEmojiFromTags(tags: LocationTag[]): string {
     return '📍';
 }
 
-export function getName(location: LocationEntry): string {
+export function getName(location: LocationDto): string {
     // show platform name if available in tags
     if (location.tags) {
         const platformName = location.tags.find(
