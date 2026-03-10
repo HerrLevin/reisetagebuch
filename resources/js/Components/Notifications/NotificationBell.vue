@@ -3,19 +3,27 @@ import { useNotificationStore } from '@/stores/notifications';
 import { useUserStore } from '@/stores/user';
 import { Bell } from 'lucide-vue-next';
 import { storeToRefs } from 'pinia';
-import { onMounted } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 
 const store = useNotificationStore();
 const user = useUserStore();
 const { unreadCount } = storeToRefs(store);
 
+const interval = ref<number | null>(null);
+
 onMounted(() => {
     if (user.user) {
         store.fetchUnreadCount();
 
-        setInterval(() => {
+        interval.value = setInterval(() => {
             store.fetchUnreadCount();
         }, 30000);
+    }
+});
+
+onUnmounted(() => {
+    if (interval.value !== null) {
+        clearInterval(interval.value);
     }
 });
 </script>
