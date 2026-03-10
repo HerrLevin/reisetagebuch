@@ -6,13 +6,12 @@ import {
     getColor,
     getEmoji,
 } from '@/Services/DepartureTypeService';
-import { StopDto } from '@/types';
-import { TransportMode } from '@/types/enums';
 import { Clock, X } from 'lucide-vue-next';
 import { DateTime } from 'luxon';
 import { computed, PropType, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { RouterLink } from 'vue-router';
+import { StopDto, TransportMode } from '../../../../types/Api.gen';
 
 const { t } = useI18n();
 
@@ -97,7 +96,7 @@ function submitTypeahead(submittedIdentifier: string | null) {
 }
 
 const identifier = computed(() => {
-    return props.requestIdentifier || props.location?.stopId;
+    return props.requestIdentifier || props.location?.id;
 });
 </script>
 

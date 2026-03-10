@@ -1,6 +1,6 @@
 import { getArrivalTime, getDepartureTime } from '@/Services/TripTimeService';
-import { Stop } from '@/types/PostTypes';
 import { DateTime, DateTimeMaybeValid } from 'luxon';
+import { StopDto } from '../../types/Api.gen';
 
 export function formatDelayAbsoluteAmount(minutes: number): string {
     if (minutes < 60) {
@@ -32,7 +32,7 @@ function formatTime(dateTime: DateTime): string {
 }
 
 export function formatDepartureTime(
-    stop: Stop,
+    stop: StopDto,
     manualTime: string | null = null,
     departureDelay: number | null = null,
 ): string | null {
@@ -41,7 +41,7 @@ export function formatDepartureTime(
 }
 
 export function formatArrivalTime(
-    stop: Stop,
+    stop: StopDto,
     manualTime: string | null = null,
     arrivalDelay: number | null = null,
 ): string | null {

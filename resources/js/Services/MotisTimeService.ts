@@ -1,12 +1,12 @@
-import { StopPlace } from '@/types';
 import { DateTime } from 'luxon';
+import { StopPlaceDto } from '../../types/Api.gen';
 
 class StopTime {
-    private readonly stop: StopPlace;
+    private readonly stop: StopPlaceDto;
     private _scheduledTime: DateTime | null = null;
     private _actualTime: DateTime | null = null;
 
-    constructor(stop: StopPlace) {
+    constructor(stop: StopPlaceDto) {
         this.stop = stop;
     }
 

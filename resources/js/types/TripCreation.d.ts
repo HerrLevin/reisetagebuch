@@ -1,7 +1,7 @@
-import { TransportMode } from '@/types/enums';
 import { LucideProps } from 'lucide-vue-next';
 import { DateTime } from 'luxon';
 import * as vue from 'vue';
+import { TransportMode } from '../../types/Api.gen';
 
 export type CreateTripForm = {
     startLocation: TripLocation | null;

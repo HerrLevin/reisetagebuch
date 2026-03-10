@@ -6,11 +6,11 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import LocationListEntry from '@/Pages/NewPostDialog/Partials/LocationListEntry.vue';
 import { LocationService } from '@/Services/LocationService';
 import { useUserStore } from '@/stores/user';
-import { LocationEntry, RequestLocationDto } from '@/types';
 import { Search } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
+import { LocationDto, RequestLocationDto } from '../../../types/Api.gen';
 
 const { t } = useI18n();
 
@@ -22,8 +22,8 @@ const currentRoute = useRoute();
 const showStartButton = ref(false);
 showStartButton.value = currentRoute.name === 'posts.create.start';
 
-const locations = ref<LocationEntry[]>([]);
-const filteredLocations = ref<LocationEntry[]>([]);
+const locations = ref<LocationDto[]>([]);
+const filteredLocations = ref<LocationDto[]>([]);
 const search = ref<string>('');
 const fetchingProgress = ref<RequestLocationDto | null>(null);
 const currentPosition = ref<GeolocationPosition | null>(null);
@@ -83,7 +83,7 @@ function fetchLocations() {
         })
         .then((response) => {
             if (response.data) {
-                const data = response.data as LocationEntry[];
+                const data = response.data as LocationDto[];
                 const existingLocationsIds = new Set(
                     locations.value.map((l) => l.id),
                 );

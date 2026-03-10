@@ -1,8 +1,11 @@
 import i18n from '@/i18n';
-import { AllPosts, isLocationPost, isTransportPost } from '@/types/PostTypes';
+import { isLocationPost, isTransportPost } from '@/types/PostTypes';
 import { DateTime } from 'luxon';
+import { BasePost, LocationPost, TransportPost } from '../../types/Api.gen';
 
 const { t } = i18n.global;
+
+type AllPosts = BasePost | LocationPost | TransportPost;
 
 export function getBaseText(post: AllPosts): string {
     if (isLocationPost(post)) {

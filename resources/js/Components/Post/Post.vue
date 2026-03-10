@@ -6,9 +6,9 @@ import RouteDisplay from '@/Components/Post/RouteDisplay.vue';
 import {
     getTravelReasonIcon,
     getTravelReasonLabel,
-} from '@/Services/ApiTravelReasonMapping';
+} from '@/Services/TravelReasonMapping';
 import { getVisibilityIcon } from '@/Services/VisibilityMapping';
-import { isApiLocationPost, isApiTransportPost } from '@/types/PostTypes';
+import { isLocationPost, isTransportPost } from '@/types/PostTypes';
 import { DateTime } from 'luxon';
 import { computed, PropType, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -80,8 +80,7 @@ const relativeCreatedAt = computed(() => {
             </RouterLink>
             <div
                 v-if="
-                    (isApiLocationPost(localPost) ||
-                        isApiTransportPost(localPost)) &&
+                    (isLocationPost(localPost) || isTransportPost(localPost)) &&
                     localPost.travelReason
                 "
                 class="inline text-xs"
@@ -116,10 +115,7 @@ const relativeCreatedAt = computed(() => {
                 />
                 {{ relativeCreatedAt }}
             </span>
-            <span
-                v-if="isApiTransportPost(localPost)"
-                class="text-xs opacity-60"
-            >
+            <span v-if="isTransportPost(localPost)" class="text-xs opacity-60">
                 · {{ DateTime.fromISO(localPost.publishedAt).toLocaleString() }}
             </span>
         </div>
@@ -130,11 +126,11 @@ const relativeCreatedAt = computed(() => {
             {{ localPost.body }}
         </p>
         <LocationDisplay
-            v-if="isApiLocationPost(localPost)"
+            v-if="isLocationPost(localPost)"
             :post="localPost as LocationPost"
         />
         <RouteDisplay
-            v-else-if="isApiTransportPost(localPost)"
+            v-else-if="isTransportPost(localPost)"
             :post="localPost as TransportPost"
         />
         <HashTags :hash-tags="localPost.hashTags" />

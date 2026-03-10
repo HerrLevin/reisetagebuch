@@ -8,7 +8,7 @@ use App\Traits\JsonResponseObject;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema(
-    schema: 'MotisGeocodeResponseEntry',
+    schema: 'GeocodeResponseEntry',
     required: ['type', 'tokens', 'name', 'identifier', 'lat', 'lon', 'score', 'id', 'level', 'street', 'houseNumber', 'zip', 'areas', 'identifiers'],
     type: 'object',
 )]
@@ -18,8 +18,8 @@ class GeocodeResponseEntry
 
     #[OA\Property(
         property: 'type',
-        description: 'The type of the location (e.g., STOP, ADDRESS, PLACE)',
         ref: LocationType::class,
+        description: 'The type of the location (e.g., STOP, ADDRESS, PLACE)',
     )]
     public LocationType $type;
 
@@ -105,8 +105,11 @@ class GeocodeResponseEntry
         property: 'areas',
         description: 'An array of area names or identifiers associated with the location',
         type: 'array',
-        items: new OA\Items(type: 'string'),
+        items: new OA\Items(ref: AreaDto::class),
     )]
+    /**
+     * @var AreaDto[]
+     */
     public array $areas = [];
 
     #[OA\Property(

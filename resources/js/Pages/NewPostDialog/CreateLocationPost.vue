@@ -3,10 +3,10 @@ import { api } from '@/api';
 import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PostCreationForm from '@/Pages/NewPostDialog/Partials/PostCreationForm.vue';
-import { TravelReason, Visibility } from '@/types/enums';
 import { reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
+import { TravelReason, Visibility } from '../../../types/Api.gen';
 
 const { t } = useI18n();
 const vueRouter = useRouter();
@@ -25,9 +25,9 @@ const loading = ref(false);
 const form = reactive({
     body: '',
     location: id,
-    visibility: Visibility.PUBLIC,
+    visibility: Visibility.Public,
     tags: [] as string[],
-    travelReason: TravelReason.LEISURE,
+    travelReason: TravelReason.Leisure,
 });
 
 function submitForm() {

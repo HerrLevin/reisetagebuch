@@ -1,5 +1,4 @@
-import { StopTime } from '@/types';
-import { TransportPost } from '@/types/PostTypes';
+import { StopTimeDto, TransportPost } from '../../types/Api.gen';
 
 export function getLineName(
     displayName: string | null,
@@ -17,8 +16,8 @@ export function getLineName(
     return null;
 }
 
-export function getDepartureLineName(stopTime: StopTime): string | null {
-    return getLineName(stopTime.displayName, stopTime.routeShortName);
+export function getDepartureLineName(StopTimeDto: StopTimeDto): string | null {
+    return getLineName(StopTimeDto.displayName, StopTimeDto.routeShortName);
 }
 
 export function getPostLineName(post: TransportPost): string | null {
@@ -56,10 +55,12 @@ export function getPostTripNumber(post: TransportPost): string | null {
     );
 }
 
-export function getDepartureTripNumber(stopTime: StopTime): string | null {
+export function getDepartureTripNumber(
+    StopTimeDto: StopTimeDto,
+): string | null {
     return getTripNumber(
-        stopTime.displayName,
-        stopTime.routeShortName,
-        stopTime.tripShortName,
+        StopTimeDto.displayName,
+        StopTimeDto.routeShortName,
+        StopTimeDto.tripShortName,
     );
 }

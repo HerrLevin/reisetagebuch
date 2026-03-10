@@ -6,12 +6,15 @@ import StopoversListEntry from '@/Pages/NewPostDialog/Partials/StopoversListEntr
 import router from '@/router';
 import { getEmoji } from '@/Services/DepartureTypeService';
 import { normalizeQueryParam } from '@/Services/QueryParamService';
-import { StopPlace, TripDto } from '@/types';
 import { DateTime } from 'luxon';
 import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
-import { TransportPostExitUpdateRequest } from '../../../types/Api.gen';
+import {
+    MotisTripDto,
+    StopPlaceDto,
+    TransportPostExitUpdateRequest,
+} from '../../../types/Api.gen';
 
 const { t } = useI18n();
 const vueRouter = useRouter();
@@ -33,8 +36,8 @@ function updateUrlParams() {
     loadStopovers();
 }
 
-const trip = ref<TripDto | null>(null);
-const stopovers = ref<StopPlace[]>([]);
+const trip = ref<MotisTripDto | null>(null);
+const stopovers = ref<StopPlaceDto[]>([]);
 const loading = ref(true);
 
 async function loadStopovers() {
@@ -79,7 +82,7 @@ onMounted(() => {
     updateUrlParams();
 });
 
-function submit(stopover: StopPlace) {
+function submit(stopover: StopPlaceDto) {
     if (postId.value && postId.value.length > 0) {
         api.posts
             .updateTransportPostExit(postId.value, {
@@ -94,7 +97,7 @@ function submit(stopover: StopPlace) {
     redirectCreatePost(stopover);
 }
 
-function redirectCreatePost(stopover: StopPlace) {
+function redirectCreatePost(stopover: StopPlaceDto) {
     const params: Record<string, string | undefined> = {
         tripId: tripId.value,
         startId: startId.value,

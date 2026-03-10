@@ -3,17 +3,51 @@
 namespace App\Dto\MotisApi;
 
 use App\Models\LocationIdentifier;
+use OpenApi\Attributes as OA;
 
+#[OA\Schema(
+    schema: 'AreaDto',
+    description: 'Data Transfer Object for an Area in the Motis API',
+    required: ['name', 'adminLevel', 'matched', 'unique', 'default'],
+    type: 'object'
+)]
 class AreaDto
 {
+    #[OA\Property(
+        property: 'name',
+        description: 'Name of the area',
+        type: 'string'
+    )]
     public string $name;
 
+    #[OA\Property(
+        property: 'adminLevel',
+        description: 'Administrative level of the area',
+        type: 'integer'
+    )]
     public int $adminLevel;
 
+    #[OA\Property(
+        property: 'matched',
+        description: 'Indicates if the area was matched to a known location',
+        type: 'boolean'
+    )]
     public bool $matched;
 
+    #[OA\Property(
+        property: 'unique',
+        description: 'Indicates if the area is unique (not shared with other locations)',
+        type: 'boolean',
+        nullable: true
+    )]
     public ?bool $unique = null;
 
+    #[OA\Property(
+        property: 'default',
+        description: 'Indicates if the area is a default area (used when no specific area is matched)',
+        type: 'boolean',
+        nullable: true
+    )]
     public ?bool $default = null;
 
     public static function fromIdentifier(LocationIdentifier $identifier, bool $matched = false, bool $default = false): self

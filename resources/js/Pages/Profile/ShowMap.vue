@@ -3,9 +3,9 @@ import { api } from '@/api';
 import LocationsMap from '@/Components/Maps/LocationsMap.vue';
 import { useTitle } from '@/composables/useTitle';
 import ProfileWrapper from '@/Pages/Profile/ProfileWrapper.vue';
-import type { UserDto } from '@/types';
 import { PropType, ref, watchEffect } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { UserDto } from '../../../types/Api.gen';
 
 const { t } = useI18n();
 

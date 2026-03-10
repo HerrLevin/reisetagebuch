@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { api } from '@/api';
 import Typeahead, { Suggestion } from '@/Components/Typeahead.vue';
-import { LocationIdentifier } from '@/types';
-import { AutocompleteResponse } from '@/types/motis';
 import { ref } from 'vue';
 import { debounce } from 'vue-debounce';
 import { useI18n } from 'vue-i18n';
-import { MotisGeocodeResponseEntry } from '../../../../types/Api.gen';
+import {
+    GeocodeResponseEntry,
+    LocationIdentifierDto,
+} from '../../../../types/Api.gen';
 
 const { t } = useI18n();
 
@@ -51,7 +52,7 @@ function fetchSuggestions() {
         })
         .then((response) => {
             suggestions.value = response.data.map(
-                (item: MotisGeocodeResponseEntry) =>
+                (item: GeocodeResponseEntry) =>
                     ({
                         label: item.name,
                         value: item,
@@ -65,7 +66,9 @@ function fetchSuggestions() {
 }
 const modelChange = debounce(() => fetchSuggestions(), 300);
 
-function getAirportIdentifier(areas: Array<LocationIdentifier>): null | string {
+function getAirportIdentifier(
+    areas: Array<LocationIdentifierDto>,
+): null | string {
     // find icao and iata codes
     const icao = areas.find((a) => a.type === 'icao');
     const iata = areas.find((a) => a.type === 'iata');
@@ -120,7 +123,7 @@ function submitTypeahead(element: Suggestion) {
     }
 
     if (element?.value && typeof element.value === 'object') {
-        emit('select', element.value as AutocompleteResponse);
+        emit('select', element.value as GeocodeResponseEntry);
     }
 }
 </script>

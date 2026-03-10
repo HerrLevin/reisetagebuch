@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import TimeDisplay from '@/Pages/NewPostDialog/Partials/TimeDisplay.vue';
 import MotisTimeService from '@/Services/MotisTimeService';
-import { StopPlace } from '@/types';
 import { defineProps, PropType, ref } from 'vue';
+import { StopPlaceDto } from '../../../../types/Api.gen';
 
 const props = defineProps({
     stop: {
-        type: Object as PropType<StopPlace>,
+        type: Object as PropType<StopPlaceDto>,
         default: () => ({}),
     },
     mode: {

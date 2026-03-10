@@ -1,20 +1,19 @@
 <script setup lang="ts">
 import Delay from '@/Components/Post/Partials/Delay.vue';
 import router from '@/router';
+import { getColor, getEmoji } from '@/Services/DepartureTypeService';
 import {
     getPostLineName,
     getPostTripNumber,
-} from '@/Services/ApiLineNameFormattingService';
-import { getColor, getEmoji } from '@/Services/DepartureTypeService';
+} from '@/Services/LineNameFormattingService';
 import {
     formatArrivalTime,
     formatDepartureTime,
 } from '@/Services/TimeFormattingService';
 import { getArrivalDelay, getDepartureDelay } from '@/Services/TripTimeService';
-import { LocationEntry } from '@/types';
 import { DateTime } from 'luxon';
 import { computed, PropType, ref, watch } from 'vue';
-import { TransportPost, TripDto } from '../../../types/Api.gen';
+import { LocationDto, TransportPost, TripDto } from '../../../types/Api.gen';
 
 const props = defineProps({
     post: {
@@ -73,7 +72,7 @@ function getRouteColor(trip: TripDto) {
     return getColor(trip.mode);
 }
 
-function selectStation(location: LocationEntry) {
+function selectStation(location: LocationDto) {
     const identifier = location.identifiers.find((id) => id.origin === 'motis');
     const params = {
         latitude: String(location.latitude),

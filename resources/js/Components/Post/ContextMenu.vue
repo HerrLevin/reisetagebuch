@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { api } from '@/api';
 import router from '@/router';
-import { getOwnShareText, getShareText } from '@/Services/ApiPostTextService';
+import { getOwnShareText, getShareText } from '@/Services/PostTextService';
 import { useUserStore } from '@/stores/user';
-import { isApiTransportPost } from '@/types/PostTypes';
+import { isTransportPost } from '@/types/PostTypes';
 import {
     ClockPlus,
     Ellipsis,
@@ -42,7 +42,7 @@ const deleteProcessing = ref(false);
 
 function showTimeButtons(): boolean {
     const post = props.post;
-    if (!isApiTransportPost(post)) {
+    if (!isTransportPost(post)) {
         return false;
     }
 
@@ -81,7 +81,7 @@ function showTimeButtons(): boolean {
 
 function departNow(): void {
     const post = props.post;
-    if (!isApiTransportPost(post)) {
+    if (!isTransportPost(post)) {
         return;
     }
 
@@ -91,7 +91,7 @@ function departNow(): void {
 
 function arriveNow(): void {
     const post = props.post;
-    if (!isApiTransportPost(post)) {
+    if (!isTransportPost(post)) {
         return;
     }
     const now = DateTime.now();
@@ -104,7 +104,7 @@ function submit(
 ): void {
     blur();
     const post = props.post;
-    if (!isApiTransportPost(post)) {
+    if (!isTransportPost(post)) {
         return;
     }
     const data = {
@@ -211,7 +211,7 @@ function blur() {
                     {{ t('verbs.share') }}
                 </a>
             </li>
-            <li v-if="!isSameUser() && isApiTransportPost(props.post)">
+            <li v-if="!isSameUser() && isTransportPost(props.post)">
                 <a href="#" @click="redirectCreatePost()">
                     <UserRoundPlus class="size-4" />
                     {{ t('posts.ride_along') }}
@@ -225,7 +225,7 @@ function blur() {
                         {{ t('verbs.edit') }}
                     </RouterLink>
                 </li>
-                <template v-if="isApiTransportPost(post)">
+                <template v-if="isTransportPost(post)">
                     <li>
                         <RouterLink
                             :to="`/posts/transport/${post.id}/times/edit`"

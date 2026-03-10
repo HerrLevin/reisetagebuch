@@ -2,10 +2,10 @@
 import FollowButton from '@/Pages/Profile/Partials/FollowButton.vue';
 import ProfileEditModal from '@/Pages/Profile/Partials/ProfileEditModal.vue';
 import { useUserStore } from '@/stores/user';
-import type { UserDto } from '@/types';
 import { EllipsisVertical } from 'lucide-vue-next';
 import { PropType } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { UserDto } from '../../../../types/Api.gen';
 
 const { t } = useI18n();
 

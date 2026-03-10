@@ -2,9 +2,9 @@
 import { api } from '@/api';
 import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { getBaseText, prettyDates } from '@/Services/ApiPostTextService';
+import { getBaseText, prettyDates } from '@/Services/PostTextService';
 import { getDepartureDelay } from '@/Services/TripTimeService';
-import { isApiTransportPost } from '@/types/PostTypes';
+import { isTransportPost } from '@/types/PostTypes';
 import { CircleX, PlaneLanding, PlaneTakeoff } from 'lucide-vue-next';
 import { DateTime } from 'luxon';
 import { ref, watch, watchEffect } from 'vue';
@@ -43,7 +43,7 @@ function fetchPost() {
     api.posts
         .showPost(props.postId)
         .then((response) => {
-            if (!isApiTransportPost(response.data)) {
+            if (!isTransportPost(response.data)) {
                 throw new Error('Post is not a transport post');
             }
             post.value = response.data;

@@ -4,10 +4,14 @@ import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PostCreationForm from '@/Pages/NewPostDialog/Partials/PostCreationForm.vue';
 import { getEmoji } from '@/Services/DepartureTypeService';
-import { TransportMode, TravelReason, Visibility } from '@/types/enums';
 import { reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
+import {
+    TransportMode,
+    TravelReason,
+    Visibility,
+} from '../../../types/Api.gen';
 
 const { t } = useI18n();
 const vueRouter = useRouter();
@@ -39,9 +43,9 @@ const form = reactive({
     startTime: startTime,
     stopId: stopId,
     stopTime: stopTime,
-    visibility: Visibility.PUBLIC,
+    visibility: Visibility.Public,
     tags: [] as string[],
-    travelReason: TravelReason.LEISURE,
+    travelReason: TravelReason.Leisure,
     vehicleIds: [] as string[],
     metaTripId: null,
     travelRole: null,

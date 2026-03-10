@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import BaseMapWrapper from '@/Components/Maps/BaseMapWrapper.vue';
-import { LocationHistoryDto, TripHistoryEntryDto, UserDto } from '@/types';
 import {
     MglCircleLayer,
     MglFullscreenControl,
@@ -11,6 +10,11 @@ import {
 import type { FeatureCollection, Geometry, GeometryCollection } from 'geojson';
 import { LngLat, LngLatBounds, LngLatBoundsLike } from 'maplibre-gl';
 import { PropType, ref } from 'vue';
+import {
+    LocationHistoryEntryDto,
+    TripHistoryEntryDto,
+    UserDto,
+} from '../../../types/Api.gen';
 
 const props = defineProps({
     user: {
@@ -18,7 +22,7 @@ const props = defineProps({
         default: () => ({}),
     },
     locations: {
-        type: Array as PropType<LocationHistoryDto[]>,
+        type: Array as PropType<LocationHistoryEntryDto[]>,
         required: true,
     },
     trips: {
@@ -77,9 +81,9 @@ for (const trip of props.trips) {
         tripsJson.value.features.push({
             type: 'Feature',
             properties: {},
-            geometry: trip.geometry,
+            geometry: trip.geometry as GeometryCollection,
         });
-        pushTripToBounds(trip.geometry);
+        pushTripToBounds(trip.geometry as GeometryCollection);
     }
 }
 

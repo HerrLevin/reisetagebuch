@@ -1,6 +1,5 @@
-import { Stop, TransportPost } from '@/types/PostTypes';
 import { DateTime, DateTimeMaybeValid } from 'luxon';
-import { TransportPost as ApiTransportPost } from '../../types/Api.gen';
+import { StopDto, TransportPost } from '../../types/Api.gen';
 
 export function calculateDelay(
     plannedTime: DateTimeMaybeValid | null,
@@ -22,9 +21,7 @@ export function calculateDelay(
     return null;
 }
 
-export function getDepartureDelay(
-    post: TransportPost | ApiTransportPost,
-): number | null {
+export function getDepartureDelay(post: TransportPost): number | null {
     return calculateDelay(
         getDepartureTime(post.originStop),
         post?.manualDepartureTime,
@@ -32,9 +29,7 @@ export function getDepartureDelay(
     );
 }
 
-export function getArrivalDelay(
-    post: TransportPost | ApiTransportPost,
-): number | null {
+export function getArrivalDelay(post: TransportPost): number | null {
     return calculateDelay(
         getArrivalTime(post.destinationStop),
         post?.manualArrivalTime,
@@ -42,7 +37,7 @@ export function getArrivalDelay(
     );
 }
 
-export function getArrivalTime(stop: Stop): DateTimeMaybeValid | null {
+export function getArrivalTime(stop: StopDto): DateTimeMaybeValid | null {
     const time = stop.arrivalTime || stop.departureTime || null;
     if (time) {
         return DateTime.fromISO(time);
@@ -51,7 +46,7 @@ export function getArrivalTime(stop: Stop): DateTimeMaybeValid | null {
     return null;
 }
 
-export function getDepartureTime(stop: Stop): DateTimeMaybeValid | null {
+export function getDepartureTime(stop: StopDto): DateTimeMaybeValid | null {
     const time = stop.departureTime || stop.arrivalTime || null;
     if (time) {
         return DateTime.fromISO(time);

@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import LocationListEntryInfo from '@/Pages/NewPostDialog/Partials/LocationListEntryInfo.vue';
 import { getEmojiFromTags, getName } from '@/Services/LocationTypeService';
-import { LocationEntry } from '@/types';
 import { CircleQuestionMark } from 'lucide-vue-next';
 import { defineProps, ref } from 'vue';
 import { RouterLink } from 'vue-router';
+import { LocationDto } from '../../../../types/Api.gen';
 
 const props = defineProps({
     location: {
         type: Object,
-        default: () => ({}) as LocationEntry,
+        default: () => ({}) as LocationDto,
     },
     showStartButton: {
         type: Boolean,
@@ -25,7 +25,7 @@ const name = ref('');
 const emoji = ref('');
 
 emoji.value = getEmojiFromTags(props.location.tags);
-name.value = getName(props.location as LocationEntry);
+name.value = getName(props.location as LocationDto);
 
 const params = {
     emoji: emoji.value,

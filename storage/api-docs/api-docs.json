@@ -952,7 +952,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "App\\Dto\\RequestLocationDto"
+                                    "$ref": "#/components/schemas/RequestLocationDto"
                                 }
                             }
                         }
@@ -1075,7 +1075,7 @@
                                 "schema": {
                                     "type": "array",
                                     "items": {
-                                        "$ref": "#/components/schemas/MotisGeocodeResponseEntry"
+                                        "$ref": "#/components/schemas/GeocodeResponseEntry"
                                     }
                                 }
                             }
@@ -2549,7 +2549,7 @@
                         "description": "Collection of departure stop times",
                         "type": "array",
                         "items": {
-                            "$ref": "App\\Dto\\MotisApi\\StopTimeDto"
+                            "$ref": "#/components/schemas/StopTimeDto"
                         }
                     }
                 },
@@ -2701,7 +2701,42 @@
                 },
                 "type": "object"
             },
-            "MotisGeocodeResponseEntry": {
+            "AreaDto": {
+                "description": "Data Transfer Object for an Area in the Motis API",
+                "required": [
+                    "name",
+                    "adminLevel",
+                    "matched",
+                    "unique",
+                    "default"
+                ],
+                "properties": {
+                    "name": {
+                        "description": "Name of the area",
+                        "type": "string"
+                    },
+                    "adminLevel": {
+                        "description": "Administrative level of the area",
+                        "type": "integer"
+                    },
+                    "matched": {
+                        "description": "Indicates if the area was matched to a known location",
+                        "type": "boolean"
+                    },
+                    "unique": {
+                        "description": "Indicates if the area is unique (not shared with other locations)",
+                        "type": "boolean",
+                        "nullable": true
+                    },
+                    "default": {
+                        "description": "Indicates if the area is a default area (used when no specific area is matched)",
+                        "type": "boolean",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "GeocodeResponseEntry": {
                 "required": [
                     "type",
                     "tokens",
@@ -2776,7 +2811,7 @@
                         "description": "An array of area names or identifiers associated with the location",
                         "type": "array",
                         "items": {
-                            "type": "string"
+                            "$ref": "#/components/schemas/AreaDto"
                         }
                     },
                     "score": {
@@ -2789,6 +2824,134 @@
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/LocationIdentifierDto"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "LegDto": {
+                "description": "Data Transfer Object for a Leg of a Trip in the Motis API",
+                "required": [
+                    "mode",
+                    "from",
+                    "to",
+                    "duration",
+                    "startTime",
+                    "endTime",
+                    "scheduledStartTime",
+                    "scheduledEndTime",
+                    "realTime",
+                    "headSign",
+                    "agencyName",
+                    "agencyId",
+                    "tripId",
+                    "routeShortName",
+                    "routeLongName",
+                    "tripShortName",
+                    "displayName",
+                    "routeColor",
+                    "routeTextColor",
+                    "source",
+                    "intermediateStops"
+                ],
+                "properties": {
+                    "mode": {
+                        "$ref": "#/components/schemas/TransportMode"
+                    },
+                    "from": {
+                        "$ref": "#/components/schemas/StopPlaceDto"
+                    },
+                    "to": {
+                        "$ref": "#/components/schemas/StopPlaceDto"
+                    },
+                    "duration": {
+                        "description": "Duration of the leg in seconds",
+                        "type": "integer"
+                    },
+                    "startTime": {
+                        "description": "Start time of the leg, if available",
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "endTime": {
+                        "description": "End time of the leg, if available",
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "scheduledStartTime": {
+                        "description": "Scheduled start time of the leg, if available",
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "scheduledEndTime": {
+                        "description": "Scheduled end time of the leg, if available",
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "realTime": {
+                        "description": "Indicates if the times are real-time or scheduled",
+                        "type": "boolean"
+                    },
+                    "headSign": {
+                        "description": "Head sign for the leg, if available",
+                        "type": "string"
+                    },
+                    "agencyName": {
+                        "description": "Name of the agency associated with this leg, if available",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "agencyId": {
+                        "description": "Identifier for the agency associated with this leg, if available",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "tripId": {
+                        "description": "Identifier for the trip associated with this leg",
+                        "type": "string"
+                    },
+                    "routeShortName": {
+                        "description": "Short name for the route, if available",
+                        "type": "string"
+                    },
+                    "routeLongName": {
+                        "description": "Long name for the route, if available",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "tripShortName": {
+                        "description": "Short name for the trip, if available",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "displayName": {
+                        "description": "Display name for the leg, if available",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "routeColor": {
+                        "description": "Color for the route, if available",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "routeTextColor": {
+                        "description": "Text color for the route, if available",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "source": {
+                        "description": "Source of the leg information (e.g., \"motis\", \"gtfs\")",
+                        "type": "string"
+                    },
+                    "intermediateStops": {
+                        "description": "List of intermediate stops for the leg, if available",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/StopPlaceDto"
                         }
                     }
                 },
@@ -2840,6 +3003,177 @@
                         "description": "Distance to the stop in meters",
                         "type": "integer",
                         "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "StopPlaceDto": {
+                "description": "Data Transfer Object for a Stop Place in the Motis API",
+                "required": [
+                    "arrival",
+                    "departure",
+                    "scheduledArrival",
+                    "scheduledDeparture",
+                    "cancelled"
+                ],
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/MotisStopDto"
+                    },
+                    {
+                        "properties": {
+                            "arrival": {
+                                "description": "Actual arrival time at the stop place, if available",
+                                "type": "string",
+                                "format": "date-time",
+                                "nullable": true
+                            },
+                            "departure": {
+                                "description": "Actual departure time from the stop place, if available",
+                                "type": "string",
+                                "format": "date-time",
+                                "nullable": true
+                            },
+                            "scheduledArrival": {
+                                "description": "Scheduled arrival time at the stop place",
+                                "type": "string",
+                                "format": "date-time",
+                                "nullable": true
+                            },
+                            "scheduledDeparture": {
+                                "description": "Scheduled departure time from the stop place",
+                                "type": "string",
+                                "format": "date-time",
+                                "nullable": true
+                            },
+                            "cancelled": {
+                                "description": "Indicates if the stop place is cancelled",
+                                "type": "boolean",
+                                "nullable": true
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "StopTimeDto": {
+                "description": "Data Transfer Object for a Stop Time in the Motis API",
+                "required": [
+                    "place",
+                    "mode",
+                    "realTime",
+                    "headSign",
+                    "agencyName",
+                    "agencyId",
+                    "tripId",
+                    "routeShortName",
+                    "routeLongName",
+                    "tripShortName",
+                    "routeColor",
+                    "routeTextColor",
+                    "displayName",
+                    "source"
+                ],
+                "properties": {
+                    "place": {
+                        "$ref": "#/components/schemas/StopPlaceDto"
+                    },
+                    "mode": {
+                        "$ref": "#/components/schemas/TransportMode"
+                    },
+                    "realTime": {
+                        "description": "Indicates if the stop time is based on real-time data",
+                        "type": "boolean"
+                    },
+                    "headSign": {
+                        "description": "Head sign for the stop time, if available",
+                        "type": "string"
+                    },
+                    "agencyName": {
+                        "description": "Name of the agency associated with this stop time, if available",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "agencyId": {
+                        "description": "Identifier for the agency associated with this stop time, if available",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "tripId": {
+                        "description": "Identifier for the trip associated with this stop time",
+                        "type": "string"
+                    },
+                    "routeShortName": {
+                        "description": "Short name for the route, if available",
+                        "type": "string"
+                    },
+                    "routeLongName": {
+                        "description": "Long name for the route, if available",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "tripShortName": {
+                        "description": "Short name for the trip, if available",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "routeColor": {
+                        "description": "Color for the route, if available",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "routeTextColor": {
+                        "description": "Text color for the route, if available",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "displayName": {
+                        "description": "Display name for the stop time, if available",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "source": {
+                        "description": "Source of the stop time information",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "MotisTripDto": {
+                "description": "Data Transfer Object for a Trip in the Motis API",
+                "required": [
+                    "duration",
+                    "startTime",
+                    "endTime",
+                    "transfers",
+                    "legs"
+                ],
+                "properties": {
+                    "duration": {
+                        "description": "Total duration of the trip in seconds",
+                        "type": "integer"
+                    },
+                    "startTime": {
+                        "description": "Start time of the trip",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "endTime": {
+                        "description": "End time of the trip",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "transfers": {
+                        "description": "Number of transfers during the trip",
+                        "type": "integer"
+                    },
+                    "legs": {
+                        "description": "List of legs that make up the trip",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/LegDto"
+                        }
                     }
                 },
                 "type": "object"
@@ -3042,6 +3376,37 @@
                     }
                 ]
             },
+            "RequestLocationDto": {
+                "description": "Data Transfer Object for Request Location",
+                "required": [
+                    "fetched",
+                    "toFetch",
+                    "updatedAt",
+                    "lastRequestedAt"
+                ],
+                "properties": {
+                    "fetched": {
+                        "description": "Number of locations fetched",
+                        "type": "integer"
+                    },
+                    "toFetch": {
+                        "description": "Number of locations to fetch",
+                        "type": "integer"
+                    },
+                    "updatedAt": {
+                        "description": "Last update time of the request location data",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "lastRequestedAt": {
+                        "description": "Last time a request was made for location data",
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
             "StopoversResponseDto": {
                 "description": "Data Transfer Object for Stopovers Response",
                 "required": [
@@ -3052,7 +3417,7 @@
                 ],
                 "properties": {
                     "trip": {
-                        "$ref": "App\\Dto\\MotisApi\\TripDto"
+                        "$ref": "#/components/schemas/MotisTripDto"
                     },
                     "startTime": {
                         "description": "Start time of the trip",

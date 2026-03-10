@@ -6,7 +6,6 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import TransitousSearch from '@/Pages/NewPostDialog/Partials/TransitousSearch.vue';
 import AirportSearch from '@/Pages/NewRoute/Partials/AirportSearch.vue';
 import TripDetailsForm from '@/Pages/Trips/Partials/TripDetailsForm.vue';
-import { AutocompleteResponse } from '@/types/motis';
 import {
     CreateTripForm,
     FormStops,
@@ -19,7 +18,11 @@ import { DateTime } from 'luxon';
 import { reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
-import { StoreTripRequest, TransportMode } from '../../../types/Api.gen';
+import {
+    GeocodeResponseEntry,
+    StoreTripRequest,
+    TransportMode,
+} from '../../../types/Api.gen';
 
 const { t } = useI18n();
 const vueRouter = useRouter();
@@ -70,7 +73,7 @@ const form = reactive({
 } as StoreTripRequest);
 
 function selectLocation(
-    e: AutocompleteResponse,
+    e: GeocodeResponseEntry,
     type: 'start' | 'end' | TripLocation,
 ) {
     const location: TripLocation = {

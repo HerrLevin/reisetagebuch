@@ -150,7 +150,7 @@ export interface DeparturesDto {
   /** Data Transfer Object for a Stop */
   stop: MotisStopDto;
   /** Collection of departure stop times */
-  departures: any[];
+  departures: StopTimeDto[];
 }
 
 /** Data Transfer Object for Departures Response */
@@ -209,7 +209,21 @@ export interface LocationHistoryDto {
   trips: TripHistoryEntryDto[];
 }
 
-export interface MotisGeocodeResponseEntry {
+/** Data Transfer Object for an Area in the Motis API */
+export interface AreaDto {
+  /** Name of the area */
+  name: string;
+  /** Administrative level of the area */
+  adminLevel: number;
+  /** Indicates if the area was matched to a known location */
+  matched: boolean;
+  /** Indicates if the area is unique (not shared with other locations) */
+  unique: boolean | null;
+  /** Indicates if the area is a default area (used when no specific area is matched) */
+  default: boolean | null;
+}
+
+export interface GeocodeResponseEntry {
   type: MotisLocationType;
   /** An array of tokens representing parts of the location name or identifier */
   tokens: string[];
@@ -238,7 +252,7 @@ export interface MotisGeocodeResponseEntry {
   /** The ZIP code of the location, if applicable */
   zip: string | null;
   /** An array of area names or identifiers associated with the location */
-  areas: string[];
+  areas: AreaDto[];
   /**
    * The confidence score of the geocode result
    * @format float
@@ -246,6 +260,64 @@ export interface MotisGeocodeResponseEntry {
   score: number;
   /** An array of location identifiers */
   identifiers: LocationIdentifierDto[];
+}
+
+/** Data Transfer Object for a Leg of a Trip in the Motis API */
+export interface LegDto {
+  /** Enumeration of transport modes */
+  mode: TransportMode;
+  /** Data Transfer Object for a Stop Place in the Motis API */
+  from: StopPlaceDto;
+  /** Data Transfer Object for a Stop Place in the Motis API */
+  to: StopPlaceDto;
+  /** Duration of the leg in seconds */
+  duration: number;
+  /**
+   * Start time of the leg, if available
+   * @format date-time
+   */
+  startTime: string | null;
+  /**
+   * End time of the leg, if available
+   * @format date-time
+   */
+  endTime: string | null;
+  /**
+   * Scheduled start time of the leg, if available
+   * @format date-time
+   */
+  scheduledStartTime: string | null;
+  /**
+   * Scheduled end time of the leg, if available
+   * @format date-time
+   */
+  scheduledEndTime: string | null;
+  /** Indicates if the times are real-time or scheduled */
+  realTime: boolean;
+  /** Head sign for the leg, if available */
+  headSign: string;
+  /** Name of the agency associated with this leg, if available */
+  agencyName: string | null;
+  /** Identifier for the agency associated with this leg, if available */
+  agencyId: string | null;
+  /** Identifier for the trip associated with this leg */
+  tripId: string;
+  /** Short name for the route, if available */
+  routeShortName: string;
+  /** Long name for the route, if available */
+  routeLongName: string | null;
+  /** Short name for the trip, if available */
+  tripShortName: string | null;
+  /** Display name for the leg, if available */
+  displayName: string | null;
+  /** Color for the route, if available */
+  routeColor: string | null;
+  /** Text color for the route, if available */
+  routeTextColor: string | null;
+  /** Source of the leg information (e.g., "motis", "gtfs") */
+  source: string;
+  /** List of intermediate stops for the leg, if available */
+  intermediateStops: StopPlaceDto[];
 }
 
 /** Data Transfer Object for a Stop */
@@ -268,6 +340,84 @@ export interface MotisStopDto {
   longitude: number;
   /** Distance to the stop in meters */
   distance: number | null;
+}
+
+/** Data Transfer Object for a Stop Place in the Motis API */
+export type StopPlaceDto = MotisStopDto & {
+  /**
+   * Actual arrival time at the stop place, if available
+   * @format date-time
+   */
+  arrival: string | null;
+  /**
+   * Actual departure time from the stop place, if available
+   * @format date-time
+   */
+  departure: string | null;
+  /**
+   * Scheduled arrival time at the stop place
+   * @format date-time
+   */
+  scheduledArrival: string | null;
+  /**
+   * Scheduled departure time from the stop place
+   * @format date-time
+   */
+  scheduledDeparture: string | null;
+  /** Indicates if the stop place is cancelled */
+  cancelled: boolean | null;
+};
+
+/** Data Transfer Object for a Stop Time in the Motis API */
+export interface StopTimeDto {
+  /** Data Transfer Object for a Stop Place in the Motis API */
+  place: StopPlaceDto;
+  /** Enumeration of transport modes */
+  mode: TransportMode;
+  /** Indicates if the stop time is based on real-time data */
+  realTime: boolean;
+  /** Head sign for the stop time, if available */
+  headSign: string;
+  /** Name of the agency associated with this stop time, if available */
+  agencyName: string | null;
+  /** Identifier for the agency associated with this stop time, if available */
+  agencyId: string | null;
+  /** Identifier for the trip associated with this stop time */
+  tripId: string;
+  /** Short name for the route, if available */
+  routeShortName: string;
+  /** Long name for the route, if available */
+  routeLongName: string | null;
+  /** Short name for the trip, if available */
+  tripShortName: string | null;
+  /** Color for the route, if available */
+  routeColor: string | null;
+  /** Text color for the route, if available */
+  routeTextColor: string | null;
+  /** Display name for the stop time, if available */
+  displayName: string | null;
+  /** Source of the stop time information */
+  source: string;
+}
+
+/** Data Transfer Object for a Trip in the Motis API */
+export interface MotisTripDto {
+  /** Total duration of the trip in seconds */
+  duration: number;
+  /**
+   * Start time of the trip
+   * @format date-time
+   */
+  startTime: string;
+  /**
+   * End time of the trip
+   * @format date-time
+   */
+  endTime: string;
+  /** Number of transfers during the trip */
+  transfers: number;
+  /** List of legs that make up the trip */
+  legs: LegDto[];
 }
 
 /** A wrapper for notification data */
@@ -376,9 +526,28 @@ export type PostPaginationDto = PaginationDto & {
   items: (LocationPost | BasePost | TransportPost)[];
 };
 
+/** Data Transfer Object for Request Location */
+export interface RequestLocationDto {
+  /** Number of locations fetched */
+  fetched: number;
+  /** Number of locations to fetch */
+  toFetch: number;
+  /**
+   * Last update time of the request location data
+   * @format date-time
+   */
+  updatedAt: string;
+  /**
+   * Last time a request was made for location data
+   * @format date-time
+   */
+  lastRequestedAt: string | null;
+}
+
 /** Data Transfer Object for Stopovers Response */
 export interface StopoversResponseDto {
-  trip: any;
+  /** Data Transfer Object for a Trip in the Motis API */
+  trip: MotisTripDto;
   /**
    * Start time of the trip
    * @format date-time
@@ -2101,7 +2270,7 @@ export class Api<
       },
       params: RequestParams = {},
     ) =>
-      this.request<any, any>({
+      this.request<RequestLocationDto, any>({
         path: `/location/request-location`,
         method: "GET",
         query: query,
@@ -2242,7 +2411,7 @@ export class Api<
       },
       params: RequestParams = {},
     ) =>
-      this.request<MotisGeocodeResponseEntry[], any>({
+      this.request<GeocodeResponseEntry[], any>({
         path: `/geocode`,
         method: "GET",
         query: query,
