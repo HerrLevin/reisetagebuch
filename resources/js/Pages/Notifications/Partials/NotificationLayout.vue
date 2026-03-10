@@ -1,8 +1,15 @@
 <script setup lang="ts">
-import { isPostLikedNotification } from '@/types/notifications';
+import {
+    isPostLikedNotification,
+    isUserFollowedNotification,
+} from '@/types/notifications';
 import { PropType } from 'vue';
 import { RouterLink } from 'vue-router';
-import { NotificationWrapper } from '../../../../types/Api.gen';
+import {
+    NotificationWrapper,
+    PostLikedData,
+    UserFollowedData,
+} from '../../../../types/Api.gen';
 
 defineProps({
     notification: {
@@ -13,7 +20,12 @@ defineProps({
 
 const getNotificationLink = (notification: NotificationWrapper): string => {
     if (isPostLikedNotification(notification)) {
-        return `/posts/${notification.data!.postId}`;
+        const data = notification.data as PostLikedData;
+        return `/posts/${data.postId}`;
+    }
+    if (isUserFollowedNotification(notification)) {
+        const data = notification.data as UserFollowedData;
+        return `/profile/${data.followerUserName}`;
     }
     return '#';
 };
