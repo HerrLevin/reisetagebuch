@@ -27,17 +27,18 @@ watch(checkBox, (newValue) => {
 });
 </script>
 <template>
-    <label class="swap swap-rotate">
-        <!-- this hidden checkbox controls the state -->
+    <label class="flex w-full cursor-pointer items-center gap-2">
+        <span class="label-text">
+            <Moon class="size-5" />
+        </span>
         <input
             v-model="checkBox"
             type="checkbox"
-            class="theme-controller"
             value="light"
+            class="toggle theme-controller"
         />
-        <Sun class="swap-off size-5" />
-
-        <!-- moon icon -->
-        <Moon class="swap-on size-5" />
+        <span class="label-text">
+            <Sun class="size-5" />
+        </span>
     </label>
 </template>

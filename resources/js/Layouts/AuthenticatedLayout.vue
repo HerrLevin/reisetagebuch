@@ -2,6 +2,7 @@
 import Dock from '@/Layouts/Partials/Dock.vue';
 import LocationHistoryChecker from '@/Layouts/Partials/LocationHistoryChecker.vue';
 import NavBar from '@/Layouts/Partials/NavBar.vue';
+import SideNav from '@/Layouts/Partials/SideNav.vue';
 </script>
 
 <template>
@@ -15,8 +16,15 @@ import NavBar from '@/Layouts/Partials/NavBar.vue';
                 </div>
             </NavBar>
 
-            <div class="mt-4 md:mt-12">
-                <div class="mx-auto max-w-4xl">
+            <div
+                class="mx-auto mt-4 grid w-full grid-cols-4 gap-4 md:mt-12 md:grid-cols-5 md:px-10"
+            >
+                <div class="col-span-1 hidden md:block">
+                    <div class="card bg-base-100 min-w-full p-0 shadow-md">
+                        <SideNav />
+                    </div>
+                </div>
+                <div class="col-span-4">
                     <main class="mb-12 w-full pb-12 md:mb-0 md:pb-0">
                         <slot />
                     </main>

@@ -109,7 +109,9 @@
         "login": "Log in",
         "register": "Register",
         "logo": "Logo",
-        "scroll_end": "You've reached the end!"
+        "scroll_end": "You've reached the end!",
+        "open_sidebar": "Open sidebar",
+        "close_sidebar": "Close sidebar"
     },
     "new_post": {
         "title": "New Post",

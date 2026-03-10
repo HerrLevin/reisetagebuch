@@ -5,9 +5,8 @@ import MassEdit from '@/Components/Post/MassEdit.vue';
 import Post from '@/Components/Post/Post.vue';
 import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { getTravelReasonLabel } from '@/Services/TravelReasonMapping';
+import { getTravelReasonLabel } from '@/Services/ApiTravelReasonMapping';
 import { getVisibilityLabel } from '@/Services/VisibilityMapping';
-import { AllPosts } from '@/types/PostTypes';
 import { onMounted, reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -239,246 +238,237 @@ function deletePost(postId: string): void {
             </h2>
         </template>
 
-        <div class="grid grid-cols-1 gap-4 lg:grid-cols-4">
+        <div>
             <!-- Filters Sidebar -->
-            <div class="lg:col-span-1">
-                <div class="card bg-base-100 shadow-md">
-                    <div class="card-body">
-                        <div class="mb-4 flex items-center justify-between">
-                            <h3 class="card-title text-base">
-                                {{ t('posts.filter.filters') }}
-                            </h3>
-                            <button
-                                v-if="hasActiveFilters()"
-                                class="btn btn-sm btn-ghost"
-                                @click="clearFilters"
-                            >
-                                {{ t('posts.filter.clear_all') }}
-                            </button>
+            <div class="card bg-base-100 shadow-md">
+                <div class="card-body">
+                    <div class="mb-4 flex items-center justify-between">
+                        <h3 class="card-title text-base">
+                            {{ t('posts.filter.filters') }}
+                        </h3>
+                        <button
+                            v-if="hasActiveFilters()"
+                            class="btn btn-sm btn-ghost"
+                            @click="clearFilters"
+                        >
+                            {{ t('posts.filter.clear_all') }}
+                        </button>
+                    </div>
+
+                    <div class="space-y-6">
+                        <!-- Date Range Filter -->
+                        <div>
+                            <label class="label">
+                                <span class="label-text font-semibold">
+                                    {{ t('posts.filter.date_range') }}
+                                </span>
+                            </label>
+                            <div class="space-y-2">
+                                <div>
+                                    <label class="label label-text text-xs">{{
+                                        t('posts.filter.from')
+                                    }}</label>
+                                    <input
+                                        v-model="filterForm.dateFrom"
+                                        type="date"
+                                        class="input input-bordered input-sm w-full"
+                                    />
+                                </div>
+                                <div>
+                                    <label class="label label-text text-xs">{{
+                                        t('posts.filter.to')
+                                    }}</label>
+                                    <input
+                                        v-model="filterForm.dateTo"
+                                        type="date"
+                                        class="input input-bordered input-sm w-full"
+                                    />
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="space-y-6">
-                            <!-- Date Range Filter -->
-                            <div>
-                                <label class="label">
-                                    <span class="label-text font-semibold">
-                                        {{ t('posts.filter.date_range') }}
-                                    </span>
-                                </label>
-                                <div class="space-y-2">
-                                    <div>
-                                        <label
-                                            class="label label-text text-xs"
-                                            >{{ t('posts.filter.from') }}</label
-                                        >
-                                        <input
-                                            v-model="filterForm.dateFrom"
-                                            type="date"
-                                            class="input input-bordered input-sm w-full"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label
-                                            class="label label-text text-xs"
-                                            >{{ t('posts.filter.to') }}</label
-                                        >
-                                        <input
-                                            v-model="filterForm.dateTo"
-                                            type="date"
-                                            class="input input-bordered input-sm w-full"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Visibility Filter -->
-                            <div>
-                                <label class="label">
-                                    <span class="label-text font-semibold">
-                                        {{ t('posts.filter.visibility') }}
-                                    </span>
-                                </label>
-                                <div class="space-y-1">
-                                    <label
-                                        v-for="option in Visibility"
-                                        :key="option"
-                                        class="label cursor-pointer justify-start gap-2"
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            class="checkbox checkbox-sm"
-                                            :checked="
-                                                filterForm.visibility.includes(
-                                                    option,
-                                                )
-                                            "
-                                            @change="toggleVisibility(option)"
-                                        />
-                                        <span class="label-text">
-                                            {{ getVisibilityLabel(option) }}
-                                        </span>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <!-- Travel Reason Filter -->
-                            <div>
-                                <label class="label">
-                                    <span class="label-text font-semibold">
-                                        {{ t('posts.filter.travel_reason') }}
-                                    </span>
-                                </label>
-                                <div class="space-y-1">
-                                    <label
-                                        v-for="option in TravelReason"
-                                        :key="option"
-                                        class="label cursor-pointer justify-start gap-2"
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            class="checkbox checkbox-sm"
-                                            :checked="
-                                                filterForm.travelReason.includes(
-                                                    option,
-                                                )
-                                            "
-                                            @change="toggleTravelReason(option)"
-                                        />
-                                        <span class="label-text">
-                                            {{ getTravelReasonLabel(option) }}
-                                        </span>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <!-- Tags Filter -->
-                            <div v-if="availableTags.length > 0">
-                                <label class="label">
-                                    <span class="label-text font-semibold">
-                                        {{ t('posts.filter.tags') }}
-                                    </span>
-                                </label>
-                                <div class="flex flex-wrap gap-2">
-                                    <button
-                                        v-for="tag in availableTags"
-                                        :key="tag"
-                                        class="btn btn-sm"
-                                        :class="
-                                            filterForm.tags.includes(tag)
-                                                ? 'btn-primary'
-                                                : 'btn-outline'
+                        <!-- Visibility Filter -->
+                        <div>
+                            <label class="label">
+                                <span class="label-text font-semibold">
+                                    {{ t('posts.filter.visibility') }}
+                                </span>
+                            </label>
+                            <div class="space-y-1">
+                                <label
+                                    v-for="option in Visibility"
+                                    :key="option"
+                                    class="label cursor-pointer justify-start gap-2"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        class="checkbox checkbox-sm"
+                                        :checked="
+                                            filterForm.visibility.includes(
+                                                option,
+                                            )
                                         "
-                                        @click="toggleTag(tag)"
-                                    >
-                                        {{ tag }}
-                                    </button>
-                                </div>
+                                        @change="toggleVisibility(option)"
+                                    />
+                                    <span class="label-text">
+                                        {{ getVisibilityLabel(option) }}
+                                    </span>
+                                </label>
                             </div>
-
-                            <button
-                                class="btn btn-primary btn-block"
-                                @click="applyFilters"
-                            >
-                                {{ t('posts.filter.apply_filters') }}
-                            </button>
                         </div>
+
+                        <!-- Travel Reason Filter -->
+                        <div>
+                            <label class="label">
+                                <span class="label-text font-semibold">
+                                    {{ t('posts.filter.travel_reason') }}
+                                </span>
+                            </label>
+                            <div class="space-y-1">
+                                <label
+                                    v-for="option in TravelReason"
+                                    :key="option"
+                                    class="label cursor-pointer justify-start gap-2"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        class="checkbox checkbox-sm"
+                                        :checked="
+                                            filterForm.travelReason.includes(
+                                                option,
+                                            )
+                                        "
+                                        @change="toggleTravelReason(option)"
+                                    />
+                                    <span class="label-text">
+                                        {{ getTravelReasonLabel(option) }}
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Tags Filter -->
+                        <div v-if="availableTags.length > 0">
+                            <label class="label">
+                                <span class="label-text font-semibold">
+                                    {{ t('posts.filter.tags') }}
+                                </span>
+                            </label>
+                            <div class="flex flex-wrap gap-2">
+                                <button
+                                    v-for="tag in availableTags"
+                                    :key="tag"
+                                    class="btn btn-sm"
+                                    :class="
+                                        filterForm.tags.includes(tag)
+                                            ? 'btn-primary'
+                                            : 'btn-outline'
+                                    "
+                                    @click="toggleTag(tag)"
+                                >
+                                    {{ tag }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <button
+                            class="btn btn-primary btn-block"
+                            @click="applyFilters"
+                        >
+                            {{ t('posts.filter.apply_filters') }}
+                        </button>
                     </div>
                 </div>
             </div>
 
             <!-- Posts List -->
-            <div class="lg:col-span-3">
-                <div class="card bg-base-100 shadow-md">
-                    <div class="flex items-center justify-between p-4 pb-2">
-                        <span v-if="hasActiveFilters()">
-                            {{ t('posts.filter.filtered_results') }}
-                        </span>
-                        <span v-else>
-                            {{ t('posts.filter.all_posts') }}
-                        </span>
+            <div class="card bg-base-100 mt-4 shadow-md">
+                <div class="flex items-center justify-between p-4 pb-2">
+                    <span v-if="hasActiveFilters()">
+                        {{ t('posts.filter.filtered_results') }}
+                    </span>
+                    <span v-else>
+                        {{ t('posts.filter.all_posts') }}
+                    </span>
 
-                        <div class="flex gap-2">
+                    <div class="flex gap-2">
+                        <button
+                            v-if="!selectionMode"
+                            class="btn btn-sm btn-ghost"
+                            @click="toggleSelectionMode"
+                        >
+                            {{ t('posts.mass_edit.select_posts') }}
+                        </button>
+                        <template v-else>
+                            <span class="self-center text-xs opacity-60">
+                                {{ selectedPosts.length }}
+                                {{ t('posts.mass_edit.selected') }}
+                            </span>
                             <button
-                                v-if="!selectionMode"
+                                class="btn btn-sm btn-primary"
+                                :disabled="selectedPosts.length === 0"
+                                @click="openMassEdit"
+                            >
+                                {{ t('posts.mass_edit.edit') }}
+                            </button>
+                            <button
                                 class="btn btn-sm btn-ghost"
                                 @click="toggleSelectionMode"
                             >
-                                {{ t('posts.mass_edit.select_posts') }}
+                                {{ t('common.cancel') }}
                             </button>
-                            <template v-else>
-                                <span class="self-center text-xs opacity-60">
-                                    {{ selectedPosts.length }}
-                                    {{ t('posts.mass_edit.selected') }}
-                                </span>
-                                <button
-                                    class="btn btn-sm btn-primary"
-                                    :disabled="selectedPosts.length === 0"
-                                    @click="openMassEdit"
-                                >
-                                    {{ t('posts.mass_edit.edit') }}
-                                </button>
-                                <button
-                                    class="btn btn-sm btn-ghost"
-                                    @click="toggleSelectionMode"
-                                >
-                                    {{ t('common.cancel') }}
-                                </button>
-                            </template>
-                        </div>
+                        </template>
                     </div>
-
-                    <ul class="list">
-                        <li
-                            v-for="post in posts"
-                            :key="post.id"
-                            class="list-row hover-list-entry cursor-pointer"
-                            :class="{
-                                'bg-primary/10':
-                                    selectionMode && isPostSelected(post),
-                            }"
-                            @click="goToPost(post.id)"
-                        >
-                            <div v-if="selectionMode">
-                                <input
-                                    type="checkbox"
-                                    class="checkbox checkbox-primary"
-                                    :checked="isPostSelected(post)"
-                                    @click.stop="togglePostSelection(post)"
-                                />
-                            </div>
-                            <Post
-                                :post="post"
-                                @delete:post="deletePost(post.id)"
-                            ></Post>
-                        </li>
-                        <li
-                            v-if="posts.length === 0 && !loading"
-                            class="p-8 text-center"
-                        >
-                            <div class="text-base-content/60">
-                                {{ t('posts.filter.no_results') }}
-                            </div>
-                        </li>
-                        <li v-if="loading" class="p-4 text-center">
-                            <Loading class="mx-auto" />
-                        </li>
-                        <li v-else-if="nextCursor" class="p-4 text-center">
-                            <button
-                                class="btn btn-ghost btn-sm"
-                                @click="loadMore"
-                            >
-                                {{ t('common.load_more') }}
-                            </button>
-                        </li>
-                    </ul>
-
-                    <MassEdit
-                        :selected-posts="selectedPosts"
-                        :show="showMassEditModal"
-                        @close="showMassEditModal = false"
-                        @updated="handleMassEditUpdated"
-                    />
                 </div>
+
+                <ul class="list">
+                    <li
+                        v-for="post in posts"
+                        :key="post.id"
+                        class="list-row hover-list-entry cursor-pointer"
+                        :class="{
+                            'bg-primary/10':
+                                selectionMode && isPostSelected(post),
+                        }"
+                        @click="goToPost(post.id)"
+                    >
+                        <div v-if="selectionMode">
+                            <input
+                                type="checkbox"
+                                class="checkbox checkbox-primary"
+                                :checked="isPostSelected(post)"
+                                @click.stop="togglePostSelection(post)"
+                            />
+                        </div>
+                        <Post
+                            :post="post"
+                            @delete:post="deletePost(post.id)"
+                        ></Post>
+                    </li>
+                    <li
+                        v-if="posts.length === 0 && !loading"
+                        class="p-8 text-center"
+                    >
+                        <div class="text-base-content/60">
+                            {{ t('posts.filter.no_results') }}
+                        </div>
+                    </li>
+                    <li v-if="loading" class="p-4 text-center">
+                        <Loading class="mx-auto" />
+                    </li>
+                    <li v-else-if="nextCursor" class="p-4 text-center">
+                        <button class="btn btn-ghost btn-sm" @click="loadMore">
+                            {{ t('common.load_more') }}
+                        </button>
+                    </li>
+                </ul>
+
+                <MassEdit
+                    :selected-posts="selectedPosts"
+                    :show="showMassEditModal"
+                    @close="showMassEditModal = false"
+                    @updated="handleMassEditUpdated"
+                />
             </div>
         </div>
     </AuthenticatedLayout>
