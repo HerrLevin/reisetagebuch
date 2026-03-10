@@ -20,10 +20,11 @@ import ListLocations from '@/Pages/NewPostDialog/ListLocations.vue';
 import ListStopovers from '@/Pages/NewPostDialog/ListStopovers.vue';
 import NotificationsIndex from '@/Pages/Notifications/Index.vue';
 import PostsFilter from '@/Pages/Posts/Filter.vue';
+import Likes from '@/Pages/Posts/Likes.vue';
+import SinglePost from '@/Pages/Posts/SinglePost.vue';
 import ProfileShow from '@/Pages/Profile/Show.vue';
 import ProfileShowMap from '@/Pages/Profile/ShowMap.vue';
 import EditSettings from '@/Pages/Settings/Edit.vue';
-import SinglePost from '@/Pages/SinglePost.vue';
 import CreateTrip from '@/Pages/Trips/Create.vue';
 import Welcome from '@/Pages/Welcome.vue';
 
@@ -161,6 +162,12 @@ const routes: RouteRecordRaw[] = [
         path: '/posts/:postId',
         name: 'posts.show',
         component: SinglePost,
+        props: true,
+    },
+    {
+        path: '/posts/:postId/likes',
+        name: 'posts.likes',
+        component: Likes,
         props: true,
     },
     {

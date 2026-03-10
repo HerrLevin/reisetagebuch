@@ -6,6 +6,7 @@ import Post from '@/Components/Post/Post.vue';
 import PostMetaInfo from '@/Components/Post/PostMetaInfo.vue';
 import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import CardBack from '@/Pages/Posts/Partials/CardBack.vue';
 import { getColorForPost } from '@/Services/DepartureTypeService';
 import {
     getArrivalDelay,
@@ -16,12 +17,11 @@ import {
 import { useUserStore } from '@/stores/user';
 import { isLocationPost, isTransportPost } from '@/types/PostTypes';
 import { GeometryCollection } from 'geojson';
-import { ArrowLeft } from 'lucide-vue-next';
 import { LngLat } from 'maplibre-gl';
 import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
-import { BasePost, LocationPost, TransportPost } from '../../types/Api.gen';
+import { BasePost, LocationPost, TransportPost } from '../../../types/Api.gen';
 
 const { t } = useI18n();
 const vueRouter = useRouter();
@@ -45,7 +45,7 @@ const loading = ref(false);
 
 const post = ref<BasePost | TransportPost | LocationPost | null>(null);
 
-function fetchPost() {
+function fetchLikes() {
     loading.value = true;
     api.posts
         .showPost(props.postId)
@@ -156,7 +156,7 @@ onUnmounted(() => {
     }
 });
 
-watch(() => props.postId, fetchPost, { immediate: true });
+watch(() => props.postId, fetchLikes, { immediate: true });
 
 const progress = computed(() => {
     if (!isTransportPost(post.value)) return 0;
@@ -206,15 +206,7 @@ function deleted() {
         </template>
 
         <div class="card bg-base-100 min-w-full shadow-md">
-            <div class="border-base-300 flex items-center gap-2 border-b-1 p-4">
-                <button
-                    class="btn btn-ghost btn-sm btn-circle text-base-content normal-case"
-                    type="button"
-                    @click="vueRouter.back()"
-                >
-                    <ArrowLeft class="size-6" />
-                </button>
-            </div>
+            <CardBack />
             <Map
                 v-if="post && startPoint"
                 :start-point="startPoint"

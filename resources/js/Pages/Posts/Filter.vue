@@ -5,7 +5,7 @@ import MassEdit from '@/Components/Post/MassEdit.vue';
 import Post from '@/Components/Post/Post.vue';
 import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { getTravelReasonLabel } from '@/Services/ApiTravelReasonMapping';
+import { getTravelReasonLabel } from '@/Services/TravelReasonMapping';
 import { getVisibilityLabel } from '@/Services/VisibilityMapping';
 import { onMounted, reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';

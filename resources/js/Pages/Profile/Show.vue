@@ -30,22 +30,22 @@ watchEffect(() => {
     }
 });
 
-const loadProfileData = async () => {
+function loadProfileData() {
     loading.value = true;
     try {
         api.profile.getProfile(props.username).then((response) => {
             user.value = response.data;
             userLoading.value = false;
-            loadPosts();
+            loadPosts(false);
         });
     } catch (error) {
         console.error('Error loading profile data:', error);
     } finally {
         loading.value = false;
     }
-};
+}
 
-const loadPosts = async () => {
+function loadPosts(append: boolean = true): void {
     if (loading.value || !user.value) return;
     loading.value = true;
     api.users
@@ -53,7 +53,11 @@ const loadPosts = async () => {
             cursor: nextCursor.value || undefined,
         })
         .then((response) => {
-            posts.value.push(...response.data.items);
+            if (!append) {
+                posts.value = response.data.items;
+            } else {
+                posts.value.push(...response.data.items);
+            }
             if (response.data.nextCursor === nextCursor.value) {
                 nextCursor.value = null;
                 return;
@@ -66,7 +70,7 @@ const loadPosts = async () => {
         .finally(() => {
             loading.value = false;
         });
-};
+}
 
 function deletePost(postId: string): void {
     const index = posts.value.findIndex((post) => post.id === postId);
