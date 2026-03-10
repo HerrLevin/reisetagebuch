@@ -107,7 +107,9 @@
         "login": "Anmelden",
         "register": "Registrieren",
         "logo": "Logo",
-        "scroll_end": "Du hast das Ende erreicht!"
+        "scroll_end": "Du hast das Ende erreicht!",
+        "open_sidebar": "Seitenleiste öffnen",
+        "close_sidebar": "Seitenleiste schließen"
     },
     "new_post": {
         "title": "Neuer Beitrag",

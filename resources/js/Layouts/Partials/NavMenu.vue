@@ -4,12 +4,11 @@ import { LocationService } from '@/Services/LocationService';
 import { useUserStore } from '@/stores/user';
 import {
     CirclePlus,
-    Filter,
     House,
     List,
     MapPin,
-    Route,
     SquarePen,
+    User,
 } from 'lucide-vue-next';
 import { onMounted, onUnmounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -43,20 +42,11 @@ function updateLocation() {
         })
         .catch(() => {});
 }
-const isNotificationRoute = () => {
-    return currentRoute.name === 'notifications';
-};
 const isPostsCreateRoute = () => {
     return (currentRoute.name as string)?.startsWith('posts.create');
 };
-const ishomeRoute = () => {
-    return currentRoute.name === 'timeline';
-};
-const isTripRoute = () => {
-    return currentRoute.name === 'trips.create';
-};
-const isFilterRoute = () => {
-    return currentRoute.name === 'posts.filter';
+const isHomeRoute = () => {
+    return (currentRoute.name as string)?.startsWith('home');
 };
 </script>
 
@@ -65,7 +55,7 @@ const isFilterRoute = () => {
         <li>
             <RouterLink
                 to="/home"
-                :class="{ 'btn-active': ishomeRoute() }"
+                :class="{ 'btn-active': isHomeRoute() }"
                 class="btn btn-ghost"
             >
                 <House class="size-5" />
@@ -113,19 +103,9 @@ const isFilterRoute = () => {
             </li>
             <li>
                 <RouterLink
-                    to="/trips/create"
-                    :class="{ 'btn-active': isTripRoute() }"
-                    class="btn btn-ghost"
-                >
-                    <Route class="size-5" />
-                    {{ t('new_route.title') }}
-                </RouterLink>
-            </li>
-            <li>
-                <RouterLink
                     to="/notifications"
-                    :class="{ 'btn-active': isNotificationRoute() }"
                     class="btn btn-ghost"
+                    active-class="btn-active"
                 >
                     <NotificationBell class="size-5" />
                     {{ t('notifications.title') }}
@@ -133,12 +113,15 @@ const isFilterRoute = () => {
             </li>
             <li>
                 <RouterLink
-                    to="/posts/filter"
-                    :class="{ 'btn-active': isFilterRoute() }"
+                    :to="{
+                        name: 'profile.show',
+                        params: { username: user.user.username },
+                    }"
                     class="btn btn-ghost"
+                    active-class="btn-active"
                 >
-                    <Filter class="size-5" />
-                    {{ t('posts.filter.title') }}
+                    <User class="size-5" />
+                    {{ t('profile.title') }}
                 </RouterLink>
             </li>
         </template>

@@ -3,13 +3,13 @@ import NotificationBell from '@/Components/Notifications/NotificationBell.vue';
 import { LocationService } from '@/Services/LocationService';
 import { useUserStore } from '@/stores/user';
 import {
-    Filter,
     House,
     List,
     MapPin,
     Plus,
     Route,
     SquarePen,
+    User,
 } from 'lucide-vue-next';
 import { onMounted, onUnmounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -129,12 +129,15 @@ const isDeparturesRoute = () => {
                     </span>
                 </RouterLink>
                 <RouterLink
-                    :to="{ name: 'posts.filter' }"
+                    :to="{
+                        name: 'profile.show',
+                        params: { username: user.user.username },
+                    }"
                     active-class="dock-active"
                 >
-                    <Filter class="size-[1.2em]" />
+                    <User class="size-[1.2em]" />
                     <span class="dock-label">
-                        {{ t('posts.filter.title') }}
+                        {{ t('profile.title') }}
                     </span>
                 </RouterLink>
             </template>
