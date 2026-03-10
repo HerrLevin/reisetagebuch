@@ -1966,6 +1966,24 @@ export class Api<
   };
   posts = {
     /**
+     * @description Get users who liked a post
+     *
+     * @tags Posts
+     * @name GetPostLikes
+     * @summary Get post likes
+     * @request GET:/posts/{post}/likes
+     * @secure
+     */
+    getPostLikes: (post: string, params: RequestParams = {}) =>
+      this.request<UserDto[], void>({
+        path: `/posts/${post}/likes`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
      * @description Like a post
      *
      * @tags Posts

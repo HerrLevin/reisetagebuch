@@ -43,8 +43,12 @@ Route::prefix('users')->group(function () {
     });
 });
 
-Route::get('posts/{post}', [PostController::class, 'show'])
-    ->name('api.posts.show');
+Route::prefix('posts/{post}')->group(function () {
+    Route::get('/', [PostController::class, 'show'])
+        ->name('api.posts.show');
+    Route::get('/likes', [LikeController::class, 'index'])
+        ->name('posts.likes');
+});
 
 route::get('app/configuration', [AppConfigurationController::class, 'index'])
     ->name('app.configuration');
@@ -86,12 +90,13 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/location', [PostController::class, 'storeLocation'])->name('posts.create.post.store');
         Route::post('/mass-edit', [PostController::class, 'massEdit'])->name('api.posts.mass-edit');
 
-        Route::prefix('{post}')->group(function () {
-            Route::patch('/', [PostController::class, 'update'])->name('posts.update');
+        Route::prefix('{postId}')->group(function () {
             Route::post('/likes', [LikeController::class, 'store'])
                 ->name('posts.like');
             Route::delete('/likes', [LikeController::class, 'destroy'])
                 ->name('posts.unlike');
+
+            Route::patch('/', [PostController::class, 'update'])->name('posts.update');
             Route::delete('/', [PostController::class, 'destroy'])
                 ->name('api.posts.destroy');
 

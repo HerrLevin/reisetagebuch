@@ -816,6 +816,42 @@
             }
         },
         "/posts/{post}/likes": {
+            "get": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Get post likes",
+                "description": "Get users who liked a post",
+                "operationId": "getPostLikes",
+                "parameters": [
+                    {
+                        "name": "post",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/UserDto"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Post not found"
+                    }
+                }
+            },
             "post": {
                 "tags": [
                     "Posts"

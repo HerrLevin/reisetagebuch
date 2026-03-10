@@ -28,7 +28,11 @@ const handleLikeToggled = (liked: boolean, count: number) => {
 <template>
     <div class="flex items-center justify-end gap-2">
         <div class="gap-1">
-            <LikesIndicator :likes="likesCount" :liked-by-user="likedByUser" />
+            <LikesIndicator
+                :likes="likesCount"
+                :liked-by-user="likedByUser"
+                :post-id="post.id"
+            />
 
             <LikeButton
                 :post-id="post.id"
