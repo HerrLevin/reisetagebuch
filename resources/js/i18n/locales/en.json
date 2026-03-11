@@ -153,6 +153,8 @@
         "title": "New Route",
         "add_stop": "Add Stopover",
         "route_details": "Route Details",
+        "show_map": "Show Map",
+        "show_form": "Show Form",
         "create_route": "Create Route",
         "airport_search": {
             "placeholder": "Search for an airport by name, IATA or ICAO code"

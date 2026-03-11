@@ -150,6 +150,8 @@
     "new_route": {
         "title": "Neue Route",
         "add_stop": "Zwischenhalt hinzufügen",
+        "show_map": "Karte anzeigen",
+        "show_form": "Formular anzeigen",
         "route_details": "Routendetails",
         "create_route": "Route erstellen",
         "airport_search": {

@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { api } from '@/api';
 import Loading from '@/Components/Loading.vue';
+import Map from '@/Components/Map.vue';
 import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import TransitousSearch from '@/Pages/NewPostDialog/Partials/TransitousSearch.vue';
-import AirportSearch from '@/Pages/NewRoute/Partials/AirportSearch.vue';
+import AirportRouteInput from '@/Pages/Trips/Partials/AirportRouteInput.vue';
+import TransitousRouteInput from '@/Pages/Trips/Partials/TransitousRouteInput.vue';
 import TripDetailsForm from '@/Pages/Trips/Partials/TripDetailsForm.vue';
 import {
     CreateTripForm,
@@ -13,9 +14,11 @@ import {
     Providers,
     TripLocation,
 } from '@/types/TripCreation';
-import { PlaneTakeoff, TrainFront } from 'lucide-vue-next';
+import { MultiPoint, Position } from 'geojson';
+import { FormIcon, MapIcon, PlaneTakeoff, TrainFront } from 'lucide-vue-next';
 import { DateTime } from 'luxon';
-import { reactive, ref, watch } from 'vue';
+import { LngLat } from 'maplibre-gl';
+import { computed, reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import {
@@ -30,6 +33,7 @@ const vueRouter = useRouter();
 useTitle(t('new_route.title'));
 
 const provider = ref<ProviderKey>('transitous');
+const showMap = ref(false);
 
 const providers: Providers = {
     transitous: {
@@ -44,18 +48,7 @@ const providers: Providers = {
 
 const loading = ref(false);
 
-const model = ref<CreateTripForm>({
-    startLocation: null,
-    endLocation: null,
-    departureTime: DateTime.now(),
-    arrivalTime: DateTime.now().plus({ hours: 1 }),
-    transportMode: null,
-    lineName: '',
-    tripShortName: '',
-    stops: [],
-    routeColor: null,
-    routeTextColor: null,
-});
+const model = ref<CreateTripForm>(emptyModel());
 
 const form = reactive({
     mode: TransportMode.BUS,
@@ -221,24 +214,52 @@ function blur() {
     }
 }
 
+function emptyModel() {
+    return {
+        startLocation: null,
+        endLocation: null,
+        departureTime: DateTime.now(),
+        arrivalTime: DateTime.now().plus({ hours: 1 }),
+        transportMode: null,
+        lineName: '',
+        tripShortName: '',
+        stops: [],
+        routeColor: null,
+        routeTextColor: null,
+    };
+}
+
 watch(
     () => provider.value,
     () => {
         // Reset model when provider changes
-        model.value = {
-            startLocation: null,
-            endLocation: null,
-            departureTime: DateTime.now(),
-            arrivalTime: DateTime.now().plus({ hours: 1 }),
-            transportMode: null,
-            lineName: '',
-            tripShortName: '',
-            stops: [],
-            routeColor: null,
-            routeTextColor: null,
-        };
+        model.value = emptyModel();
     },
 );
+
+const stopOvers = computed<MultiPoint | null>(() => {
+    const points: Position[] = [];
+    if (model.value.startLocation) {
+        points.push([
+            model.value.startLocation.longitude,
+            model.value.startLocation.latitude,
+        ]);
+    }
+    model.value.stops.forEach((stop) => {
+        if (stop.latitude && stop.longitude) {
+            points.push([stop.longitude, stop.latitude]);
+        }
+    });
+    if (model.value.endLocation) {
+        points.push([
+            model.value.endLocation.longitude,
+            model.value.endLocation.latitude,
+        ]);
+    }
+    return points.length > 0
+        ? { type: 'MultiPoint', coordinates: points }
+        : null;
+});
 </script>
 
 <template>
@@ -249,7 +270,23 @@ watch(
             </h2>
         </template>
 
-        <div class="flex justify-end gap-4 px-6 pb-4">
+        <div class="flex justify-between gap-4 px-6 pb-4">
+            <button
+                v-if="!showMap"
+                class="btn btn-outline"
+                @click="showMap = !showMap"
+            >
+                <MapIcon class="inline size-4 sm:me-2" />
+                <span class="sr-only sm:not-sr-only">
+                    {{ t('new_route.show_map') }}
+                </span>
+            </button>
+            <button v-else class="btn btn-outline" @click="showMap = !showMap">
+                <FormIcon class="inline size-4 sm:me-2" />
+                <span class="sr-only sm:not-sr-only">
+                    {{ t('new_route.show_form') }}
+                </span>
+            </button>
             <div class="dropdown">
                 <div
                     tabindex="0"
@@ -280,56 +317,66 @@ watch(
                 </ul>
             </div>
         </div>
-
-        <div class="card bg-base-100 min-w-full p-0 shadow-md">
-            <div class="card-body">
-                <div class="grid grid-cols-1 gap-8">
-                    <TransitousSearch
-                        v-if="provider === 'transitous'"
-                        @select="selectLocation($event, 'start')"
-                    />
-                    <AirportSearch
-                        v-else
-                        @select="selectLocation($event, 'start')"
-                    />
+        <div v-show="!showMap">
+            <TransitousRouteInput
+                v-if="provider === 'transitous'"
+                :stops="model.stops"
+                @update:start="selectLocation($event, 'start')"
+                @update:end="selectLocation($event, 'end')"
+                @update:stop="selectLocation($event.value, $event.stop)"
+                @add-stop="addStop()"
+            />
+            <AirportRouteInput
+                v-else-if="provider === 'airports'"
+                :stops="model.stops"
+                @update:start="selectLocation($event, 'start')"
+                @update:end="selectLocation($event, 'end')"
+                @update:stop="selectLocation($event.value, $event.stop)"
+                @add-stop="addStop()"
+            />
+            <div class="card bg-base-100 mt-4 min-w-full p-0 shadow-md">
+                <div class="card-body">
+                    <div class="card-title">
+                        {{ t('new_route.route_details') }}
+                    </div>
+                    <TripDetailsForm v-model="model" />
                 </div>
-                <div
-                    v-for="stop in model.stops"
-                    :key="stop.order"
-                    class="grid grid-cols-1 gap-8"
+            </div>
+            <div class="mt-4 flex justify-end">
+                <Loading v-if="loading" class="me-2" />
+                <button
+                    class="btn btn-primary"
+                    :disabled="loading"
+                    @click="submit"
                 >
-                    <TransitousSearch @select="selectLocation($event, stop)" />
-                </div>
-                <div v-if="provider === 'transitous'">
-                    <a class="link" @click.prevent="addStop()">
-                        {{ t('new_route.add_stop') }}
-                    </a>
-                </div>
-                <div class="grid grid-cols-1 gap-8">
-                    <TransitousSearch
-                        v-if="provider === 'transitous'"
-                        @select="selectLocation($event, 'end')"
-                    />
-                    <AirportSearch
-                        v-else
-                        @select="selectLocation($event, 'end')"
+                    {{ t('new_route.create_route') }}
+                </button>
+            </div>
+        </div>
+        <template v-if="showMap">
+            <div class="card bg-base-100 min-w-full p-0 shadow-md">
+                <div class="card-body px-0">
+                    <Map
+                        :start-point="
+                            model.startLocation
+                                ? new LngLat(
+                                      model.startLocation.longitude,
+                                      model.startLocation.latitude,
+                                  )
+                                : null
+                        "
+                        :end-point="
+                            model.endLocation
+                                ? new LngLat(
+                                      model.endLocation.longitude,
+                                      model.endLocation.latitude,
+                                  )
+                                : null
+                        "
+                        :stop-overs="stopOvers"
                     />
                 </div>
             </div>
-        </div>
-        <div class="card bg-base-100 mt-4 min-w-full p-0 shadow-md">
-            <div class="card-body">
-                <div class="card-title">
-                    {{ t('new_route.route_details') }}
-                </div>
-                <TripDetailsForm v-model="model" />
-            </div>
-        </div>
-        <div class="mt-4 flex justify-end">
-            <Loading v-if="loading" class="me-2" />
-            <button class="btn btn-primary" :disabled="loading" @click="submit">
-                {{ t('new_route.create_route') }}
-            </button>
-        </div>
+        </template>
     </AuthenticatedLayout>
 </template>

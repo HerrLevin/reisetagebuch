@@ -19,7 +19,7 @@ import { computed, PropType, ref, watch } from 'vue';
 
 const props = defineProps({
     startPoint: {
-        type: Object as PropType<LngLat>,
+        type: Object as PropType<LngLat | null>,
         default: new LngLat(8.403, 49),
         required: false,
     },
@@ -87,10 +87,11 @@ function getPointFeature(
         },
     };
 }
-
-geoJsonA.value.features.push(
-    getPointFeature(props.startPoint.lng, props.startPoint.lat),
-);
+if (props.startPoint) {
+    geoJsonA.value.features.push(
+        getPointFeature(props.startPoint.lng, props.startPoint.lat),
+    );
+}
 
 if (props.endPoint) {
     geoJsonA.value.features.push(
@@ -285,7 +286,7 @@ const animatedPointSource = computed(() => {
 
 <template>
     <BaseMapWrapper
-        :center="startPoint"
+        :center="startPoint || endPoint || new LngLat(8.403, 49)"
         :zoom="zoom"
         height="50vh"
         :bounds="bounds"

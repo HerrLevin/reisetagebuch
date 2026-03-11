@@ -131,9 +131,7 @@ function submitTypeahead(element: Suggestion) {
 <template>
     <Typeahead
         v-model="search"
-        class="input input-bordered w-full"
         name="departure-search"
-        :required="false"
         :placeholder="placeholder || t('new_route.airport_search.placeholder')"
         :suggestions="suggestions"
         @submit="submitTypeahead($event)"
