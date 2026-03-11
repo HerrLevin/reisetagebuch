@@ -52,5 +52,8 @@
         "vue-debounce": "^5.0.1",
         "vue-i18n": "^11.1.12",
         "vue-router": "^5.0.3"
+    },
+    "overrides": {
+        "serialize-javascript": ">=7.0.3"
     }
 }
