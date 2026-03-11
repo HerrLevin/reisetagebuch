@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use Database\Factories\UserStatisticsFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class UserStatistics extends Model
 {
-    /** @use HasFactory<\Database\Factories\UserStatisticsFactory> */
+    /** @use HasFactory<UserStatisticsFactory> */
     use HasFactory;
 
     protected $fillable = [

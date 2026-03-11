@@ -14,6 +14,7 @@ use Clickbar\Magellan\Data\Geometries\Dimension;
 use Clickbar\Magellan\Data\Geometries\Geometry;
 use Clickbar\Magellan\Data\Geometries\LineString;
 use Clickbar\Magellan\Database\PostgisFunctions\ST;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Log;
 
@@ -237,7 +238,7 @@ class TransportTripRepository
         return $query->get();
     }
 
-    private function getStopsForTripQuery(string $tripId): \Illuminate\Database\Eloquent\Builder
+    private function getStopsForTripQuery(string $tripId): Builder
     {
         return TransportTripStop::where('transport_trip_id', $tripId)
             ->orderBy('stop_sequence');

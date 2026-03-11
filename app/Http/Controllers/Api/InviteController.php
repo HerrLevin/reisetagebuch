@@ -6,6 +6,7 @@ use App\Http\Controllers\Backend\InviteController as Backend;
 use App\Http\Requests\StoreInviteCodeRequest;
 use App\Http\Resources\InviteDto;
 use App\Models\Invite;
+use App\Models\User;
 use OpenApi\Attributes as OA;
 
 class InviteController extends Controller
@@ -38,7 +39,7 @@ class InviteController extends Controller
     {
         $this->authorize('create', Invite::class);
 
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = $this->auth->user();
 
         return $this->backend->index($user->id);
@@ -65,7 +66,7 @@ class InviteController extends Controller
     {
         $this->authorize('create', Invite::class);
 
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = $this->auth->user();
 
         $this->backend->store($user->id, $request->input('expires_at'));

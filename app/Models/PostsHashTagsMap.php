@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\PostsHashTagsMapFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class PostsHashTagsMap extends Pivot
 {
-    /** @use HasFactory<\Database\Factories\PostsHashTagsMapFactory> */
+    /** @use HasFactory<PostsHashTagsMapFactory> */
     use HasFactory, HasUuids;
 
     protected $table = 'posts_hash_tags_maps';

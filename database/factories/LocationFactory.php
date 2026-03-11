@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\Location;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Location>
+ * @extends Factory<Location>
  */
 class LocationFactory extends Factory
 {

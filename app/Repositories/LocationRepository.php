@@ -13,6 +13,7 @@ use App\Services\OsmNameService;
 use Carbon\Carbon;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Clickbar\Magellan\Database\PostgisFunctions\ST;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
 
@@ -203,7 +204,7 @@ class LocationRepository
         return $requestLocation;
     }
 
-    private function recentRequestLocationQuery(Point $position, int $radius): \Illuminate\Database\Eloquent\Builder
+    private function recentRequestLocationQuery(Point $position, int $radius): Builder
     {
         return RequestLocation::select()
             ->addSelect(ST::distanceSphere($position, 'location')->as('distance'))

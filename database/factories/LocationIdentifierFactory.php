@@ -3,10 +3,11 @@
 namespace Database\Factories;
 
 use App\Models\Location;
+use App\Models\LocationIdentifier;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\LocationIdentifier>
+ * @extends Factory<LocationIdentifier>
  */
 class LocationIdentifierFactory extends Factory
 {

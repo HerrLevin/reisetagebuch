@@ -7,6 +7,7 @@ use App\Models\Profile;
 use App\Models\User;
 use App\Models\UserStatistics;
 use Carbon\Carbon;
+use Illuminate\Routing\UrlGenerator;
 use PHPUnit\Framework\TestCase;
 
 class UserHydratorTest extends TestCase
@@ -44,7 +45,7 @@ class UserHydratorTest extends TestCase
         });
 
         // Create an instance of UserHydrator
-        $urlGenerator = $this->createMock(\Illuminate\Routing\UrlGenerator::class);
+        $urlGenerator = $this->createMock(UrlGenerator::class);
         $urlGenerator->method('to')->willReturnCallback(function ($path) {
             return $path;
         });
@@ -82,7 +83,7 @@ class UserHydratorTest extends TestCase
         });
 
         // Create an instance of UserHydrator
-        $urlGenerator = $this->createMock(\Illuminate\Routing\UrlGenerator::class);
+        $urlGenerator = $this->createMock(UrlGenerator::class);
         $urlGenerator->method('to')->willReturnCallback(function ($path) {
             return $path;
         });

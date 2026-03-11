@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Backend\AccountBackend;
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -35,7 +36,7 @@ class AccountController extends Controller
     )]
     public function show(Request $request): JsonResponse
     {
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = $this->auth->user();
 
         return response()->json([
@@ -95,7 +96,7 @@ class AccountController extends Controller
     )]
     public function disconnectTraewelling(Request $request)
     {
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = $this->auth->user();
 
         if ($this->accountBackend->disconnectTraewelling($user)) {

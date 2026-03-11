@@ -12,6 +12,7 @@ use App\Hydrators\UserHydrator;
 use App\Models\Location;
 use App\Models\LocationPost;
 use App\Models\Post;
+use App\Models\PostMetaInfo;
 use App\Models\TransportPost;
 use App\Models\TransportTrip;
 use App\Models\TransportTripStop;
@@ -65,7 +66,7 @@ class PostHydratorTest extends TestCase
 
     private function createMetaInfoMock(MetaInfoKey $key, string $value, ?int $order = null)
     {
-        $mock = $this->createMock(\App\Models\PostMetaInfo::class);
+        $mock = $this->createMock(PostMetaInfo::class);
         $callback = function ($property) use ($key, $value, $order) {
             return match ($property) {
                 'key' => $key,
