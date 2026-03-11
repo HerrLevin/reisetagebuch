@@ -3,12 +3,13 @@
 namespace Database\Factories;
 
 use App\Models\Post;
+use App\Models\TransportPost;
 use App\Models\TransportTrip;
 use App\Models\TransportTripStop;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\TransportPost>
+ * @extends Factory<TransportPost>
  */
 class TransportPostFactory extends Factory
 {

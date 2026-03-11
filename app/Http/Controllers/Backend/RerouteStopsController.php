@@ -25,7 +25,7 @@ class RerouteStopsController extends Controller
 
     private TransportTripRepository $transportTripRepository;
 
-    private GeoJsonParser $geoJsonParser;
+    private GeojsonParser $geoJsonParser;
 
     public function __construct(
         BrouterRequestService $brouterRequestService,

@@ -4,10 +4,11 @@ namespace Database\Factories;
 
 use App\Models\Location;
 use App\Models\TransportTrip;
+use App\Models\TransportTripStop;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\TransportTripStop>
+ * @extends Factory<TransportTripStop>
  */
 class TransportTripStopFactory extends Factory
 {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\PostTypes;
 
+use App\Enums\PostMetaInfo\MetaInfoValueType;
 use App\Enums\Visibility;
 use App\Http\Resources\UserDto;
 use App\Models\Post;
@@ -91,7 +92,7 @@ class BasePost
         $this->likedByUser = $post->liked_by_user ?? false;
         $this->metaInfos = $post->metaInfos?->groupBy(fn ($metaInfo) => $metaInfo->key->value)
             ->map(function ($group) {
-                if ($group->first()->key->valueType() === \App\Enums\PostMetaInfo\MetaInfoValueType::STRING_LIST) {
+                if ($group->first()->key->valueType() === MetaInfoValueType::STRING_LIST) {
                     return $group->sortBy('order')->pluck('value')->values()->toArray();
                 }
 

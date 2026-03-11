@@ -3,10 +3,11 @@
 namespace Database\Factories;
 
 use App\Enums\TransportMode;
+use App\Models\TransportTrip;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\TransportTrip>
+ * @extends Factory<TransportTrip>
  */
 class TransportTripFactory extends Factory
 {

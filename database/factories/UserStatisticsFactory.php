@@ -2,10 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\UserStatistics;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\UserStatistics>
+ * @extends Factory<UserStatistics>
  */
 class UserStatisticsFactory extends Factory
 {

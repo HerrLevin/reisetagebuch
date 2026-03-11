@@ -50,7 +50,7 @@ Route::prefix('posts/{post}')->group(function () {
         ->name('posts.likes');
 });
 
-route::get('app/configuration', [AppConfigurationController::class, 'index'])
+Route::get('app/configuration', [AppConfigurationController::class, 'index'])
     ->name('app.configuration');
 
 Route::middleware('auth:api')->group(function () {

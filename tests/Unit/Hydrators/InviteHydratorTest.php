@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Hydrators;
 
+use App\Hydrators\InviteHydrator;
+use App\Models\Invite;
 use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 
@@ -9,7 +11,7 @@ class InviteHydratorTest extends TestCase
 {
     public function test_model_to_dto()
     {
-        $invite = $this->createMock(\App\Models\Invite::class);
+        $invite = $this->createMock(Invite::class);
         $invite->method('__get')->willReturnCallback(function ($property) {
             return match ($property) {
                 'id' => 'asdf',
@@ -20,7 +22,7 @@ class InviteHydratorTest extends TestCase
             };
         });
 
-        $inviteHydrator = new \App\Hydrators\InviteHydrator;
+        $inviteHydrator = new InviteHydrator;
         $dto = $inviteHydrator->modelToDto($invite);
 
         $this->assertEquals('asdf', $dto->id);
