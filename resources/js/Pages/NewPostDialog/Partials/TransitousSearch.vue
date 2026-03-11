@@ -35,7 +35,10 @@ const search = ref('');
 const suggestions = ref<Suggestion[]>([]);
 const loading = ref(false);
 
-const emit = defineEmits(['select', 'selectIdentifier']);
+const emit = defineEmits<{
+    (e: 'select', value: GeocodeResponseEntry): void;
+    (e: 'selectIdentifier', value: string): void;
+}>();
 
 search.value = props.stop?.name || '';
 
