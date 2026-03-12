@@ -6,6 +6,8 @@ use App\Enums\PostMetaInfo\MetaInfoKey;
 use App\Enums\PostMetaInfo\TravelReason;
 use App\Enums\PostMetaInfo\TravelRole;
 use App\Enums\TransportMode;
+use App\Exceptions\TraewellingLocationNotFound;
+use App\Exceptions\TraewellingPostError;
 use App\Http\Controllers\Controller;
 use App\Models\Location;
 use App\Models\LocationIdentifier;
@@ -15,7 +17,6 @@ use App\Models\TransportTripStop;
 use App\Repositories\PostMetaInfoRepository;
 use App\Services\TraewellingRequestService;
 use Carbon\Carbon;
-use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -62,7 +63,13 @@ class CrossPostController extends Controller
         }
 
         if ($post->transportPost->transportTrip->provider === 'transitous') {
-            $data = $this->crosspostTransitous($post);
+            try {
+                $data = $this->crosspostTransitous($post);
+            } catch (GuzzleException|TraewellingPostError $exception) {
+                Log::error('Traewelling API error during Transitous check-in for post '.$postId.': '.$exception->getMessage());
+                Log::info('Transitous check-in failed, falling back to manual check-in for post '.$postId);
+                $data = $this->crosspostManualTrip($post);
+            }
         } elseif ($post->transportPost->transportTrip->provider === 'reisetagebuch') {
             $data = $this->crosspostManualTrip($post);
         } else {
@@ -83,6 +90,11 @@ class CrossPostController extends Controller
 
     private function syncTags(Post $post): void
     {
+        if ($this->traewellingId === null) {
+            Log::debug('No Traewelling ID found for post '.$post->id.', skipping tag sync');
+
+            return;
+        }
         $tags = $this->traewellingRequestService->getPostTags($this->traewellingId, $post->user_id);
         Log::debug('Syncing tags for Traewelling post '.$this->traewellingId, ['existing_tags' => $tags]);
         $visibility = $post->visibility->getTraewellingVisibility();
@@ -232,7 +244,7 @@ class CrossPostController extends Controller
         $trwlOriginIdentifier = $this->getTrwlStationIdentifier($originStop->location);
         $trwlDestinationIdentifier = $this->getTrwlStationIdentifier($destinationStop->location);
         if (! $trwlOriginIdentifier || ! $trwlDestinationIdentifier) {
-            throw new Exception('Origin or destination departure board not found');
+            throw new TraewellingLocationNotFound('Origin or destination departure board not found');
         }
 
         // post to traewelling
@@ -341,7 +353,8 @@ class CrossPostController extends Controller
     }
 
     /**
-     * @throws GuzzleException
+     * @throws TraewellingLocationNotFound
+     * @throws TraewellingPostError
      * @throws Throwable
      */
     private function crosspostTransitous(Post $post): ?array
@@ -354,13 +367,13 @@ class CrossPostController extends Controller
         $trwlOriginIdentifier = $this->getTrwlStationIdentifier($originStop->location);
         $trwlDestinationIdentifier = $this->getTrwlStationIdentifier($destinationStop->location);
         if (! $trwlOriginIdentifier || ! $trwlDestinationIdentifier) {
-            throw new Exception('Origin or destination not found');
+            throw new TraewellingLocationNotFound('Origin or destination not found');
         }
 
         // post to traewelling
         $data = $this->checkin($post, $trwlOriginIdentifier, $trwlDestinationIdentifier);
         if (isset($data['error'])) {
-            throw new Exception('Traewelling API error: '.$data['error']);
+            throw new TraewellingPostError('Traewelling API error: '.$data['error']);
         }
 
         return $data;
@@ -370,7 +383,7 @@ class CrossPostController extends Controller
      * @throws GuzzleException
      * @throws Throwable
      */
-    private function checkin(
+    private function checkinRequest(
         Post $post,
         LocationIdentifier $trwlOrigin,
         LocationIdentifier $trwlDestination,
@@ -404,6 +417,32 @@ class CrossPostController extends Controller
             } else {
                 throw $e;
             }
+        }
+    }
+
+    /**
+     * @throws Throwable
+     * @throws GuzzleException
+     */
+    private function checkin(
+        Post $post,
+        LocationIdentifier $trwlOrigin,
+        LocationIdentifier $trwlDestination,
+        bool $force = false,
+        ?string $tripId = null,
+    ): ?array {
+        try {
+            return $this->checkinRequest($post, $trwlOrigin, $trwlDestination, $force);
+        } catch (GuzzleException $e) {
+            Log::error($e);
+            if (str_contains($e->getMessage(), 'Given stations are not on the trip')) {
+                Log::warning('Soft check-in failed due to station mismatch, falling back to manual trip creation', ['post_id' => $post->id, 'error' => $e->getMessage()]);
+                // wait a bit, to let the TRWL database settle
+                sleep(30);
+
+                return $this->checkinRequest($post, $trwlOrigin, $trwlDestination, true, $tripId);
+            }
+            throw $e;
         }
     }
 
