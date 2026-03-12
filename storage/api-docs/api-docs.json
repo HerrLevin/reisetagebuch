@@ -815,7 +815,7 @@
                 ]
             }
         },
-        "/posts/{post}/likes": {
+        "/posts/{postId}/likes": {
             "get": {
                 "tags": [
                     "Posts"
@@ -825,7 +825,7 @@
                 "operationId": "getPostLikes",
                 "parameters": [
                     {
-                        "name": "post",
+                        "name": "postId",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -861,7 +861,7 @@
                 "operationId": "likePost",
                 "parameters": [
                     {
-                        "name": "post",
+                        "name": "postId",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -894,7 +894,7 @@
                 "operationId": "unlikePost",
                 "parameters": [
                     {
-                        "name": "post",
+                        "name": "postId",
                         "in": "path",
                         "required": true,
                         "schema": {

@@ -1971,12 +1971,12 @@ export class Api<
      * @tags Posts
      * @name GetPostLikes
      * @summary Get post likes
-     * @request GET:/posts/{post}/likes
+     * @request GET:/posts/{postId}/likes
      * @secure
      */
-    getPostLikes: (post: string, params: RequestParams = {}) =>
+    getPostLikes: (postId: string, params: RequestParams = {}) =>
       this.request<UserDto[], void>({
-        path: `/posts/${post}/likes`,
+        path: `/posts/${postId}/likes`,
         method: "GET",
         secure: true,
         format: "json",
@@ -1989,12 +1989,12 @@ export class Api<
      * @tags Posts
      * @name LikePost
      * @summary Like post
-     * @request POST:/posts/{post}/likes
+     * @request POST:/posts/{postId}/likes
      * @secure
      */
-    likePost: (post: string, params: RequestParams = {}) =>
+    likePost: (postId: string, params: RequestParams = {}) =>
       this.request<LikeResponseDto, void>({
-        path: `/posts/${post}/likes`,
+        path: `/posts/${postId}/likes`,
         method: "POST",
         secure: true,
         format: "json",
@@ -2007,12 +2007,12 @@ export class Api<
      * @tags Posts
      * @name UnlikePost
      * @summary Unlike post
-     * @request DELETE:/posts/{post}/likes
+     * @request DELETE:/posts/{postId}/likes
      * @secure
      */
-    unlikePost: (post: string, params: RequestParams = {}) =>
+    unlikePost: (postId: string, params: RequestParams = {}) =>
       this.request<LikeResponseDto, void>({
-        path: `/posts/${post}/likes`,
+        path: `/posts/${postId}/likes`,
         method: "DELETE",
         secure: true,
         format: "json",
