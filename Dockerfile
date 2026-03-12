@@ -69,6 +69,8 @@ RUN set -e \
 RUN rm -f /var/www/html/database/database.sqlite
 
 # Environment variables
+ARG APP_VERSION=0.0.0
+ENV APP_VERSION=${APP_VERSION}
 ENV SERVER_NAME={HOSTNAME}
 
 # Copy configuration files
