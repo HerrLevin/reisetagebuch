@@ -2,11 +2,13 @@
 import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PostLikedNotification from '@/Pages/Notifications/Partials/PostLikedNotification.vue';
+import TraewellingCrosspostFailedNotification from '@/Pages/Notifications/Partials/TraewellingCrosspostFailedNotification.vue';
 import UserFollowedNotification from '@/Pages/Notifications/Partials/UserFollowedNotification.vue';
 import { useNotificationStore } from '@/stores/notifications';
 import {
     getTypedNotificationData,
     isPostLikedNotification,
+    isTraewellingCrosspostFailedNotification,
     isUserFollowedNotification,
 } from '@/types/notifications';
 import { storeToRefs } from 'pinia';
@@ -28,6 +30,9 @@ const getNotificationComponent = (notification: NotificationWrapper) => {
     }
     if (isUserFollowedNotification(notification)) {
         return UserFollowedNotification;
+    }
+    if (isTraewellingCrosspostFailedNotification(notification)) {
+        return TraewellingCrosspostFailedNotification;
     }
     return null;
 };

@@ -3315,6 +3315,26 @@
                 },
                 "type": "object"
             },
+            "TraewellingCrosspostFailedData": {
+                "description": "Data for a traewelling crosspost failed notification",
+                "required": [
+                    "postId",
+                    "errormessage"
+                ],
+                "properties": {
+                    "postId": {
+                        "description": "ID of the liked post",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "errorMessage": {
+                        "description": "Error message describing the reason for the crosspost failure",
+                        "type": "string",
+                        "format": "text"
+                    }
+                },
+                "type": "object"
+            },
             "UserFollowedData": {
                 "description": "Data for a user followed notification",
                 "required": [
@@ -3543,7 +3563,8 @@
                 "type": "string",
                 "enum": [
                     "PostLikedNotification",
-                    "UserFollowedNotification"
+                    "UserFollowedNotification",
+                    "TraewellingCrosspostFailedNotification"
                 ]
             },
             "Feature": {

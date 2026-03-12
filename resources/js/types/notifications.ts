@@ -2,6 +2,7 @@ import {
     NotificationType,
     NotificationWrapper,
     PostLikedData,
+    TraewellingCrosspostFailedData,
     UserFollowedData,
 } from '../../types/Api.gen';
 
@@ -25,6 +26,18 @@ export const isUserFollowedNotification = (
     );
 };
 
+export const isTraewellingCrosspostFailedNotification = (
+    notification: NotificationWrapper,
+) => {
+    const data = notification.data;
+    return (
+        notification.data !== null &&
+        notification.type ===
+            NotificationType.TraewellingCrosspostFailedNotification &&
+        (data as TraewellingCrosspostFailedData).errorMessage !== undefined
+    );
+};
+
 export const getTypedNotificationData = (
     notification: NotificationWrapper,
 ): PostLikedData | UserFollowedData | null => {
@@ -32,6 +45,9 @@ export const getTypedNotificationData = (
         return notification.data;
     }
     if (isUserFollowedNotification(notification)) {
+        return notification.data;
+    }
+    if (isTraewellingCrosspostFailedNotification(notification)) {
         return notification.data;
     }
     return null;

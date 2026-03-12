@@ -13,6 +13,10 @@
         "liked": {
             "lead": "{user} hat deinen Post geliked"
         },
+        "crosspost_failed": {
+            "lead": "Fehler beim Teilen deines Beitrags auf Träwelling",
+            "info": "Fehlermeldung: {error}"
+        },
         "follower": {
             "lead": "{user} folgt dir jetzt"
         }

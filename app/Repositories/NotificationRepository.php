@@ -59,9 +59,10 @@ class NotificationRepository
             ->delete();
     }
 
-    public function notifyUser(UserDto $user, NotificationObject $notification): void
+    public function notifyUser(UserDto|string $user, NotificationObject $notification): void
     {
-        $userModel = User::findOrFail($user->id);
+        $userId = $user instanceof UserDto ? $user->id : $user;
+        $userModel = User::findOrFail($userId);
 
         Notification::send($userModel, $notification);
     }

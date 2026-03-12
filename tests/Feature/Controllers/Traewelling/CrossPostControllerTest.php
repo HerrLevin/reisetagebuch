@@ -3,6 +3,7 @@
 namespace Tests\Feature\Controllers\Traewelling;
 
 use App\Enums\PostMetaInfo\MetaInfoKey;
+use App\Exceptions\TraewellingLocationNotFound;
 use App\Http\Controllers\Traewelling\CrossPostController;
 use App\Models\Location;
 use App\Models\LocationIdentifier;
@@ -291,7 +292,7 @@ class CrossPostControllerTest extends TestCase
             })));
 
         $job = new CrossPostController(new TraewellingRequestService($mockClient));
-        $this->expectException(\Exception::class);
+        $this->expectException(TraewellingLocationNotFound::class);
         $this->expectExceptionMessage('Origin or destination not found');
         $job->crossCheckIn($post->id);
         $this->assertDatabaseMissing('post_meta_infos', [
@@ -332,7 +333,7 @@ class CrossPostControllerTest extends TestCase
             })));
 
         $job = new CrossPostController(new TraewellingRequestService($mockClient));
-        $this->expectException(\Exception::class);
+        $this->expectException(TraewellingLocationNotFound::class);
         $this->expectExceptionMessage('Origin or destination departure board not found');
         $job->crossCheckIn($post->id);
         $this->assertDatabaseMissing('post_meta_infos', [

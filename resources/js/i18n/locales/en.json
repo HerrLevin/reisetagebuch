@@ -13,6 +13,10 @@
         "liked": {
             "lead": "{user} liked your post"
         },
+        "crosspost_failed": {
+            "lead": "Failed to post your post to Träwelling",
+            "info": "Error details: {error}"
+        },
         "follower": {
             "lead": "{user} started following you"
         }
