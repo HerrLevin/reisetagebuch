@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Dto\LikeDto;
 use App\Http\Controllers\Backend\LikeController as Backend;
 use App\Http\Resources\UserDto;
-use App\Hydrators\UserHydrator;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
 
@@ -13,13 +12,10 @@ class LikeController extends Controller
 {
     private Backend $likeController;
 
-    private UserHydrator $userHydrator;
-
-    public function __construct(Backend $likeController, UserHydrator $userHydrator)
+    public function __construct(Backend $likeController)
     {
         parent::__construct();
         $this->likeController = $likeController;
-        $this->userHydrator = $userHydrator;
     }
 
     #[OA\Get(
@@ -29,7 +25,7 @@ class LikeController extends Controller
         summary: 'Get post likes',
         tags: ['Posts'],
         parameters: [
-            new OA\Parameter(name: 'post', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'postId', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
         ],
         responses: [
             new OA\Response(response: 200, description: Controller::OA_DESC_SUCCESS, content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: UserDto::class))),
@@ -48,7 +44,7 @@ class LikeController extends Controller
         summary: 'Like post',
         tags: ['Posts'],
         parameters: [
-            new OA\Parameter(name: 'post', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'postId', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
         ],
         responses: [
             new OA\Response(response: 200, description: Controller::OA_DESC_SUCCESS, content: new OA\JsonContent(ref: LikeDto::class)),
@@ -67,7 +63,7 @@ class LikeController extends Controller
         summary: 'Unlike post',
         tags: ['Posts'],
         parameters: [
-            new OA\Parameter(name: 'post', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'postId', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
         ],
         responses: [
             new OA\Response(response: 200, description: Controller::OA_DESC_SUCCESS, content: new OA\JsonContent(ref: LikeDto::class)),
