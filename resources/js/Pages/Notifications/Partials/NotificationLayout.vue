@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
     isPostLikedNotification,
+    isTraewellingCrosspostFailedNotification,
     isUserFollowedNotification,
 } from '@/types/notifications';
 import { PropType } from 'vue';
@@ -8,6 +9,7 @@ import { RouterLink } from 'vue-router';
 import {
     NotificationWrapper,
     PostLikedData,
+    TraewellingCrosspostFailedData,
     UserFollowedData,
 } from '../../../../types/Api.gen';
 
@@ -18,14 +20,33 @@ defineProps({
     },
 });
 
-const getNotificationLink = (notification: NotificationWrapper): string => {
+const getNotificationLink = (notification: NotificationWrapper) => {
     if (isPostLikedNotification(notification)) {
         const data = notification.data as PostLikedData;
-        return `/posts/${data.postId}`;
+        return {
+            name: 'posts.show',
+            params: {
+                postId: data.postId,
+            },
+        };
     }
     if (isUserFollowedNotification(notification)) {
         const data = notification.data as UserFollowedData;
-        return `/profile/${data.followerUserName}`;
+        return {
+            name: 'profile.show',
+            params: {
+                username: data.followerUserName,
+            },
+        };
+    }
+    if (isTraewellingCrosspostFailedNotification(notification)) {
+        const data = notification.data as TraewellingCrosspostFailedData;
+        return {
+            name: 'posts.show',
+            params: {
+                postId: data.postId,
+            },
+        };
     }
     return '#';
 };

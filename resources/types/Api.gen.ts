@@ -76,6 +76,7 @@ export enum Feature {
 export enum NotificationType {
   PostLikedNotification = "PostLikedNotification",
   UserFollowedNotification = "UserFollowedNotification",
+  TraewellingCrosspostFailedNotification = "TraewellingCrosspostFailedNotification",
 }
 
 export enum MotisLocationType {
@@ -482,6 +483,20 @@ export interface PostLikedData {
   likedByUserAvatarUrl: string;
   /** Optional summary of the liked post */
   postSummary: string | null;
+}
+
+/** Data for a traewelling crosspost failed notification */
+export interface TraewellingCrosspostFailedData {
+  /**
+   * ID of the liked post
+   * @format uuid
+   */
+  postId: string;
+  /**
+   * Error message describing the reason for the crosspost failure
+   * @format text
+   */
+  errorMessage?: string;
 }
 
 /** Data for a user followed notification */

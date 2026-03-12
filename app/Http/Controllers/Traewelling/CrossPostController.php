@@ -14,6 +14,8 @@ use App\Models\LocationIdentifier;
 use App\Models\Post;
 use App\Models\SocialAccount;
 use App\Models\TransportTripStop;
+use App\Notifications\TraewellingCrosspostFailedNotification;
+use App\Repositories\NotificationRepository;
 use App\Repositories\PostMetaInfoRepository;
 use App\Services\TraewellingRequestService;
 use Carbon\Carbon;
@@ -28,12 +30,15 @@ class CrossPostController extends Controller
 
     private PostMetaInfoRepository $postMetaInfoRepository;
 
+    private NotificationRepository $notificationRepository;
+
     private ?string $traewellingId = null;
 
-    public function __construct(?TraewellingRequestService $traewellingRequestService = null, ?PostMetaInfoRepository $postMetaInfoRepository = null)
+    public function __construct(?TraewellingRequestService $traewellingRequestService = null, ?PostMetaInfoRepository $postMetaInfoRepository = null, ?NotificationRepository $notificationRepository = null)
     {
         $this->traewellingRequestService = $traewellingRequestService ?? new TraewellingRequestService;
         $this->postMetaInfoRepository = $postMetaInfoRepository ?? new PostMetaInfoRepository;
+        $this->notificationRepository = $notificationRepository ?? new NotificationRepository;
     }
 
     private function getPost(string $postId): ?Post
@@ -62,20 +67,32 @@ class CrossPostController extends Controller
             return null;
         }
 
-        if ($post->transportPost->transportTrip->provider === 'transitous') {
-            try {
-                $data = $this->crosspostTransitous($post);
-            } catch (GuzzleException|TraewellingPostError $exception) {
-                Log::error('Traewelling API error during Transitous check-in for post '.$postId.': '.$exception->getMessage());
-                Log::info('Transitous check-in failed, falling back to manual check-in for post '.$postId);
-                $data = $this->crosspostManualTrip($post);
-            }
-        } elseif ($post->transportPost->transportTrip->provider === 'reisetagebuch') {
-            $data = $this->crosspostManualTrip($post);
-        } else {
-            Log::error('Unknown trip provider: '.$post->transportPost->transportTrip->provider);
+        try {
 
-            return false;
+            if ($post->transportPost->transportTrip->provider === 'transitous') {
+                try {
+                    $data = $this->crosspostTransitous($post);
+                } catch (GuzzleException|TraewellingPostError $exception) {
+                    Log::error('Traewelling API error during Transitous check-in for post '.$postId.': '.$exception->getMessage());
+                    Log::info('Transitous check-in failed, falling back to manual check-in for post '.$postId);
+                    $data = $this->crosspostManualTrip($post);
+                }
+            } elseif ($post->transportPost->transportTrip->provider === 'reisetagebuch') {
+                $data = $this->crosspostManualTrip($post);
+            } else {
+                Log::error('Unknown trip provider: '.$post->transportPost->transportTrip->provider);
+
+                return false;
+            }
+        } catch (Throwable $exception) {
+            Log::error('Error during Traewelling check-in for post '.$postId.': '.$exception->getMessage());
+
+            $this->notificationRepository->notifyUser(
+                $post->user_id,
+                new TraewellingCrosspostFailedNotification($post->id, $exception->getMessage())
+            );
+
+            throw $exception;
         }
 
         $this->traewellingId = $data['data']['status']['id'] ?? '';
