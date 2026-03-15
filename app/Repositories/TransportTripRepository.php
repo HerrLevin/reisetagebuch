@@ -211,12 +211,16 @@ class TransportTripRepository
         string $pathType = 'rail',
         bool $interpolated = false
     ): ?RouteSegment {
-        return RouteSegment::where('from_location_id', $start->location_id)
+        $query = RouteSegment::where('from_location_id', $start->location_id)
             ->where('to_location_id', $end->location_id)
-            ->where('duration', $duration)
             ->where('path_type', $pathType)
-            ->where('interpolated', $interpolated)
-            ->first();
+            ->where('interpolated', $interpolated);
+
+        if ($duration >= 5 * 60) {
+            $query->whereBetween('duration', [$duration * 0.9, $duration * 1.1]);
+        }
+
+        return $query->first();
     }
 
     public function getStopById(string $stopId): ?TransportTripStop
