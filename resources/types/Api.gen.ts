@@ -1090,7 +1090,7 @@ export interface UserStatisticsDto {
    */
   travelledDistance: number;
   /**
-   * Total duration of travel by the user in minutes
+   * Total duration of travel by the user in seconds
    * @format int32
    */
   travelledDuration: number;
