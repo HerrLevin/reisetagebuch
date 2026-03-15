@@ -4183,7 +4183,9 @@
                     "trip",
                     "travelReason",
                     "manualDepartureTime",
-                    "manualArrivalTime"
+                    "manualArrivalTime",
+                    "distance",
+                    "duration"
                 ],
                 "type": "object",
                 "allOf": [
@@ -4221,6 +4223,14 @@
                                 ],
                                 "nullable": true,
                                 "description": "Reason for travel associated with the transport post"
+                            },
+                            "distance": {
+                                "description": "Distance traveled in meters",
+                                "type": "integer"
+                            },
+                            "duration": {
+                                "description": "Duration of the trip in seconds",
+                                "type": "integer"
                             }
                         },
                         "type": "object"

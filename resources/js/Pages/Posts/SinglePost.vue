@@ -4,6 +4,7 @@ import Loading from '@/Components/Loading.vue';
 import Map from '@/Components/Map.vue';
 import Post from '@/Components/Post/Post.vue';
 import PostMetaInfo from '@/Components/Post/PostMetaInfo.vue';
+import TransportPostStats from '@/Components/Post/TransportPostStats.vue';
 import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import CardBack from '@/Pages/Posts/Partials/CardBack.vue';
@@ -233,6 +234,12 @@ function deleted() {
                 </ul>
             </div>
         </div>
+
+        <TransportPostStats
+            v-if="isTransportPost(post)"
+            :post="post as TransportPost"
+            class="mt-4"
+        />
 
         <PostMetaInfo v-if="post" :meta-infos="post.metaInfos" class="mt-4" />
     </AuthenticatedLayout>

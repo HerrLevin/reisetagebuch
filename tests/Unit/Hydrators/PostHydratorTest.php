@@ -207,6 +207,8 @@ class PostHydratorTest extends TestCase
                 'originStop' => $this->getTransportTripStop('2023-01-01 00:00:00'),
                 'destinationStop' => $this->getTransportTripStop(),
                 'transportTrip' => $transportTrip,
+                'distance' => 10,
+                'duration' => 15,
                 default => null,
             };
         });

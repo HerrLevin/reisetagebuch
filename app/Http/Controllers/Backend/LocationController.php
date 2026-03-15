@@ -16,6 +16,7 @@ use App\Http\Resources\LocationHistoryEntryDto;
 use App\Http\Resources\TripHistoryEntryDto;
 use App\Hydrators\DbTripHydrator;
 use App\Hydrators\TripDtoHydrator;
+use App\Jobs\CalculateStatsForTransportPost;
 use App\Jobs\PrefetchJob;
 use App\Jobs\RerouteStops;
 use App\Models\RequestLocation;
@@ -293,6 +294,10 @@ class LocationController extends Controller
                 );
             }
             $order++;
+        }
+
+        foreach ($trip->transportPosts as $post) {
+            CalculateStatsForTransportPost::dispatch($post->post_id);
         }
     }
 

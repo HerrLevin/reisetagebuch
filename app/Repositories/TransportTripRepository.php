@@ -6,6 +6,7 @@ namespace App\Repositories;
 
 use App\Models\Location;
 use App\Models\RouteSegment;
+use App\Models\TransportPost;
 use App\Models\TransportTrip;
 use App\Models\TransportTripStop;
 use App\Models\User;
@@ -228,13 +229,17 @@ class TransportTripRepository
         return TransportTripStop::find($stopId);
     }
 
+    /**
+     * @return Collection<TransportTripStop>
+     */
     public function getStopsBetween(
-        TransportTripStop $start,
-        TransportTripStop $end,
+        string $transportTripId,
+        int $startSequence,
+        int $endSequence,
         bool $withRouteSegment = true
     ): Collection {
-        $query = $this->getStopsForTripQuery($start->transport_trip_id)
-            ->whereBetween('stop_sequence', [$start->stop_sequence, $end->stop_sequence]);
+        $query = $this->getStopsForTripQuery($transportTripId)
+            ->whereBetween('stop_sequence', [$startSequence, $endSequence]);
         if ($withRouteSegment) {
             $query->with('routeSegment');
         }
@@ -246,5 +251,14 @@ class TransportTripRepository
     {
         return TransportTripStop::where('transport_trip_id', $tripId)
             ->orderBy('stop_sequence');
+    }
+
+    public function getPostIdsForTrip(TransportTrip|string $trip): \Illuminate\Support\Collection
+    {
+        $tripId = $trip instanceof TransportTrip ? $trip->id : $trip;
+
+        return TransportPost::where('transport_trip_id', $tripId)
+            ->whereNotNull('post_id')
+            ->pluck('post_id');
     }
 }

@@ -6,15 +6,27 @@ const { t } = useI18n();
 
 const props = defineProps<{
     metaInfos: Record<string, string | string[]>;
+    distance?: number;
 }>();
 
 const metaInfoEntries = computed(() => {
-    return Object.entries(props.metaInfos).map(([key, value]) => ({
+    const objects = Object.entries(props.metaInfos).map(([key, value]) => ({
         key,
         value,
         label: getMetaInfoLabel(key),
         displayValue: getMetaInfoDisplayValue(key, value),
     }));
+
+    if (props.distance !== undefined) {
+        objects.push({
+            key: 'rtb:distance',
+            value: props.distance.toString(),
+            label: t('posts.meta_info.distance'),
+            displayValue: (props.distance / 1000).toFixed(2) + ' km',
+        });
+    }
+
+    return objects.sort((a, b) => a.label.localeCompare(b.label));
 });
 
 const getMetaInfoLabel = (key: string): string => {

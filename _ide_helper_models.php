@@ -424,6 +424,8 @@ namespace App\Models{
  * @property string $destination_stop_id
  * @property \Illuminate\Support\Carbon|null $manual_departure
  * @property \Illuminate\Support\Carbon|null $manual_arrival
+ * @property int $distance distance in kilometers
+ * @property int $duration Duration in seconds
  * @property-read \App\Models\Location|null $destination
  * @property-read \App\Models\TransportTripStop $destinationStop
  * @property-read \App\Models\Location|null $origin
@@ -436,6 +438,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost whereDestinationStopId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost whereDistance($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost whereDuration($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost whereManualArrival($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost whereManualDeparture($value)
@@ -465,6 +469,8 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $last_refreshed_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\TransportTripStop> $stops
  * @property-read int|null $stops_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\TransportPost> $transportPosts
+ * @property-read int|null $transport_posts_count
  * @property-read \App\Models\User|null $user
  * @method static \Database\Factories\TransportTripFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip newModelQuery()
@@ -615,7 +621,7 @@ namespace App\Models{
  * @property int $followers_count
  * @property int $following_count
  * @property int $travelled_distance in meters
- * @property int $travelled_duration in minutes
+ * @property int $travelled_duration in seconds
  * @property int $visited_countries_count
  * @property int $visited_locations_count
  * @property \Illuminate\Support\Carbon|null $created_at

@@ -22,6 +22,7 @@ use App\Http\Requests\TransportTimesUpdateRequest;
 use App\Http\Resources\PostTypes\BasePost;
 use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
+use App\Jobs\CalculateStatsForTransportPost;
 use App\Jobs\PrefetchJob;
 use App\Jobs\TraewellingChangeExitJob;
 use App\Jobs\TraewellingCrossCheckInJob;
@@ -32,6 +33,7 @@ use App\Models\User;
 use App\Repositories\LocationRepository;
 use App\Repositories\PostRepository;
 use App\Repositories\TransportTripRepository;
+use App\Repositories\UserStatisticsRepository;
 use Auth;
 use Illuminate\Auth\Access\AuthorizationException;
 use Throwable;
@@ -44,19 +46,28 @@ class PostController extends Controller
 
     private TransportTripRepository $transportTripRepository;
 
+    private UserStatisticsRepository $statisticsRepository;
+
+    private CalculateTransportStatsController $calculateTransportStatsController;
+
     public function __construct(
         PostRepository $postRepository,
         LocationRepository $locationRepository,
-        TransportTripRepository $transportTripRepository
+        TransportTripRepository $transportTripRepository,
+        UserStatisticsRepository $statisticsRepository,
+        CalculateTransportStatsController $calculateTransportStatsController
     ) {
         $this->locationRepository = $locationRepository;
         $this->postRepository = $postRepository;
         $this->transportTripRepository = $transportTripRepository;
+        $this->statisticsRepository = $statisticsRepository;
+        $this->calculateTransportStatsController = $calculateTransportStatsController;
     }
 
     public function storeLocation(LocationBasePostRequest $request): BasePost|LocationPost|TransportPost
     {
         $location = $this->locationRepository->getLocationById($request->input('location'));
+        $this->statisticsRepository->storeLocationPostCreation($request->user()->id);
 
         return $this->postRepository->storeLocation(
             $request->user(),
@@ -70,6 +81,8 @@ class PostController extends Controller
 
     public function storeText(BasePostRequest $request): BasePost
     {
+        $this->statisticsRepository->storeTextPostCreation($request->user()->id);
+
         return $this->postRepository->storeText(
             $request->user(),
             Visibility::from($request->input('visibility')),
@@ -121,8 +134,10 @@ class PostController extends Controller
             $request->input('metaTripId'),
             ! empty($request->input('travelRole')) ? TravelRole::tryFrom($request->input('travelRole')) : null
         );
+        $this->statisticsRepository->storeTransportPostCreation($request->user()->id);
 
         TraewellingCrossCheckInJob::dispatch($post->id);
+        $this->calculateTransportStatsController->calculateStatsForPost($post->id);
         PrefetchJob::dispatch($stopStopover->location->location);
 
         return $post;
@@ -179,6 +194,7 @@ class PostController extends Controller
 
         if ($post instanceof TransportPost) {
             TraewellingEditPostJob::dispatch($post);
+
         }
 
         return $post;
@@ -196,6 +212,15 @@ class PostController extends Controller
 
         if ($post instanceof TransportPost) {
             TraewellingDeletePostJob::dispatch($post);
+            $this->statisticsRepository->storeTransportPostDeletion($post->user->id, $post->distance, $post->duration);
+        }
+
+        if ($post instanceof LocationPost) {
+            $this->statisticsRepository->storeLocationPostDeletion($post->id);
+        }
+
+        if (! ($post instanceof LocationPost) && ! ($post instanceof TransportPost)) {
+            $this->statisticsRepository->storeTextPostDeletion($post->id);
         }
 
         $this->postRepository->delete($post);
@@ -224,6 +249,8 @@ class PostController extends Controller
             $request->manualArrivalTime,
             $request->has('manualArrivalTime')
         );
+
+        $this->calculateTransportStatsController->calculateStatsForPost($post->id);
 
         TraewellingEditPostJob::dispatch($post);
 
@@ -259,6 +286,7 @@ class PostController extends Controller
         }
 
         TraewellingChangeExitJob::dispatch($post);
+        $this->calculateTransportStatsController->calculateStatsForPost($post->id);
 
         return $post;
     }
@@ -294,6 +322,7 @@ class PostController extends Controller
         foreach ($updated as $post) {
             if ($post instanceof TransportPost) {
                 TraewellingEditPostJob::dispatch($post);
+                CalculateStatsForTransportPost::dispatch($post->id);
             }
         }
 

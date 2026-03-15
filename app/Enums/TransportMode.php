@@ -62,4 +62,38 @@ enum TransportMode: string
             default => 'regional'
         };
     }
+
+    public function getRoutingType(): string
+    {
+        return match ($this) {
+            self::RAIL,
+            self::HIGHSPEED_RAIL,
+            self::LONG_DISTANCE,
+            self::NIGHT_RAIL,
+            self::REGIONAL_FAST_RAIL,
+            self::REGIONAL_RAIL,
+            self::TRAM,
+            self::SUBWAY,
+            self::SUBURBAN,
+            self::METRO,
+            self::FUNICULAR => 'rail',
+            self::CAR,
+            self::CAR_PARKING,
+            self::ODM,
+            self::FLEX,
+            self::BUS,
+            self::RENTAL,
+            self::COACH => 'road',
+            self::WALK ,
+            self::BIKE,
+            self::CAR_DROPOFF,
+            self::TRANSIT,
+            self::FERRY,
+            self::AIRPLANE,
+            self::CABLE_CAR,
+            self::AERIAL_LIFT,
+            self::OTHER,
+            self::AREAL_LIFT => null,
+        };
+    }
 }

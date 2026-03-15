@@ -16,6 +16,7 @@ use App\Http\Resources\PostTypes\TransportPost;
 use App\Hydrators\PostHydrator;
 use App\Models\Location;
 use App\Models\Post;
+use App\Models\TransportPost as TransportPostModel;
 use App\Models\TransportTrip;
 use App\Models\TransportTripStop;
 use App\Models\User;
@@ -23,6 +24,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use JetBrains\PhpStorm\ArrayShape;
 use Throwable;
 
 class PostRepository
@@ -252,6 +254,7 @@ class PostRepository
     {
         return Post::with([
             'user', 'locationPost.location', 'locationPost.location.tags', 'transportPost', 'transportPost.origin', 'transportPost.destination',
+            'transportPost.originStop', 'transportPost.destinationStop',
             'transportPost.originStop.location', 'transportPost.destinationStop.location', 'transportPost.transportTrip', 'hashTags',
         ])
             ->withCount('likes');
@@ -351,10 +354,21 @@ class PostRepository
         );
     }
 
+    public function internalGetById(string $postId): ?Post
+    {
+        return $this->basePostQuery()
+            ->where('id', $postId)
+            ->first();
+    }
+
+    public function updateStats(string $postId, int $distance, int $duration): void
+    {
+        TransportPostModel::where('post_id', $postId)->update(['distance' => $distance, 'duration' => $duration]);
+    }
+
     public function getById(string $postId, ?User $visitingUser = null): BasePost|LocationPost|TransportPost
     {
-        $post = Post::with(['user', 'locationPost.location', 'locationPost.location.tags', 'transportPost', 'transportPost.origin', 'transportPost.destination', 'hashTags', 'metaInfos'])
-            ->withCount('likes')
+        $post = $this->basePostQuery()
             ->when($visitingUser, function ($query) use ($visitingUser) {
                 $query->withExists(['likes as liked_by_user' => function ($q) use ($visitingUser) {
                     $q->where('user_id', $visitingUser->id);
@@ -542,5 +556,52 @@ class PostRepository
             report($e);
             throw $e;
         }
+    }
+
+    public function getTotalDistanceForUser(string $userId): int
+    {
+        return Post::where('user_id', $userId)
+            ->whereHas('transportPost')
+            ->with('transportPost')
+            ->get()
+            ->pluck('transportPost.distance')
+            ->sum();
+    }
+
+    public function getTotalDurationForUser(string $userId): int
+    {
+        return Post::where('user_id', $userId)
+            ->whereHas('transportPost')
+            ->with('transportPost')
+            ->get()
+            ->pluck('transportPost.duration')
+            ->sum();
+    }
+
+    #[ArrayShape(['total' => 'int', 'transport' => 'int', 'location' => 'int', 'text' => 'int'])]
+    public function getPostCountsForUser(string $userId): array
+    {
+        $totalPosts = Post::where('user_id', $userId)->count();
+        $transportPosts = Post::where('user_id', $userId)->whereHas('transportPost')->count();
+        $locationPosts = Post::where('user_id', $userId)->whereHas('locationPost')->count();
+        $textPosts = $totalPosts - $transportPosts - $locationPosts;
+
+        return [
+            'total' => $totalPosts,
+            'transport' => $transportPosts,
+            'location' => $locationPosts,
+            'text' => $textPosts,
+        ];
+    }
+
+    public function getVisitedLocationsForUser(string $userId): int
+    {
+        return Post::where('user_id', $userId)
+            ->whereHas('locationPost')
+            ->with('locationPost')
+            ->get()
+            ->pluck('locationPost.location_id')
+            ->unique()
+            ->count();
     }
 }
