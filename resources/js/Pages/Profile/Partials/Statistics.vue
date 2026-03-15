@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import DurationStats from '@/Pages/Profile/Partials/DurationStats.vue';
+import {
+    formatFullNumber,
+    formatShortenedNumber,
+} from '@/Services/NumberFormattingService';
 import { PropType } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { UserDto } from '../../../../types/Api.gen';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 defineProps({
     user: {
@@ -15,10 +19,14 @@ defineProps({
 </script>
 
 <template>
-    <!-- todo: add statistics -->
     <div class="flex flex-wrap gap-x-3">
-        <a class="link link-hover flex cursor-pointer">
-            <b>{{ user.statistics.followersCount }}</b>
+        <a
+            class="link link-hover tooltip flex cursor-pointer"
+            :data-tip="formatFullNumber(user.statistics.followersCount, locale)"
+        >
+            <b>{{
+                formatShortenedNumber(user.statistics.followersCount, locale)
+            }}</b>
             &nbsp;
             <span class="opacity-65">
                 {{
@@ -26,8 +34,13 @@ defineProps({
                 }}
             </span>
         </a>
-        <a class="link link-hover flex cursor-pointer">
-            <b>{{ user.statistics.followingCount }}</b>
+        <a
+            class="link link-hover tooltip flex cursor-pointer"
+            :data-tip="formatFullNumber(user.statistics.followingCount, locale)"
+        >
+            <b>{{
+                formatShortenedNumber(user.statistics.followingCount, locale)
+            }}</b>
             &nbsp;
             <span class="opacity-65">
                 {{
@@ -38,8 +51,18 @@ defineProps({
                 }}
             </span>
         </a>
-        <a class="link link-hover flex cursor-pointer">
-            <b>{{ user.statistics.visitedLocationsCount }}</b>
+        <a
+            class="link link-hover tooltip flex cursor-pointer"
+            :data-tip="
+                formatFullNumber(user.statistics.visitedLocationsCount, locale)
+            "
+        >
+            <b>{{
+                formatShortenedNumber(
+                    user.statistics.visitedLocationsCount,
+                    locale,
+                )
+            }}</b>
             &nbsp;
             <span class="opacity-65">
                 {{
@@ -50,8 +73,18 @@ defineProps({
                 }}
             </span>
         </a>
-        <a class="link link-hover flex cursor-pointer">
-            <b>{{ user.statistics.transportPostsCount }}</b>
+        <a
+            class="link link-hover tooltip flex cursor-pointer"
+            :data-tip="
+                formatFullNumber(user.statistics.transportPostsCount, locale)
+            "
+        >
+            <b>{{
+                formatShortenedNumber(
+                    user.statistics.transportPostsCount,
+                    locale,
+                )
+            }}</b>
             &nbsp;
             <span class="opacity-65">
                 {{
@@ -62,16 +95,34 @@ defineProps({
                 }}
             </span>
         </a>
-    </div>
-    <div class="flex flex-wrap gap-x-3">
-        <span class="flex">
-            <b>{{ user.statistics.postsCount }}</b>
+        <span
+            class="tooltip flex"
+            :data-tip="formatFullNumber(user.statistics.postsCount, locale)"
+        >
+            <b>{{
+                formatShortenedNumber(user.statistics.postsCount, locale)
+            }}</b>
             &nbsp;<span class="opacity-65">
                 {{ t('profile.stats.posts', user.statistics.postsCount) }}
             </span>
         </span>
-        <span class="flex">
-            <b>{{ (user.statistics.travelledDistance / 1000).toFixed(2) }}</b>
+        <span
+            class="tooltip flex"
+            :data-tip="
+                formatFullNumber(
+                    user.statistics.travelledDistance / 1000,
+                    locale,
+                ) + ' km'
+            "
+        >
+            <b>
+                {{
+                    formatShortenedNumber(
+                        user.statistics.travelledDistance / 1000,
+                        locale,
+                    )
+                }}
+            </b>
             &nbsp;<span class="opacity-65">km</span>
         </span>
         <DurationStats :duration="user.statistics.travelledDuration" />

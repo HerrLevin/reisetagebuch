@@ -4480,7 +4480,7 @@
                         "format": "int32"
                     },
                     "travelledDuration": {
-                        "description": "Total duration of travel by the user in minutes",
+                        "description": "Total duration of travel by the user in seconds",
                         "type": "integer",
                         "format": "int32"
                     },
