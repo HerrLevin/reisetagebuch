@@ -44,7 +44,7 @@ class UserStatisticsDto
         #[OA\Property('travelledDistance', description: 'Total distance travelled by the user in meters', type: 'integer', format: 'int32')]
         public int $travelledDistance,
 
-        #[OA\Property('travelledDuration', description: 'Total duration of travel by the user in minutes', type: 'integer', format: 'int32')]
+        #[OA\Property('travelledDuration', description: 'Total duration of travel by the user in seconds', type: 'integer', format: 'int32')]
         public int $travelledDuration,
 
         #[OA\Property('visitedCountriesCount', description: 'Number of distinct countries visited by the user', type: 'integer', format: 'int32')]

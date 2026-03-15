@@ -947,6 +947,10 @@ export type TransportPost = BasePost & {
   manualArrivalTime: string | null;
   /** Reason for travel associated with the transport post */
   travelReason: TravelReason | null;
+  /** Distance traveled in meters */
+  distance: number;
+  /** Duration of the trip in seconds */
+  duration: number;
 };
 
 /** Data Transfer Object for a Transport Trip Stop */

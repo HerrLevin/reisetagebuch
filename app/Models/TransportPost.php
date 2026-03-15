@@ -19,6 +19,8 @@ class TransportPost extends Model
         'destination_stop_id',
         'manual_departure',
         'manual_arrival',
+        'distance',
+        'duration',
     ];
 
     protected $casts = [

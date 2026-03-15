@@ -27,7 +27,7 @@ class MapController extends Controller
             return collect();
         }
 
-        return $this->transportTripRepository->getStopsBetween($start, $end);
+        return $this->transportTripRepository->getStopsBetween($start->transport_trip_id, $start->stop_sequence, $end->stop_sequence);
     }
 
     public function stopPointGeometryFromTo(string $fromStopId, string $toStopId): ?MultiPoint

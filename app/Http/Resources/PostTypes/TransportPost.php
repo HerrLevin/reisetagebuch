@@ -13,7 +13,7 @@ use OpenApi\Attributes as OA;
 #[OA\Schema(
     schema: 'TransportPost',
     description: 'Transport Post Resource',
-    required: ['originStop', 'destinationStop', 'trip', 'travelReason', 'manualDepartureTime', 'manualArrivalTime'],
+    required: ['originStop', 'destinationStop', 'trip', 'travelReason', 'manualDepartureTime', 'manualArrivalTime', 'distance', 'duration'],
     type: 'object'
 )]
 class TransportPost extends BasePost
@@ -65,6 +65,20 @@ class TransportPost extends BasePost
     )]
     public ?TravelReason $travelReason;
 
+    #[OA\Property(
+        property: 'distance',
+        description: 'Distance traveled in meters',
+        type: 'integer'
+    )]
+    public int $distance;
+
+    #[OA\Property(
+        property: 'duration',
+        description: 'Duration of the trip in seconds',
+        type: 'integer'
+    )]
+    public int $duration;
+
     public function __construct(Post $post, UserDto $userDto)
     {
         parent::__construct($post, $userDto);
@@ -75,5 +89,7 @@ class TransportPost extends BasePost
         $this->manualDepartureTime = $post->transportPost->manual_departure?->toIso8601String();
         $this->manualArrivalTime = $post->transportPost->manual_arrival?->toIso8601String();
         $this->travelReason = TravelReason::tryFrom($post->metaInfos->where('key', MetaInfoKey::TRAVEL_REASON)->first()?->value);
+        $this->distance = $post->transportPost->distance;
+        $this->duration = $post->transportPost->duration;
     }
 }

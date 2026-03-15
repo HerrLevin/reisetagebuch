@@ -2,7 +2,9 @@
 
 namespace App\Jobs;
 
-use App\Models\User;
+use App\Repositories\PostRepository;
+use App\Repositories\UserRepository;
+use App\Repositories\UserStatisticsRepository;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
@@ -19,34 +21,26 @@ class CalculateStatisticsForUser implements ShouldQueue
 
     public function handle(): void
     {
-        $user = User::whereId($this->userId)->firstOrFail();
+        $repository = app(UserStatisticsRepository::class);
+        $postRepository = app(PostRepository::class);
+        $userRepository = app(UserRepository::class);
 
-        $posts = $user->posts()->count();
+        $followCounts = $userRepository->getFollowCountsForUser($this->userId);
+        $posts = $postRepository->getPostCountsForUser($this->userId);
+        $distance = $postRepository->getTotalDistanceForUser($this->userId);
+        $duration = $postRepository->getTotalDurationForUser($this->userId);
+        $visitedLocations = $postRepository->getVisitedLocationsForUser($this->userId);
 
-        $transportPosts = $user->posts()->whereHas('transportPost')->count();
-        $locationPosts = $user->posts()->whereHas('locationPost')->count();
-
-        // get unique visited locations count
-        $visitedLocations = $user->posts()
-            ->whereHas('locationPost')
-            ->with('locationPost')
-            ->get()
-            ->pluck('locationPost.location_id')
-            ->unique()
-            ->count();
-
-        $user->statistics()->update([
-            'posts_count' => $posts,
-            'transport_posts_count' => $transportPosts,
-            'location_posts_count' => $locationPosts,
-            'visited_locations_count' => $visitedLocations,
-            'followers_count' => $user->followers()->count(),
-            'following_count' => $user->followings()->count(),
-
-            // todo: implement these statistics later
-            // 'travelled_distance' => $user->trips()->sum('distance'),
-            // 'travelled_duration' => $user->trips()->sum('duration'),
-            // 'visited_countries_count' => $user->trips()->distinct('country')->count('country'),
-        ]);
+        $repository->setData(
+            $this->userId,
+            $posts['total'],
+            $posts['transport'],
+            $posts['location'],
+            $visitedLocations,
+            $followCounts['followers'],
+            $followCounts['followings'],
+            $distance,
+            $duration,
+        );
     }
 }

@@ -294,6 +294,10 @@
         "departures": "Abfahrten",
         "text": "Text",
         "ride_along": "Mitfahren",
+        "distance": "Entfernung",
+        "duration": "Dauer",
+        "speed": "Durchschnittsgeschwindigkeit",
+        "speed_unit": "km/h",
         "meta_info": {
             "title": "Zusatzinformationen",
             "vehicle_id": "Fahrzeugnummer",

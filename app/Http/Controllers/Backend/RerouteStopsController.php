@@ -8,6 +8,7 @@ use App\Dto\MotisApi\TripDto;
 use App\Enums\TransportMode;
 use App\Exceptions\BrouterRouteCreationFailed;
 use App\Http\Controllers\Controller;
+use App\Jobs\CalculateStatsForTransportPost;
 use App\Models\TransportTrip;
 use App\Models\TransportTripStop;
 use App\Repositories\TransportTripRepository;
@@ -43,6 +44,7 @@ class RerouteStopsController extends Controller
     public function rerouteStops(TripDto|TransportTrip $tripDto, array $stops): void
     {
         foreach ($stops as $key => $stop) {
+            $tripIds[$stop->transport_trip_id] = $stop->transport_trip_id;
             $previousStop = $stops[$key - 1] ?? null;
             if (! $previousStop || $stop['route_segment_id'] !== null) {
                 continue;
@@ -55,15 +57,24 @@ class RerouteStopsController extends Controller
                 $mode = $tripDto->mode;
             }
 
-            $pathType = $this->getPathType(TransportMode::tryFrom($mode));
+            $mode = TransportMode::from($mode);
+            $pathType = $mode->getRoutingType();
             if (! $pathType) {
                 Log::warning('RerouteStops: Unsupported transport mode, interpolating', ['mode' => $mode]);
-                $this->interpolateBetween($previousStop, $stop, 'mode:'.$mode);
+                $this->interpolateBetween($previousStop, $stop, 'mode:'.$mode?->value);
 
                 continue;
             }
             Log::debug('RerouteStops: Transport mode', ['mode' => $mode, 'pathType' => $pathType]);
             $this->rerouteBetween($previousStop, $stop, $pathType);
+        }
+
+        $tripId = array_pop($stops)->transport_trip_id;
+        $postIds = $this->transportTripRepository->getPostIdsForTrip($tripId);
+        Log::Info('RerouteStops: Dispatching distance calculation for posts', ['postIds' => $postIds]);
+
+        foreach ($postIds as $postId) {
+            CalculateStatsForTransportPost::dispatch($postId);
         }
     }
 
@@ -140,39 +151,6 @@ class RerouteStopsController extends Controller
             Log::error('RerouteStops: Failed to create route segment', ['error' => $e->getMessage()]);
             report($e);
         }
-    }
-
-    private function getPathType(?TransportMode $mode): ?string
-    {
-        $railModes = [
-            TransportMode::RAIL,
-            TransportMode::HIGHSPEED_RAIL,
-            TransportMode::LONG_DISTANCE,
-            TransportMode::NIGHT_RAIL,
-            TransportMode::REGIONAL_FAST_RAIL,
-            TransportMode::REGIONAL_RAIL,
-            TransportMode::TRAM,
-            TransportMode::SUBWAY,
-            TransportMode::METRO,
-            TransportMode::FUNICULAR,
-        ];
-        $roadModes = [
-            TransportMode::CAR,
-            TransportMode::CAR_PARKING,
-            TransportMode::ODM,
-            TransportMode::FLEX,
-            TransportMode::BUS,
-            TransportMode::COACH,
-        ];
-
-        if (in_array($mode, $railModes, true)) {
-            return 'rail';
-        }
-        if (in_array($mode, $roadModes, true)) {
-            return 'road';
-        }
-
-        return null;
     }
 
     public function interpolateGreatCircle(TransportTripStop $from, TransportTripStop $to, int $numPoints = 20): Geometry

@@ -48,4 +48,9 @@ class TransportTrip extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function transportPosts(): HasMany
+    {
+        return $this->hasMany(TransportPost::class, 'transport_trip_id', 'id');
+    }
 }
