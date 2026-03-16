@@ -67,6 +67,10 @@ function submit() {
                 name: 'posts.show',
                 params: { postId: props.postId },
             });
+        })
+        .catch((error) => {
+            alert(error.error.message);
+            uploading.value = false;
         });
 }
 
