@@ -14,9 +14,11 @@ use Carbon\Carbon;
 use Clickbar\Magellan\Data\Geometries\Dimension;
 use Clickbar\Magellan\Data\Geometries\Geometry;
 use Clickbar\Magellan\Data\Geometries\LineString;
-use Clickbar\Magellan\Database\PostgisFunctions\ST;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Location\Coordinate;
+use Location\Distance\Vincenty;
+use Location\Polyline;
 use Log;
 
 class TransportTripRepository
@@ -178,7 +180,6 @@ class TransportTripRepository
         $segment = new RouteSegment;
         $segment->from_location_id = $fromLocation->id;
         $segment->to_location_id = $toLocation->id;
-        $segment->distance = ST::distanceSphere($fromLocation->location, $toLocation->location);
         $segment->duration = $duration;
         $segment->path_type = $pathType;
         $segment->interpolated = $interpolated;
@@ -191,10 +192,21 @@ class TransportTripRepository
             $geometry = LineString::make($points, $geometry->getSrid(), Dimension::DIMENSION_3DZ);
         }
         $segment->geometry = $geometry;
+        $this->calculateDistance($segment);
 
         $segment->save();
 
         return $segment;
+    }
+
+    public function calculateDistance(RouteSegment $segment): void
+    {
+        $track = new Polyline;
+        foreach ($segment->geometry->getPoints() as $point) {
+            $track->addPoint(new Coordinate($point->getLatitude(), $point->getLongitude()));
+        }
+
+        $segment->distance = (int) $track->getLength(new Vincenty);
     }
 
     public function setRouteSegmentForStop(

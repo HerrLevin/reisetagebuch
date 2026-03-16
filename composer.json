@@ -19,7 +19,8 @@
         "laravel/socialite": "^5.23",
         "laravel/tinker": "^2.10.1",
         "predis/predis": "^3.1",
-        "ext-pdo": "*"
+        "ext-pdo": "*",
+        "ext-simplexml": "*"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.5",

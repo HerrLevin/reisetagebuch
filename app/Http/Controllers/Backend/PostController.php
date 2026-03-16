@@ -361,6 +361,7 @@ class PostController extends Controller
 
         $internalPost = $this->postRepository->internalGetById($postId);
         $this->postRepository->updateTransportGeometry($internalPost->transportPost, $geometry);
+        $this->calculateTransportStatsController->calculateStatsForPost($post->id);
 
         return $this->postRepository->getById($postId, $user);
     }
@@ -392,6 +393,8 @@ class PostController extends Controller
 
         $internalPost = $this->postRepository->internalGetById($postId);
         $this->postRepository->updateTransportGeometry($internalPost->transportPost, null);
+
+        $this->calculateTransportStatsController->calculateStatsForPost($post->id);
 
         return $this->postRepository->getById($postId, $user);
     }
