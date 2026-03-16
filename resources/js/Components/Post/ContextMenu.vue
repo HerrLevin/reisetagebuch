@@ -7,6 +7,7 @@ import { isTransportPost } from '@/types/PostTypes';
 import {
     ClockPlus,
     Ellipsis,
+    LogOut,
     PlaneLanding,
     PlaneTakeoff,
     Route,
@@ -220,7 +221,12 @@ function blur() {
             <template v-if="isSameUser()">
                 <li class="mx-0 border-b-1"></li>
                 <li>
-                    <RouterLink :to="`/posts/${post.id}/edit`">
+                    <RouterLink
+                        :to="{
+                            name: 'posts.edit',
+                            params: { postId: post.id },
+                        }"
+                    >
                         <SquarePen class="size-4" />
                         {{ t('verbs.edit') }}
                     </RouterLink>
@@ -228,7 +234,10 @@ function blur() {
                 <template v-if="isTransportPost(post)">
                     <li>
                         <RouterLink
-                            :to="`/posts/transport/${post.id}/times/edit`"
+                            :to="{
+                                name: 'posts.edit.transport-times',
+                                params: { postId: post.id },
+                            }"
                         >
                             <ClockPlus class="size-4" />
                             {{ t('posts.edit.change_times') }}
@@ -236,10 +245,31 @@ function blur() {
                     </li>
                     <li>
                         <RouterLink
-                            :to="`/posts/transport/exit/edit?postId=${post.id}&tripId=${post.trip.foreignId}&startId=${post.originStop.id}&startTime=${post.originStop.arrivalTime || post.originStop.departureTime}`"
+                            :to="{
+                                name: 'posts.edit.transport-post',
+                                query: {
+                                    postId: post.id,
+                                    tripId: post.trip.foreignId,
+                                    startId: post.originStop.id,
+                                    startTime:
+                                        post.originStop.arrivalTime ||
+                                        post.originStop.departureTime,
+                                },
+                            }"
+                        >
+                            <LogOut class="size-4" />
+                            {{ t('posts.edit.change_exit') }}
+                        </RouterLink>
+                    </li>
+                    <li>
+                        <RouterLink
+                            :to="{
+                                name: 'posts.edit.transport-track',
+                                params: { postId: post.id },
+                            }"
                         >
                             <Route class="size-4" />
-                            {{ t('posts.edit.change_exit') }}
+                            {{ t('posts.edit.manual_tracking') }}
                         </RouterLink>
                     </li>
                     <template v-if="showTimeButtons()">

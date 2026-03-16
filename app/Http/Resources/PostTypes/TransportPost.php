@@ -8,12 +8,13 @@ use App\Http\Resources\StopDto;
 use App\Http\Resources\TripDto;
 use App\Http\Resources\UserDto;
 use App\Models\Post;
+use Clickbar\Magellan\IO\Generator\Geojson\GeojsonGenerator;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema(
     schema: 'TransportPost',
     description: 'Transport Post Resource',
-    required: ['originStop', 'destinationStop', 'trip', 'travelReason', 'manualDepartureTime', 'manualArrivalTime', 'distance', 'duration'],
+    required: ['originStop', 'destinationStop', 'trip', 'travelReason', 'manualDepartureTime', 'manualArrivalTime', 'distance', 'duration', 'userGeometry'],
     type: 'object'
 )]
 class TransportPost extends BasePost
@@ -79,7 +80,15 @@ class TransportPost extends BasePost
     )]
     public int $duration;
 
-    public function __construct(Post $post, UserDto $userDto)
+    #[OA\Property(
+        property: 'userGeometry',
+        description: 'User-uploaded track geometry as GeoJSON',
+        type: 'object',
+        nullable: true
+    )]
+    public ?array $userGeometry = null;
+
+    public function __construct(Post $post, UserDto $userDto, bool $withGeometry = false)
     {
         parent::__construct($post, $userDto);
         $asdf = $post->transportPost->originStop;
@@ -91,5 +100,9 @@ class TransportPost extends BasePost
         $this->travelReason = TravelReason::tryFrom($post->metaInfos->where('key', MetaInfoKey::TRAVEL_REASON)->first()?->value);
         $this->distance = $post->transportPost->distance;
         $this->duration = $post->transportPost->duration;
+
+        if ($withGeometry && $post->transportPost->user_geometry !== null) {
+            $this->userGeometry = (new GeojsonGenerator)->generate($post->transportPost->user_geometry);
+        }
     }
 }

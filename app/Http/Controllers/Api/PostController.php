@@ -15,6 +15,7 @@ use App\Http\Requests\MassEditPostRequest;
 use App\Http\Requests\TransportBasePostCreateRequest;
 use App\Http\Requests\TransportPostExitUpdateRequest;
 use App\Http\Requests\TransportTimesUpdateRequest;
+use App\Http\Requests\TransportTrackUploadRequest;
 use App\Http\Resources\PostTypes\BasePost;
 use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
@@ -526,5 +527,83 @@ class PostController extends Controller
         } catch (NegativePeriodException $exception) {
             abort(400, $exception->getMessage());
         }
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    #[OA\Post(
+        path: '/posts/{id}/transport/track',
+        operationId: 'uploadTransportTrack',
+        description: 'Upload a GPX or GeoJSON track file for a transport post',
+        summary: 'Upload transport track',
+        security: [
+            [
+                'passport' => [],
+            ],
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\MediaType(
+                mediaType: 'multipart/form-data',
+                schema: new OA\Schema(ref: TransportTrackUploadRequest::class)
+            )
+        ),
+        tags: ['Posts', 'TransportPosts'],
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                description: 'Post id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'string', format: 'uuid')
+            ),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'successful operation', content: new OA\JsonContent(ref: TransportPost::class)),
+            new OA\Response(response: 400, description: 'Bad request'),
+            new OA\Response(response: 403, description: 'Forbidden'),
+            new OA\Response(response: 404, description: 'Resource Not Found'),
+            new OA\Response(response: 422, description: 'Validation error'),
+        ]
+    )]
+    public function uploadTransportTrack(string $postId, TransportTrackUploadRequest $request): TransportPost
+    {
+        return $this->postController->uploadTransportTrack($postId, $request->file('track'), $this->auth->user());
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    #[OA\Delete(
+        path: '/posts/{id}/transport/track',
+        operationId: 'deleteTransportTrack',
+        description: 'Remove the uploaded track from a transport post',
+        summary: 'Delete transport track',
+        security: [
+            [
+                'passport' => [],
+            ],
+        ],
+        tags: ['Posts', 'TransportPosts'],
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                description: 'Post id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'string', format: 'uuid')
+            ),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'successful operation', content: new OA\JsonContent(ref: TransportPost::class)),
+            new OA\Response(response: 400, description: 'Bad request'),
+            new OA\Response(response: 403, description: 'Forbidden'),
+            new OA\Response(response: 404, description: 'Resource Not Found'),
+        ]
+    )]
+    public function deleteTransportTrack(string $postId): TransportPost
+    {
+        return $this->postController->deleteTransportTrack($postId, $this->auth->user());
     }
 }

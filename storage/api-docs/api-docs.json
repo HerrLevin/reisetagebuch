@@ -2147,6 +2147,115 @@
                 ]
             }
         },
+        "/posts/{id}/transport/track": {
+            "post": {
+                "tags": [
+                    "Posts",
+                    "TransportPosts"
+                ],
+                "summary": "Upload transport track",
+                "description": "Upload a GPX or GeoJSON track file for a transport post",
+                "operationId": "uploadTransportTrack",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Post id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TransportTrackUploadRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TransportPost"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Posts",
+                    "TransportPosts"
+                ],
+                "summary": "Delete transport track",
+                "description": "Remove the uploaded track from a transport post",
+                "operationId": "deleteTransportTrack",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Post id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TransportPost"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
         "/socialite/traewelling/connect": {
             "get": {
                 "tags": [
@@ -3866,6 +3975,21 @@
                 },
                 "type": "object"
             },
+            "TransportTrackUploadRequest": {
+                "description": "Request to upload a GPX or GeoJSON track file",
+                "required": [
+                    "track"
+                ],
+                "properties": {
+                    "track": {
+                        "description": "GPX or GeoJSON track file (max 5MB)",
+                        "type": "string",
+                        "format": "binary",
+                        "nullable": false
+                    }
+                },
+                "type": "object"
+            },
             "UpdateProfileRequest": {
                 "description": "Request to update user profile",
                 "required": [
@@ -4185,7 +4309,8 @@
                     "manualDepartureTime",
                     "manualArrivalTime",
                     "distance",
-                    "duration"
+                    "duration",
+                    "userGeometry"
                 ],
                 "type": "object",
                 "allOf": [
@@ -4231,6 +4356,11 @@
                             "duration": {
                                 "description": "Duration of the trip in seconds",
                                 "type": "integer"
+                            },
+                            "userGeometry": {
+                                "description": "User-uploaded track geometry as GeoJSON",
+                                "type": "object",
+                                "nullable": true
                             }
                         },
                         "type": "object"

@@ -426,6 +426,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $manual_arrival
  * @property int $distance distance in kilometers
  * @property int $duration Duration in seconds
+ * @property \Clickbar\Magellan\Data\Geometries\LineString|null $user_geometry
  * @property-read \App\Models\Location|null $destination
  * @property-read \App\Models\TransportTripStop $destinationStop
  * @property-read \App\Models\Location|null $origin
@@ -447,6 +448,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost wherePostId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost whereTransportTripId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost whereUserGeometry($value)
  */
 	class TransportPost extends \Eloquent {}
 }

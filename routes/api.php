@@ -103,6 +103,8 @@ Route::middleware('auth:api')->group(function () {
             Route::prefix('transport')->group(function () {
                 Route::put('/exit', [PostController::class, 'updateTransportPostExit'])->name('posts.update.transport-post');
                 Route::put('/times', [PostController::class, 'updateTimesTransport'])->name('posts.update.transport-times');
+                Route::post('/track', [PostController::class, 'uploadTransportTrack'])->name('posts.upload.transport-track');
+                Route::delete('/track', [PostController::class, 'deleteTransportTrack'])->name('posts.delete.transport-track');
             });
         });
 

@@ -145,6 +145,18 @@
         "arrive_now": "Jetzt ankommen",
         "save_times": "Zeiten speichern"
     },
+    "edit_manual_tracking": {
+        "title": "Manuelle GPS-Route",
+        "description": "Wenn du eine GPS-Route deiner Reise hast, kannst du diese hier hochladen. Die Datei muss im GPX- oder GeoJSON-Format vorliegen. Dadurch können wir einen genaueren Beitrag zu deiner Reise erstellen, einschließlich der zurückgelegten Route und der zurückgelegten Strecke.",
+        "upload": "Datei hochladen",
+        "save_track": "Track speichern",
+        "file": "Datei",
+        "delete_track": "Track löschen",
+        "no_file": "Keine Datei ausgewählt. Bitte wähle eine GPX- oder GeoJSON-Datei zum Hochladen aus.",
+        "invalid_file": "Ungültiges Dateiformat. Bitte laden eine GPX- oder GeoJSON-Datei hoch.",
+        "preview": "Track-Vorschau",
+        "confirm_delete": "Bist du sicher, dass du diesen GPS-Track löschen möchtest?"
+    },
     "location": {
         "open_osm": "In OpenStreetMap öffnen"
     },
@@ -308,7 +320,8 @@
         },
         "edit": {
             "change_times": "Zeiten bearbeiten",
-            "change_exit": "Ausstieg bearbeiten"
+            "change_exit": "Ausstieg bearbeiten",
+            "manual_tracking": "Manueller GPS-Track"
         },
         "delete": {
             "question": "Bist du dir sicher, dass du deinen Beitrag löschen willst?"
