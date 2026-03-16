@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Clickbar\Magellan\Data\Geometries\LineString;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -21,11 +22,13 @@ class TransportPost extends Model
         'manual_arrival',
         'distance',
         'duration',
+        'user_geometry',
     ];
 
     protected $casts = [
         'manual_departure' => 'datetime',
         'manual_arrival' => 'datetime',
+        'user_geometry' => LineString::class,
     ];
 
     public function origin(): BelongsTo

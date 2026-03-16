@@ -34,8 +34,12 @@ use App\Repositories\LocationRepository;
 use App\Repositories\PostRepository;
 use App\Repositories\TransportTripRepository;
 use App\Repositories\UserStatisticsRepository;
+use App\Services\GpxParserService;
 use Auth;
+use Clickbar\Magellan\Data\Geometries\LineString;
+use Clickbar\Magellan\IO\Parser\Geojson\GeojsonParser;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Http\UploadedFile;
 use Throwable;
 
 class PostController extends Controller
@@ -330,5 +334,65 @@ class PostController extends Controller
             'success' => true,
             'updatedCount' => count($updated),
         ];
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function uploadTransportTrack(string $postId, UploadedFile $file, User $user): TransportPost
+    {
+        $post = $this->postRepository->getById($postId, $user);
+        if ($user->cannot('update', $post)) {
+            throw new AuthorizationException('You do not have permission to update this post.');
+        }
+
+        if (! $post instanceof TransportPost) {
+            abort(422, 'Not a transport post');
+        }
+
+        $content = $file->get();
+        $extension = strtolower($file->getClientOriginalExtension());
+
+        $geometry = match ($extension) {
+            'gpx' => app(GpxParserService::class)->parse($content),
+            'geojson', 'json' => $this->parseGeoJsonTrack($content),
+            default => abort(422, 'Unsupported file type'),
+        };
+
+        $internalPost = $this->postRepository->internalGetById($postId);
+        $this->postRepository->updateTransportGeometry($internalPost->transportPost, $geometry);
+
+        return $this->postRepository->getById($postId, $user);
+    }
+
+    private function parseGeoJsonTrack(string $content): LineString
+    {
+        $parsed = app(GeojsonParser::class)->parse($content);
+
+        if (! $parsed instanceof LineString) {
+            abort(422, 'GeoJSON must contain a LineString geometry');
+        }
+
+        return $parsed;
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function deleteTransportTrack(string $postId, User $user): TransportPost
+    {
+        $post = $this->postRepository->getById($postId, $user);
+        if ($user->cannot('update', $post)) {
+            throw new AuthorizationException('You do not have permission to update this post.');
+        }
+
+        if (! $post instanceof TransportPost) {
+            abort(422, 'Not a transport post');
+        }
+
+        $internalPost = $this->postRepository->internalGetById($postId);
+        $this->postRepository->updateTransportGeometry($internalPost->transportPost, null);
+
+        return $this->postRepository->getById($postId, $user);
     }
 }

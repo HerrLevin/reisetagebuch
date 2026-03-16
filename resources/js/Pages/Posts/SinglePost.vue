@@ -87,17 +87,21 @@ function mapPostDetails() {
             tPost.destinationStop.location.latitude ?? 49,
         );
 
-        api.map
-            .getLineStringBetween({
-                from: tPost.originStop.id,
-                to: tPost.destinationStop.id,
-            })
-            .then((response) => {
-                lineString.value = response.data as GeometryCollection;
-            })
-            .catch(() => {
-                lineString.value = null;
-            });
+        if (post.value.userGeometry) {
+            lineString.value = post.value.userGeometry as GeometryCollection;
+        } else {
+            api.map
+                .getLineStringBetween({
+                    from: tPost.originStop.id,
+                    to: tPost.destinationStop.id,
+                })
+                .then((response) => {
+                    lineString.value = response.data as GeometryCollection;
+                })
+                .catch(() => {
+                    lineString.value = null;
+                });
+        }
 
         api.map
             .getStopsBetween({

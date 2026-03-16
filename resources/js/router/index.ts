@@ -14,6 +14,7 @@ import LocationHistoryIndex from '@/Pages/LocationHistory/Index.vue';
 import CreateLocationPost from '@/Pages/NewPostDialog/CreateLocationPost.vue';
 import CreateTextPost from '@/Pages/NewPostDialog/CreateTextPost.vue';
 import CreateTransportPost from '@/Pages/NewPostDialog/CreateTransportPost.vue';
+import EditManualGPSTrack from '@/Pages/NewPostDialog/EditManualGPSTrack.vue';
 import EditTransportTimes from '@/Pages/NewPostDialog/EditTransportTimes.vue';
 import ListDepartures from '@/Pages/NewPostDialog/ListDepartures.vue';
 import ListLocations from '@/Pages/NewPostDialog/ListLocations.vue';
@@ -149,6 +150,13 @@ const routes: RouteRecordRaw[] = [
         path: '/posts/transport/:postId/times/edit',
         name: 'posts.edit.transport-times',
         component: EditTransportTimes,
+        meta: { auth: true },
+        props: true,
+    },
+    {
+        path: '/posts/transport/:postId/track',
+        name: 'posts.edit.transport-track',
+        component: EditManualGPSTrack,
         meta: { auth: true },
         props: true,
     },

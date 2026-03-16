@@ -21,6 +21,7 @@ use App\Models\TransportTrip;
 use App\Models\TransportTripStop;
 use App\Models\User;
 use Carbon\Carbon;
+use Clickbar\Magellan\Data\Geometries\LineString;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -152,7 +153,7 @@ class PostRepository
             report($e);
         }
 
-        return $this->postHydrator->modelToDto($post);
+        return $this->postHydrator->modelToDto($post, true);
     }
 
     public function updateTransportPost(TransportPost $transportPost, string $stopId, TravelReason $travelReason): TransportPost
@@ -193,7 +194,7 @@ class PostRepository
             throw $e;
         }
 
-        return $this->postHydrator->modelToDto($post);
+        return $this->postHydrator->modelToDto($post, true);
     }
 
     public function storeTransport(
@@ -247,7 +248,7 @@ class PostRepository
             report($e);
         }
 
-        return $this->postHydrator->modelToDto($post);
+        return $this->postHydrator->modelToDto($post, true);
     }
 
     private function basePostQuery(): Builder
@@ -366,6 +367,11 @@ class PostRepository
         TransportPostModel::where('post_id', $postId)->update(['distance' => $distance, 'duration' => $duration]);
     }
 
+    public function updateTransportGeometry(TransportPostModel $transportPost, ?LineString $geometry): void
+    {
+        TransportPostModel::where('post_id', $transportPost->post_id)->update(['user_geometry' => $geometry]);
+    }
+
     public function getById(string $postId, ?User $visitingUser = null): BasePost|LocationPost|TransportPost
     {
         $post = $this->basePostQuery()
@@ -386,7 +392,7 @@ class PostRepository
             abort(403);
         }
 
-        return $this->postHydrator->modelToDto($post);
+        return $this->postHydrator->modelToDto($post, true);
     }
 
     /**
@@ -426,7 +432,7 @@ class PostRepository
             throw $e;
         }
 
-        return $this->postHydrator->modelToDto($post);
+        return $this->postHydrator->modelToDto($post, true);
     }
 
     public function delete(BasePost $post): void

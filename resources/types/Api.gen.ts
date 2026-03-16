@@ -768,6 +768,15 @@ export interface TransportTimesUpdateRequest {
   manualArrivalTime?: string | null;
 }
 
+/** Request to upload a GPX or GeoJSON track file */
+export interface TransportTrackUploadRequest {
+  /**
+   * GPX or GeoJSON track file (max 5MB)
+   * @format binary
+   */
+  track: File;
+}
+
 /** Request to update user profile */
 export interface UpdateProfileRequest {
   /**
@@ -951,6 +960,8 @@ export type TransportPost = BasePost & {
   distance: number;
   /** Duration of the trip in seconds */
   duration: number;
+  /** User-uploaded track geometry as GeoJSON */
+  userGeometry: object | null;
 };
 
 /** Data Transfer Object for a Transport Trip Stop */
@@ -2258,6 +2269,48 @@ export class Api<
         body: data,
         secure: true,
         type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Upload a GPX or GeoJSON track file for a transport post
+     *
+     * @tags Posts, TransportPosts
+     * @name UploadTransportTrack
+     * @summary Upload transport track
+     * @request POST:/posts/{id}/transport/track
+     * @secure
+     */
+    uploadTransportTrack: (
+      id: string,
+      data: TransportTrackUploadRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<TransportPost, void>({
+        path: `/posts/${id}/transport/track`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.FormData,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Remove the uploaded track from a transport post
+     *
+     * @tags Posts, TransportPosts
+     * @name DeleteTransportTrack
+     * @summary Delete transport track
+     * @request DELETE:/posts/{id}/transport/track
+     * @secure
+     */
+    deleteTransportTrack: (id: string, params: RequestParams = {}) =>
+      this.request<TransportPost, void>({
+        path: `/posts/${id}/transport/track`,
+        method: "DELETE",
+        secure: true,
         format: "json",
         ...params,
       }),

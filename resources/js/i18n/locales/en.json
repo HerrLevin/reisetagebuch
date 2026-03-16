@@ -147,6 +147,18 @@
         "arrive_now": "Arrive Now",
         "save_times": "Save Times"
     },
+    "edit_manual_tracking": {
+        "title": "Manual GPS Track",
+        "description": "If you have a GPS track of your trip, you can upload it here. The file must be in GPX or GeoJSON format. This will allow us to create a more accurate post for your trip, including the route taken and the distance traveled.",
+        "upload": "Upload File",
+        "save_track": "Save Track",
+        "file": "File",
+        "delete_track": "Delete Track",
+        "no_file": "No file selected. Please choose a GPX or GeoJSON file to upload.",
+        "invalid_file": "Invalid file format. Please upload a GPX or GeoJSON file.",
+        "preview": "Track Preview",
+        "confirm_delete": "Are you sure you want to delete the existing track?"
+    },
     "location": {
         "open_osm": "Open in OpenStreetMap"
     },
@@ -310,7 +322,8 @@
         },
         "edit": {
             "change_times": "Change Times",
-            "change_exit": "Change Exit"
+            "change_exit": "Change Exit",
+            "manual_tracking": "Manual GPS Track"
         },
         "delete": {
             "question": "Are you sure you want to delete your post?"
