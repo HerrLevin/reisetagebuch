@@ -10,7 +10,11 @@ use App\Repositories\PostRepository;
 use App\Repositories\TransportTripRepository;
 use App\Repositories\UserStatisticsRepository;
 use Carbon\Carbon;
+use Clickbar\Magellan\Data\Geometries\LineString;
 use Illuminate\Support\Facades\Log;
+use Location\Coordinate;
+use Location\Distance\Vincenty;
+use Location\Polyline;
 use Throwable;
 
 class CalculateTransportStatsController extends Controller
@@ -50,7 +54,12 @@ class CalculateTransportStatsController extends Controller
             return;
         }
 
-        $distance = $this->calculateDistance($post);
+        if ($post->transportPost->user_geometry) {
+            $distance = $this->calculateDistanceForLine($post->transportPost->user_geometry);
+        } else {
+            $distance = $this->calculateDistance($post);
+        }
+
         $duration = $this->calculateDuration($post);
 
         $originalDistance = $post->transportPost->distance;
@@ -83,6 +92,16 @@ class CalculateTransportStatsController extends Controller
 
             return null;
         }
+    }
+
+    private function calculateDistanceForLine(LineString $lineString): int
+    {
+        $track = new Polyline;
+        foreach ($lineString->getPoints() as $coordinate) {
+            $track->addPoint(new Coordinate($coordinate->getLatitude(), $coordinate->getLongitude()));
+        }
+
+        return (int) $track->getLength(new Vincenty);
     }
 
     private function calculateDuration(Post $post): int
