@@ -224,16 +224,18 @@ function deleted() {
                 "
                 :progress="progress"
             ></Map>
-            <div class="p-4">
+            <div class="py-4 md:p-4">
                 <ul class="list">
-                    <li class="list-row">
-                        <Loading v-if="loading" class="mx-auto my-4" />
-                        <Post
-                            v-if="post"
-                            :post
-                            @delete:post="deleted()"
-                            @update:post="updatePost"
-                        />
+                    <li>
+                        <div class="list-row">
+                            <Loading v-if="loading" class="mx-auto my-4" />
+                            <Post
+                                v-if="post"
+                                :post
+                                @delete:post="deleted()"
+                                @update:post="updatePost"
+                            />
+                        </div>
                     </li>
                 </ul>
             </div>
