@@ -137,33 +137,33 @@
         },
         {
             "name": "clickbar/laravel-magellan",
-            "version": "2.0.1",
+            "version": "2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/clickbar/laravel-magellan.git",
-                "reference": "71a2e016a0f13bab0e9129ac252afa2927c682bb"
+                "reference": "cc16837c97bd6ddce3a85b2d7a4abe801c0f1360"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/clickbar/laravel-magellan/zipball/71a2e016a0f13bab0e9129ac252afa2927c682bb",
-                "reference": "71a2e016a0f13bab0e9129ac252afa2927c682bb",
+                "url": "https://api.github.com/repos/clickbar/laravel-magellan/zipball/cc16837c97bd6ddce3a85b2d7a4abe801c0f1360",
+                "reference": "cc16837c97bd6ddce3a85b2d7a4abe801c0f1360",
                 "shasum": ""
             },
             "require": {
-                "illuminate/console": "^11.0|^12.0",
-                "illuminate/contracts": "^11.0|^12.0",
-                "illuminate/database": "^11.0|^12.0",
-                "illuminate/support": "^11.0|^12.0",
+                "illuminate/console": "^11.0|^12.0|^13.0",
+                "illuminate/contracts": "^11.0|^12.0|^13.0",
+                "illuminate/database": "^11.0|^12.0|^13.0",
+                "illuminate/support": "^11.0|^12.0|^13.0",
                 "php": "^8.2",
                 "spatie/laravel-package-tools": "^1.14.0"
             },
             "require-dev": {
                 "larastan/larastan": "^3.1",
-                "laravel/pint": "1.21.0",
+                "laravel/pint": "1.29.0",
                 "nunomaduro/collision": "^v8.1",
-                "orchestra/testbench": "^9.0|^10.0",
-                "pestphp/pest": "^3.7",
-                "pestphp/pest-plugin-laravel": "^3.1",
+                "orchestra/testbench": "^9.0|^10.0|^11.0",
+                "pestphp/pest": "^3.7|^4.4",
+                "pestphp/pest-plugin-laravel": "^3.1|^4.1",
                 "phpstan/extension-installer": "^1.4",
                 "phpstan/phpstan-deprecation-rules": "^2.0",
                 "phpstan/phpstan-phpunit": "^2.0"
@@ -172,7 +172,12 @@
             "extra": {
                 "laravel": {
                     "aliases": {
-                        "Magellan": "Clickbar\\Magellan\\Facades\\Magellan"
+                        "WKBParser": "Clickbar\\Magellan\\Facades\\WKBParser",
+                        "WKTParser": "Clickbar\\Magellan\\Facades\\WKTParser",
+                        "WKBGenerator": "Clickbar\\Magellan\\Facades\\WKBGenerator",
+                        "WKTGenerator": "Clickbar\\Magellan\\Facades\\WKTGenerator",
+                        "GeojsonParser": "Clickbar\\Magellan\\Facades\\GeojsonParser",
+                        "GeojsonGenerator": "Clickbar\\Magellan\\Facades\\GeojsonGenerator"
                     },
                     "providers": [
                         "Clickbar\\Magellan\\MagellanServiceProvider"
@@ -211,9 +216,9 @@
             ],
             "support": {
                 "issues": "https://github.com/clickbar/laravel-magellan/issues",
-                "source": "https://github.com/clickbar/laravel-magellan/tree/2.0.1"
+                "source": "https://github.com/clickbar/laravel-magellan/tree/2.1.0"
             },
-            "time": "2025-08-13T09:25:47+00:00"
+            "time": "2026-03-17T08:29:27+00:00"
         },
         {
             "name": "darkaonline/l5-swagger",
