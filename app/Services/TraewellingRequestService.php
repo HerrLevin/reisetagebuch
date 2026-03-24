@@ -107,7 +107,7 @@ class TraewellingRequestService
     public function createTrip(array $data): array
     {
         $client = $this->getClient();
-        $response = $client->post('trains/trip', ['json' => $data]);
+        $response = $client->post('trips', ['json' => $data]);
 
         return json_decode($response->getBody()->getContents(), true);
     }

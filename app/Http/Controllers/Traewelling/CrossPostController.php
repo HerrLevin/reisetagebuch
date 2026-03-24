@@ -457,7 +457,7 @@ class CrossPostController extends Controller
         ?string $tripId = null,
     ): ?array {
         try {
-            return $this->checkinRequest($post, $trwlOrigin, $trwlDestination, $force);
+            return $this->checkinRequest($post, $trwlOrigin, $trwlDestination, $force, $tripId);
         } catch (GuzzleException $e) {
             Log::error($e);
             if (str_contains($e->getMessage(), 'Given stations are not on the trip')) {
