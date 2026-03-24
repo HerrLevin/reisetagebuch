@@ -205,7 +205,7 @@ class CrossPostControllerTest extends TestCase
         $mockClient = Mockery::mock(Client::class);
         $mockClient->shouldReceive('post')
             ->withArgs(function ($url, $options) {
-                return $url === 'trains/trip' &&
+                return $url === 'trips' &&
                     $options['json']['originId'] === 1234 &&
                     $options['json']['destinationId'] === 1234;
                 // idk why but this makes the test flaky
