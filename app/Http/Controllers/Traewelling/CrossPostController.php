@@ -19,6 +19,7 @@ use App\Repositories\NotificationRepository;
 use App\Repositories\PostMetaInfoRepository;
 use App\Services\TraewellingRequestService;
 use Carbon\Carbon;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -86,10 +87,17 @@ class CrossPostController extends Controller
             }
         } catch (Throwable $exception) {
             Log::error('Error during Traewelling check-in for post '.$postId.': '.$exception->getMessage());
+            $message = $exception->getMessage();
+
+            if ($exception instanceof ClientException) {
+                $data = $exception->getResponse()->getBody();
+                $array = json_decode($data, true);
+                $message = $array['message'] ?? $exception->getMessage();
+            }
 
             $this->notificationRepository->notifyUser(
                 $post->user_id,
-                new TraewellingCrosspostFailedNotification($post->id, $exception->getMessage())
+                new TraewellingCrosspostFailedNotification($post->id, $message)
             );
 
             throw $exception;
