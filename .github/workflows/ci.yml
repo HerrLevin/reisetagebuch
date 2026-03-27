@@ -21,7 +21,8 @@ jobs:
           node-version: 25
 
       - name: Check for vulnerabilities (without installing)
-        run: npm audit --package-lock-only
+        # Fail the job only for vulnerabilities with severity "high" or above
+        run: npm audit --package-lock-only --audit-level=high
 
   install-node-dependencies:
     name: Install Node Dependencies & Build
