@@ -13,11 +13,13 @@ class LocationIdentifierFactory extends Factory
 {
     public function definition(): array
     {
+        $origin = $this->faker->randomElement(['motis', 'ourairports']);
+
         return [
             'location_id' => Location::factory()->create()->id,
             'identifier' => $this->faker->bothify('???-#####'),
-            'type' => $this->faker->randomElement(['IATA', 'ICAO', 'Custom']),
-            'origin' => $this->faker->randomElement(['osm', 'transitous']),
+            'type' => $origin === 'motis' ? 'stop' : $this->faker->randomElement(['IATA', 'ICAO', 'Custom']),
+            'origin' => $origin,
             'name' => $this->faker->city(),
         ];
     }

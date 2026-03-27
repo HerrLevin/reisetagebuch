@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Location;
+use App\Models\LocationIdentifier;
 use App\Models\TransportTrip;
 use App\Models\TransportTripStop;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -14,9 +15,13 @@ class TransportTripStopFactory extends Factory
 {
     public function definition(): array
     {
+        $location = Location::factory()->create();
+
+        LocationIdentifier::factory()->create(['location_id' => $location, 'origin' => 'motis', 'type' => 'stop']);
+
         return [
             'transport_trip_id' => TransportTrip::factory()->create()->id,
-            'location_id' => Location::factory()->create()->id,
+            'location_id' => $location->id,
             'arrival_time' => $this->faker->dateTimeBetween('-1 month', '+1 month'),
             'departure_time' => $this->faker->dateTimeBetween('-1 month', '+1 month'),
             'arrival_delay' => $this->faker->numberBetween(0, 3600),
