@@ -14,6 +14,7 @@ Route::middleware('cache.headers:public;max_age=2628000;etag')->get('/files/{pat
 })->where('path', '.*')->name('files.show');
 
 // SPA catch-all — must be last
+// Do not catch requests starting with "telescope" (Laravel Telescope routes)
 Route::get('/{any}', function () {
     return view('app');
-})->where('any', '.*');
+})->where('any', '^(?!telescope).*$');
