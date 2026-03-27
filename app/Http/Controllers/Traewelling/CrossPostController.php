@@ -191,7 +191,7 @@ class CrossPostController extends Controller
         $payload = $this->getUpdatePayload($post);
 
         $destinationStop = $post->transportPost->destinationStop;
-        $trwlDestinationIdentifier = $this->getTrwlStationIdentifier($destinationStop->location);
+        $trwlDestinationIdentifier = $this->getTraewellingStationIdentifier($destinationStop->location);
         if (! $trwlDestinationIdentifier) {
             Log::debug('Destination not found for exit change of post '.$postId);
 
@@ -218,7 +218,7 @@ class CrossPostController extends Controller
         ];
     }
 
-    private function getTrwlStationIdentifier(Location $location): ?LocationIdentifier
+    private function getTraewellingStationIdentifier(Location $location): ?LocationIdentifier
     {
         Log::debug('Getting TRWL-id for location '.$location->name, ['location_id' => $location->id]);
         $traewellingIdentifier = $location->identifiers->firstWhere('origin', 'traewelling') ?? null;
@@ -256,6 +256,11 @@ class CrossPostController extends Controller
         return null;
     }
 
+    private function getStationIdentifier(Location $location): ?LocationIdentifier
+    {
+        return $location->identifiers->firstWhere('origin', 'motis') ?? $location->identifiers->firstWhere('type', 'icao') ?? $location->identifiers->firstWhere('type', 'iata');
+    }
+
     /**
      * @throws GuzzleException
      * @throws Throwable
@@ -266,8 +271,8 @@ class CrossPostController extends Controller
         $originStop = $post->transportPost->originStop;
         $destinationStop = $post->transportPost->destinationStop;
 
-        $trwlOriginIdentifier = $this->getTrwlStationIdentifier($originStop->location);
-        $trwlDestinationIdentifier = $this->getTrwlStationIdentifier($destinationStop->location);
+        $trwlOriginIdentifier = $this->getTraewellingStationIdentifier($originStop->location);
+        $trwlDestinationIdentifier = $this->getTraewellingStationIdentifier($destinationStop->location);
         if (! $trwlOriginIdentifier || ! $trwlDestinationIdentifier) {
             throw new TraewellingLocationNotFound('Origin or destination departure board not found');
         }
@@ -317,7 +322,7 @@ class CrossPostController extends Controller
 
     private function createStopover(TransportTripStop $stop, ?Carbon $interpolatedDeparture = null, ?Carbon $interpolatedArrival = null): ?array
     {
-        $trwlStation = $this->getTrwlStationIdentifier($stop->location);
+        $trwlStation = $this->getStationIdentifier($stop->location);
         if (! $trwlStation) {
             Log::debug('Stopover station '.$stop->location->name.' not found');
 
@@ -389,8 +394,8 @@ class CrossPostController extends Controller
         $originStop = $post->transportPost->originStop;
         $destinationStop = $post->transportPost->destinationStop;
 
-        $trwlOriginIdentifier = $this->getTrwlStationIdentifier($originStop->location);
-        $trwlDestinationIdentifier = $this->getTrwlStationIdentifier($destinationStop->location);
+        $trwlOriginIdentifier = $this->getStationIdentifier($originStop->location);
+        $trwlDestinationIdentifier = $this->getStationIdentifier($destinationStop->location);
         if (! $trwlOriginIdentifier || ! $trwlDestinationIdentifier) {
             throw new TraewellingLocationNotFound('Origin or destination not found');
         }
@@ -417,10 +422,23 @@ class CrossPostController extends Controller
     ): ?array {
         $reason = $this->postMetaInfoRepository->getMetaInfoValue($post, MetaInfoKey::TRAVEL_REASON);
         $reason = TravelReason::tryFrom($reason) ?? TravelReason::LEISURE;
-        $body = [
+
+        if ($post->transportPost->transportTrip->provider === 'reisetagebuch') {
+            $append = [
+                'start' => $trwlOrigin->identifier,
+                'destination' => $trwlDestination->identifier,
+            ];
+        } else {
+            $append = [
+                'startIdentifier' => $trwlOrigin->identifier,
+                'startIdentifierType' => $trwlOrigin->type === 'stop' ? $trwlOrigin->origin : $trwlOrigin->type,
+                'destinationIdentifier' => $trwlDestination->identifier,
+                'destinationIdentifierType' => $trwlDestination->type === 'stop' ? $trwlDestination->origin : $trwlDestination->type,
+            ];
+        }
+
+        $body = array_merge([
             'body' => $post->body,
-            'start' => $trwlOrigin->identifier,
-            'destination' => $trwlDestination->identifier,
             'tripId' => $tripId ?? $post->transportPost->transportTrip->foreign_trip_id,
             'departure' => $post->transportPost->originStop->departure_time?->toIso8601String(),
             'arrival' => $post->transportPost->destinationStop->arrival_time?->toIso8601String(),
@@ -428,7 +446,8 @@ class CrossPostController extends Controller
             'visibility' => $post->visibility->getTraewellingVisibility(),
             'force' => $force,
             'business' => $reason->getTraewellingReasonIdentifier(),
-        ];
+        ], $append);
+
         try {
             Log::debug('Traewelling API checkin request', [
                 'post_id' => $post->id,

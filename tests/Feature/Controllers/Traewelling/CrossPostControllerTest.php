@@ -105,7 +105,7 @@ class CrossPostControllerTest extends TestCase
         $user = User::factory()->create();
         $post = Post::factory()->for($user)->create();
         $trip = TransportTrip::factory()->create(['provider' => 'transitous']);
-        TransportPost::factory()->create([
+        $transportPost = TransportPost::factory()->create([
             'post_id' => $post->id,
             'transport_trip_id' => $trip->id,
         ]);
@@ -119,13 +119,6 @@ class CrossPostControllerTest extends TestCase
         $mockResponse->shouldReceive('getBody->getContents')->andReturn(json_encode([
             'data' => ['status' => ['id' => 'trwl_trip_id']],
         ]));
-        $stationMockResponse = Mockery::mock(ResponseInterface::class);
-        $stationMockResponse->shouldReceive('getBody->getContents')->andReturn(json_encode([
-            'data' => [
-                'id' => 'trwl_station_id',
-                'name' => 'Idk station name',
-            ],
-        ]));
 
         $tagsMockResponse = Mockery::mock(ResponseInterface::class);
         $tagsMockResponse->shouldReceive('getBody->getContents')->andReturn(json_encode(['data' => []]));
@@ -133,25 +126,24 @@ class CrossPostControllerTest extends TestCase
         $mockClient = Mockery::mock(Client::class);
         $mockClient->shouldReceive('post')
             ->withArgs(
-                function ($url, $options) use ($post) {
+                function ($url, $options) use ($post, $transportPost) {
                     $json = $options['json'];
+
+                    $origin = $transportPost->originStop->location->identifiers->first();
+                    $destination = $transportPost->destinationStop->location->identifiers->first();
 
                     return $url === 'trains/checkin' &&
                         $json['body'] == $post->body &&
-                        $json['start'] == 'trwl_station_id' &&
-                        $json['destination'] == 'trwl_station_id' &&
+                        $json['startIdentifier'] == $origin->identifier &&
+                        $json['startIdentifierType'] == 'motis' &&
+                        $json['destinationIdentifier'] == $destination->identifier &&
+                        $json['destinationIdentifierType'] == 'motis' &&
                         $json['tripId'] == $post->transportPost->transportTrip->foreign_trip_id &&
                         $json['departure'] == $post->transportPost->originStop->departure_time?->toIso8601String() &&
                         $json['arrival'] == $post->transportPost->destinationStop->arrival_time?->toIso8601String();
                 }
             )
             ->andReturn($mockResponse);
-        $mockClient->shouldReceive('get')
-            ->withArgs(function ($url) {
-                return str_contains($url, 'trains/station/nearby');
-            })
-            ->twice()
-            ->andReturn($stationMockResponse);
 
         $mockClient->shouldReceive('get')
             ->with('status/trwl_trip_id/tags')
@@ -176,8 +168,10 @@ class CrossPostControllerTest extends TestCase
         $user = User::factory()->create();
         $post = Post::factory()->for($user)->create();
         $trip = TransportTrip::factory()->create(['provider' => 'reisetagebuch']);
-        $origin = TransportTripStop::factory()->create(['transport_trip_id' => $trip->id]);
-        $destination = TransportTripStop::factory()->create(['transport_trip_id' => $trip->id]);
+        $originLocation = Location::factory()->create();
+        $origin = TransportTripStop::factory()->create(['transport_trip_id' => $trip->id, 'location_id' => $originLocation->id]);
+        $destinationLocation = Location::factory()->create();
+        $destination = TransportTripStop::factory()->create(['transport_trip_id' => $trip->id, 'location_id' => $destinationLocation->id]);
         TransportPost::factory()->create([
             'post_id' => $post->id,
             'transport_trip_id' => $trip->id,
@@ -262,7 +256,7 @@ class CrossPostControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $post = Post::factory()->for($user)->create();
-        $trip = TransportTrip::factory()->create(['provider' => 'transitous']);
+        $trip = TransportTrip::factory()->create(['provider' => 'reisetagebuch']);
         TransportPost::factory()->create([
             'post_id' => $post->id,
             'transport_trip_id' => $trip->id,
@@ -293,7 +287,7 @@ class CrossPostControllerTest extends TestCase
 
         $job = new CrossPostController(new TraewellingRequestService($mockClient));
         $this->expectException(TraewellingLocationNotFound::class);
-        $this->expectExceptionMessage('Origin or destination not found');
+        $this->expectExceptionMessage('Origin or destination departure board not found');
         $job->crossCheckIn($post->id);
         $this->assertDatabaseMissing('post_meta_infos', [
             'post_id' => $post->id,
@@ -346,7 +340,7 @@ class CrossPostControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $post = Post::factory()->for($user)->create();
-        $trip = TransportTrip::factory()->create(['provider' => 'transitous']);
+        $trip = TransportTrip::factory()->create(['provider' => 'reisetagebuch']);
         $location = Location::factory()->create();
         LocationIdentifier::factory()->create([
             'location_id' => $location->id,
@@ -437,24 +431,10 @@ class CrossPostControllerTest extends TestCase
             'data' => ['status' => ['id' => 'trwl_trip_id']],
         ]));
 
-        $stationMockResponse = Mockery::mock(ResponseInterface::class);
-        $stationMockResponse->shouldReceive('getBody->getContents')->andReturn(json_encode([
-            'data' => [[
-                'id' => 'station_origin_id',
-                'name' => 'Idk station name',
-            ]],
-        ]));
-
         $tagsMockResponse = Mockery::mock(ResponseInterface::class);
         $tagsMockResponse->shouldReceive('getBody->getContents')->andReturn(json_encode(['data' => []]));
 
         $mockClient = Mockery::mock(Client::class);
-        $mockClient->shouldReceive('get')
-            ->withArgs(function ($msg, $options = []) {
-                return $msg == 'stations' && ($options['query']['identifier'] ?? '') === 'station_origin_id';
-            })
-            ->twice()
-            ->andReturn($stationMockResponse);
         $mockClient->shouldReceive('post')->andReturn($mockResponse);
 
         $mockClient->shouldReceive('get')
@@ -504,23 +484,8 @@ class CrossPostControllerTest extends TestCase
             ->once()
             ->andReturn($mockResponse);
 
-        $stationMockResponse = Mockery::mock(ResponseInterface::class);
-        $stationMockResponse->shouldReceive('getBody->getContents')->andReturn(json_encode([
-            'data' => [
-                'id' => 'station_origin_id',
-                'name' => 'Idk station name',
-            ],
-        ]));
-
         $tagsMockResponse = Mockery::mock(ResponseInterface::class);
         $tagsMockResponse->shouldReceive('getBody->getContents')->andReturn(json_encode(['data' => []]));
-
-        $mockClient->shouldReceive('get')
-            ->withArgs(function ($url) {
-                return str_contains($url, 'trains/station/nearby');
-            })
-            ->twice()
-            ->andReturn($stationMockResponse);
 
         $mockClient->shouldReceive('get')
             ->with('status/trwl_trip_id/tags')
@@ -574,23 +539,8 @@ class CrossPostControllerTest extends TestCase
         $mockClient = Mockery::mock(Client::class);
         $mockClient->shouldReceive('post')->andReturn($mockResponse);
 
-        $stationMockResponse = Mockery::mock(ResponseInterface::class);
-        $stationMockResponse->shouldReceive('getBody->getContents')->andReturn(json_encode([
-            'data' => [
-                'id' => 'station_origin_id',
-                'name' => 'Idk station name',
-            ],
-        ]));
-
         $tagsMockResponse = Mockery::mock(ResponseInterface::class);
         $tagsMockResponse->shouldReceive('getBody->getContents')->andReturn(json_encode(['data' => []]));
-
-        $mockClient->shouldReceive('get')
-            ->withArgs(function ($url) {
-                return str_contains($url, 'trains/station/nearby');
-            })
-            ->twice()
-            ->andReturn($stationMockResponse);
 
         $mockClient->shouldReceive('get')
             ->with('status/trwl_trip_id/tags')
