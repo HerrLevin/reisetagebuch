@@ -254,6 +254,7 @@ function blur() {
                                     startTime:
                                         post.originStop.arrivalTime ||
                                         post.originStop.departureTime,
+                                    stopId: post.destinationStop.id,
                                 },
                             }"
                         >

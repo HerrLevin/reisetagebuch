@@ -24,6 +24,7 @@ const tripId = ref<string>('');
 const startId = ref<string>('');
 const startTime = ref<string>('');
 const postId = ref<string>('');
+const stopId = ref<string>('');
 
 function updateUrlParams() {
     const queryParams = route.query;
@@ -31,7 +32,10 @@ function updateUrlParams() {
     startId.value = normalizeQueryParam(queryParams.startId) || '';
     startTime.value = normalizeQueryParam(queryParams.startTime) || '';
     postId.value = normalizeQueryParam(queryParams.postId) || '';
+    stopId.value = normalizeQueryParam(queryParams.stopId) || '';
     startTime.value = startTime.value.replaceAll(' ', '+');
+
+    console.log(stopId.value);
 
     loadStopovers();
 }
@@ -154,6 +158,7 @@ function getTitle() {
                     :mode="trip?.legs[0].mode"
                     :short-name="trip?.legs[0].routeShortName"
                     :real-time="trip?.legs[0].realTime"
+                    :selected="stopId == stopover.tripStopId"
                     @click="submit(stopover)"
                 />
             </ul>
