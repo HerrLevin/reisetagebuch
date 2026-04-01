@@ -2612,6 +2612,11 @@
                         "items": {
                             "$ref": "#/components/schemas/FeatureFlag"
                         }
+                    },
+                    "appVersion": {
+                        "description": "The version of the application",
+                        "type": "string",
+                        "example": "1.0.0"
                     }
                 },
                 "type": "object"
@@ -3775,21 +3780,21 @@
                     "name": {
                         "description": "The full name of the user",
                         "type": "string",
-                        "maxLength": 255,
-                        "example": "John Doe"
+                        "example": "John Doe",
+                        "maxLength": 255
                     },
                     "username": {
                         "description": "The unique username for the user (lowercase, alphanumeric, dashes, and underscores only)",
                         "type": "string",
-                        "maxLength": 30,
-                        "example": "john_doe"
+                        "example": "john_doe",
+                        "maxLength": 30
                     },
                     "email": {
                         "description": "The email address of the user (lowercase)",
                         "type": "string",
                         "format": "email",
-                        "maxLength": 255,
-                        "example": "mail@example.com"
+                        "example": "mail@example.com",
+                        "maxLength": 255
                     }
                 },
                 "type": "object"
@@ -3800,6 +3805,8 @@
                     "motisRadius": {
                         "description": "Radius for Motis suggestions in meters (allowed values: 50, 100, 200, 300, 400, 500)",
                         "type": "integer",
+                        "example": 100,
+                        "nullable": true,
                         "enum": [
                             50,
                             100,
@@ -3807,9 +3814,7 @@
                             300,
                             400,
                             500
-                        ],
-                        "example": 100,
-                        "nullable": true
+                        ]
                     }
                 },
                 "type": "object"
@@ -4004,15 +4009,15 @@
                     "bio": {
                         "description": "Biography of the user",
                         "type": "string",
-                        "maxLength": 500,
-                        "nullable": true
+                        "nullable": true,
+                        "maxLength": 500
                     },
                     "website": {
                         "description": "Website URL of the user",
                         "type": "string",
                         "format": "uri",
-                        "maxLength": 255,
-                        "nullable": true
+                        "nullable": true,
+                        "maxLength": 255
                     }
                 },
                 "type": "object"

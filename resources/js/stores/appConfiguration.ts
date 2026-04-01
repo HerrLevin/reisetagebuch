@@ -33,10 +33,20 @@ export const useAppConfigurationStore = defineStore('appConfiguration', () => {
         return checkFeature(Feature.Invite);
     };
 
+    const appName = () => {
+        return configuration.value?.appName || 'Reisetagebuch';
+    };
+
+    const appVersion = () => {
+        return configuration.value?.appVersion || '0.0.0';
+    };
+
     return {
         configuration,
         fetchConfig,
         canRegister,
         canInvite,
+        appName,
+        appVersion,
     };
 });

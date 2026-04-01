@@ -21,6 +21,12 @@ use OpenApi\Attributes as OA;
             type: 'array',
             items: new OA\Items(ref: '#/components/schemas/FeatureFlag'),
         ),
+        new OA\Property(
+            property: 'appVersion',
+            description: 'The version of the application',
+            type: 'string',
+            example: '1.0.0',
+        ),
     ],
 )]
 readonly class AppConfigurationDto
@@ -29,9 +35,7 @@ readonly class AppConfigurationDto
 
     public function __construct(
         public string $appName,
-        public string $reisetagebuchVersion,
-        public string $laravelVersion,
-        public string $phpVersion,
+        public string $appVersion,
         public array $featureFlags,
     ) {}
 }

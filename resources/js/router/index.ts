@@ -27,14 +27,15 @@ import ProfileShow from '@/Pages/Profile/Show.vue';
 import ProfileShowMap from '@/Pages/Profile/ShowMap.vue';
 import EditSettings from '@/Pages/Settings/Edit.vue';
 import CreateTrip from '@/Pages/Trips/Create.vue';
-import Welcome from '@/Pages/Welcome.vue';
 
 const routes: RouteRecordRaw[] = [
     {
         path: '/',
         name: 'welcome',
-        component: Welcome,
         meta: { guest: true },
+        redirect: () => {
+            return { path: '/login' };
+        },
     },
     {
         path: '/login',
