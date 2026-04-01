@@ -6,6 +6,7 @@ import BioText from '@/Pages/Profile/Partials/BioText.vue';
 import BottomInfo from '@/Pages/Profile/Partials/BottomInfo.vue';
 import ProfileMenu from '@/Pages/Profile/Partials/ProfileMenu.vue';
 import Statistics from '@/Pages/Profile/Partials/Statistics.vue';
+import ProfileHeaderSkeleton from '@/Pages/Profile/ProfileHeaderSkeleton.vue';
 import type { PropType } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { UserDto } from '../../../types/Api.gen';
@@ -48,6 +49,10 @@ defineProps({
             <BioText :user="user" />
             <BottomInfo :user="user" />
             <ProfileMenu :user="user" />
+        </div>
+
+        <div v-else class="mb-4 space-y-1 px-5">
+            <ProfileHeaderSkeleton />
         </div>
 
         <div class="card bg-base-100 min-w-full shadow-md">

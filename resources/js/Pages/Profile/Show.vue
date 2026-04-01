@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { api } from '@/api';
-import Loading from '@/Components/Loading.vue';
 import Post from '@/Components/Post/Post.vue';
+import PostSkeleton from '@/Components/Post/PostSkeleton.vue';
 import { useTitle } from '@/composables/useTitle';
 import ProfileWrapper from '@/Pages/Profile/ProfileWrapper.vue';
-import { ref, watchEffect } from 'vue';
+import { onMounted, ref, watchEffect } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { RouterLink } from 'vue-router';
 import {
@@ -21,7 +21,7 @@ const props = defineProps<{ username: string }>();
 const posts = ref<Array<BasePost | TransportPost | LocationPost>>([]);
 const nextCursor = ref<string | null>(null);
 const user = ref<UserDto | null>(null);
-const loading = ref(true);
+const loading = ref(false);
 const userLoading = ref(true);
 
 watchEffect(() => {
@@ -31,7 +31,7 @@ watchEffect(() => {
 });
 
 function loadProfileData() {
-    loading.value = true;
+    userLoading.value = true;
     try {
         api.profile.getProfile(props.username).then((response) => {
             user.value = response.data;
@@ -41,7 +41,7 @@ function loadProfileData() {
     } catch (error) {
         console.error('Error loading profile data:', error);
     } finally {
-        loading.value = false;
+        userLoading.value = false;
     }
 }
 
@@ -79,13 +79,15 @@ function deletePost(postId: string): void {
     }
 }
 
-loadProfileData();
+onMounted(() => {
+    loadProfileData();
+});
 </script>
 
 <template>
     <ProfileWrapper :user="user" @profile-updated="loadProfileData()">
         <div class="card bg-base-100 min-w-full shadow-md">
-            <ul v-if="posts.length > 0" class="list">
+            <ul class="list">
                 <li v-for="post in posts" :key="post.id">
                     <RouterLink
                         class="list-row hover-list-entry cursor-pointer"
@@ -97,6 +99,13 @@ loadProfileData();
                         ></Post>
                     </RouterLink>
                 </li>
+                <template v-if="loading">
+                    <li v-for="i in 10" :key="i">
+                        <div class="list-row">
+                            <PostSkeleton />
+                        </div>
+                    </li>
+                </template>
                 <li v-show="!loading && nextCursor" class="p-4 text-center">
                     <button class="btn btn-ghost w-full" @click="loadPosts()">
                         {{ t('common.load_more') }}
@@ -104,7 +113,6 @@ loadProfileData();
                 </li>
             </ul>
             <!--<InfiniteScroller :only="['posts']" />-->
-            <Loading v-if="loading" class="mx-auto my-4"></Loading>
         </div>
     </ProfileWrapper>
 </template>
