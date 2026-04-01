@@ -40,6 +40,7 @@ class UserHydratorTest extends TestCase
                 'statistics' => $stats,
                 'created_at' => new Carbon('2023-01-01'),
                 'is_followed' => true,
+                'is_follow_requested' => false,
                 default => null,
             };
         });
@@ -78,6 +79,7 @@ class UserHydratorTest extends TestCase
                 'statistics' => UserStatistics::factory()->make(),
                 'created_at' => new Carbon('2023-01-01'),
                 'is_followed' => true,
+                'is_follow_requested' => false,
                 default => null,
             };
         });

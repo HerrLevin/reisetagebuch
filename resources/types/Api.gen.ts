@@ -77,6 +77,7 @@ export enum NotificationType {
   PostLikedNotification = "PostLikedNotification",
   UserFollowedNotification = "UserFollowedNotification",
   TraewellingCrosspostFailedNotification = "TraewellingCrosspostFailedNotification",
+  UserRequestedFollowNotification = "UserRequestedFollowNotification",
 }
 
 export enum MotisLocationType {
@@ -526,8 +527,30 @@ export interface UserFollowedData {
    * @format uri
    */
   followerUserAvatarUrl: string;
-  /** Optional summary of the liked post */
-  postSummary?: string | null;
+}
+
+/** Data for a user requested follow notification */
+export interface UserRequestedFollowData {
+  /**
+   * ID of the user who followed you
+   * @format uuid
+   */
+  followerUserId: string;
+  /**
+   * Username of the user who followed you
+   * @example "johndoe"
+   */
+  followerUserName: string;
+  /**
+   * Display name of the user who followed you
+   * @example "John Doe"
+   */
+  followerUserDisplayName: string;
+  /**
+   * Avatar URL of the user who followed you
+   * @format uri
+   */
+  followerUserAvatarUrl: string;
 }
 
 /** A generic pagination DTO */
@@ -628,6 +651,11 @@ export interface UserSettingsDto {
    * @example 500
    */
   motisRadius: number | null;
+  /**
+   * Requires follow request
+   * @example true
+   */
+  requiresFollowRequest: boolean;
 }
 
 /** Request to upload an image */
@@ -672,6 +700,8 @@ export interface SettingsUpdateRequest {
    * @example 100
    */
   motisRadius?: 50 | 100 | 200 | 300 | 400 | 500 | null;
+  /** Requires following request */
+  requiresFollowRequest?: boolean | null;
 }
 
 export interface StoreInviteCodeRequest {
@@ -1064,6 +1094,10 @@ export interface UserDto {
   website: string | null;
   /** Indicates if the current user is following this user */
   isFollowed?: boolean;
+  /** Indicates if the current user has requested to follow this user */
+  isFollowRequested?: boolean;
+  /** Indicates if following this user requires approval */
+  requiresFollowRequest?: boolean;
   /** User Statistics Data Object */
   statistics: UserStatisticsDto;
   /**
@@ -1895,6 +1929,69 @@ export class Api<
     ) =>
       this.request<void, void>({
         path: `/users/${userId}/followers/${targetId}`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Approve a follow request between two users
+     *
+     * @tags Follows
+     * @name ApproveFollowRequest
+     * @summary Approve follow request
+     * @request PUT:/users/{userId}/follow-requests/{targetId}
+     * @secure
+     */
+    approveFollowRequest: (
+      userId: string,
+      targetId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, void>({
+        path: `/users/${userId}/follow-requests/${targetId}`,
+        method: "PUT",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Create a follow request between two users
+     *
+     * @tags Follows
+     * @name CreateFollowRequest
+     * @summary Create follow request
+     * @request POST:/users/{userId}/follow-requests/{targetId}
+     * @secure
+     */
+    createFollowRequest: (
+      userId: string,
+      targetId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, void>({
+        path: `/users/${userId}/follow-requests/${targetId}`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Delete a follow request between two users
+     *
+     * @tags Follows
+     * @name DeleteFollowRequest
+     * @summary Delete follow relationship
+     * @request DELETE:/users/{userId}/follow-requests/{targetId}
+     * @secure
+     */
+    deleteFollowRequest: (
+      userId: string,
+      targetId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, void>({
+        path: `/users/${userId}/follow-requests/${targetId}`,
         method: "DELETE",
         secure: true,
         ...params,

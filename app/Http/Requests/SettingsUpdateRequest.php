@@ -14,8 +14,14 @@ use OpenApi\Attributes as OA;
             property: 'motisRadius',
             description: 'Radius for Motis suggestions in meters (allowed values: 50, 100, 200, 300, 400, 500)',
             type: 'integer',
-            enum: [50, 100, 200, 300, 400, 500],
             example: 100,
+            nullable: true,
+            enum: [50, 100, 200, 300, 400, 500]
+        ),
+        new OA\Property(
+            property: 'requiresFollowRequest',
+            description: 'Requires following request',
+            type: 'boolean',
             nullable: true
         ),
     ]
@@ -29,6 +35,7 @@ class SettingsUpdateRequest extends FormRequest
     {
         return [
             'motisRadius' => ['nullable', 'integer', Rule::in([50, 100, 200, 300, 400, 500])],
+            'requiresFollowRequest' => ['nullable', 'boolean'],
         ];
     }
 }

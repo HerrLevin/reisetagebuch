@@ -24,6 +24,7 @@ class UserSettingsBackend extends Controller
         }
 
         $settings->motis_radius = $request->motisRadius;
+        $settings->requires_follow_request = $request->requiresFollowRequest;
 
         $settings->save();
     }

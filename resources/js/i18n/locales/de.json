@@ -21,6 +21,11 @@
         },
         "follower": {
             "lead": "{user} folgt dir jetzt"
+        },
+        "follow_request": {
+            "lead": "{user} möchte dir folgen",
+            "accept": "Anfrage akzeptieren",
+            "decline": "Anfrage ablehnen"
         }
     },
     "trip_details": {
@@ -198,6 +203,8 @@
         "header_image": "Kopfzeilenbild",
         "follow": "Folgen",
         "unfollow": "Entfolgen",
+        "request_follow": "Folgeanfrage senden",
+        "withdraw_follow_request": "Folgeanfrage zurückziehen",
         "menu": {
             "posts": "Beiträge",
             "map": "Karte"
@@ -246,7 +253,8 @@
             "radius_meters": "{meters} Meter",
             "departures": "Abfahrten",
             "locations": "Orte",
-            "text": "Text"
+            "text": "Text",
+            "requires_follow_request": "Nutzer müssen eine Anfrage senden, um dir folgen zu können"
         },
         "device_settings": {
             "title": "Geräteeinstellungen",

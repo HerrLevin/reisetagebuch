@@ -38,6 +38,7 @@ class User extends Authenticatable
     protected $appends = [
         'is_followed',
         'is_following',
+        'is_follow_requested',
     ];
 
     protected function casts(): array
@@ -113,6 +114,16 @@ class User extends Authenticatable
         return $this->hasMany(Follow::class, 'target_user_id');
     }
 
+    public function followerRequests(): HasMany
+    {
+        return $this->hasMany(FollowRequest::class, 'target_user_id');
+    }
+
+    public function followRequests(): HasMany
+    {
+        return $this->hasMany(FollowRequest::class, 'origin_user_id');
+    }
+
     public function getIsFollowedAttribute(): bool
     {
         $actingUser = Auth::guard('api')?->user();
@@ -125,5 +136,12 @@ class User extends Authenticatable
         $actingUser = Auth::guard('api')?->user();
 
         return $actingUser && $this->followings()->where('target_user_id', $actingUser->id)->exists();
+    }
+
+    public function getIsFollowRequestedAttribute(): bool
+    {
+        $actingUser = Auth::guard('api')?->user();
+
+        return $actingUser && $this->followerRequests()->where('origin_user_id', $actingUser->id)->exists();
     }
 }

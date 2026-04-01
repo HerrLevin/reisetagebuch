@@ -13,6 +13,7 @@ class UserSettings extends Model
     protected $fillable = [
         'user_id',
         'motis_radius',
+        'requires_follow_request',
     ];
 
     public function user(): BelongsTo

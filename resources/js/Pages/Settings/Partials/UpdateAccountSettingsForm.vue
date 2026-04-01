@@ -17,6 +17,7 @@ const recentlySuccessful = ref(false);
 
 const form = reactive({
     motisRadius: props.user.settings.motisRadius,
+    requiresFollowRequest: props.user.settings.requiresFollowRequest,
 });
 
 function formSubmit() {
@@ -112,6 +113,18 @@ function formSubmit() {
                         },
                     ]"
                 ></SelectInput>
+            </div>
+
+            <div>
+                <label>
+                    <input
+                        v-model="form.requiresFollowRequest"
+                        name="trackHistory"
+                        type="checkbox"
+                        class="toggle"
+                    />
+                    {{ t('settings.account_settings.requires_follow_request') }}
+                </label>
             </div>
 
             <div class="flex items-center gap-4">

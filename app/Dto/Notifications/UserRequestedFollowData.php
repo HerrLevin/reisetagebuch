@@ -5,8 +5,8 @@ namespace App\Dto\Notifications;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema(
-    schema: 'UserFollowedData',
-    description: 'Data for a user followed notification',
+    schema: 'UserRequestedFollowData',
+    description: 'Data for a user requested follow notification',
     required: [
         'followerUserId',
         'followerUserName',
@@ -40,7 +40,7 @@ use OpenApi\Attributes as OA;
         ),
     ]
 )]
-readonly class UserFollowedData
+readonly class UserRequestedFollowData
 {
     public function __construct(
         public string $followerUserId,

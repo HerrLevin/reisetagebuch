@@ -30,6 +30,8 @@ class UserHydrator
         $dto->bio = $user->profile?->bio;
         $dto->website = $user->profile?->website;
         $dto->isFollowed = $user->is_followed;
+        $dto->isFollowRequested = $user->is_follow_requested;
+        $dto->requiresFollowRequest = $user->settings?->requires_follow_request ?? false;
         $dto->statistics = $this->statisticsToDto($user->statistics);
         $dto->createdAt = $user->created_at->toIso8601String();
 
