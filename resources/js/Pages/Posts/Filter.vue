@@ -3,6 +3,7 @@ import { api } from '@/api';
 import Loading from '@/Components/Loading.vue';
 import MassEdit from '@/Components/Post/MassEdit.vue';
 import Post from '@/Components/Post/Post.vue';
+import PostSkeleton from '@/Components/Post/PostSkeleton.vue';
 import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { getTravelReasonLabel } from '@/Services/TravelReasonMapping';
@@ -445,6 +446,13 @@ function deletePost(postId: string): void {
                             @delete:post="deletePost(post.id)"
                         ></Post>
                     </li>
+                    <template v-if="loading">
+                        <li v-for="i in 10" :key="i">
+                            <div class="list-row">
+                                <PostSkeleton />
+                            </div>
+                        </li>
+                    </template>
                     <li
                         v-if="posts.length === 0 && !loading"
                         class="p-8 text-center"

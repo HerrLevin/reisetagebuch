@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { api } from '@/api';
-import Loading from '@/Components/Loading.vue';
 import Map from '@/Components/Map.vue';
 import Post from '@/Components/Post/Post.vue';
 import PostMetaInfo from '@/Components/Post/PostMetaInfo.vue';
+import PostSkeleton from '@/Components/Post/PostSkeleton.vue';
 import TransportPostStats from '@/Components/Post/TransportPostStats.vue';
 import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
@@ -224,10 +224,11 @@ function deleted() {
                 "
                 :progress="progress"
             ></Map>
+            <div v-if="loading" class="skeleton h-110 w-full" />
             <div class="p-4">
                 <ul class="list">
                     <li class="list-row">
-                        <Loading v-if="loading" class="mx-auto my-4" />
+                        <PostSkeleton v-if="loading" />
                         <Post
                             v-if="post"
                             :post
@@ -238,6 +239,9 @@ function deleted() {
                 </ul>
             </div>
         </div>
+
+        <div v-if="loading" class="skeleton my-5 h-20 w-full" />
+        <div v-if="loading" class="skeleton my-5 h-20 w-full" />
 
         <TransportPostStats
             v-if="isTransportPost(post)"

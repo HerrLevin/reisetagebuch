@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { api } from '@/api';
-import Loading from '@/Components/Loading.vue';
 import Post from '@/Components/Post/Post.vue';
+import PostSkeleton from '@/Components/Post/PostSkeleton.vue';
 import router from '@/router';
 import { ChevronsUpDown } from 'lucide-vue-next';
 import { ref } from 'vue';
@@ -83,6 +83,12 @@ loadPosts();
             {{ t('pages.timeline.no_followings') }}
             {{ t('pages.timeline.discover_followings') }}
         </li>
+        <template v-if="loading">
+            <li v-for="i in 10" v-show="loading" :key="i">
+                <div class="list-row">
+                    <PostSkeleton />
+                </div>
+            </li>
+        </template>
     </ul>
-    <Loading v-show="loading" class="m-4 mx-auto" />
 </template>
