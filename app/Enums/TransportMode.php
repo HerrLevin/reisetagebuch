@@ -96,4 +96,31 @@ enum TransportMode: string
             self::AREAL_LIFT => null,
         };
     }
+
+    public function getEmoji(): string
+    {
+        return match ($this) {
+            self::TRANSIT, self::FLEX => '🚍',
+            self::WALK => '🚶‍♂️',
+            self::BIKE => '🚴‍♂️',
+            self::RENTAL => '🚲',
+            self::CAR, self::CAR_DROPOFF => '🚗',
+            self::CAR_PARKING => '🅿️',
+            self::ODM, self::BUS, self::COACH => '🚌',
+            self::TRAM => '🚊',
+            self::SUBWAY => '🚇',
+            self::FERRY => '⛴️',
+            self::AIRPLANE => '✈️',
+            self::METRO, self::SUBURBAN => '🚉',
+            self::RAIL, self::REGIONAL_RAIL, self::REGIONAL_FAST_RAIL => '🚆',
+            self::HIGHSPEED_RAIL => '🚄',
+            self::LONG_DISTANCE => '🚅',
+            self::NIGHT_RAIL => '🌙',
+            self::CABLE_CAR => '🚠',
+            self::FUNICULAR => '🚞',
+            self::AERIAL_LIFT => '🚡',
+            self::AREAL_LIFT => '↕️',
+            default => '🫥',
+        };
+    }
 }
