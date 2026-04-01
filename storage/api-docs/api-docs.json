@@ -718,6 +718,125 @@
                 }
             }
         },
+        "/users/{userId}/follow-requests/{targetId}": {
+            "put": {
+                "tags": [
+                    "Follows"
+                ],
+                "summary": "Approve follow request",
+                "description": "Approve a follow request between two users",
+                "operationId": "approveFollowRequest",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "targetId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "successful operation"
+                    },
+                    "400": {
+                        "description": "Bad request, e.g. when trying to follow yourself"
+                    },
+                    "403": {
+                        "description": "Forbidden, e.g. when trying to follow on behalf of another user"
+                    },
+                    "404": {
+                        "description": "Not found, e.g. when the user or target user does not exist"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Follows"
+                ],
+                "summary": "Create follow request",
+                "description": "Create a follow request between two users",
+                "operationId": "createFollowRequest",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "targetId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "successful operation"
+                    },
+                    "400": {
+                        "description": "Bad request, e.g. when trying to follow yourself"
+                    },
+                    "403": {
+                        "description": "Forbidden, e.g. when trying to follow on behalf of another user"
+                    },
+                    "404": {
+                        "description": "Not found, e.g. when the user or target user does not exist"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Follows"
+                ],
+                "summary": "Delete follow relationship",
+                "description": "Delete a follow request between two users",
+                "operationId": "deleteFollowRequest",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "targetId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "successful operation"
+                    },
+                    "403": {
+                        "description": "Forbidden, e.g. when trying to follow on behalf of another user"
+                    },
+                    "404": {
+                        "description": "Not found, e.g. when the user or target user does not exist"
+                    }
+                }
+            }
+        },
         "/invites": {
             "get": {
                 "tags": [
@@ -3477,11 +3596,38 @@
                         "description": "Avatar URL of the user who followed you",
                         "type": "string",
                         "format": "uri"
-                    },
-                    "postSummary": {
-                        "description": "Optional summary of the liked post",
+                    }
+                },
+                "type": "object"
+            },
+            "UserRequestedFollowData": {
+                "description": "Data for a user requested follow notification",
+                "required": [
+                    "followerUserId",
+                    "followerUserName",
+                    "followerUserDisplayName",
+                    "followerUserAvatarUrl"
+                ],
+                "properties": {
+                    "followerUserId": {
+                        "description": "ID of the user who followed you",
                         "type": "string",
-                        "nullable": true
+                        "format": "uuid"
+                    },
+                    "followerUserName": {
+                        "description": "Username of the user who followed you",
+                        "type": "string",
+                        "example": "johndoe"
+                    },
+                    "followerUserDisplayName": {
+                        "description": "Display name of the user who followed you",
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "followerUserAvatarUrl": {
+                        "description": "Avatar URL of the user who followed you",
+                        "type": "string",
+                        "format": "uri"
                     }
                 },
                 "type": "object"
@@ -3660,7 +3806,8 @@
                 "title": "User Settings DTO",
                 "description": "Data Transfer Object representing user settings",
                 "required": [
-                    "motisRadius"
+                    "motisRadius",
+                    "requiresFollowRequest"
                 ],
                 "properties": {
                     "motisRadius": {
@@ -3668,6 +3815,11 @@
                         "type": "integer",
                         "example": 500,
                         "nullable": true
+                    },
+                    "requiresFollowRequest": {
+                        "description": "Requires follow request",
+                        "type": "boolean",
+                        "example": true
                     }
                 },
                 "type": "object"
@@ -3678,7 +3830,8 @@
                 "enum": [
                     "PostLikedNotification",
                     "UserFollowedNotification",
-                    "TraewellingCrosspostFailedNotification"
+                    "TraewellingCrosspostFailedNotification",
+                    "UserRequestedFollowNotification"
                 ]
             },
             "Feature": {
@@ -3815,6 +3968,11 @@
                             400,
                             500
                         ]
+                    },
+                    "requiresFollowRequest": {
+                        "description": "Requires following request",
+                        "type": "boolean",
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -4557,6 +4715,14 @@
                     },
                     "isFollowed": {
                         "description": "Indicates if the current user is following this user",
+                        "type": "boolean"
+                    },
+                    "isFollowRequested": {
+                        "description": "Indicates if the current user has requested to follow this user",
+                        "type": "boolean"
+                    },
+                    "requiresFollowRequest": {
+                        "description": "Indicates if following this user requires approval",
                         "type": "boolean"
                     },
                     "statistics": {

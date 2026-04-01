@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import NotificationLayout from '@/Pages/Notifications/Partials/NotificationLayout.vue';
-import { Heart } from 'lucide-vue-next';
+import { UserPlus } from 'lucide-vue-next';
 import { PropType } from 'vue';
 import { useI18n } from 'vue-i18n';
 import {
@@ -22,7 +22,7 @@ const data = props.notification.data as UserFollowedData;
 <template>
     <NotificationLayout :notification="notification">
         <div>
-            <Heart class="fill-red-500 text-red-500"></Heart>
+            <UserPlus></UserPlus>
         </div>
         <div class="flex-1">
             <div class="text-sm">

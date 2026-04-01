@@ -136,10 +136,137 @@ class FollowController extends Controller
     {
         try {
             $this->backend->deleteFollow($userId, $targetId, $this->auth->user());
+
+            return response(null, 204);
         } catch (InsufficientRightsException $e) {
             abort(403, $e->getMessage());
         }
+    }
 
-        return response(null, 204);
+    public function getFollowRequests(string $userId): array
+    {
+        try {
+            return $this->backend->getFollowRequests($userId, $this->auth->user());
+        } catch (InsufficientRightsException $e) {
+            abort(403, $e->getMessage());
+        }
+    }
+
+    #[OA\Post(
+        path: '/users/{userId}/follow-requests/{targetId}',
+        operationId: 'createFollowRequest',
+        description: 'Create a follow request between two users',
+        summary: 'Create follow request',
+        tags: ['Follows'],
+        parameters: [
+            new OA\Parameter(name: 'userId', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'targetId', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
+        ],
+        responses: [
+            new OA\Response(
+                response: 201,
+                description: Controller::OA_DESC_SUCCESS
+            ),
+            new OA\Response(
+                response: 400,
+                description: 'Bad request, e.g. when trying to follow yourself'
+            ),
+            new OA\Response(
+                response: 403,
+                description: 'Forbidden, e.g. when trying to follow on behalf of another user'
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'Not found, e.g. when the user or target user does not exist'
+            ),
+        ]
+    )]
+    public function createFollowRequest(string $userId, string $targetId): ResponseFactory|Response
+    {
+        try {
+            $this->backend->createFollowRequest($userId, $targetId, $this->auth->user());
+
+            return response(null, 204);
+        } catch (ConflictException $e) {
+            abort(400, $e->getMessage());
+        } catch (InsufficientRightsException $e) {
+            abort(403, $e->getMessage());
+        }
+    }
+
+    #[OA\Delete(
+        path: '/users/{userId}/follow-requests/{targetId}',
+        operationId: 'deleteFollowRequest',
+        description: 'Delete a follow request between two users',
+        summary: 'Delete follow relationship',
+        tags: ['Follows'],
+        parameters: [
+            new OA\Parameter(name: 'userId', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'targetId', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
+        ],
+        responses: [
+            new OA\Response(
+                response: 204,
+                description: Controller::OA_DESC_SUCCESS
+            ),
+            new OA\Response(
+                response: 403,
+                description: 'Forbidden, e.g. when trying to follow on behalf of another user'
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'Not found, e.g. when the user or target user does not exist'
+            ),
+        ]
+    )]
+    public function deleteFollowRequest(string $userId, string $targetId): Response
+    {
+        try {
+            $this->backend->deleteFollowRequest($userId, $targetId, $this->auth->user());
+
+            return response(null, 204);
+        } catch (InsufficientRightsException $e) {
+            abort(403, $e->getMessage());
+        }
+    }
+
+    #[OA\Put(
+        path: '/users/{userId}/follow-requests/{targetId}',
+        operationId: 'approveFollowRequest',
+        description: 'Approve a follow request between two users',
+        summary: 'Approve follow request',
+        tags: ['Follows'],
+        parameters: [
+            new OA\Parameter(name: 'userId', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'targetId', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
+        ],
+        responses: [
+            new OA\Response(
+                response: 201,
+                description: Controller::OA_DESC_SUCCESS
+            ),
+            new OA\Response(
+                response: 400,
+                description: 'Bad request, e.g. when trying to follow yourself'
+            ),
+            new OA\Response(
+                response: 403,
+                description: 'Forbidden, e.g. when trying to follow on behalf of another user'
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'Not found, e.g. when the user or target user does not exist'
+            ),
+        ]
+    )]
+    public function approveFollowRequest(string $userId, string $targetId): Response
+    {
+        try {
+            $this->backend->approveFollowRequest($userId, $targetId, $this->auth->user());
+
+            return response(null, 204);
+        } catch (InsufficientRightsException $e) {
+            abort(403, $e->getMessage());
+        }
     }
 }

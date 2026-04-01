@@ -7,6 +7,7 @@ namespace App\Repositories;
 use App\Http\Resources\UserDto;
 use App\Hydrators\UserHydrator;
 use App\Models\Follow;
+use App\Models\FollowRequest;
 use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -43,6 +44,13 @@ class FollowRepository
         return $followers->map(fn (User $user) => $this->userHydrator->modelToDto($user))->toArray();
     }
 
+    public function getFollowRequests(string $userId): array
+    {
+        $followers = User::findOrFail($userId)->followings()->with('originUser')->get()->pluck('originUser');
+
+        return $followers->map(fn (User $user) => $this->userHydrator->modelToDto($user))->toArray();
+    }
+
     /**
      * @throws ModelNotFoundException<User>
      */
@@ -52,6 +60,22 @@ class FollowRepository
             'origin_user_id' => $originUser->id,
             'target_user_id' => $targetUser->id,
         ])->id;
+    }
+
+    public function createFollowRequest(UserDto $originUser, UserDto $targetUser): string
+    {
+        return FollowRequest::create([
+            'origin_user_id' => $originUser->id,
+            'target_user_id' => $targetUser->id,
+        ])->id;
+    }
+
+    public function deleteFollowRequest(UserDto $originUser, UserDto $targetUser): string
+    {
+        $request = FollowRequest::where('origin_user_id', $originUser->id)->where('target_user_id', $targetUser->id)->firstOrFail();
+        $request->delete();
+
+        return $request->id;
     }
 
     public function deleteFollow(string $originUserId, string $targetUserId): string

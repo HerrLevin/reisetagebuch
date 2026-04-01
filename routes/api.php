@@ -40,6 +40,12 @@ Route::prefix('users')->group(function () {
             Route::get('/', [FollowController::class, 'getFollowings'])->name('profile.followings');
             Route::delete('/{targetId}', [FollowController::class, 'deleteFollow'])->name('profile.remove-follower');
         });
+        Route::prefix('follow-requests')->group(function () {
+            Route::get('/', [FollowController::class, 'getFollowRequests'])->name('profile.followrequests');
+            Route::post('/{targetId}', [FollowController::class, 'createFollowRequest'])->name('profile.followrequest');
+            Route::put('/{targetId}', [FollowController::class, 'approveFollowRequest'])->name('profile.followrequest.update');
+            Route::delete('/{targetId}', [FollowController::class, 'deleteFollowRequest'])->name('profile.unfollowrequest');
+        });
     });
 });
 

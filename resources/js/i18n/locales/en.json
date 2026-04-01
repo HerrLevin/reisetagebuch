@@ -21,6 +21,11 @@
         },
         "follower": {
             "lead": "{user} started following you"
+        },
+        "follow_request": {
+            "lead": "{user} requested to follow you",
+            "accept": "Accept",
+            "decline": "Decline"
         }
     },
     "trip_details": {
@@ -200,6 +205,8 @@
         "header_image": "Header Image",
         "follow": "Follow",
         "unfollow": "Unfollow",
+        "request_follow": "Request to Follow",
+        "withdraw_follow_request": "Withdraw Follow Request",
         "menu": {
             "posts": "Posts",
             "map": "Map"
@@ -248,7 +255,8 @@
             "radius_meters": "{meters} meters",
             "departures": "Departures",
             "locations": "Locations",
-            "text": "Text"
+            "text": "Text",
+            "requires_follow_request": "Users have to make a request to follow you"
         },
         "device_settings": {
             "title": "Device Settings",

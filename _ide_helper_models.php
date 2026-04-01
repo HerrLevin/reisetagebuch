@@ -35,6 +35,17 @@ namespace App\Models{
 
 namespace App\Models{
 /**
+ * @property-read \App\Models\User|null $originUser
+ * @property-read \App\Models\User|null $targetUser
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FollowRequest newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FollowRequest newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FollowRequest query()
+ */
+	class FollowRequest extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
  * @property string $id
  * @property string $user_id
  * @property string $value
@@ -546,10 +557,15 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Passport\Client> $clients
  * @property-read int|null $clients_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\FollowRequest> $followRequests
+ * @property-read int|null $follow_requests_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\FollowRequest> $followerRequests
+ * @property-read int|null $follower_requests_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Follow> $followers
  * @property-read int|null $followers_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Follow> $followings
  * @property-read int|null $followings_count
+ * @property-read bool $is_follow_requested
  * @property-read bool $is_followed
  * @property-read bool $is_following
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\HashTag> $hashTags

@@ -41,6 +41,12 @@ class UserDto
     #[OA\Property('isFollowed', description: 'Indicates if the current user is following this user', type: 'boolean')]
     public bool $isFollowed = false;
 
+    #[OA\Property('isFollowRequested', description: 'Indicates if the current user has requested to follow this user', type: 'boolean')]
+    public bool $isFollowRequested = false;
+
+    #[OA\Property('requiresFollowRequest', description: 'Indicates if following this user requires approval', type: 'boolean')]
+    public bool $requiresFollowRequest = false;
+
     #[OA\Property(ref: '#/components/schemas/UserStatisticsDto')]
     public UserStatisticsDto $statistics;
 
