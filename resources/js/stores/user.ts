@@ -33,10 +33,15 @@ export const useUserStore = defineStore(
             user.value = null;
         };
 
+        const isAuthenticated = () => {
+            return !!user.value;
+        };
+
         return {
             user,
             fetchUser,
             invalidateUser,
+            isAuthenticated,
         };
     },
     {

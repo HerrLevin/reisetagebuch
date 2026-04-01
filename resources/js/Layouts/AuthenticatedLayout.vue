@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Dock from '@/Layouts/Partials/Dock.vue';
+import Footer from '@/Layouts/Partials/Footer.vue';
 import LocationHistoryChecker from '@/Layouts/Partials/LocationHistoryChecker.vue';
 import NavBar from '@/Layouts/Partials/NavBar.vue';
 import SideNav from '@/Layouts/Partials/SideNav.vue';
@@ -31,6 +32,7 @@ import SideNav from '@/Layouts/Partials/SideNav.vue';
                 </div>
             </div>
         </div>
+        <Footer />
         <Dock class="flex md:hidden" />
         <LocationHistoryChecker />
     </div>

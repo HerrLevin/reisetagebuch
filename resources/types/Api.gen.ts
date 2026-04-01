@@ -93,6 +93,11 @@ export interface AppConfigurationDto {
   appName: string;
   /** List of feature flags and their statuses */
   featureFlags: FeatureFlag[];
+  /**
+   * The version of the application
+   * @example "1.0.0"
+   */
+  appVersion?: string;
 }
 
 /**

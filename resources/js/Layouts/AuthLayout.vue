@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
+import Footer from '@/Layouts/Partials/Footer.vue';
+import { useAppConfigurationStore } from '@/stores/appConfiguration';
+const config = useAppConfigurationStore();
+config.fetchConfig();
 </script>
 
 <template>
@@ -17,7 +21,7 @@ import ApplicationLogo from '@/Components/ApplicationLogo.vue';
                             background-position: center;
                         "
                     >
-                        <div class="hero-content py-12">
+                        <div class="hero-content py-12 text-shadow-md">
                             <div class="max-w-md">
                                 <h1
                                     class="text-center text-3xl font-bold text-white mix-blend-difference"
@@ -25,8 +29,11 @@ import ApplicationLogo from '@/Components/ApplicationLogo.vue';
                                     <ApplicationLogo
                                         class="inline-block h-12 w-12 fill-current"
                                     />
-                                    &nbsp; Reisetagebuch
+                                    &nbsp; {{ config.appName() }}
                                 </h1>
+                                <h5 class="text-center">
+                                    {{ config.appVersion() }}
+                                </h5>
                             </div>
                         </div>
                     </div>
@@ -37,4 +44,5 @@ import ApplicationLogo from '@/Components/ApplicationLogo.vue';
             </div>
         </div>
     </div>
+    <Footer />
 </template>

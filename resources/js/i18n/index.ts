@@ -6,6 +6,5 @@ export type MessageSchema = typeof en;
 
 export default createI18n({
     legacy: false,
-    fallbackLocale: 'en',
     messages: { en, de },
 });
