@@ -12,10 +12,12 @@
     ],
     "require": {
         "php": "^8.4",
+        "ext-openssl": "*",
         "ext-pdo": "*",
         "ext-simplexml": "*",
         "clickbar/laravel-magellan": "^2.0",
         "darkaonline/l5-swagger": "^11.0",
+        "landrok/activitypub": "^0.8.1",
         "laravel/framework": "^13.0",
         "laravel/passport": "^13.4",
         "laravel/socialite": "^5.23",

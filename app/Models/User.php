@@ -22,6 +22,8 @@ class User extends Authenticatable
         'username',
         'email',
         'password',
+        'public_key',
+        'private_key',
     ];
 
     protected $hidden = [
@@ -149,5 +151,30 @@ class User extends Authenticatable
         $actingUser = Auth::guard('api')?->user();
 
         return $actingUser && $this->followerRequests()->where('origin_user_id', $actingUser->id)->exists();
+    }
+
+    public function createKeys(): void
+    {
+        if ($this->private_key && $this->public_key) {
+            return;
+        }
+
+        $config = [
+            'private_key_bits' => 2048,
+            'private_key_type' => OPENSSL_KEYTYPE_RSA,
+        ];
+        $keyPair = openssl_pkey_new($config);
+        openssl_pkey_export($keyPair, $privateKey);
+        $publicKey = openssl_pkey_get_details($keyPair)['key'];
+
+        $this->private_key = $privateKey;
+        $this->public_key = $publicKey;
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function (User $user) {
+            $user->createKeys();
+        });
     }
 }
