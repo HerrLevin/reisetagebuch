@@ -105,4 +105,18 @@ class TransportPost extends BasePost
             $this->userGeometry = (new GeojsonGenerator)->generate($post->transportPost->user_geometry);
         }
     }
+
+    public function getBody(): ?string
+    {
+        $parentBody = parent::getBody();
+        $emoji = $this->trip->mode?->getEmoji();
+        $line = $this->trip->lineName;
+        $origin = $this->originStop->name;
+        $destination = $this->destinationStop->name;
+        $duration = round($this->duration / 60);
+        $distance = round($this->distance / 1000, 1);
+        $body = "<p>$emoji<strong>$line</strong> · $origin → $destination<br>🕐 $duration min · $distance km</p>";
+
+        return $parentBody ? nl2br(e($parentBody)).$body : $body;
+    }
 }
