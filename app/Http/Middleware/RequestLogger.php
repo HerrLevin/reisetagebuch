@@ -14,6 +14,10 @@ class RequestLogger
      */
     public function handle(Request $request, Closure $next): Response
     {
+        if (! config('app.debug')) {
+            return $next($request);
+        }
+
         try {
             $data = [
                 'method' => $request->method(),
