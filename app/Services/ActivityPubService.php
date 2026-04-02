@@ -2,13 +2,14 @@
 
 namespace App\Services;
 
+use App\Http\Resources\UserDto;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class ActivityPubService
 {
-    public function deliverActivity(User $user, string $followerActorId, array $activity): void
+    public function deliverActivity(UserDto $user, string $followerActorId, array $activity): void
     {
         Log::info('Deliver Activity for actor: '.$followerActorId);
         // Fetch the follower's actor to get their inbox
@@ -63,14 +64,16 @@ class ActivityPubService
         }
     }
 
-    private function createSignature(User $user, string $method, string $path, string $host, string $date, string $digest): string
+    private function createSignature(UserDto $user, string $method, string $path, string $host, string $date, string $digest): string
     {
         $keyId = url('/users/'.$user->username.'#main-key');
         $headers = '(request-target) host date digest';
         $stringToSign = '(request-target): '.strtolower($method)." {$path}\nhost: {$host}\ndate: {$date}\ndigest: {$digest}";
 
+        $userModel = User::whereId($user->id)->first();
+
         $signature = '';
-        openssl_sign($stringToSign, $signature, $user->private_key, OPENSSL_ALGO_SHA256);
+        openssl_sign($stringToSign, $signature, $userModel->private_key, OPENSSL_ALGO_SHA256);
 
         return 'keyId="'.$keyId.'",algorithm="rsa-sha256",headers="'.$headers.'",signature="'.base64_encode($signature).'"';
     }
