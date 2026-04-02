@@ -67,7 +67,7 @@ class InboxController extends Controller
         // Send Accept
         $accept = [
             '@context' => 'https://www.w3.org/ns/activitystreams',
-            'id' => url("/ap/users/{$user->username}") . '#accept-' . $follower->id,
+            'id' => url("/ap/users/{$user->username}").'#accept-'.$follower->id,
             'type' => 'Accept',
             'actor' => url("/ap/users/{$user->username}"),
             'object' => $payload,
@@ -257,7 +257,7 @@ class InboxController extends Controller
     {
         // Check if URL matches our post pattern /ap/posts/{id}
         $appUrl = rtrim(config('app.url'), '/');
-        $prefix = $appUrl . '/ap/posts/';
+        $prefix = $appUrl.'/ap/posts/';
 
         if (str_starts_with($url, $prefix)) {
             $postId = substr($url, strlen($prefix));

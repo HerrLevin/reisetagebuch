@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { api } from '@/api';
-import ActivityPubInteractions from '@/Components/Post/ActivityPubInteractions.vue';
 import Map from '@/Components/Map.vue';
+import ActivityPubInteractions from '@/Components/Post/ActivityPubInteractions.vue';
 import Post from '@/Components/Post/Post.vue';
 import PostMetaInfo from '@/Components/Post/PostMetaInfo.vue';
 import PostSkeleton from '@/Components/Post/PostSkeleton.vue';

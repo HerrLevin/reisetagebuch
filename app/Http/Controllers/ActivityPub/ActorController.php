@@ -74,7 +74,7 @@ class ActorController extends Controller
             $note = $this->activityPubService->buildNote($post);
             $items[] = [
                 '@context' => 'https://www.w3.org/ns/activitystreams',
-                'id' => url("/ap/posts/{$post->id}") . '#create',
+                'id' => url("/ap/posts/{$post->id}").'#create',
                 'type' => 'Create',
                 'actor' => url("/ap/users/{$user->username}"),
                 'published' => $post->published_at->toIso8601String(),
@@ -93,7 +93,7 @@ class ActorController extends Controller
         ];
 
         if ($posts->nextCursor()) {
-            $collection['next'] = $outboxUrl . '?cursor=' . $posts->nextCursor()->encode();
+            $collection['next'] = $outboxUrl.'?cursor='.$posts->nextCursor()->encode();
         }
 
         return response()->json($collection, 200, [

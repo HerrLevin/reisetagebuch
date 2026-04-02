@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { api } from '@/api';
 import type { ActivityPubRemoteInteractions } from '@/types/activitypub';
 import { Heart, MessageCircle, Repeat2 } from 'lucide-vue-next';
 import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { api } from '@/api';
 
 const { t } = useI18n();
 
@@ -36,7 +36,12 @@ onMounted(fetchInteractions);
 
 <template>
     <div
-        v-if="interactions && (interactions.likes > 0 || interactions.boosts > 0 || interactions.replies.length > 0)"
+        v-if="
+            interactions &&
+            (interactions.likes > 0 ||
+                interactions.boosts > 0 ||
+                interactions.replies.length > 0)
+        "
         class="card bg-base-100 mt-4 shadow-md"
     >
         <div class="card-body">
@@ -45,13 +50,25 @@ onMounted(fetchInteractions);
             </h3>
 
             <div class="flex gap-4 text-sm">
-                <div v-if="interactions.likes > 0" class="flex items-center gap-1">
+                <div
+                    v-if="interactions.likes > 0"
+                    class="flex items-center gap-1"
+                >
                     <Heart class="h-4 w-4 fill-red-500 text-red-500" />
-                    <span>{{ interactions.likes }} {{ t('activitypub.likes', interactions.likes) }}</span>
+                    <span
+                        >{{ interactions.likes }}
+                        {{ t('activitypub.likes', interactions.likes) }}</span
+                    >
                 </div>
-                <div v-if="interactions.boosts > 0" class="flex items-center gap-1">
+                <div
+                    v-if="interactions.boosts > 0"
+                    class="flex items-center gap-1"
+                >
                     <Repeat2 class="h-4 w-4 text-green-500" />
-                    <span>{{ interactions.boosts }} {{ t('activitypub.boosts', interactions.boosts) }}</span>
+                    <span
+                        >{{ interactions.boosts }}
+                        {{ t('activitypub.boosts', interactions.boosts) }}</span
+                    >
                 </div>
             </div>
 
@@ -64,7 +81,7 @@ onMounted(fetchInteractions);
                     <li
                         v-for="reply in interactions.replies"
                         :key="reply.id"
-                        class="rounded-lg bg-base-200 p-3"
+                        class="bg-base-200 rounded-lg p-3"
                     >
                         <div class="flex items-start gap-2">
                             <div class="avatar">
@@ -78,9 +95,14 @@ onMounted(fetchInteractions);
                             </div>
                             <div class="flex-1">
                                 <div class="text-sm font-medium">
-                                    {{ reply.actorDisplayName || reply.actorUsername }}
+                                    {{
+                                        reply.actorDisplayName ||
+                                        reply.actorUsername
+                                    }}
                                     <span class="font-normal opacity-60">
-                                        @{{ reply.actorUsername }}@{{ reply.actorInstance }}
+                                        @{{ reply.actorUsername }}@{{
+                                            reply.actorInstance
+                                        }}
                                     </span>
                                 </div>
                                 <div
@@ -88,8 +110,14 @@ onMounted(fetchInteractions);
                                     class="mt-1 text-sm"
                                     v-html="reply.content"
                                 ></div>
-                                <div class="mt-1 flex items-center gap-2 text-xs opacity-40">
-                                    <span>{{ new Date(reply.createdAt).toLocaleString() }}</span>
+                                <div
+                                    class="mt-1 flex items-center gap-2 text-xs opacity-40"
+                                >
+                                    <span>{{
+                                        new Date(
+                                            reply.createdAt,
+                                        ).toLocaleString()
+                                    }}</span>
                                     <a
                                         v-if="reply.remoteUrl"
                                         :href="reply.remoteUrl"

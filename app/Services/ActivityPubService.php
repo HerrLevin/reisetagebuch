@@ -19,7 +19,7 @@ class ActivityPubService
         $host = $parsed['host'];
         $path = $parsed['path'] ?? '/';
         $date = gmdate('D, d M Y H:i:s \G\M\T');
-        $digest = 'SHA-256=' . base64_encode(hash('sha256', $body, true));
+        $digest = 'SHA-256='.base64_encode(hash('sha256', $body, true));
 
         $signingString = "(request-target): post {$path}\nhost: {$host}\ndate: {$date}\ndigest: {$digest}";
 
@@ -75,15 +75,15 @@ class ActivityPubService
         $signingParts = [];
         foreach ($headers as $header) {
             if ($header === '(request-target)') {
-                $signingParts[] = '(request-target): ' . strtolower($request->method()) . ' ' . $request->getRequestUri();
+                $signingParts[] = '(request-target): '.strtolower($request->method()).' '.$request->getRequestUri();
             } elseif ($header === 'host') {
-                $signingParts[] = 'host: ' . $request->header('Host');
+                $signingParts[] = 'host: '.$request->header('Host');
             } elseif ($header === 'date') {
-                $signingParts[] = 'date: ' . $request->header('Date');
+                $signingParts[] = 'date: '.$request->header('Date');
             } elseif ($header === 'digest') {
-                $signingParts[] = 'digest: ' . $request->header('Digest');
+                $signingParts[] = 'digest: '.$request->header('Digest');
             } else {
-                $signingParts[] = $header . ': ' . $request->header(str_replace('-', ' ', ucwords($header, '-')));
+                $signingParts[] = $header.': '.$request->header(str_replace('-', ' ', ucwords($header, '-')));
             }
         }
 
@@ -127,13 +127,13 @@ class ActivityPubService
 
         $contentParts = [];
         if ($post->body) {
-            $contentParts[] = '<p>' . e($post->body) . '</p>';
+            $contentParts[] = '<p>'.e($post->body).'</p>';
         }
 
         if ($post->locationPost && $post->locationPost->location) {
             $locationName = $post->locationPost->location->name ?? '';
             if ($locationName) {
-                $contentParts[] = '<p>📍 ' . e($locationName) . '</p>';
+                $contentParts[] = '<p>📍 '.e($locationName).'</p>';
             }
         }
 
@@ -141,11 +141,11 @@ class ActivityPubService
             $origin = $post->transportPost->originStop?->location?->name ?? '';
             $destination = $post->transportPost->destinationStop?->location?->name ?? '';
             if ($origin && $destination) {
-                $contentParts[] = '<p>🚆 ' . e($origin) . ' → ' . e($destination) . '</p>';
+                $contentParts[] = '<p>🚆 '.e($origin).' → '.e($destination).'</p>';
             }
         }
 
-        $contentParts[] = '<p><a href="' . e($postWebUrl) . '">' . e($postWebUrl) . '</a></p>';
+        $contentParts[] = '<p><a href="'.e($postWebUrl).'">'.e($postWebUrl).'</a></p>';
 
         $content = implode("\n", $contentParts);
 
@@ -179,7 +179,7 @@ class ActivityPubService
 
         return [
             '@context' => 'https://www.w3.org/ns/activitystreams',
-            'id' => url("/ap/posts/{$post->id}") . '#create',
+            'id' => url("/ap/posts/{$post->id}").'#create',
             'type' => 'Create',
             'actor' => url("/ap/users/{$user->username}"),
             'published' => $post->published_at->toIso8601String(),
@@ -196,7 +196,7 @@ class ActivityPubService
 
         return [
             '@context' => 'https://www.w3.org/ns/activitystreams',
-            'id' => url("/ap/posts/{$post->id}") . '#update-' . now()->timestamp,
+            'id' => url("/ap/posts/{$post->id}").'#update-'.now()->timestamp,
             'type' => 'Update',
             'actor' => url("/ap/users/{$user->username}"),
             'to' => $note['to'],
@@ -212,7 +212,7 @@ class ActivityPubService
 
         return [
             '@context' => 'https://www.w3.org/ns/activitystreams',
-            'id' => url("/ap/posts/{$post->id}") . '#delete',
+            'id' => url("/ap/posts/{$post->id}").'#delete',
             'type' => 'Delete',
             'actor' => url("/ap/users/{$user->username}"),
             'to' => ['https://www.w3.org/ns/activitystreams#Public'],

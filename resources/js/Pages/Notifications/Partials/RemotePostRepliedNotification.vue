@@ -40,7 +40,10 @@ const data = props.notification.data as unknown as RemotePostRepliedData;
                     })
                 }}
             </div>
-            <div v-if="data.replyContent" class="line-clamp-1 text-xs opacity-60">
+            <div
+                v-if="data.replyContent"
+                class="line-clamp-1 text-xs opacity-60"
+            >
                 {{ data.replyContent }}
             </div>
             <div class="mt-1 text-xs opacity-40">

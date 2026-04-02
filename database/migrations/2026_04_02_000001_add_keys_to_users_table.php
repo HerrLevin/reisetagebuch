@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -14,7 +15,7 @@ return new class extends Migration
         });
 
         // Generate RSA-2048 key pairs for all existing users
-        $users = \App\Models\User::whereNull('public_key')->get();
+        $users = User::whereNull('public_key')->get();
         foreach ($users as $user) {
             $res = openssl_pkey_new([
                 'private_key_bits' => 2048,

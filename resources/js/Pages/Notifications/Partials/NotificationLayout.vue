@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import type {
+    RemotePostBoostedData,
+    RemotePostLikedData,
+    RemotePostRepliedData,
+} from '@/types/activitypub';
 import {
     isPostLikedNotification,
     isRemotePostBoostedNotification,
@@ -7,11 +12,6 @@ import {
     isTraewellingCrosspostFailedNotification,
     isUserFollowedNotification,
 } from '@/types/notifications';
-import type {
-    RemotePostBoostedData,
-    RemotePostLikedData,
-    RemotePostRepliedData,
-} from '@/types/activitypub';
 import { PropType } from 'vue';
 import { RouterLink } from 'vue-router';
 import {
