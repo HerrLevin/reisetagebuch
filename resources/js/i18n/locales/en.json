@@ -26,7 +26,26 @@
             "lead": "{user} requested to follow you",
             "accept": "Accept",
             "decline": "Decline"
+        },
+        "remote_liked": {
+            "lead": "{user} from {instance} liked your post"
+        },
+        "remote_boosted": {
+            "lead": "{user} from {instance} boosted your post"
+        },
+        "remote_replied": {
+            "lead": "{user} from {instance} replied to your post"
+        },
+        "remote_followed": {
+            "lead": "{user} from {instance} started following you"
         }
+    },
+    "activitypub": {
+        "remote_interactions": "Fediverse Interactions",
+        "likes": "Like | Likes",
+        "boosts": "Boost | Boosts",
+        "replies": "Reply | Replies",
+        "no_interactions": "No remote interactions yet"
     },
     "trip_details": {
         "departure": "Departure",

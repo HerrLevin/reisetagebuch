@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AccountController;
+use App\Http\Controllers\Api\ActivityPubInteractionController;
 use App\Http\Controllers\Api\AppConfigurationController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\FollowController;
@@ -54,6 +55,8 @@ Route::prefix('posts/{post}')->group(function () {
         ->name('api.posts.show');
     Route::get('/likes', [LikeController::class, 'index'])
         ->name('posts.likes');
+    Route::get('/remote-interactions', [ActivityPubInteractionController::class, 'index'])
+        ->name('posts.remote-interactions');
 });
 
 Route::get('app/configuration', [AppConfigurationController::class, 'index'])

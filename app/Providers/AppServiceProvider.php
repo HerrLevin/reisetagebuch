@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Http\Resources\PostTypes\BasePost;
 use App\Models\Invite;
+use App\Models\Post;
+use App\Observers\PostObserver;
 use App\Policies\InvitePolicy;
 use App\Policies\PostPolicy;
 use App\Services\Socialite\TraewellingProvider;
@@ -34,6 +36,9 @@ class AppServiceProvider extends ServiceProvider
         // Gates
         Gate::policy(BasePost::class, PostPolicy::class);
         Gate::policy(Invite::class, InvitePolicy::class);
+
+        // Observers
+        Post::observe(PostObserver::class);
 
         if ($this->app->environment('local')) {
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);

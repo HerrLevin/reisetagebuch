@@ -2,6 +2,7 @@
 
 use App\Console\Commands\FetchAirports;
 use App\Http\Middleware\ApiMiddleware;
+use App\Http\Middleware\VerifyHttpSignature;
 use App\Jobs\DeleteOldNearbyRequests;
 use App\Jobs\DispatchRefreshJobForActiveTrips;
 use Illuminate\Console\Scheduling\Schedule;
@@ -28,6 +29,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'rtb_allow_history',
         ]);
         $middleware->redirectGuestsTo('/login');
+        $middleware->validateCsrfTokens(except: [
+            'ap/users/*/inbox',
+        ]);
+        $middleware->alias([
+            'activitypub.verify' => VerifyHttpSignature::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

@@ -1,9 +1,17 @@
 <script setup lang="ts">
 import {
     isPostLikedNotification,
+    isRemotePostBoostedNotification,
+    isRemotePostLikedNotification,
+    isRemotePostRepliedNotification,
     isTraewellingCrosspostFailedNotification,
     isUserFollowedNotification,
 } from '@/types/notifications';
+import type {
+    RemotePostBoostedData,
+    RemotePostLikedData,
+    RemotePostRepliedData,
+} from '@/types/activitypub';
 import { PropType } from 'vue';
 import { RouterLink } from 'vue-router';
 import {
@@ -41,6 +49,33 @@ const getNotificationLink = (notification: NotificationWrapper) => {
     }
     if (isTraewellingCrosspostFailedNotification(notification)) {
         const data = notification.data as TraewellingCrosspostFailedData;
+        return {
+            name: 'posts.show',
+            params: {
+                postId: data.postId,
+            },
+        };
+    }
+    if (isRemotePostLikedNotification(notification)) {
+        const data = notification.data as unknown as RemotePostLikedData;
+        return {
+            name: 'posts.show',
+            params: {
+                postId: data.postId,
+            },
+        };
+    }
+    if (isRemotePostBoostedNotification(notification)) {
+        const data = notification.data as unknown as RemotePostBoostedData;
+        return {
+            name: 'posts.show',
+            params: {
+                postId: data.postId,
+            },
+        };
+    }
+    if (isRemotePostRepliedNotification(notification)) {
+        const data = notification.data as unknown as RemotePostRepliedData;
         return {
             name: 'posts.show',
             params: {

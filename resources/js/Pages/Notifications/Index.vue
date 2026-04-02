@@ -2,6 +2,10 @@
 import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PostLikedNotification from '@/Pages/Notifications/Partials/PostLikedNotification.vue';
+import RemotePostBoostedNotification from '@/Pages/Notifications/Partials/RemotePostBoostedNotification.vue';
+import RemotePostLikedNotification from '@/Pages/Notifications/Partials/RemotePostLikedNotification.vue';
+import RemotePostRepliedNotification from '@/Pages/Notifications/Partials/RemotePostRepliedNotification.vue';
+import RemoteUserFollowedNotification from '@/Pages/Notifications/Partials/RemoteUserFollowedNotification.vue';
 import TraewellingCrosspostFailedNotification from '@/Pages/Notifications/Partials/TraewellingCrosspostFailedNotification.vue';
 import UserFollowedNotification from '@/Pages/Notifications/Partials/UserFollowedNotification.vue';
 import UserRequestedFollowNotification from '@/Pages/Notifications/Partials/UserRequestedFollowNotification.vue';
@@ -9,6 +13,10 @@ import { useNotificationStore } from '@/stores/notifications';
 import {
     getTypedNotificationData,
     isPostLikedNotification,
+    isRemotePostBoostedNotification,
+    isRemotePostLikedNotification,
+    isRemotePostRepliedNotification,
+    isRemoteUserFollowedNotification,
     isTraewellingCrosspostFailedNotification,
     isUserFollowedNotification,
     isUserRequestedFollowNotification,
@@ -38,6 +46,18 @@ const getNotificationComponent = (notification: NotificationWrapper) => {
     }
     if (isUserRequestedFollowNotification(notification)) {
         return UserRequestedFollowNotification;
+    }
+    if (isRemotePostLikedNotification(notification)) {
+        return RemotePostLikedNotification;
+    }
+    if (isRemotePostBoostedNotification(notification)) {
+        return RemotePostBoostedNotification;
+    }
+    if (isRemotePostRepliedNotification(notification)) {
+        return RemotePostRepliedNotification;
+    }
+    if (isRemoteUserFollowedNotification(notification)) {
+        return RemoteUserFollowedNotification;
     }
     return null;
 };

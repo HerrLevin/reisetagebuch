@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { api } from '@/api';
+import ActivityPubInteractions from '@/Components/Post/ActivityPubInteractions.vue';
 import Map from '@/Components/Map.vue';
 import Post from '@/Components/Post/Post.vue';
 import PostMetaInfo from '@/Components/Post/PostMetaInfo.vue';
@@ -250,5 +251,7 @@ function deleted() {
         />
 
         <PostMetaInfo v-if="post" :meta-infos="post.metaInfos" class="mt-4" />
+
+        <ActivityPubInteractions v-if="post" :post-id="post.id" />
     </AuthenticatedLayout>
 </template>

@@ -24,9 +24,19 @@ class User extends Authenticatable
         'password',
     ];
 
+    protected static function booted(): void
+    {
+        static::creating(function (User $user) {
+            if (! $user->public_key) {
+                $user->createKeys();
+            }
+        });
+    }
+
     protected $hidden = [
         'password',
         'remember_token',
+        'private_key',
     ];
 
     protected $casts = [
@@ -122,6 +132,24 @@ class User extends Authenticatable
     public function followRequests(): HasMany
     {
         return $this->hasMany(FollowRequest::class, 'origin_user_id');
+    }
+
+    public function activityPubFollowers(): HasMany
+    {
+        return $this->hasMany(ActivityPubFollower::class, 'followed_user_id');
+    }
+
+    public function createKeys(): void
+    {
+        $res = openssl_pkey_new([
+            'private_key_bits' => 2048,
+            'private_key_type' => OPENSSL_KEYTYPE_RSA,
+        ]);
+        openssl_pkey_export($res, $privateKey);
+        $publicKey = openssl_pkey_get_details($res)['key'];
+
+        $this->public_key = $publicKey;
+        $this->private_key = $privateKey;
     }
 
     public function getIsFollowedAttribute(): bool

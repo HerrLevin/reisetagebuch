@@ -33,6 +33,7 @@ class Post extends Model
             $post->locationPost()->delete();
             $post->transportPost()->delete();
             $post->metaInfos()->delete();
+            $post->activityPubInteractions()->delete();
         });
     }
 
@@ -66,5 +67,10 @@ class Post extends Model
     public function likes(): HasMany
     {
         return $this->hasMany(Like::class);
+    }
+
+    public function activityPubInteractions(): HasMany
+    {
+        return $this->hasMany(ActivityPubInteraction::class);
     }
 }
