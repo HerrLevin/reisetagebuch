@@ -23,9 +23,14 @@ class MastodonActivityPubController extends Controller
         private readonly PostRepository $postRepository
     ) {}
 
+    private function checkHeader(Request $request)
+    {
+        return ! str_contains($request->header('accept'), 'application/ld+json');
+    }
+
     public function actor(Request $request, string $username): JsonResponse|RedirectResponse
     {
-        if ($request->header('accept') !== 'application/ld+json') {
+        if ($this->checkHeader($request)) {
             return redirect()->away(url('/profile/'.$username));
         }
         $user = User::where('username', $username)->first();
@@ -178,7 +183,7 @@ class MastodonActivityPubController extends Controller
 
     public function postObject(Request $request, string $id): RedirectResponse|JsonResponse
     {
-        if ($request->header('accept') !== 'application/ld+json') {
+        if ($this->checkHeader($request)) {
             return redirect()->away(url('/posts/'.$id));
         }
         $post = $this->postRepository->getById($id);
