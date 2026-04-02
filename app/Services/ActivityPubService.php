@@ -21,15 +21,12 @@ class ActivityPubService
                 $followerActor = $response->json();
                 $inbox = $followerActor['inbox'] ?? null;
                 if (! $inbox) {
-                    Log::info('No inbox found for actor: '.$followerActorId);
-                    Log::debug($followerActor);
-                    Log::debug($response);
+                    Log::warning('No inbox found for actor: '.$followerActorId, ['followerActor' => $followerActor, 'response' => $response->body()]);
 
                     return; // No inbox, can't send
                 }
             } else {
-                Log::info('No inbox found for actor: '.$followerActorId);
-                Log::debug($response->body());
+                Log::warning('No inbox found for actor: '.$followerActorId, ['response' => $response->body()]);
 
                 return; // Can't fetch actor
             }
@@ -55,8 +52,8 @@ class ActivityPubService
                 'Date' => $date,
                 'Digest' => $digest,
                 'Signature' => $signature,
-            ])->post($inbox, $activity);
-            Log::info('Delivered Activity to inbox: '.$inbox.' Response status: '.$data->status());
+            ])->post($inbox, $body);
+            Log::info('Delivered Activity to inbox: '.$inbox.' Response status: '.$data->status(), ['body' => $body]);
             Log::info($data->body());
         } catch (\Exception $e) {
             Log::error($e->getMessage());

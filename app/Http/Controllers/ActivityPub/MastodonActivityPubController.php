@@ -54,6 +54,7 @@ class MastodonActivityPubController extends Controller
             'https://www.w3.org/ns/activitystreams',
             'https://w3id.org/security/v1',
         ]);
+        Log::info('actor response', $person->toArray());
 
         return response()->json($person->toArray())->header('Content-Type', 'application/activity+json');
     }
