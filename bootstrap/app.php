@@ -4,6 +4,7 @@ use App\Console\Commands\FetchAirports;
 use App\Exceptions\ApiExceptionRenderer;
 use App\Http\Middleware\ApiMiddleware;
 use App\Http\Middleware\EnsurePrivacyPolicyAccepted;
+use App\Http\Middleware\RequestLogger;
 use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Jobs\DeleteOldNearbyRequests;
 use App\Jobs\DispatchRefreshJobForActiveTrips;
@@ -27,9 +28,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->web(append: [
             CreateFreshApiToken::class,
+            RequestLogger::class,
         ]);
         $middleware->api(append: [
             ApiMiddleware::class,
+            RequestLogger::class,
         ]);
         $middleware->encryptCookies(except: [
             'rtb_allow_history',

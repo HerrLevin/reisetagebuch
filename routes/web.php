@@ -3,7 +3,6 @@
 use App\Http\Controllers\ActivityPub\MastodonActivityPubController;
 use App\Http\Controllers\ActivityPub\NodeInfoController;
 use App\Http\Controllers\ActivityPub\WellKnownController;
-use App\Http\Middleware\RequestLogger;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -18,12 +17,12 @@ Route::middleware('cache.headers:public;max_age=2628000;etag')->get('/files/{pat
     abort(404);
 })->where('path', '.*')->name('files.show');
 
-Route::prefix('.well-known')->name('well-known.')->middleware([RequestLogger::class])->group(function () {
+Route::prefix('.well-known')->name('well-known.')->group(function () {
     Route::get('nodeinfo', [WellKnownController::class, 'nodeInfo']);
     Route::get('webfinger', [WellKnownController::class, 'webfinger']);
 });
 
-Route::get('nodeinfo/2.0', [NodeInfoController::class, 'nodeInfo20'])->middleware([RequestLogger::class]);
+Route::get('nodeinfo/2.0', [NodeInfoController::class, 'nodeInfo20']);
 
 Route::prefix('ap')
     ->name('ap.')
@@ -31,7 +30,6 @@ Route::prefix('ap')
     // external actors, so they should not require a web CSRF token. Exclude
     // Laravel's VerifyCsrfToken middleware for this route group.
     ->withoutMiddleware([VerifyCsrfToken::class])
-    ->middleware([RequestLogger::class])
     ->group(function () {
         Route::get('users/{username}#main-key', [MastodonActivityPubController::class, 'actor'])->name('actor-key');
         Route::get('users/{username}', [MastodonActivityPubController::class, 'actor'])->name('actor');
