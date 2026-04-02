@@ -52,8 +52,14 @@ class ActivityPubService
                 'Date' => $date,
                 'Digest' => $digest,
                 'Signature' => $signature,
-            ])->post($inbox, $body);
-            Log::info('Delivered Activity to inbox: '.$inbox.' Response status: '.$data->status(), ['body' => $body]);
+            ])->withBody($body)->post($inbox);
+            Log::info('Delivered Activity to inbox: '.$inbox.' Response status: '.$data->status(), [
+                'body' => $body,
+                'Content-Type' => 'application/activity+json',
+                'Date' => $date,
+                'Digest' => $digest,
+                'Signature' => $signature,
+            ]);
             Log::info($data->body());
         } catch (\Exception $e) {
             Log::error($e->getMessage());

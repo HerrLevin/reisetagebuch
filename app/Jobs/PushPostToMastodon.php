@@ -44,7 +44,7 @@ class PushPostToMastodon implements ShouldQueue
             'type' => 'Create',
             'actor' => route('ap.actor', ['username' => 'user']),
             'published' => $this->post->getBody(),
-            'url' => url('/posts/'.$this->post->id),
+            'url' => route('ap.post', ['id' => $this->post->id]),
             'to' => ['https://www.w3.org/ns/activitystreams#Public'],
             'object' => [
                 'id' => route('ap.post-object', ['id' => $this->post->id]),

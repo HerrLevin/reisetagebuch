@@ -182,11 +182,8 @@ class MastodonActivityPubController extends Controller
         return response()->json('', 202);
     }
 
-    public function postObject(Request $request, string $id): RedirectResponse|JsonResponse
+    private function postData(Request $request, string $id): JsonResponse
     {
-        if ($this->checkHeader($request)) {
-            return redirect()->away(url('/posts/'.$id));
-        }
         $post = $this->postRepository->getById($id);
 
         $note = Type::create('Note', [
@@ -199,6 +196,15 @@ class MastodonActivityPubController extends Controller
         $note->set('@context', 'https://www.w3.org/ns/activitystreams');
 
         return response()->json($note->toArray())->header('Content-Type', 'application/activity+json');
+    }
+
+    public function postObject(Request $request, string $id): RedirectResponse|JsonResponse
+    {
+        if ($this->checkHeader($request)) {
+            return redirect()->away(url('/posts/'.$id));
+        }
+
+        return $this->postData($request, $id);
     }
 
     private function sendAccept(UserDto $user, array $followActivity, ?string $id): void
