@@ -11,7 +11,9 @@ use App\Repositories\PostRepository;
 use App\Repositories\UserRepository;
 use App\Services\ActivityPubService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class MastodonActivityPubController extends Controller
 {
@@ -21,8 +23,11 @@ class MastodonActivityPubController extends Controller
         private readonly PostRepository $postRepository
     ) {}
 
-    public function actor(Request $request, string $username): JsonResponse
+    public function actor(Request $request, string $username): JsonResponse|RedirectResponse
     {
+        if ($request->header('accept') !== 'application/ld+json') {
+            return redirect()->away(url('/profile/'.$username));
+        }
         $user = User::where('username', $username)->first();
         if (! $user) {
             return response()->json(['error' => 'User not found'], 404);
@@ -72,7 +77,7 @@ class MastodonActivityPubController extends Controller
         $items = [];
         foreach ($posts as $post) {
             $note = Type::create('Note', [
-                'id' => route('ap.object', ['id' => $post->id]),
+                'id' => route('ap.post-object', ['id' => $post->id]),
                 'published' => $post->created_at->toISOString(),
                 'attributedTo' => route('ap.actor', ['username' => $post->user->username]),
                 'content' => $post->body,
@@ -80,7 +85,7 @@ class MastodonActivityPubController extends Controller
             ]);
 
             $create = Type::create('Create', [
-                'id' => route('ap.object', ['id' => $post->id]),
+                'id' => route('ap.post-object', ['id' => $post->id]),
                 'actor' => route('ap.actor', ['username' => $post->user->username]),
                 'published' => $post->created_at->toISOString(),
                 'to' => ['https://www.w3.org/ns/activitystreams#Public'],
@@ -110,42 +115,76 @@ class MastodonActivityPubController extends Controller
 
     public function inbox(Request $request, string $username): JsonResponse
     {
+        Log::info('getting inbox request', [$request->all()]);
         $user = $this->userRepository->getUserByUsername($username);
 
         $activity = $request->json()->all();
 
         if ($activity['type'] === 'Follow') {
-            // Handle follow
-            $followerActorId = $activity['actor'];
-            $followedActorId = $activity['object'];
-
-            // Verify it's following this user
-            if ($followedActorId !== route('ap.actor', ['username' => $user->username])) {
-                return response()->json(['error' => 'Invalid follow object'], 400);
-            }
-
-            // Create follow record
-            ActivityPubFollower::firstOrCreate([
-                'follower_actor_id' => $followerActorId,
-                'followed_user_id' => $user->id,
-            ]);
-
-            // Send Accept activity
-            $this->sendAccept($user, $activity);
-
-            return response()->json('', 202);
+            return $this->handleFollow($activity, $user);
+        }
+        if ($activity['type'] === 'Undo' && $activity['object']['type'] === 'Follow') {
+            return $this->handleUndoFollow($activity, $user);
         }
 
         // For other activities, just accept
         return response()->json('', 202);
     }
 
-    public function postObject(Request $request, string $id): JsonResponse
+    private function handleFollow($activity, UserDto $user): JsonResponse
     {
+        $followerActorId = $activity['actor'];
+        $followedActorId = $activity['object'];
+
+        if ($followedActorId !== route('ap.actor', ['username' => $user->username])) {
+            Log::info('invalid follow object', [$user->username, $followedActorId]);
+
+            return response()->json(['error' => 'Invalid follow object'], 400);
+        }
+
+        $follow = ActivityPubFollower::firstOrCreate([
+            'follower_actor_id' => $followerActorId,
+            'followed_user_id' => $user->id,
+        ]);
+
+        $this->sendAccept($user, $activity, $follow->id);
+
+        return response()->json('', 202);
+    }
+
+    private function handleUndoFollow($activity, UserDto $user): JsonResponse
+    {
+        $object = $activity['object'];
+        $followerActorId = $object['actor'];
+        $followedActorId = $object['object'];
+
+        if ($followedActorId !== route('ap.actor', ['username' => $user->username])) {
+            Log::info('invalid follow object', [$user->username, $followedActorId]);
+
+            return response()->json(['error' => 'Invalid follow object'], 400);
+        }
+
+        $delete = ActivityPubFollower::where([
+            'follower_actor_id' => $followerActorId,
+            'followed_user_id' => $user->id,
+        ])->firstOrFail();
+
+        $delete->delete();
+
+        $this->sendAccept($user, $activity, $followedActorId);
+
+        return response()->json('', 202);
+    }
+
+    public function postObject(Request $request, string $id): RedirectResponse|JsonResponse
+    {
+        if ($request->header('accept') !== 'application/ld+json') {
+            return redirect()->away(url('/posts/'.$id));
+        }
         $post = $this->postRepository->getById($id);
 
         $note = Type::create('Note', [
-            'id' => route('ap.object', ['id' => $id]),
+            'id' => route('ap.post-object', ['id' => $id]),
             'published' => $post->publishedAt,
             'attributedTo' => route('ap.actor', ['username' => $id]),
             'content' => $post->getBody() ?? '',
@@ -156,13 +195,13 @@ class MastodonActivityPubController extends Controller
         return response()->json($note->toArray())->header('Content-Type', 'application/activity+json');
     }
 
-    private function sendAccept(UserDto $user, array $followActivity): void
+    private function sendAccept(UserDto $user, array $followActivity, ?string $id): void
     {
         $followerActorId = $followActivity['actor'];
 
         // Create Accept activity
         $accept = Type::create('Accept', [
-            'id' => url('/activities/'.uniqid()),
+            'id' => route('ap.activity', ['id' => $id]),
             'actor' => route('ap.actor', ['username' => $user->username]),
             'object' => $followActivity,
         ]);
