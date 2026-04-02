@@ -24,6 +24,7 @@ use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
 use App\Jobs\CalculateStatsForTransportPost;
 use App\Jobs\PrefetchJob;
+use App\Jobs\PushPostToMastodon;
 use App\Jobs\TraewellingChangeExitJob;
 use App\Jobs\TraewellingCrossCheckInJob;
 use App\Jobs\TraewellingDeletePostJob;
@@ -69,12 +70,17 @@ class PostController extends Controller
         $this->calculateTransportStatsController = $calculateTransportStatsController;
     }
 
+    private function dispatchPost(BasePost|LocationPost|TransportPost $post): void
+    {
+        PushPostToMastodon::dispatch($post);
+    }
+
     public function storeLocation(LocationBasePostRequest $request): BasePost|LocationPost|TransportPost
     {
         $location = $this->locationRepository->getLocationById($request->input('location'));
         $this->statisticsRepository->storeLocationPostCreation($request->user()->id);
 
-        return $this->postRepository->storeLocation(
+        $post = $this->postRepository->storeLocation(
             $request->user(),
             $location,
             Visibility::from($request->input('visibility')),
@@ -83,18 +89,24 @@ class PostController extends Controller
             TravelReason::from($request->input('travelReason')),
             $request->input('visitedAt') ? Carbon::parse($request->input('visitedAt')) : null,
         );
+        $this->dispatchPost($post);
+
+        return $post;
     }
 
     public function storeText(BasePostRequest $request): BasePost
     {
         $this->statisticsRepository->storeTextPostCreation($request->user()->id);
 
-        return $this->postRepository->storeText(
+        $post = $this->postRepository->storeText(
             $request->user(),
             Visibility::from($request->input('visibility')),
             $request->input('body'),
             $request->input('tags', [])
         );
+        $this->dispatchPost($post);
+
+        return $post;
     }
 
     public function storeMotisTransport(TransportBasePostCreateRequest $request): BasePost|LocationPost|TransportPost
@@ -145,6 +157,7 @@ class PostController extends Controller
         TraewellingCrossCheckInJob::dispatch($post->id);
         $this->calculateTransportStatsController->calculateStatsForPost($post->id);
         PrefetchJob::dispatch($stopStopover->location->location);
+        $this->dispatchPost($post);
 
         return $post;
     }

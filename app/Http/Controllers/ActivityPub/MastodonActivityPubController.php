@@ -3,23 +3,20 @@
 namespace App\Http\Controllers\ActivityPub;
 
 use ActivityPhp\Type;
-use App\Enums\TransportMode;
 use App\Http\Controllers\Controller;
-use App\Models\Follow;
-use App\Models\Post;
+use App\Models\ActivityPubFollower;
 use App\Models\User;
+use App\Repositories\PostRepository;
 use App\Services\ActivityPubService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class MastodonActivityPubController extends Controller
 {
-    private ActivityPubService $activityPubService;
-
-    public function __construct(ActivityPubService $activityPubService)
-    {
-        $this->activityPubService = $activityPubService;
-    }
+    public function __construct(
+        private readonly ActivityPubService $activityPubService,
+        private readonly PostRepository $postRepository
+    ) {}
 
     public function actor(Request $request, string $username): JsonResponse
     {
@@ -128,7 +125,7 @@ class MastodonActivityPubController extends Controller
             }
 
             // Create follow record
-            Follow::firstOrCreate([
+            ActivityPubFollower::firstOrCreate([
                 'follower_actor_id' => $followerActorId,
                 'followed_user_id' => $user->id,
             ]);
@@ -145,38 +142,13 @@ class MastodonActivityPubController extends Controller
 
     public function postObject(Request $request, string $id): JsonResponse
     {
-        $post = Post::find($id);
-        if (! $post) {
-            return response()->json(['error' => 'Post not found'], 404);
-        }
-
-        $body = $post->body ?? '';
-
-        if ($post->transportPost) {
-            $emoji = TransportMode::tryFrom($post->transportPost->transportTrip->mode)?->getEmoji();
-            $line = $post->transportPost->transportTrip->line_name;
-            $origin = $post->transportPost->originStop->location->name;
-            $destination = $post->transportPost->destinationStop->location->name;
-            $duration = round($post->transportPost->duration / 60);
-            $distance = round($post->transportPost->distance / 1000, 1);
-            $body = "<p>$emoji<strong>$line</strong> · $origin → $destination<br>🕐 $duration min · $distance km</p>";
-
-            $body = $post->body ? nl2br(e($post->body)).$body : $body;
-        }
-
-        if ($post->locationPost) {
-
-            $name = $post->locationPost->location->name;
-            $body = "<p>📍<strong>$name</strong></p>";
-
-            $body = $post->body ? nl2br(e($post->body)).$body : $body;
-        }
+        $post = $this->postRepository->getById($id);
 
         $note = Type::create('Note', [
             'id' => route('ap.object', ['id' => $id]),
-            'published' => $post->created_at->toISOString(),
+            'published' => $post->publishedAt,
             'attributedTo' => route('ap.actor', ['username' => $id]),
-            'content' => $body,
+            'content' => $post->getBody() ?? '',
             'to' => ['https://www.w3.org/ns/activitystreams#Public'],
         ]);
         $note->set('@context', 'https://www.w3.org/ns/activitystreams');

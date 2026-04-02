@@ -47,4 +47,13 @@ class LocationPost extends BasePost
         $this->travelReason = TravelReason::tryFrom($post->metaInfos->where('key', MetaInfoKey::TRAVEL_REASON)->first()?->value);
         $this->visitedAt = $post->locationPost->visited_at?->toIso8601String();
     }
+
+    public function getBody(): ?string
+    {
+        $parentBody = parent::getBody();
+        $name = $this->location->name;
+        $body = "<p>📍<strong>$name</strong></p>";
+
+        return $parentBody ? nl2br(e($parentBody)).$body : $body;
+    }
 }
