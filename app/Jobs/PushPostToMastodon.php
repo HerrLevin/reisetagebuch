@@ -40,16 +40,17 @@ class PushPostToMastodon implements ShouldQueue
         // Create the Create activity
         $createActivity = [
             '@context' => 'https://www.w3.org/ns/activitystreams',
-            'id' => url('/posts/'.$this->post->id),
+            'id' => route('ap.post', ['id' => $this->post->id]),
             'type' => 'Create',
-            'actor' => url('/users/'.$user->username),
+            'actor' => route('ap.actor', ['username' => 'user']),
             'published' => $this->post->getBody(),
+            'url' => url('/posts/'.$this->post->id),
             'to' => ['https://www.w3.org/ns/activitystreams#Public'],
             'object' => [
-                'id' => url('/posts/'.$this->post->id.'/object'),
+                'id' => route('ap.post-object', ['id' => $this->post->id]),
                 'type' => 'Note',
                 'published' => $this->post->publishedAt,
-                'attributedTo' => url('/users/'.$user->username),
+                'attributedTo' => route('ap.actor', ['username' => 'user']),
                 'content' => $this->post->getBody(),
                 'to' => ['https://www.w3.org/ns/activitystreams#Public'],
             ],

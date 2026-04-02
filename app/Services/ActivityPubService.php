@@ -57,7 +57,7 @@ class ActivityPubService
                 'Signature' => $signature,
             ])->post($inbox, $activity);
             Log::info('Delivered Activity to inbox: '.$inbox.' Response status: '.$data->status());
-            Log::debug($data->body());
+            Log::info($data->body());
         } catch (\Exception $e) {
             Log::error($e->getMessage());
             // Log error or handle
@@ -66,7 +66,7 @@ class ActivityPubService
 
     private function createSignature(UserDto $user, string $method, string $path, string $host, string $date, string $digest): string
     {
-        $keyId = url('/users/'.$user->username.'#main-key');
+        $keyId = route('ap.actor-key', ['username' => $user->username]);
         $headers = '(request-target) host date digest';
         $stringToSign = '(request-target): '.strtolower($method)." {$path}\nhost: {$host}\ndate: {$date}\ndigest: {$digest}";
 
