@@ -4,9 +4,11 @@ namespace App\Http\Controllers\ActivityPub;
 
 use ActivityPhp\Type;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserDto;
 use App\Models\ActivityPubFollower;
 use App\Models\User;
 use App\Repositories\PostRepository;
+use App\Repositories\UserRepository;
 use App\Services\ActivityPubService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,6 +17,7 @@ class MastodonActivityPubController extends Controller
 {
     public function __construct(
         private readonly ActivityPubService $activityPubService,
+        private readonly UserRepository $userRepository,
         private readonly PostRepository $postRepository
     ) {}
 
@@ -107,10 +110,7 @@ class MastodonActivityPubController extends Controller
 
     public function inbox(Request $request, string $username): JsonResponse
     {
-        $user = User::where('username', $username)->first();
-        if (! $user) {
-            return response()->json(['error' => 'User not found'], 404);
-        }
+        $user = $this->userRepository->getUserByUsername($username);
 
         $activity = $request->json()->all();
 
@@ -156,7 +156,7 @@ class MastodonActivityPubController extends Controller
         return response()->json($note->toArray())->header('Content-Type', 'application/activity+json');
     }
 
-    private function sendAccept(User $user, array $followActivity): void
+    private function sendAccept(UserDto $user, array $followActivity): void
     {
         $followerActorId = $followActivity['actor'];
 
