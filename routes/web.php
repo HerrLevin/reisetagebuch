@@ -35,12 +35,8 @@ Route::prefix('ap')
         Route::get('users/{username}', [MastodonActivityPubController::class, 'actor'])->name('actor');
         Route::get('users/{username}/outbox', [MastodonActivityPubController::class, 'outbox'])->name('outbox');
         Route::post('users/{username}/inbox', [MastodonActivityPubController::class, 'inbox'])->name('inbox');
+        Route::get('posts/{id}', [MastodonActivityPubController::class, 'postObject'])->name('post');
         Route::get('posts/{id}/object', [MastodonActivityPubController::class, 'postObject'])->name('post-object');
-        Route::get('posts/{id}', function ($id) {
-            // This route can be used to fetch individual posts if needed
-            // For now, it can return a 404 or a placeholder response
-            return response()->json(['error' => 'Not implemented'], 404);
-        })->name('post');
         Route::get('activities/{id}', function ($id) {
             // This route can be used to fetch individual activities if needed
             // For now, it can return a 404 or a placeholder response
