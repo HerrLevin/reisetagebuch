@@ -182,4 +182,9 @@ class User extends Authenticatable
             $user->createKeys();
         });
     }
+
+    public function activityPubFollowers(): HasMany
+    {
+        return $this->hasMany(ActivityPubFollower::class, 'followed_user_id');
+    }
 }
