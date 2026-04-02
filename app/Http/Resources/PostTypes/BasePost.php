@@ -99,4 +99,9 @@ class BasePost
                 return $group->first()->value;
             })->toArray() ?? [];
     }
+
+    public function getBody(): ?string
+    {
+        return $this->body;
+    }
 }
