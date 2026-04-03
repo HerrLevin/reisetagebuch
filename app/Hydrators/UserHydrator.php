@@ -34,6 +34,7 @@ class UserHydrator
         $dto->requiresFollowRequest = $user->settings?->requires_follow_request ?? false;
         $dto->statistics = $this->statisticsToDto($user->statistics);
         $dto->createdAt = $user->created_at->toIso8601String();
+        $dto->publicKeyPem = $user->public_key;
 
         return $dto;
     }

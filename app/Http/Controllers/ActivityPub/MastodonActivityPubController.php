@@ -25,7 +25,7 @@ class MastodonActivityPubController extends Controller
 
     private function checkHeader(Request $request)
     {
-        return ! str_contains($request->header('accept'), 'application/ld+json');
+        return ! (str_contains($request->header('accept'), 'application/ld+json') || str_contains($request->header('accept'), 'application/activity+json'));
     }
 
     public function actor(Request $request, string $username): JsonResponse|RedirectResponse
@@ -33,30 +33,69 @@ class MastodonActivityPubController extends Controller
         if ($this->checkHeader($request)) {
             return redirect()->away(url('/profile/'.$username));
         }
-        $user = User::where('username', $username)->first();
-        if (! $user) {
-            return response()->json(['error' => 'User not found'], 404);
-        }
+        $user = $this->userRepository->getUserByUsername($username);
 
-        $person = Type::create('Person', [
+        $data = [
+            'type' => 'Person',
             'id' => route('ap.actor', ['username' => $user->username]),
-            'preferredUsername' => $user->username,
-            'name' => $user->name,
+            // 'following' => ,
+            // 'followers
             'inbox' => route('ap.inbox', ['username' => $user->username]),
             'outbox' => route('ap.outbox', ['username' => $user->username]),
+            'preferredUsername' => $user->username,
+            'name' => $user->name,
+            'summary' => $user->bio ?? '',
+            'url' => url('/@'.$user->username),
+            // 'manuallyApprovesFollowers' => $user->requiresFollowRequest,
+            // 'discoverable' => true,
+            // 'indexable' => true,
+            'published' => $user->createdAt,
+            // 'alsoKnownAs' => [
+            //    url('/profile/' . $user->username),
+            // ],
             'publicKey' => [
                 'id' => route('ap.actor', ['username' => $user->username.'#main-key']),
                 'owner' => route('ap.actor', ['username' => $user->username]),
-                'publicKeyPem' => $user->public_key,
+                'publicKeyPem' => $user->publicKeyPem,
             ],
-        ]);
-        $person->set('@context', [
+        ];
+
+        if ($user->avatar) {
+            $data['icon'] = [
+                'type' => 'Image',
+                'mediaType' => 'image/jpeg',
+                'url' => url($user->avatar),
+            ];
+        }
+
+        $data['@context'] = [
             'https://www.w3.org/ns/activitystreams',
             'https://w3id.org/security/v1',
-        ]);
-        Log::info('actor response', $person->toArray());
+            [
+                // 'manuallyApprovesFollowers' => 'as:manuallyApprovesFollowers',
+                'toot' => 'http://joinmastodon.org/ns#',
+                'schema' => 'http://schema.org#',
+                'PropertyValue' => 'schema:PropertyValue',
+                'value' => 'schema:value',
+                'discoverable' => 'toot:discoverable',
+                'indexable' => 'toot:indexable',
+                'attributionDomains' => [
+                    '@id' => 'toot:attributionDomains',
+                    '@type' => '@id',
+                ],
+                'focalPoint' => [
+                    '@container' => '@list',
+                    '@id' => 'toot:focalPoint',
+                ],
+                'alsoKnownAs' => [
+                    '@id' => 'toot:alsoKnownAs',
+                    '@type' => '@id',
+                ],
+            ],
+        ];
+        Log::info('actor response', $data);
 
-        return response()->json($person->toArray())->header('Content-Type', 'application/activity+json');
+        return response()->json(data: $data, options: JSON_UNESCAPED_SLASHES)->header('Content-Type', 'application/activity+json');
     }
 
     public function outbox(Request $request, string $username): JsonResponse
@@ -75,7 +114,7 @@ class MastodonActivityPubController extends Controller
             ]);
             $collection->set('@context', 'https://www.w3.org/ns/activitystreams');
 
-            return response()->json($collection->toArray())->header('Content-Type', 'application/activity+json');
+            return response()->json(data: $collection->toArray(), options: JSON_UNESCAPED_SLASHES)->header('Content-Type', 'application/activity+json');
         }
 
         $posts = $user->posts()->orderBy('created_at', 'desc')->orderBy('id', 'desc')->cursorPaginate(5);
@@ -195,7 +234,7 @@ class MastodonActivityPubController extends Controller
         ]);
         $note->set('@context', 'https://www.w3.org/ns/activitystreams');
 
-        return response()->json($note->toArray())->header('Content-Type', 'application/activity+json');
+        return response()->json(data: $note->toArray(), options: JSON_UNESCAPED_SLASHES)->header('Content-Type', 'application/activity+json');
     }
 
     public function postObject(Request $request, string $id): RedirectResponse|JsonResponse
