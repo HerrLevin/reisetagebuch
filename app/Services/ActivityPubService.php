@@ -22,7 +22,8 @@ class ActivityPubService
             if ($response->successful()) {
                 $followerActor = $response->json();
                 $inbox = $followerActor['inbox'] ?? null;
-                $sharedInbox = $followerActor['sharedInbox'] ?? null;
+                $endpoints = $followerActor['endpoints'] ?? [];
+                $sharedInbox = $endpoints['sharedInbox'] ?? null;
                 if ($inbox) {
                     return [
                         'inbox' => $inbox,
