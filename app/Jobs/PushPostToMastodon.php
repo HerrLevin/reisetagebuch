@@ -56,8 +56,17 @@ class PushPostToMastodon implements ShouldQueue
             ],
         ];
 
+        $usedInboxes = [];
+
         foreach ($followers as $follow) {
-            $this->activityPub->deliverActivity($user, $follow->follower_actor_id, $createActivity);
+            $inbox = $follow->follower_shared_inbox_url ?? $follow->follower_inbox_url;
+            if ($inbox !== null) {
+                if (in_array($inbox, $usedInboxes)) {
+                    continue;
+                }
+                $usedInboxes[] = $inbox;
+            }
+            $this->activityPub->deliverActivity($user, $follow->follower_actor_id, $inbox, $createActivity);
         }
     }
 }

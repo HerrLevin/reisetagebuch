@@ -6,35 +6,43 @@ use App\Http\Resources\UserDto;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use JetBrains\PhpStorm\ArrayShape;
 
 class ActivityPubService
 {
-    public function deliverActivity(UserDto $user, string $followerActorId, array $activity): void
+    #[ArrayShape(['inbox' => 'string|null', 'sharedInbox' => 'string|null'])]
+    public function getInbox(string $followerActorId): ?array
     {
-        Log::info('Deliver Activity for actor: '.$followerActorId);
-        // Fetch the follower's actor to get their inbox
+        $followerActor = null;
         try {
             $response = Http::withHeaders([
                 'Accept' => 'application/activity+json',
             ])->get($followerActorId);
+
             if ($response->successful()) {
                 $followerActor = $response->json();
                 $inbox = $followerActor['inbox'] ?? null;
-                if (! $inbox) {
-                    Log::warning('No inbox found for actor: '.$followerActorId, ['followerActor' => $followerActor, 'response' => $response->body()]);
-
-                    return; // No inbox, can't send
+                $sharedInbox = $followerActor['sharedInbox'] ?? null;
+                if ($inbox) {
+                    return [
+                        'inbox' => $inbox,
+                        'sharedInbox' => $sharedInbox,
+                    ];
                 }
-            } else {
-                Log::warning('No inbox found for actor: '.$followerActorId, ['response' => $response->body()]);
-
-                return; // Can't fetch actor
             }
+            Log::warning('No inbox found for actor: '.$followerActorId, ['followerActor' => $followerActor, 'response' => $response->body()]);
         } catch (\Exception $e) {
             Log::error('Error fetching actor: '.$followerActorId.' Error: '.$e->getMessage());
-
-            return; // Error fetching
         }
+
+        return null; // Error fetching
+    }
+
+    public function deliverActivity(UserDto $user, string $followerActorId, ?string $inbox, array $activity): void
+    {
+        Log::info('Deliver Activity for actor: '.$followerActorId);
+        // Fetch the follower's actor to get their inbox
+        $inbox = $inbox ?? $this->getInbox($followerActorId)['inbox'] ?? null;
 
         // Prepare the request
         $body = json_encode($activity);
