@@ -164,6 +164,7 @@ class MastodonActivityPubController extends Controller
         $user = $this->userRepository->getUserByUsername($username);
 
         $activity = $request->json()->all();
+        Log::info('inbox request', [$request->all()]);
 
         if ($activity['type'] === 'Follow') {
             return $this->handleFollow($activity, $user);
@@ -187,12 +188,16 @@ class MastodonActivityPubController extends Controller
             return response()->json(['error' => 'Invalid follow object'], 400);
         }
 
+        $inboxes = $this->activityPubService->getInbox($followerActorId);
+
         $follow = ActivityPubFollower::firstOrCreate([
             'follower_actor_id' => $followerActorId,
             'followed_user_id' => $user->id,
+            'follower_shared_inbox_url' => $inboxes['sharedInbox'] ?? null,
+            'follower_inbox_url' => $inboxes['inbox'] ?? null,
         ]);
 
-        $this->sendAccept($user, $activity, $follow->id);
+        $this->sendAccept($user, $activity, $follow, $follow->id);
 
         return response()->json('', 202);
     }
@@ -216,7 +221,7 @@ class MastodonActivityPubController extends Controller
 
         $delete->delete();
 
-        $this->sendAccept($user, $activity, $followedActorId);
+        $this->sendAccept($user, $activity, null, $followedActorId);
 
         return response()->json('', 202);
     }
@@ -246,7 +251,7 @@ class MastodonActivityPubController extends Controller
         return $this->postData($request, $id);
     }
 
-    private function sendAccept(UserDto $user, array $followActivity, ?string $id): void
+    private function sendAccept(UserDto $user, array $followActivity, ?ActivityPubFollower $follower, ?string $id): void
     {
         $followerActorId = $followActivity['actor'];
 
@@ -258,6 +263,6 @@ class MastodonActivityPubController extends Controller
         ]);
         $accept->set('@context', 'https://www.w3.org/ns/activitystreams');
 
-        $this->activityPubService->deliverActivity($user, $followerActorId, $accept->toArray());
+        $this->activityPubService->deliverActivity($user, $followerActorId, $follower?->follower_shared_inbox_url ?? $follower?->follower_inbox_url ?? null, $accept->toArray());
     }
 }
