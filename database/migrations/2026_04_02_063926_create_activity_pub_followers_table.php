@@ -15,6 +15,7 @@ return new class extends Migration
             $table->foreignIdFor(User::class, 'followed_user_id')->constrained();
             $table->unique(['follower_actor_id', 'followed_user_id']); // Prevent duplicate follows
             $table->timestamps();
+            $table->index(['followed_user_id']);
         });
     }
 

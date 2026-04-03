@@ -14,7 +14,7 @@ class RequestLogger
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (! config('app.debug')) {
+        if (true) {
             return $next($request);
         }
 

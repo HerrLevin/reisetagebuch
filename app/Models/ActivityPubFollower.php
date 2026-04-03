@@ -13,6 +13,8 @@ class ActivityPubFollower extends Model
     protected $fillable = [
         'follower_actor_id',
         'followed_user_id',
+        'follower_shared_inbox_url',
+        'follower_inbox_url',
     ];
 
     public function user(): BelongsTo
