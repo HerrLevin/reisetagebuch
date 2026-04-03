@@ -50,6 +50,9 @@ class UserDto
     #[OA\Property(ref: '#/components/schemas/UserStatisticsDto')]
     public UserStatisticsDto $statistics;
 
+    #[OA\Property('publicKeyPem', description: 'Public Key PEM', type: 'string')]
+    public string $publicKeyPem;
+
     #[OA\Property('createdAt', description: 'Account creation timestamp', type: 'string', format: 'date-time')]
     public string $createdAt;
 }
