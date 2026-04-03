@@ -201,10 +201,19 @@ const routes: RouteRecordRaw[] = [
         meta: { auth: true },
     },
     {
-        path: '/profile/:username',
+        path: '/@:username',
         name: 'profile.show',
         component: ProfileShow,
         props: true,
+    },
+    {
+        path: '/profile/:username',
+        redirect: (to) => {
+            return {
+                name: 'profile.show',
+                params: { username: to.params.username },
+            };
+        },
     },
     {
         path: '/profile/:username/map',
