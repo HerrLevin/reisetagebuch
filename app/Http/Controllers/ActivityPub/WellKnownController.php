@@ -51,16 +51,31 @@ class WellKnownController extends Controller
 
         $user = $this->userRepository->getUserByUsername($username);
 
-        return response()->json([
-            'subject' => $resource,
-            'links' => [
-                [
-                    'rel' => 'self',
-                    'type' => 'application/activity+json',
-                    'href' => route('ap.actor', ['username' => $user->username]),
-                ],
+        $links = [
+            [
+                'rel' => 'self',
+                'type' => 'application/activity+json',
+                'href' => route('ap.actor', ['username' => $user->username]),
             ],
-        ])->header('Content-Type', 'application/jrd+json');
+            [
+                'rel' => 'http://webfinger.net/rel/profile-page',
+                'type' => 'text/html',
+                'href' => url('/@'.$user->username),
+            ],
+        ];
+
+        if ($user->avatar) {
+            $links[] = [
+                'rel' => 'http://webfinger.net/rel/avatar',
+                'type' => 'image/jpeg',
+                'href' => $user->avatar,
+            ];
+        }
+
+        return response()->json(data: [
+            'subject' => $resource,
+            'links' => $links,
+        ], options: JSON_UNESCAPED_SLASHES)->header('Content-Type', 'application/jrd+json');
     }
 
     private function getUsername(array $elements): ?string
