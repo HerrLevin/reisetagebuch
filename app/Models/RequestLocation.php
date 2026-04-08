@@ -10,7 +10,7 @@ class RequestLocation extends Model
 {
     use HasUuids;
 
-    protected $fillable = ['location', 'last_requested_at', 'to_fetch', 'fetched'];
+    protected $fillable = ['location', 'last_requested_at', 'to_fetch', 'fetched', 'radius'];
 
     protected $casts = [
         'location' => Point::class,
