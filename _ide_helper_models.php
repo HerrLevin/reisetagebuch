@@ -35,11 +35,21 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * @property-read \App\Models\User|null $originUser
- * @property-read \App\Models\User|null $targetUser
+ * @property string $id
+ * @property string $origin_user_id
+ * @property string $target_user_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\User $originUser
+ * @property-read \App\Models\User $targetUser
  * @method static \Illuminate\Database\Eloquent\Builder<static>|FollowRequest newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|FollowRequest newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|FollowRequest query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FollowRequest whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FollowRequest whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FollowRequest whereOriginUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FollowRequest whereTargetUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FollowRequest whereUpdatedAt($value)
  */
 	class FollowRequest extends \Eloquent {}
 }
@@ -616,6 +626,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property int|null $motis_radius
+ * @property bool $requires_follow_request
  * @property-read \App\Models\User $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings newQuery()
@@ -623,6 +634,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings whereMotisRadius($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings whereRequiresFollowRequest($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings whereUserId($value)
  */

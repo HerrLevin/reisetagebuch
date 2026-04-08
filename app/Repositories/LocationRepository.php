@@ -209,7 +209,6 @@ class LocationRepository
         return RequestLocation::select()
             ->addSelect(ST::distanceSphere($position, 'location')->as('distance'))
             ->where(ST::distanceSphere($position, 'location'), '<=', $radius)
-            ->where('radius', '=', $radius)
             ->where(
                 'last_requested_at',
                 '>=',

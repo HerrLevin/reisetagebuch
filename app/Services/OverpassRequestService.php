@@ -3,10 +3,12 @@
 namespace App\Services;
 
 use App\Dto\OverpassLocation;
+use App\Exceptions\OverpassApiOverloaded;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Generator;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Support\Facades\Log;
 
 class OverpassRequestService
 {
@@ -141,14 +143,22 @@ class OverpassRequestService
         return $query;
     }
 
+    /**
+     * @throws OverpassApiOverloaded
+     */
     public function getElements(): array
     {
         $query = $this->getQuery();
+        Log::debug('Overpass query: '.$query);
 
         $url = 'https://overpass-api.de/api/interpreter?data='.urlencode($query);
         try {
             $response = $this->client->get($url);
-        } catch (GuzzleException) {
+        } catch (GuzzleException $exception) {
+            if ($exception->getCode() === 504) {
+                throw new OverpassApiOverloaded;
+            }
+
             return [];
         }
         $response = $response->getBody()->getContents();

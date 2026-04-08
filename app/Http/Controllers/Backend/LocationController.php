@@ -10,6 +10,7 @@ use App\Dto\MotisApi\StopDto;
 use App\Dto\MotisApi\StopPlaceDto;
 use App\Dto\MotisApi\TripDto;
 use App\Dto\RequestLocationDto;
+use App\Exceptions\OverpassApiOverloaded;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\LocationDto;
 use App\Http\Resources\LocationHistoryEntryDto;
@@ -114,11 +115,34 @@ class LocationController extends Controller
         return $recent ? RequestLocationDto::fromModel($recent) : null;
     }
 
+    /**
+     * @throws OverpassApiOverloaded
+     */
     public function prefetch(Point $point, int $radius): void
     {
         if (! $this->locationRepository->recentNearbyRequests($point, $radius)) {
+            Log::debug('Prefetching nearby locations for point '.$point.' with radius '.$radius);
             $requestLocation = $this->locationRepository->createRequestLocation($point, $radius);
-            $this->fetchNearbyLocations($point, $requestLocation, $radius);
+            try {
+                $this->fetchNearbyLocations($point, $requestLocation, $radius);
+            } catch (OverpassApiOverloaded) {
+                try {
+                    $radius = intdiv($radius, 2);
+                    $requestLocation->update(['radius' => $radius]);
+                    $this->fetchNearbyLocations($point, $requestLocation, $radius);
+                } catch (OverpassApiOverloaded) {
+                    try {
+                        $radius = intdiv($radius, 2);
+                        $requestLocation->update(['radius' => $radius]);
+                        $this->fetchNearbyLocations($point, $requestLocation, $radius);
+                    } catch (OverpassApiOverloaded $exception) {
+                        $requestLocation->update([
+                            'last_requested_at' => now()->subMinutes(config('app.recent_location.timeout'))->subMinute(),
+                        ]);
+                        throw $exception;
+                    }
+                }
+            }
         }
     }
 
@@ -156,6 +180,9 @@ class LocationController extends Controller
         });
     }
 
+    /**
+     * @throws OverpassApiOverloaded
+     */
     public function fetchNearbyLocations(Point $point, ?RequestLocation $requestLocation, int $radius): void
     {
         $this->overpassRequestService->setRadius($radius);
