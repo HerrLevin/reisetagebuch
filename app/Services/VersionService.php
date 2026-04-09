@@ -20,6 +20,19 @@ class VersionService
         return $version;
     }
 
+    public function getRequestUserAgent(): string
+    {
+        $version = $this->getVersion();
+
+        return sprintf(
+            'Mozilla/5.0 (compatible; %s/%s; %s; contact: %s)',
+            config('app.name'),
+            $version,
+            config('app.url'),
+            config('app.legal.email')
+        );
+    }
+
     public function getUserAgent(): string
     {
         $version = $this->getVersion();

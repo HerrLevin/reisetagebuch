@@ -346,4 +346,15 @@ class LocationRepository
             ->limit(50)
             ->get();
     }
+
+    public function getByOsmId(string $nodeId): Collection
+    {
+        return Location::with(['tags', 'identifiers'])
+            ->select('locations.*')
+            ->join('location_identifiers', 'location_identifiers.location_id', '=', 'locations.id')
+            ->whereIn('location_identifiers.type', ['node', 'way', 'relation'])
+            ->where('location_identifiers.origin', 'osm')
+            ->where('location_identifiers.identifier', $nodeId)
+            ->get();
+    }
 }

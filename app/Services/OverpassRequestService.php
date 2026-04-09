@@ -9,6 +9,7 @@ use Generator;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Log;
+use InvalidArgumentException;
 
 class OverpassRequestService
 {
@@ -17,6 +18,10 @@ class OverpassRequestService
     private int $radius;
 
     private Client $client;
+
+    private VersionService $versionService;
+
+    private const string INTERPRETER_URL = 'https://overpass-api.de/api/interpreter?data=';
 
     private const array EXCLUDE = [
         'amenity' => [
@@ -69,10 +74,20 @@ class OverpassRequestService
         ],
     ];
 
-    public function __construct(int $radius = 200, ?Client $client = null)
+    public function __construct(int $radius = 200, ?Client $client = null, ?VersionService $versionService = null)
     {
         $this->radius = $radius;
+        $this->versionService = $versionService ?? new VersionService;
         $this->client = $client ?? new Client;
+    }
+
+    private function getHeaders(): array
+    {
+        return [
+            'Accept' => 'application/json',
+            'User-Agent' => $this->versionService->getRequestUserAgent(),
+            'Accept-Encoding' => 'gzip, deflate',
+        ];
     }
 
     public function setRadius(int $radius): void
@@ -146,14 +161,42 @@ class OverpassRequestService
     /**
      * @throws OverpassApiOverloaded
      */
+    public function getById(string $id, string $type = 'node'): array
+    {
+        if (! in_array($type, ['node', 'way', 'relation'])) {
+            throw new InvalidArgumentException('Invalid type: '.$type);
+        }
+
+        $query = sprintf('[out:json];%s(id:%s);out;', $type, $id);
+        Log::debug('Overpass query: '.$query);
+
+        $url = self::INTERPRETER_URL.urlencode($query);
+        Log::debug('Overpass URL: '.$url);
+        try {
+            $response = $this->client->request('GET', $url, ['headers' => $this->getHeaders()]);
+        } catch (GuzzleException $e) {
+            if ($e->getCode() === 504) {
+                throw new OverpassApiOverloaded;
+            }
+
+            return [];
+        }
+        $response = $response->getBody()->getContents();
+
+        return json_decode($response, true);
+    }
+
+    /**
+     * @throws OverpassApiOverloaded
+     */
     public function getElements(): array
     {
         $query = $this->getQuery();
         Log::debug('Overpass query: '.$query);
 
-        $url = 'https://overpass-api.de/api/interpreter?data='.urlencode($query);
+        $url = self::INTERPRETER_URL.urlencode($query);
         try {
-            $response = $this->client->get($url);
+            $response = $this->client->get($url, ['headers' => $this->getHeaders()]);
         } catch (GuzzleException $exception) {
             if ($exception->getCode() === 504) {
                 throw new OverpassApiOverloaded;
@@ -163,7 +206,7 @@ class OverpassRequestService
         }
         $response = $response->getBody()->getContents();
 
-        return json_decode($response, true);
+        return json_decode($response, true)['elements'][0];
     }
 
     /**
