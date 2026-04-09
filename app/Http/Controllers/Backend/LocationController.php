@@ -126,16 +126,19 @@ class LocationController extends Controller
             try {
                 $this->fetchNearbyLocations($point, $requestLocation, $radius);
             } catch (OverpassApiOverloaded) {
+                Log::warning('Overpass API overloaded, reducing radius and retrying for point '.$point.' with radius '.$radius);
                 try {
                     $radius = intdiv($radius, 2);
                     $requestLocation->update(['radius' => $radius]);
                     $this->fetchNearbyLocations($point, $requestLocation, $radius);
                 } catch (OverpassApiOverloaded) {
+                    Log::warning('Overpass API overloaded, reducing radius and retrying for point '.$point.' with radius '.$radius);
                     try {
                         $radius = intdiv($radius, 2);
                         $requestLocation->update(['radius' => $radius]);
                         $this->fetchNearbyLocations($point, $requestLocation, $radius);
                     } catch (OverpassApiOverloaded $exception) {
+                        Log::warning('Overpass API overloaded. Failing job');
                         $requestLocation->update([
                             'last_requested_at' => now()->subMinutes(config('app.recent_location.timeout'))->subMinute(),
                         ]);
@@ -168,6 +171,23 @@ class LocationController extends Controller
         });
     }
 
+    public function searchByNodeId(string $nodeId): Collection|DbCollection
+    {
+        $locations = $this->locationRepository->getByOsmId($nodeId);
+
+        if ($locations->isEmpty()) {
+            try {
+                $this->fetchById($nodeId, 'node');
+            } catch (OverpassApiOverloaded $e) {
+                report($e);
+            } finally {
+                return $this->locationRepository->getByOsmId($nodeId);
+            }
+        }
+
+        return $locations;
+    }
+
     public function searchNearby(Point $point, ?string $search, int $radius): DbCollection|Collection
     {
         $locations = $this->locationRepository->searchNearby($point, $search, $radius);
@@ -178,6 +198,23 @@ class LocationController extends Controller
                 return $identifier->origin === 'motis';
             });
         });
+    }
+
+    /**
+     * @throws OverpassApiOverloaded
+     */
+    public function fetchById(string $id, string $type)
+    {
+        $response = $this->overpassRequestService->getById($id, $type);
+
+        foreach ($this->overpassRequestService->parseLocations($response) as $location) {
+            try {
+                $this->locationRepository->updateOrCreateOsmLocation($location);
+            } catch (Exception $e) {
+                Log::error('Error processing location', [$location]);
+                report($e);
+            }
+        }
     }
 
     /**

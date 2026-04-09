@@ -118,8 +118,11 @@ class LocationController extends Controller
         if (empty($request->get('query'))) {
             $radius = config('app.nearby.radius');
         }
-
-        $locations = $this->locationController->searchNearby($point, $request->input('query'), $radius);
+        if (str_starts_with($request->input('query'), 'osm:')) {
+            $locations = $this->locationController->searchByNodeId(str_replace('osm:', '', $request->input('query')));
+        } else {
+            $locations = $this->locationController->searchNearby($point, $request->input('query'), $radius);
+        }
 
         return array_values($locations->map(fn ($location) => new LocationDto($location))->toArray());
     }
