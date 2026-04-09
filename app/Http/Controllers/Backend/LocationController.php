@@ -128,22 +128,16 @@ class LocationController extends Controller
             } catch (OverpassApiOverloaded) {
                 Log::warning('Overpass API overloaded, reducing radius and retrying for point '.$point.' with radius '.$radius);
                 try {
-                    $radius = intdiv($radius, 2);
+                    sleep(5);
+                    $radius = intdiv($radius, 4);
                     $requestLocation->update(['radius' => $radius]);
                     $this->fetchNearbyLocations($point, $requestLocation, $radius);
-                } catch (OverpassApiOverloaded) {
-                    Log::warning('Overpass API overloaded, reducing radius and retrying for point '.$point.' with radius '.$radius);
-                    try {
-                        $radius = intdiv($radius, 2);
-                        $requestLocation->update(['radius' => $radius]);
-                        $this->fetchNearbyLocations($point, $requestLocation, $radius);
-                    } catch (OverpassApiOverloaded $exception) {
-                        Log::warning('Overpass API overloaded. Failing job');
-                        $requestLocation->update([
-                            'last_requested_at' => now()->subMinutes(config('app.recent_location.timeout'))->subMinute(),
-                        ]);
-                        throw $exception;
-                    }
+                } catch (OverpassApiOverloaded $exception) {
+                    Log::warning('Overpass API overloaded. Failing job');
+                    $requestLocation->update([
+                        'last_requested_at' => now()->subMinutes(config('app.recent_location.timeout'))->subMinute(),
+                    ]);
+                    throw $exception;
                 }
             }
         }
