@@ -8,7 +8,8 @@ use App\Hydrators\TripDtoHydrator;
 use App\Jobs\PrefetchJob;
 use App\Repositories\LocationRepository;
 use App\Repositories\TransportTripRepository;
-use App\Services\OverpassRequestService;
+use App\Services\OverpassLocationRequestService;
+use App\Services\OverpassRadiusRequestService;
 use App\Services\TransitousRequestService;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Illuminate\Foundation\Testing\TestCase;
@@ -38,7 +39,7 @@ class PrefetchJobTest extends TestCase
             ->method('createRequestLocation')
             ->with($point);
 
-        $overpassRequestService = $this->createMock(OverpassRequestService::class);
+        $overpassRequestService = $this->createMock(OverpassRadiusRequestService::class);
         $overpassRequestService->expects($this->once())
             ->method('getElements')
             ->willReturn(['elements' => []]);
@@ -49,7 +50,8 @@ class PrefetchJobTest extends TestCase
             $this->createMock(TransportTripRepository::class),
             $this->createMock(TripDtoHydrator::class),
             $overpassRequestService,
-            $this->createMock(MapController::class)
+            $this->createMock(MapController::class),
+            new OverpassLocationRequestService,
         );
 
         $job = new PrefetchJob($point, $locationController);

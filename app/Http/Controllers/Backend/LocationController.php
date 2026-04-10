@@ -25,7 +25,8 @@ use App\Models\TimestampedUserWaypoint;
 use App\Models\TransportTripStop;
 use App\Repositories\LocationRepository;
 use App\Repositories\TransportTripRepository;
-use App\Services\OverpassRequestService;
+use App\Services\OverpassLocationRequestService;
+use App\Services\OverpassRadiusRequestService;
 use App\Services\TransitousRequestService;
 use Carbon\Carbon;
 use Clickbar\Magellan\Data\Geometries\Point;
@@ -33,6 +34,7 @@ use Exception;
 use Illuminate\Database\Eloquent\Collection as DbCollection;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Log;
 use Throwable;
 
@@ -46,7 +48,9 @@ class LocationController extends Controller
 
     private TripDtoHydrator $tripDtoHydrator;
 
-    private OverpassRequestService $overpassRequestService;
+    private OverpassRadiusRequestService $overpassRequestService;
+
+    private OverpassLocationRequestService $overpassLocationRequestService;
 
     private MapController $mapController;
 
@@ -55,8 +59,9 @@ class LocationController extends Controller
         TransitousRequestService $transitousRequestService,
         TransportTripRepository $transportTripRepository,
         TripDtoHydrator $tripDtoHydrator,
-        OverpassRequestService $overpassRequestService,
-        MapController $mapController
+        OverpassRadiusRequestService $overpassRequestService,
+        MapController $mapController,
+        OverpassLocationRequestService $overpassLocationRequestService,
     ) {
         $this->locationRepository = $locationRepository;
         $this->transitousRequestService = $transitousRequestService;
@@ -64,6 +69,7 @@ class LocationController extends Controller
         $this->tripDtoHydrator = $tripDtoHydrator;
         $this->overpassRequestService = $overpassRequestService;
         $this->mapController = $mapController;
+        $this->overpassLocationRequestService = $overpassLocationRequestService;
     }
 
     /**
@@ -109,7 +115,7 @@ class LocationController extends Controller
 
     public function getRecentRequestLocation(Point $point): ?RequestLocationDto
     {
-        $radius = config('app.recent_location.radius');
+        $radius = config('app.overpass.radius');
         $recent = $this->locationRepository->getRecentRequestLocation($point, $radius);
 
         return $recent ? RequestLocationDto::fromModel($recent) : null;
@@ -135,7 +141,7 @@ class LocationController extends Controller
                 } catch (OverpassApiOverloaded $exception) {
                     Log::warning('Overpass API overloaded. Failing job');
                     $requestLocation->update([
-                        'last_requested_at' => now()->subMinutes(config('app.recent_location.timeout'))->subMinute(),
+                        'last_requested_at' => now()->subMinutes(config('app.overpass.timeout'))->subMinute(),
                     ]);
                     throw $exception;
                 }
@@ -167,9 +173,14 @@ class LocationController extends Controller
 
     public function searchByNodeId(string $nodeId): Collection|DbCollection
     {
+        if (! preg_match('/^\d+$/', $nodeId)) {
+            return collect();
+        }
+
         $locations = $this->locationRepository->getByOsmId($nodeId);
 
-        if ($locations->isEmpty()) {
+        if ($locations->isEmpty() && Cache::add(sprintf('overpass:fetch_by_id:node:%s', $nodeId), true, now()->addminutes(5))) {
+            // If another process has recently fetched this node (within 1 minute), skip fetching
             try {
                 $this->fetchById($nodeId, 'node');
             } catch (OverpassApiOverloaded $e) {
@@ -199,7 +210,7 @@ class LocationController extends Controller
      */
     public function fetchById(string $id, string $type)
     {
-        $response = $this->overpassRequestService->getById($id, $type);
+        $response = $this->overpassLocationRequestService->getById($id, $type);
 
         foreach ($this->overpassRequestService->parseLocations($response) as $location) {
             try {
