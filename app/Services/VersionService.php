@@ -16,21 +16,11 @@ class VersionService
             $git = $this->getCurrentGitCommit();
             $version = $git ? substr($git, 0, 5) : 'unknown';
         }
+        if (config('app.debug')) {
+            $version .= '-dev';
+        }
 
         return $version;
-    }
-
-    public function getRequestUserAgent(): string
-    {
-        $version = $this->getVersion();
-
-        return sprintf(
-            'Mozilla/5.0 (compatible; %s/%s; %s; contact: %s)',
-            config('app.name'),
-            $version,
-            config('app.url'),
-            config('app.legal.email')
-        );
     }
 
     public function getUserAgent(): string

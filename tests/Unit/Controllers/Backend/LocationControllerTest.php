@@ -14,7 +14,8 @@ use App\Jobs\RerouteStops;
 use App\Models\RequestLocation;
 use App\Repositories\LocationRepository;
 use App\Repositories\TransportTripRepository;
-use App\Services\OverpassRequestService;
+use App\Services\OverpassLocationRequestService;
+use App\Services\OverpassRadiusRequestService;
 use App\Services\TransitousRequestService;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Illuminate\Database\Eloquent\Collection;
@@ -36,7 +37,7 @@ class LocationControllerTest extends TestCase
 
     private TripDtoHydrator $tripDtoHydrator;
 
-    private OverpassRequestService $overpassRequestService;
+    private OverpassRadiusRequestService $overpassRequestService;
 
     protected function setUp(): void
     {
@@ -45,7 +46,7 @@ class LocationControllerTest extends TestCase
         $this->transitousRequestService = $this->createMock(TransitousRequestService::class);
         $this->transportTripRepository = $this->createMock(TransportTripRepository::class);
         $this->tripDtoHydrator = $this->createMock(TripDtoHydrator::class);
-        $this->overpassRequestService = $this->createMock(OverpassRequestService::class);
+        $this->overpassRequestService = $this->createMock(OverpassRadiusRequestService::class);
 
         $this->controller = new LocationController(
             $this->repository,
@@ -53,7 +54,8 @@ class LocationControllerTest extends TestCase
             $this->transportTripRepository,
             $this->tripDtoHydrator,
             $this->overpassRequestService,
-            $this->createMock(MapController::class)
+            $this->createMock(MapController::class),
+            new OverpassLocationRequestService,
         );
     }
 
@@ -116,7 +118,7 @@ class LocationControllerTest extends TestCase
             ->method('getElements')
             ->willReturn(['elements' => []]);
 
-        $radius = config('app.recent_location.radius');
+        $radius = config('app.overpass.radius');
         $this->controller->prefetch($point, $radius);
     }
 
@@ -134,7 +136,7 @@ class LocationControllerTest extends TestCase
         $this->overpassRequestService->expects($this->never())
             ->method('getElements');
 
-        $radius = config('app.recent_location.radius');
+        $radius = config('app.overpass.radius');
         $this->controller->prefetch($point, $radius);
     }
 

@@ -9,14 +9,25 @@ class VersionServiceTest extends TestCase
 {
     public function test_get_version()
     {
+        config()->set('app.debug', false);
         config()->set('app.version', '1.0.0');
         $versionService = new VersionService;
         $version = $versionService->getVersion();
         $this->assertEquals('1.0.0', $version);
     }
 
+    public function test_get_dev_version()
+    {
+        config()->set('app.debug', true);
+        config()->set('app.version', '1.0.0');
+        $versionService = new VersionService;
+        $version = $versionService->getVersion();
+        $this->assertEquals('1.0.0-dev', $version);
+    }
+
     public function test_get_user_agent()
     {
+        config()->set('app.debug', false);
         config()->set('app.version', '1.2.3');
         config()->set('app.name', 'TestApp');
         config()->set('app.url', 'https://example.com');
@@ -29,6 +40,7 @@ class VersionServiceTest extends TestCase
 
     public function test_get_version_without_version()
     {
+        config()->set('app.debug', false);
         config()->set('app.version', '');
         $versionService = new VersionService;
         $version = $versionService->getVersion();
@@ -38,6 +50,7 @@ class VersionServiceTest extends TestCase
 
     public function test_git_version_without_head()
     {
+        config()->set('app.debug', false);
         config()->set('app.version', '');
         $versionServiceMock = $this->getMockBuilder(VersionService::class)
             ->onlyMethods(['getGitHead'])
@@ -51,6 +64,7 @@ class VersionServiceTest extends TestCase
 
     public function test_git_version_with_defective_head()
     {
+        config()->set('app.debug', false);
         config()->set('app.version', '');
         $versionServiceMock = $this->getMockBuilder(VersionService::class)
             ->onlyMethods(['getGitHead'])

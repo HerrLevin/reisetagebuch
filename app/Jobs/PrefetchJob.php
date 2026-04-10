@@ -18,15 +18,15 @@ class PrefetchJob implements ShouldQueue
 
     private ?LocationController $locationController;
 
-    public int $tries = 2;
-
-    public int $retryAfter = 60 * 2;
-
     public function __construct(Point $point, ?LocationController $locationController = null)
     {
         $this->point = $point;
         $this->locationController = $locationController;
     }
+
+    public int $tries = 2;
+
+    public int $retryAfter = 60 * 2;
 
     public function handle(): void
     {
@@ -39,7 +39,7 @@ class PrefetchJob implements ShouldQueue
         if ($this->locationController === null) {
             $this->locationController = App::make(LocationController::class);
         }
-        $radius = config('app.recent_location.radius');
+        $radius = config('app.overpass.radius');
 
         if ($attempts !== null && $attempts > 1) {
             $radius = intdiv($radius, 4);

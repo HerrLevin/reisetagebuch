@@ -212,7 +212,7 @@ class LocationRepository
             ->where(
                 'last_requested_at',
                 '>=',
-                now()->subMinutes(config('app.recent_location.timeout'))
+                now()->subMinutes(config('app.overpass.timeout'))
             );
     }
 
@@ -235,7 +235,7 @@ class LocationRepository
         RequestLocation::where(
             'last_requested_at',
             '<=',
-            now()->subMinutes(config('app.recent_location.timeout'))
+            now()->subMinutes(config('app.overpass.timeout'))
         )
             ->delete();
     }

@@ -30,9 +30,10 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
-    'recent_location' => [
-        'radius' => env('APP_RECENT_LOCATION_RADIUS', 1000),
-        'timeout' => env('APP_RECENT_LOCATION_TIMEOUT', 60 * 24),
+    'overpass' => [
+        'radius' => env('APP_OVERPASS_RADIUS', 1000),
+        'timeout' => env('APP_OVERPASS_TIMEOUT', 60 * 24 * 7),
+        'url' => env('APP_OVERPASS_URL', 'https://overpass.private.coffee/api/interpreter'),
     ],
 
     'motis' => [
