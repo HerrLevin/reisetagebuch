@@ -36,6 +36,7 @@ use App\Repositories\TransportTripRepository;
 use App\Repositories\UserStatisticsRepository;
 use App\Services\GpxParserService;
 use Auth;
+use Carbon\Carbon;
 use Clickbar\Magellan\Data\Geometries\LineString;
 use Clickbar\Magellan\IO\Parser\Geojson\GeojsonParser;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -79,7 +80,8 @@ class PostController extends Controller
             Visibility::from($request->input('visibility')),
             $request->input('body'),
             $request->input('tags', []),
-            TravelReason::from($request->input('travelReason'))
+            TravelReason::from($request->input('travelReason')),
+            $request->input('visitedAt') ? Carbon::parse($request->input('visitedAt')) : null,
         );
     }
 
@@ -198,7 +200,13 @@ class PostController extends Controller
 
         if ($post instanceof TransportPost) {
             TraewellingEditPostJob::dispatch($post);
+        }
 
+        if ($post instanceof LocationPost) {
+            $post = $this->postRepository->updateLocationPost(
+                $post,
+                $request->input('visitedAt') ? Carbon::parse($request->input('visitedAt')) : null,
+            );
         }
 
         return $post;

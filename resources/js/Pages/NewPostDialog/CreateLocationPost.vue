@@ -18,7 +18,7 @@ useTitle(t('new_post.title'));
 
 const emoji = (route.query.emoji as string | undefined) || '📍';
 const name = (route.query.name as string | undefined) || '';
-const id = route.query.id as string | undefined;
+const id = route.query.id as string | '';
 
 const loading = ref(false);
 
@@ -28,6 +28,7 @@ const form = reactive({
     visibility: Visibility.Public,
     tags: [] as string[],
     travelReason: TravelReason.Leisure,
+    visitedAt: null,
 });
 
 function submitForm() {
@@ -59,6 +60,8 @@ function submitForm() {
                     :name="name"
                     :emoji="emoji"
                     :show-travel-reason="true"
+                    :show-time-select="true"
+                    :post-time="form.visitedAt"
                     :loading="loading"
                     @cancel="useRouter().back()"
                     @select-travel-reason="
@@ -67,6 +70,7 @@ function submitForm() {
                     @select-visibility="
                         (visibility) => (form.visibility = visibility)
                     "
+                    @update:time="(dateTime) => (form.visitedAt = dateTime)"
                     @update:tags="(tags) => (form.tags = tags)"
                 />
             </form>

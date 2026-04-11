@@ -1830,7 +1830,17 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "App\\Http\\Requests\\BasePostRequest"
+                                "oneOf": [
+                                    {
+                                        "$ref": "#/components/schemas/BasePostRequest"
+                                    },
+                                    {
+                                        "$ref": "#/components/schemas/LocationPostRequest"
+                                    },
+                                    {
+                                        "$ref": "#/components/schemas/TransportPostRequest"
+                                    }
+                                ]
                             }
                         }
                     }
@@ -2032,7 +2042,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "App\\Http\\Requests\\TransportBasePostCreateRequest"
+                                "$ref": "#/components/schemas/TransportPostRequest"
                             }
                         }
                     }
@@ -2075,7 +2085,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "App\\Http\\Requests\\BasePostRequest"
+                                "$ref": "#/components/schemas/BasePostRequest"
                             }
                         }
                     }
@@ -2118,7 +2128,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "App\\Http\\Requests\\LocationBasePostRequest"
+                                "$ref": "#/components/schemas/LocationPostRequest"
                             }
                         }
                     }
@@ -3906,6 +3916,39 @@
                     "only-authenticated"
                 ]
             },
+            "BasePostRequest": {
+                "required": [
+                    "visibility",
+                    "travelReason"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "ID of the pot. Required if post is edited.",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "body": {},
+                    "visibility": {
+                        "$ref": "#/components/schemas/Visibility"
+                    },
+                    "travelReason": {
+                        "$ref": "#/components/schemas/TravelReason"
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "vehicleIds": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "type": "object"
+            },
             "ImageUploadRequest": {
                 "description": "Request to upload an image",
                 "required": [
@@ -3920,6 +3963,31 @@
                     }
                 },
                 "type": "object"
+            },
+            "LocationPostRequest": {
+                "required": [
+                    "location"
+                ],
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/BasePostRequest"
+                    },
+                    {
+                        "properties": {
+                            "location": {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            "visitedAt": {
+                                "type": "string",
+                                "format": "date-time",
+                                "nullable": true
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
             },
             "ProfileUpdateRequest": {
                 "title": "Profile Update Request",
@@ -4105,6 +4173,61 @@
                     }
                 },
                 "type": "object"
+            },
+            "TransportPostRequest": {
+                "required": [
+                    "tripId",
+                    "startId",
+                    "startTime",
+                    "stopId",
+                    "stopTime"
+                ],
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/BasePostRequest"
+                    },
+                    {
+                        "properties": {
+                            "tripId": {
+                                "type": "string"
+                            },
+                            "startId": {
+                                "type": "string"
+                            },
+                            "startTime": {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            "stopId": {
+                                "type": "string"
+                            },
+                            "stopTime": {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            "vehicleIds": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "travelRole": {
+                                "oneOf": [
+                                    {
+                                        "$ref": "#/components/schemas/TravelRole"
+                                    }
+                                ],
+                                "nullable": true
+                            },
+                            "metaTripId": {
+                                "type": "string",
+                                "nullable": true
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
             },
             "TransportPostExitUpdateRequest": {
                 "required": [
@@ -4436,7 +4559,8 @@
                 "description": "Location Post Resource",
                 "required": [
                     "location",
-                    "travelReason"
+                    "travelReason",
+                    "visitedAt"
                 ],
                 "type": "object",
                 "allOf": [
@@ -4456,6 +4580,11 @@
                                 ],
                                 "nullable": true,
                                 "description": "Reason for travel associated with the location post"
+                            },
+                            "visitedAt": {
+                                "type": "string",
+                                "format": "date-time",
+                                "nullable": true
                             }
                         },
                         "type": "object"

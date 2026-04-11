@@ -413,7 +413,11 @@ class PostController extends Controller
         ],
         requestBody: new OA\RequestBody(
             required: true,
-            content: new OA\JsonContent(ref: BasePostRequest::class)
+            content: new OA\JsonContent(oneOf: [
+                new OA\Schema(ref: BasePostRequest::class),
+                new OA\Schema(ref: LocationBasePostRequest::class),
+                new OA\Schema(ref: TransportBasePostCreateRequest::class),
+            ])
         ),
         tags: ['Posts'],
         parameters: [

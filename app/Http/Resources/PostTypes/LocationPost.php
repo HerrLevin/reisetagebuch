@@ -12,7 +12,7 @@ use OpenApi\Attributes as OA;
 #[OA\Schema(
     schema: 'LocationPost',
     description: 'Location Post Resource',
-    required: ['location', 'travelReason'],
+    required: ['location', 'travelReason', 'visitedAt'],
     type: 'object'
 )]
 class LocationPost extends BasePost
@@ -32,10 +32,19 @@ class LocationPost extends BasePost
     )]
     public ?TravelReason $travelReason;
 
+    #[OA\Property(
+        property: 'visitedAt',
+        type: 'string',
+        format: 'date-time',
+        nullable: true
+    )]
+    public ?string $visitedAt;
+
     public function __construct(Post $post, UserDto $userDto)
     {
         parent::__construct($post, $userDto);
         $this->location = new LocationDto($post->locationPost->location);
         $this->travelReason = TravelReason::tryFrom($post->metaInfos->where('key', MetaInfoKey::TRAVEL_REASON)->first()?->value);
+        $this->visitedAt = $post->locationPost->visited_at?->toIso8601String();
     }
 }

@@ -225,8 +225,8 @@ function deleted() {
                 :progress="progress"
             ></Map>
             <div v-if="loading" class="skeleton h-110 w-full" />
-            <div class="p-4">
-                <ul class="list">
+            <div class="w-full p-4">
+                <ul class="list w-full">
                     <li class="list-row">
                         <PostSkeleton v-if="loading" />
                         <Post
