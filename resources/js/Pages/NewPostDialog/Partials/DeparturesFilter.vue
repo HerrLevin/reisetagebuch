@@ -113,13 +113,12 @@ const identifier = computed(() => {
                         @select-identifier="submitTypeahead"
                     />
                 </div>
-                <div class="dropdown dropdown-end">
-                    <div tabindex="0" role="button" class="btn btn-neutral">
+                <details class="dropdown dropdown-end">
+                    <summary class="btn btn-neutral">
                         <Clock class="h-4 w-4" />
-                    </div>
+                    </summary>
                     <div
-                        tabindex="-1"
-                        class="dropdown-content bg-base-100 rounded-box p-3 shadow-lg"
+                        class="dropdown-content bg-base-100 rounded-box w-52 p-3 shadow-lg"
                     >
                         <input
                             type="date"
@@ -163,7 +162,7 @@ const identifier = computed(() => {
                             {{ t('new_post.departures_filter.set_datetime') }}
                         </RouterLink>
                     </div>
-                </div>
+                </details>
             </li>
             <li
                 class="flex gap-1 overflow-x-scroll p-4 pb-2 text-xs tracking-wide"
