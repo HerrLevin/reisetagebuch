@@ -40,6 +40,43 @@ class PostLiked extends Notification
             'reference_id' => $this->like->id,
             'post_id' => $this->post->id,
             'post_body' => $this->post->body ? substr($this->post->body, 0, 50) : null,
+            'summary' => $this->getSummary(),
         ];
+    }
+
+    private function getSummary(): ?string
+    {
+        if ($this->post instanceof LocationPost) {
+            return $this->getLocationPostSummary();
+        } elseif ($this->post instanceof TransportPost) {
+            return $this->getTransportPostSummary();
+        }
+
+        return empty($this->post->body) ? null : $this->formattedBody();
+    }
+
+    private function formattedBody(): string
+    {
+        return $this->post->body ? sprintf('"%s" ', $this->post->body) : '';
+    }
+
+    private function getLocationPostSummary(): string
+    {
+        return sprintf(
+            '%s@ %s',
+            $this->formattedBody(),
+            $this->post->location->name
+        );
+    }
+
+    private function getTransportPostSummary(): string
+    {
+        return sprintf(
+            '%s@ %s, %s ➜ %s',
+            $this->formattedBody(),
+            $this->post->trip->displayName ?? $this->post->trip->tripShortName ?? $this->post->trip->lineName ?? $this->post->trip->routeLongName,
+            $this->post->originStop->name,
+            $this->post->destinationStop->name
+        );
     }
 }

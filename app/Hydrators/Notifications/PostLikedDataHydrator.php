@@ -18,7 +18,7 @@ class PostLikedDataHydrator
             likedByUserName: $data['liker']['username'],
             likedByUserDisplayName: $data['liker']['name'],
             likedByUserAvatarUrl: $data['liker']['avatar'],
-            postSummary: null // todo: implement post summary logic if needed
+            postSummary: ! empty($data['summary']) ? $data['summary'] : null
         );
     }
 }
