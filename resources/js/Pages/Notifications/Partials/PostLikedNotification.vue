@@ -38,8 +38,11 @@ const data = props.notification.data as PostLikedData;
                     })
                 }}
             </div>
-            <div v-if="data.postBody" class="line-clamp-1 text-xs opacity-60">
-                {{ data.postBody }}
+            <div
+                v-if="data.postSummary || data.postBody"
+                class="line-clamp-1 text-xs opacity-60"
+            >
+                {{ data.postSummary ?? data.postBody }}
             </div>
             <div class="mt-1 text-xs opacity-40">
                 {{ new Date(notification.createdAt).toLocaleString() }}
