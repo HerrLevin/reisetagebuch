@@ -119,7 +119,7 @@ const relativeCreatedAt = computed(() => {
                 · {{ DateTime.fromISO(localPost.publishedAt).toLocaleString() }}
             </span>
             <span
-                v-if="false && isLocationPost(localPost) && localPost.visitedAt"
+                v-if="isLocationPost(localPost) && localPost.visitedAt"
                 class="text-xs opacity-60"
             >
                 · @
