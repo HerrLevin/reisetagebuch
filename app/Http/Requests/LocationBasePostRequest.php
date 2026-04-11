@@ -6,7 +6,7 @@ use OpenApi\Attributes as OA;
 
 #[OA\Schema(
     schema: 'LocationPostRequest',
-    required: ['location'],
+    required: ['location', 'visitedAt'],
     properties: [
         new OA\Property(
             property: 'location',
@@ -30,7 +30,7 @@ class LocationBasePostRequest extends BasePostRequest
 
         return array_merge([
             'location' => 'required|exists:locations,id',
-            'visitedAt' => ['sometimes', 'date', 'nullable'],
+            'visitedAt' => ['required', 'date', 'nullable'],
         ], parent::rules());
     }
 }
