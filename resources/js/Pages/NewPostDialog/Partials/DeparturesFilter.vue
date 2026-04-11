@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import TimeSelect from '@/Components/TimeSelect.vue';
 import TransitousSearch from '@/Pages/NewPostDialog/Partials/TransitousSearch.vue';
 import router from '@/router';
 import {
@@ -6,9 +7,9 @@ import {
     getColor,
     getEmoji,
 } from '@/Services/DepartureTypeService';
-import { Clock, X } from 'lucide-vue-next';
+import { X } from 'lucide-vue-next';
 import { DateTime } from 'luxon';
-import { computed, PropType, ref } from 'vue';
+import { computed, PropType, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { RouterLink } from 'vue-router';
 import { StopDto, TransportMode } from '../../../../types/Api.gen';
@@ -45,39 +46,13 @@ const props = defineProps({
     },
 });
 
-function blur() {
-    (document.activeElement as HTMLElement)?.blur();
-}
-
 const selectedTime = ref<DateTime | null>(null);
-if (props.requestTime) {
-    selectedTime.value = DateTime.fromISO(props.requestTime);
-} else {
-    selectedTime.value = DateTime.now();
-}
 
-function selectDate(date: EventTarget | null) {
-    if (date && date instanceof HTMLInputElement) {
-        const dateObject = DateTime.fromISO(date.value);
-        selectedTime.value = selectedTime.value
-            ? selectedTime.value.set({
-                  year: dateObject.year,
-                  month: dateObject.month,
-                  day: dateObject.day,
-              })
-            : dateObject;
-    }
-}
-
-function selectTime(time: EventTarget | null) {
-    if (time && time instanceof HTMLInputElement) {
-        const timeObject = DateTime.fromISO(time.value);
-        selectedTime.value = selectedTime.value
-            ? selectedTime.value.set({
-                  hour: timeObject.hour,
-                  minute: timeObject.minute,
-              })
-            : timeObject;
+function evaluateProps() {
+    if (props.requestTime) {
+        selectedTime.value = DateTime.fromISO(props.requestTime);
+    } else {
+        selectedTime.value = DateTime.now();
     }
 }
 
@@ -95,9 +70,28 @@ function submitTypeahead(submittedIdentifier: string | null) {
     }
 }
 
+function updateTime() {
+    router.push({
+        path: departuresPath,
+        query: {
+            latitude: String(props.latitude),
+            longitude: String(props.longitude),
+            identifier: identifier.value,
+            when: selectedTime.value?.toISO() ?? undefined,
+        },
+    });
+}
+
 const identifier = computed(() => {
     return props.requestIdentifier || props.location?.id;
 });
+watch(
+    () => props.requestTime,
+    () => {
+        evaluateProps();
+    },
+    { immediate: true },
+);
 </script>
 
 <template>
@@ -113,56 +107,10 @@ const identifier = computed(() => {
                         @select-identifier="submitTypeahead"
                     />
                 </div>
-                <details class="dropdown dropdown-end">
-                    <summary class="btn btn-neutral">
-                        <Clock class="h-4 w-4" />
-                    </summary>
-                    <div
-                        class="dropdown-content bg-base-100 rounded-box w-52 p-3 shadow-lg"
-                    >
-                        <input
-                            type="date"
-                            class="input input-bordered w-full"
-                            :value="selectedTime?.toFormat('yyyy-MM-dd')"
-                            @change="selectDate($event.target)"
-                        />
-                        <input
-                            type="time"
-                            class="input input-bordered mt-2 w-full"
-                            :value="selectedTime?.toFormat('HH:mm')"
-                            @change="selectTime($event.target)"
-                        />
-                        <div class="mt-2 grid grid-cols-2 gap-2">
-                            <button
-                                class="btn btn-secondary w-full"
-                                @click="selectedTime = DateTime.now()"
-                            >
-                                {{ t('new_post.departures_filter.now') }}
-                            </button>
-                            <button
-                                class="btn btn-secondary w-full"
-                                @click="selectedTime = null"
-                            >
-                                {{ t('new_post.departures_filter.clear') }}
-                            </button>
-                        </div>
-                        <RouterLink
-                            class="btn btn-primary mt-2 w-full"
-                            :to="{
-                                path: departuresPath,
-                                query: {
-                                    latitude: String(latitude),
-                                    longitude: String(longitude),
-                                    identifier: identifier,
-                                    when: selectedTime?.toISO() ?? undefined,
-                                },
-                            }"
-                            @click="blur()"
-                        >
-                            {{ t('new_post.departures_filter.set_datetime') }}
-                        </RouterLink>
-                    </div>
-                </details>
+                <TimeSelect
+                    v-model="selectedTime"
+                    @update:model-value="updateTime()"
+                />
             </li>
             <li
                 class="flex gap-1 overflow-x-scroll p-4 pb-2 text-xs tracking-wide"

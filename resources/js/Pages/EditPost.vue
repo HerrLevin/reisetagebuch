@@ -57,6 +57,7 @@ const form = reactive({
     vehicleIds: [] as string[],
     metaTripId: null as string | null,
     travelRole: null as TravelRole | null,
+    visitedAt: null as string | null,
 });
 
 function submitForm() {
@@ -90,6 +91,7 @@ function prefillForm() {
     form.tags = post.value.hashTags || [];
     form.travelReason =
         (post.value as LocationPost)?.travelReason || TravelReason.Leisure;
+    form.visitedAt = (post.value as LocationPost)?.visitedAt;
 
     const vehicleIds = post.value.metaInfos['rtb:vehicle_id'];
     if (Array.isArray(vehicleIds)) {
@@ -148,9 +150,11 @@ fetchPost();
                         isTransportPost(post) || isLocationPost(post)
                     "
                     :show-vehicle-id="isTransportPost(post)"
+                    :show-time-select="true"
                     :vehicle-ids="form.vehicleIds"
                     :travel-role="form.travelRole"
                     :meta-trip-id="form.metaTripId"
+                    :post-time="form.visitedAt"
                     @select-travel-reason="
                         (reason) => (form.travelReason = reason)
                     "
@@ -160,6 +164,7 @@ fetchPost();
                     @update:vehicle-ids="(ids) => (form.vehicleIds = ids)"
                     @update:travel-role="(role) => (form.travelRole = role)"
                     @update:trip-id="(ids) => (form.metaTripId = ids)"
+                    @update:time="(time) => (form.visitedAt = time)"
                 />
             </form>
         </div>

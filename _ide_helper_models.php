@@ -187,6 +187,7 @@ namespace App\Models{
  * @property string $location_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $visited_at
  * @property-read \App\Models\Location|null $location
  * @property-read \App\Models\Post $post
  * @method static \Illuminate\Database\Eloquent\Builder<static>|LocationPost newModelQuery()
@@ -197,6 +198,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|LocationPost whereLocationId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|LocationPost wherePostId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|LocationPost whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|LocationPost whereVisitedAt($value)
  */
 	class LocationPost extends \Eloquent {}
 }

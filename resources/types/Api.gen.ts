@@ -658,6 +658,21 @@ export interface UserSettingsDto {
   requiresFollowRequest: boolean;
 }
 
+export interface BasePostRequest {
+  /**
+   * ID of the pot. Required if post is edited.
+   * @format uuid
+   */
+  id?: string;
+  body?: any;
+  /** Visibility levels for posts */
+  visibility: Visibility;
+  /** Reasons for travel associated with transport posts */
+  travelReason: TravelReason;
+  tags?: string[];
+  vehicleIds?: string[];
+}
+
 /** Request to upload an image */
 export interface ImageUploadRequest {
   /**
@@ -666,6 +681,13 @@ export interface ImageUploadRequest {
    */
   image?: File;
 }
+
+export type LocationPostRequest = BasePostRequest & {
+  /** @format uuid */
+  location: string;
+  /** @format date-time */
+  visitedAt?: string | null;
+};
 
 /**
  * Profile Update Request
@@ -779,6 +801,19 @@ export interface StoreTripRequest {
     order?: number;
   }[];
 }
+
+export type TransportPostRequest = BasePostRequest & {
+  tripId: string;
+  startId: string;
+  /** @format date-time */
+  startTime: string;
+  stopId: string;
+  /** @format date-time */
+  stopTime: string;
+  vehicleIds?: string[];
+  travelRole?: TravelRole | null;
+  metaTripId?: string | null;
+};
 
 export interface TransportPostExitUpdateRequest {
   /**
@@ -969,6 +1004,8 @@ export type LocationPost = BasePost & {
   location: LocationDto;
   /** Reason for travel associated with the location post */
   travelReason: TravelReason | null;
+  /** @format date-time */
+  visitedAt: string | null;
 };
 
 /** Transport Post Resource */
@@ -2195,7 +2232,11 @@ export class Api<
      * @request PATCH:/posts/{id}
      * @secure
      */
-    updatePost: (id: string, data: any, params: RequestParams = {}) =>
+    updatePost: (
+      id: string,
+      data: BasePostRequest | LocationPostRequest | TransportPostRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<BasePost | TransportPost | LocationPost, void>({
         path: `/posts/${id}`,
         method: "PATCH",
@@ -2276,7 +2317,10 @@ export class Api<
      * @request POST:/posts/transport
      * @secure
      */
-    storeTransportPost: (data: any, params: RequestParams = {}) =>
+    storeTransportPost: (
+      data: TransportPostRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<TransportPost, void>({
         path: `/posts/transport`,
         method: "POST",
@@ -2296,7 +2340,7 @@ export class Api<
      * @request POST:/posts/text
      * @secure
      */
-    storeTextPost: (data: any, params: RequestParams = {}) =>
+    storeTextPost: (data: BasePostRequest, params: RequestParams = {}) =>
       this.request<BasePost, void>({
         path: `/posts/text`,
         method: "POST",
@@ -2316,7 +2360,10 @@ export class Api<
      * @request POST:/posts/location
      * @secure
      */
-    storeLocationPost: (data: any, params: RequestParams = {}) =>
+    storeLocationPost: (
+      data: LocationPostRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<LocationPost, void>({
         path: `/posts/location`,
         method: "POST",

@@ -49,19 +49,26 @@ class PostRepository
         Visibility $visibility,
         ?string $body = null,
         array $hashTagIds = [],
-        TravelReason $travelReason = TravelReason::LEISURE
+        TravelReason $travelReason = TravelReason::LEISURE,
+        ?Carbon $visitedAt = null,
     ): BasePost|LocationPost|TransportPost {
         try {
             DB::beginTransaction();
+
+            $publishedAt = $visitedAt->clone() ?? Carbon::now();
+            $publishedAt = $publishedAt->subMinutes(10);
+
             /** @var Post $post */
             $post = Post::create([
                 'user_id' => $user->id,
                 'body' => $body,
                 'visibility' => $visibility,
+                'published_at' => $publishedAt->toIso8601ZuluString(),
             ]);
             // create location post
             $post->locationPost()->create([
                 'location_id' => $location->id,
+                'visited_at' => $visitedAt->toIso8601ZuluString(),
             ]);
 
             if (! empty($hashTagIds)) {
@@ -93,6 +100,7 @@ class PostRepository
                 'user_id' => $user->id,
                 'body' => $body,
                 'visibility' => $visibility,
+                'published_at' => Carbon::now()->subMinutes(10),
             ]);
 
             if (! empty($tags)) {
@@ -148,6 +156,24 @@ class PostRepository
             DB::commit();
 
             $post->load('locationPost', 'transportPost', 'hashTags');
+        } catch (Throwable $e) {
+            DB::rollBack();
+            report($e);
+        }
+
+        return $this->postHydrator->modelToDto($post, true);
+    }
+
+    public function updateLocationPost(LocationPost $locationPost, ?Carbon $visitedAt = null): LocationPost
+    {
+        try {
+            DB::beginTransaction();
+            $post = Post::where('id', $locationPost->id)->firstOrFail();
+            $post->published_at = $visitedAt?->subMinutes(10);
+            $post->locationPost()->update([
+                'visited_at' => $visitedAt->toIso8601ZuluString(),
+            ]);
+            DB::commit();
         } catch (Throwable $e) {
             DB::rollBack();
             report($e);

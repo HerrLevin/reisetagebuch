@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Enums\PostMetaInfo\TravelRole;
 use Illuminate\Validation\Rule;
+use OpenApi\Attributes as OA;
 
 /**
  * @property string $body
@@ -16,6 +17,52 @@ use Illuminate\Validation\Rule;
  * @property TravelRole|null $travelRole
  * @property string|null $metaTripId
  */
+#[OA\Schema(
+    schema: 'TransportPostRequest',
+    required: ['tripId', 'startId', 'startTime', 'stopId', 'stopTime'],
+    properties: [
+        new OA\Property(
+            property: 'tripId',
+            type: 'string',
+        ),
+        new OA\Property(
+            property: 'startId',
+            type: 'string',
+        ),
+        new OA\Property(
+            property: 'startTime',
+            type: 'string',
+            format: 'date-time',
+        ),
+        new OA\Property(
+            property: 'stopId',
+            type: 'string',
+        ),
+        new OA\Property(
+            property: 'stopTime',
+            type: 'string',
+            format: 'date-time',
+        ),
+        new OA\Property(
+            property: 'vehicleIds',
+            type: 'array',
+            items: new OA\Items(
+                type: 'string',
+            )
+        ),
+        new OA\Property(
+            property: 'travelRole',
+            ref: TravelRole::class,
+            nullable: true,
+        ),
+        new OA\Property(
+            property: 'metaTripId',
+            type: 'string',
+            nullable: true,
+        ),
+    ],
+    type: 'object'
+)]
 class TransportBasePostCreateRequest extends BasePostRequest
 {
     public function rules(): array

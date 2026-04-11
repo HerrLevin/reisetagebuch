@@ -10,7 +10,11 @@ class LocationPost extends Model
 {
     use HasUuids;
 
-    protected $fillable = ['post_id', 'location_id'];
+    protected $fillable = ['post_id', 'location_id', 'visited_at'];
+
+    protected $casts = [
+        'visited_at' => 'datetime',
+    ];
 
     public function post(): BelongsTo
     {

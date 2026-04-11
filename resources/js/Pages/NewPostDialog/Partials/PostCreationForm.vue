@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import TimeSelect from '@/Components/TimeSelect.vue';
 import TagsInput from '@/Pages/NewPostDialog/Partials/TagsInput.vue';
 import VehicleIdInput from '@/Pages/NewPostDialog/Partials/VehicleIdInput.vue';
 import {
@@ -11,7 +12,8 @@ import {
     getVisibilityIcon,
     getVisibilityLabel,
 } from '@/Services/VisibilityMapping';
-import { ref } from 'vue';
+import { DateTime } from 'luxon';
+import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import {
     TravelReason,
@@ -53,7 +55,15 @@ const props = defineProps({
         type: String as () => TravelReason,
         default: null,
     },
+    postTime: {
+        type: String as () => string | null,
+        default: null,
+    },
     showTravelReason: {
+        type: Boolean,
+        default: false,
+    },
+    showTimeSelect: {
         type: Boolean,
         default: false,
     },
@@ -83,6 +93,7 @@ const emit = defineEmits([
     'cancel',
     'selectVisibility',
     'selectTravelReason',
+    'update:time',
     'update:modelValue',
     'update:tags',
     'update:vehicleIds',
@@ -91,6 +102,21 @@ const emit = defineEmits([
 ]);
 const selectedVisibility = ref(props.defaultVisibility || Visibility.Public);
 const selectedTravelReason = ref(props.travelReason || TravelReason.Leisure);
+const selectedTime = ref(
+    props.postTime ? DateTime.fromISO(props.postTime) : null,
+);
+
+function evaluateProps() {
+    if (props.defaultVisibility) {
+        selectedVisibility.value = props.defaultVisibility;
+    }
+    if (props.travelReason) {
+        selectedTravelReason.value = props.travelReason;
+    }
+    selectedTime.value = props.postTime
+        ? DateTime.fromISO(props.postTime)
+        : null;
+}
 
 if (!props.defaultVisibility) {
     recallStoredVisibility();
@@ -134,6 +160,12 @@ function selectTravelReason(travelReason: TravelReason) {
     emit('selectTravelReason', travelReason);
 }
 
+function selectTime(time: DateTime | null | undefined) {
+    selectedTime.value = time || null;
+    console.log(time?.toISO());
+    emit('update:time', time?.toISO());
+}
+
 function blur() {
     (document.activeElement as HTMLElement)?.blur();
 }
@@ -154,6 +186,14 @@ function updateTripId(event: Event) {
     const tripId = (event.target as HTMLInputElement).value;
     emit('update:tripId', tripId);
 }
+
+watch(
+    () => props,
+    () => {
+        evaluateProps();
+    },
+    { immediate: true, deep: true },
+);
 </script>
 
 <template>
@@ -271,6 +311,14 @@ function updateTripId(event: Event) {
                 </template>
             </ul>
         </div>
+        <TimeSelect
+            v-if="showTimeSelect"
+            v-model="selectedTime"
+            :display-time="true"
+            button-class="btn btn-outline btn-primary btn-sm"
+            class-name="py-2 ps-2"
+            @update:model-value="selectTime($event)"
+        />
         <textarea
             v-model="model"
             class="textarea textarea-ghost transparent-input w-full"
