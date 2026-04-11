@@ -55,7 +55,7 @@ class PostRepository
         try {
             DB::beginTransaction();
 
-            $publishedAt = $visitedAt->clone() ?? Carbon::now();
+            $publishedAt = $visitedAt?->clone() ?? Carbon::now();
             $publishedAt = $publishedAt->subMinutes(10);
 
             /** @var Post $post */

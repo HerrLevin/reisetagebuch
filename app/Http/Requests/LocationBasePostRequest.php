@@ -30,7 +30,7 @@ class LocationBasePostRequest extends BasePostRequest
 
         return array_merge([
             'location' => 'required|exists:locations,id',
-            'visitedAt' => ['required', 'date', 'nullable'],
+            'visitedAt' => ['date', 'nullable'],
         ], parent::rules());
     }
 }
