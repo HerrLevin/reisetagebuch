@@ -68,7 +68,7 @@ class PostRepository
             // create location post
             $post->locationPost()->create([
                 'location_id' => $location->id,
-                'visited_at' => $visitedAt->toIso8601ZuluString(),
+                'visited_at' => $visitedAt?->toIso8601ZuluString(),
             ]);
 
             if (! empty($hashTagIds)) {
@@ -169,10 +169,11 @@ class PostRepository
         try {
             DB::beginTransaction();
             $post = Post::where('id', $locationPost->id)->firstOrFail();
-            $post->published_at = $visitedAt?->subMinutes(10);
+            $post->published_at = ($visitedAt ?? $post->created_at ?? Carbon::now())->clone()->subMinutes(10)->toIso8601ZuluString();
             $post->locationPost()->update([
-                'visited_at' => $visitedAt->toIso8601ZuluString(),
+                'visited_at' => $visitedAt?->toIso8601ZuluString(),
             ]);
+            $post->save();
             DB::commit();
         } catch (Throwable $e) {
             DB::rollBack();
