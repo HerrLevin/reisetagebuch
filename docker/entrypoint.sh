@@ -8,13 +8,15 @@ echo "Starting Reisetagebuch..."
 if [ ! -f /var/www/html/.env ]; then
   echo "Environment file not found. Creating a new one..."
   touch /var/www/html/.env
-  echo "APP_ENV=production" >> /var/www/html/.env
-  echo "APP_DEBUG=false" >> /var/www/html/.env
-  echo "APP_KEY=base64:$(openssl rand -base64 32)" > /var/www/html/.env
+
+  [ -z "$APP_ENV" ]   && echo "APP_ENV=production" >> /var/www/html/.env
+  [ -z "$APP_DEBUG" ] && echo "APP_DEBUG=false" >> /var/www/html/.env
+  [ -z "$APP_KEY" ]   && echo "APP_KEY=base64:$(openssl rand -base64 32)" >> /var/www/html/.env
 fi
 
-# Set correct permissions
-chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+# Set correct permissions (may fail when running as non-root, which is fine
+# since the Dockerfile already sets correct ownership)
+chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true
 
 # Start Supervisor in the background
 supervisord -c /etc/supervisord.conf &

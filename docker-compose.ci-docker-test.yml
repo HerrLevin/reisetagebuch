@@ -1,0 +1,56 @@
+services:
+    app:
+        image: 'herrlevin/reisetagebuch:ci-test'
+        ports:
+            - '8080:80'
+        environment:
+            APP_NAME: Reisetagebuch
+            APP_ENV: local
+            APP_DEBUG: 'true'
+            APP_URL: http://localhost
+            APP_TESTING_CYPRESS: 'true'
+            APP_TESTING_CYPRESS_TOKEN: testing
+            APP_REGISTRATION: 'true'
+            DB_CONNECTION: pgsql
+            DB_HOST: pgsql
+            DB_PORT: 5432
+            DB_DATABASE: reisetagebuch
+            DB_USERNAME: sail
+            DB_PASSWORD: password
+            REDIS_HOST: redis
+            REDIS_PASSWORD: 'null'
+            BROADCAST_CONNECTION: log
+            TELESCOPE_ENABLED: 'false'
+        depends_on:
+            pgsql:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+    pgsql:
+        platform: 'linux/amd64'
+        image: 'postgis/postgis:17-master'
+        environment:
+            PGPASSWORD: password
+            POSTGRES_DB: reisetagebuch
+            POSTGRES_USER: sail
+            POSTGRES_PASSWORD: password
+        healthcheck:
+            test:
+                - CMD
+                - pg_isready
+                - '-q'
+                - '-d'
+                - reisetagebuch
+                - '-U'
+                - sail
+            retries: 3
+            timeout: 5s
+    redis:
+        image: 'redis:alpine'
+        healthcheck:
+            test:
+                - CMD
+                - redis-cli
+                - ping
+            retries: 3
+            timeout: 5s
