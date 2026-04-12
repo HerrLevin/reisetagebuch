@@ -9,7 +9,7 @@ use OpenApi\Attributes as OA;
     schema: 'AuthenticatedUserDto',
     title: 'Authenticated User DTO',
     description: 'Data Transfer Object representing the authenticated user',
-    required: ['id', 'name', 'username', 'email', 'mustVerifyEmail', 'canInviteUsers', 'traewellingConnected', 'settings', 'avatar'],
+    required: ['id', 'name', 'username', 'email', 'mustVerifyEmail', 'canInviteUsers', 'traewellingConnected', 'settings', 'avatar', 'isAdmin'],
     properties: [
         new OA\Property(
             property: 'id',
@@ -67,6 +67,12 @@ use OpenApi\Attributes as OA;
             ref: '#/components/schemas/UserSettingsDto',
             description: 'The user settings'
         ),
+        new OA\Property(
+            property: 'isAdmin',
+            description: 'Indicates whether the user has administrative privileges on this instance',
+            type: 'boolean',
+            example: false
+        ),
     ]
 )]
 readonly class AuthenticatedUserDto
@@ -83,5 +89,6 @@ readonly class AuthenticatedUserDto
         public UserSettingsDto $settings,
         public bool $canInviteUsers = false,
         public bool $traewellingConnected = false,
+        public bool $isAdmin = false,
     ) {}
 }

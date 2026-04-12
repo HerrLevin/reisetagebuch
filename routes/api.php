@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AccountController;
 use App\Http\Controllers\Api\AppConfigurationController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\FollowController;
+use App\Http\Controllers\Api\ImprintController;
 use App\Http\Controllers\Api\InviteController;
 use App\Http\Controllers\Api\LikeController;
 use App\Http\Controllers\Api\LocationController as ApiLocationController;
@@ -56,13 +57,24 @@ Route::prefix('posts/{post}')->group(function () {
         ->name('posts.likes');
 });
 
-Route::get('app/configuration', [AppConfigurationController::class, 'index'])
-    ->name('app.configuration');
+Route::prefix('app')->group(function () {
+    Route::get('configuration', [AppConfigurationController::class, 'index'])
+        ->name('app.configuration');
+
+    Route::get('imprint', [ImprintController::class, 'show'])
+        ->name('imprint.show');
+});
 
 Route::middleware('auth:api')->group(function () {
     Route::prefix('socialite')->group(function () {
         Route::get('/traewelling/connect', [TraewellingOAuthController::class, 'redirectToProvider'])->name('traewelling.connect');
         Route::get('/traewelling/callback', [TraewellingOAuthController::class, 'handleProviderCallback'])->name('traewelling.callback');
+    });
+
+    Route::prefix('app')->group(function () {
+        Route::patch('imprint', [ImprintController::class, 'update'])
+            ->middleware('admin')
+            ->name('imprint.update');
     });
 
     // Auth routes (authenticated)

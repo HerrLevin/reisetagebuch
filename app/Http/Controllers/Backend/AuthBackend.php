@@ -28,7 +28,8 @@ class AuthBackend extends Controller
             mustVerifyEmail: $user instanceof MustVerifyEmail && ! $user->hasVerifiedEmail(),
             settings: $this->getSettings($user),
             canInviteUsers: config('app.invite.enabled') && $user->can('create', Invite::class),
-            traewellingConnected: (bool) $user->traewellingAccount
+            traewellingConnected: (bool) $user->traewellingAccount,
+            isAdmin: $user->isAdmin(),
         );
     }
 

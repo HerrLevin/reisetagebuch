@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@plugin '@tailwindcss/typography';
 @import 'maplibre-gl/dist/maplibre-gl.css';
 
 @plugin 'daisyui' {

@@ -150,6 +150,11 @@ export interface AuthenticatedUserDto {
   traewellingConnected: boolean;
   /** Data Transfer Object representing user settings */
   settings: UserSettingsDto;
+  /**
+   * Indicates whether the user has administrative privileges on this instance
+   * @example false
+   */
+  isAdmin: boolean;
 }
 
 /** Data Transfer Object for Departures at a Stop */
@@ -200,6 +205,15 @@ export type FilteredPostPaginationDto = PostPaginationDto & {
   /** Array of post items on the current page */
   items: (LocationPost | BasePost | TransportPost)[];
 };
+
+/**
+ * Imprint DTO
+ * Data Transfer Object representing the configured imprint text
+ */
+export interface ImprintDto {
+  /** The imprint content, rendered as free-form text */
+  content: string | null;
+}
 
 export interface LikeResponseDto {
   /** Indicates if the post is liked by the user */
@@ -682,11 +696,17 @@ export interface ImageUploadRequest {
   image?: File;
 }
 
+/** Request to update the instance imprint */
+export interface ImprintUpdateRequest {
+  /** The imprint content */
+  content: string | null;
+}
+
 export type LocationPostRequest = BasePostRequest & {
   /** @format uuid */
   location: string;
   /** @format date-time */
-  visitedAt?: string | null;
+  visitedAt: string | null;
 };
 
 /**
@@ -1604,6 +1624,44 @@ export class Api<
         path: `/app/configuration`,
         method: "GET",
         secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags App
+     * @name GetImprint
+     * @summary Get the instance imprint
+     * @request GET:/app/imprint
+     * @secure
+     */
+    getImprint: (params: RequestParams = {}) =>
+      this.request<ImprintDto, any>({
+        path: `/app/imprint`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Update the instance imprint. Requires admin privileges.
+     *
+     * @tags App
+     * @name UpdateImprint
+     * @summary Update the instance imprint
+     * @request PATCH:/app/imprint
+     * @secure
+     */
+    updateImprint: (data: ImprintUpdateRequest, params: RequestParams = {}) =>
+      this.request<ImprintDto, void>({
+        path: `/app/imprint`,
+        method: "PATCH",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),

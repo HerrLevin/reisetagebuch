@@ -2,6 +2,7 @@
 
 use App\Console\Commands\FetchAirports;
 use App\Http\Middleware\ApiMiddleware;
+use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Jobs\DeleteOldNearbyRequests;
 use App\Jobs\DispatchRefreshJobForActiveTrips;
 use Illuminate\Console\Scheduling\Schedule;
@@ -26,6 +27,9 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->encryptCookies(except: [
             'rtb_allow_history',
+        ]);
+        $middleware->alias([
+            'admin' => EnsureUserIsAdmin::class,
         ]);
         $middleware->redirectGuestsTo('/login');
     })

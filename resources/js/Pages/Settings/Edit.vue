@@ -4,6 +4,7 @@ import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import UpdateAccountSettingsForm from '@/Pages/Settings/Partials/UpdateAccountSettingsForm.vue';
 import UpdateDeviceSettingsForm from '@/Pages/Settings/Partials/UpdateDeviceSettingsForm.vue';
+import UpdateImprintForm from '@/Pages/Settings/Partials/UpdateImprintForm.vue';
 import { useUserStore } from '@/stores/user';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -138,6 +139,13 @@ if (route.name === 'socialite.traewelling.callback') {
             </div>
             <div class="card bg-base-100 min-w-full p-8 shadow-md">
                 <DeleteUserForm class="max-w-xl" />
+            </div>
+
+            <div
+                v-if="user.user.isAdmin"
+                class="card bg-base-100 min-w-full p-8 shadow-md"
+            >
+                <UpdateImprintForm class="max-w-xl" />
             </div>
         </div>
     </AuthenticatedLayout>
