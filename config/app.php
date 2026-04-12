@@ -55,4 +55,9 @@ return [
     'transit' => [
         'refresh_interval' => env('APP_TRANSIT_REFRESH_INTERVAL', 5),
     ],
+
+    'testing' => [
+        'cypress' => env('APP_TESTING_CYPRESS', false),
+        'cypress_token' => env('APP_TESTING_CYPRESS_TOKEN', 'testing'),
+    ],
 ];

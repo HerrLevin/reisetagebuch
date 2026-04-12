@@ -26,6 +26,7 @@ export default defineConfigWithVueTs(
             'docs/.vitepress/cache/**',
             'docs/.vitepress/dist/**',
             'resources/types/Api.gen.ts',
+            'cypress',
         ],
     },
     {

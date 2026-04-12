@@ -125,6 +125,7 @@ const submit = async () => {
             </div>
 
             <button
+                type="submit"
                 class="btn btn-primary mt-12 w-full"
                 :class="{ 'opacity-25': processing }"
                 :disabled="processing"

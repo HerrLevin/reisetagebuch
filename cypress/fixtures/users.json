@@ -1,0 +1,16 @@
+{
+    "default": {
+        "name": "Test User",
+        "username": "testuser",
+        "email": "test@example.com",
+        "password": "Password123!",
+        "password_confirmation": "Password123!"
+    },
+    "alternate": {
+        "name": "Other User",
+        "username": "otheruser",
+        "email": "other@example.com",
+        "password": "Password123!",
+        "password_confirmation": "Password123!"
+    }
+}
