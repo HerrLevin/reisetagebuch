@@ -63,6 +63,10 @@
             "location_entries": "Ein Ortseintrag | {count} Ortseinträge",
             "trip_entries": "Ein Tripeintrag | {count} Tripeinträge",
             "waypoints": "Ein Wegpunkt | {count} Wegpunkte"
+        },
+        "imprint": {
+            "title": "Impressum",
+            "empty": "Es ist noch kein Impressum hinterlegt."
         }
     },
     "auth": {
@@ -267,6 +271,11 @@
             "current_password": "Aktuelles Passwort",
             "new_password": "Neues Passwort",
             "confirm_password": "Passwort bestätigen"
+        },
+        "imprint": {
+            "title": "Impressum",
+            "description": "Konfiguriere das Impressum, das in der Fußzeile angezeigt wird.",
+            "content": "Inhalt"
         }
     },
     "errors": {

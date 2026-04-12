@@ -9,6 +9,7 @@ import VerifyEmail from '@/Pages/Auth/VerifyEmail.vue';
 import EditPost from '@/Pages/EditPost.vue';
 import NotFound from '@/Pages/Errors/NotFound.vue';
 import Home from '@/Pages/Home.vue';
+import Imprint from '@/Pages/Imprint.vue';
 import Invites from '@/Pages/Invites.vue';
 import LocationHistoryIndex from '@/Pages/LocationHistory/Index.vue';
 import CreateLocationPost from '@/Pages/NewPostDialog/CreateLocationPost.vue';
@@ -213,6 +214,11 @@ const routes: RouteRecordRaw[] = [
         path: '/socialite/traewelling/callback',
         name: 'socialite.traewelling.callback',
         component: EditSettings,
+    },
+    {
+        path: '/imprint',
+        name: 'imprint',
+        component: Imprint,
     },
     { path: '/:pathMatch(.*)*', name: 'not-found', component: NotFound },
 ];

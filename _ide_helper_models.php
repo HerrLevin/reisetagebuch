@@ -83,6 +83,23 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property string $id
+ * @property string|null $content
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Imprint newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Imprint newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Imprint query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Imprint whereContent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Imprint whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Imprint whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Imprint whereUpdatedAt($value)
+ */
+	class Imprint extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property string $id
  * @property string $user_id
  * @property string|null $used_by
  * @property \Illuminate\Support\Carbon|null $expires_at
@@ -567,6 +584,7 @@ namespace App\Models{
  * @property string|null $remember_token
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property bool $is_admin
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Passport\Client> $clients
  * @property-read int|null $clients_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\FollowRequest> $followRequests
@@ -612,6 +630,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereEmail($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereEmailVerifiedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereIsAdmin($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User wherePassword($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereRememberToken($value)

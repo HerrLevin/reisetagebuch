@@ -41,7 +41,9 @@ config.fetchConfig();
             <a class="link link-hover">{{
                 $t('footer.legal.privacy_policy')
             }}</a>
-            <a class="link link-hover">{{ $t('footer.legal.imprint') }}</a>
+            <router-link :to="{ name: 'imprint' }" class="link link-hover">
+                {{ $t('footer.legal.imprint') }}
+            </router-link>
         </nav>
         <nav>
             <LocaleChanger />

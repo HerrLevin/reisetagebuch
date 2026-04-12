@@ -65,6 +65,10 @@
             "location_entries": "One location entry | {count} location entries",
             "trip_entries": "One trip entry | {count} trip entries",
             "waypoints": "One waypoint | {count} waypoints"
+        },
+        "imprint": {
+            "title": "Imprint",
+            "empty": "No imprint configured yet."
         }
     },
     "auth": {
@@ -269,6 +273,11 @@
             "current_password": "Current Password",
             "new_password": "New Password",
             "confirm_password": "Confirm Password"
+        },
+        "imprint": {
+            "title": "Imprint",
+            "description": "Configure the imprint shown in the footer.",
+            "content": "Content"
         }
     },
     "errors": {

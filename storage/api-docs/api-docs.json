@@ -837,6 +837,65 @@
                 }
             }
         },
+        "/app/imprint": {
+            "get": {
+                "tags": [
+                    "App"
+                ],
+                "summary": "Get the instance imprint",
+                "operationId": "getImprint",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ImprintDto"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "App"
+                ],
+                "summary": "Update the instance imprint",
+                "description": "Update the instance imprint. Requires admin privileges.",
+                "operationId": "updateImprint",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ImprintUpdateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ImprintDto"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
         "/invites": {
             "get": {
                 "tags": [
@@ -2762,7 +2821,8 @@
                     "canInviteUsers",
                     "traewellingConnected",
                     "settings",
-                    "avatar"
+                    "avatar",
+                    "isAdmin"
                 ],
                 "properties": {
                     "id": {
@@ -2810,6 +2870,11 @@
                     },
                     "settings": {
                         "$ref": "#/components/schemas/UserSettingsDto"
+                    },
+                    "isAdmin": {
+                        "description": "Indicates whether the user has administrative privileges on this instance",
+                        "type": "boolean",
+                        "example": false
                     }
                 },
                 "type": "object"
@@ -2938,6 +3003,21 @@
                         "type": "object"
                     }
                 ]
+            },
+            "ImprintDto": {
+                "title": "Imprint DTO",
+                "description": "Data Transfer Object representing the configured imprint text",
+                "required": [
+                    "content"
+                ],
+                "properties": {
+                    "content": {
+                        "description": "The imprint content, rendered as free-form text",
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
             },
             "LikeResponseDto": {
                 "required": [
@@ -3964,9 +4044,24 @@
                 },
                 "type": "object"
             },
+            "ImprintUpdateRequest": {
+                "description": "Request to update the instance imprint",
+                "required": [
+                    "content"
+                ],
+                "properties": {
+                    "content": {
+                        "description": "The imprint content",
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
             "LocationPostRequest": {
                 "required": [
-                    "location"
+                    "location",
+                    "visitedAt"
                 ],
                 "type": "object",
                 "allOf": [
@@ -4965,6 +5060,10 @@
         {
             "name": "Follows",
             "description": "Follows"
+        },
+        {
+            "name": "App",
+            "description": "App"
         },
         {
             "name": "Invites",
