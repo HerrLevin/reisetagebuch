@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/api/v1/geocode",
+    "queryParameters": {
+      "text": {
+        "equalTo": "Karlsruhe Hbf"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "body": "[\n  {\n    \"type\": \"STOP\",\n    \"tokens\": [\n      [\n        0E0,\n        9E0\n      ],\n      [\n        1E1,\n        3E0\n      ]\n    ],\n    \"name\": \"Karlsruhe Hauptbahnhof\",\n    \"id\": \"de-test-karlsruhe\",\n    \"lat\": 4.8993515E1,\n    \"lon\": 8.402185E0,\n    \"level\": 1E0,\n    \"country\": \"DE\",\n    \"zip\": \"76137\",\n    \"tz\": \"Europe/Berlin\",\n    \"areas\": [\n      {\n        \"name\": \"Deutschland\",\n        \"adminLevel\": 2E0,\n        \"matched\": false,\n        \"unique\": false,\n        \"default\": false\n      },\n      {\n        \"name\": \"Baden-Württemberg\",\n        \"adminLevel\": 4E0,\n        \"matched\": false,\n        \"unique\": false,\n        \"default\": false\n      },\n      {\n        \"name\": \"Regierungsbezirk Karlsruhe\",\n        \"adminLevel\": 5E0,\n        \"matched\": false,\n        \"unique\": false,\n        \"default\": false\n      },\n      {\n        \"name\": \"Karlsruhe\",\n        \"adminLevel\": 6E0,\n        \"matched\": false,\n        \"unique\": false,\n        \"default\": true\n      },\n      {\n        \"name\": \"Südweststadt\",\n        \"adminLevel\": 1E1,\n        \"matched\": false,\n        \"unique\": false,\n        \"default\": false\n      },\n      {\n        \"name\": \"Südweststadt Östlicher Teil\",\n        \"adminLevel\": 1.1E1,\n        \"matched\": false,\n        \"unique\": false,\n        \"default\": false\n      }\n    ],\n    \"score\": -9.428000450134277E0,\n    \"modes\": [\n      \"HIGHSPEED_RAIL\",\n      \"LONG_DISTANCE\",\n      \"REGIONAL_FAST_RAIL\",\n      \"REGIONAL_RAIL\",\n      \"SUBURBAN\",\n      \"TRAM\",\n      \"BUS\"\n    ],\n    \"importance\": 1.7916390672326088E-2\n  }\n]",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
+

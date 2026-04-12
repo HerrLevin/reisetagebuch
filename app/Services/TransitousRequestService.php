@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Log;
 
 class TransitousRequestService
 {
-    private const API_URL = 'https://api.transitous.org/api';
+    private string $apiUrl;
 
     private VersionService $versionService;
 
@@ -35,6 +35,7 @@ class TransitousRequestService
         $this->versionService = $versionService ?? new VersionService;
         $this->geoService = $geoService ?? new GeoService;
         $this->hydrator = $hydrator ?? new MotisHydrator;
+        $this->apiUrl = config('app.motis.api_url');
     }
 
     public function getLocationByIdentifier(string $identifier): ?StopPlaceDto
@@ -58,7 +59,7 @@ class TransitousRequestService
         }
 
         $response = Http::withUserAgent($this->versionService->getUserAgent())
-            ->get(self::API_URL.'/v5/stoptimes', $params);
+            ->get($this->apiUrl.'/v5/stoptimes', $params);
 
         if (! $response->ok()) {
             Log::error('Unknown response (getDepartures)', [
@@ -105,7 +106,7 @@ class TransitousRequestService
         $center = new Coordinate($point->getLatitude(), $point->getLongitude());
         $bbox = $this->geoService->getBoundingBox($center, 500);
 
-        $response = Http::withUserAgent($this->versionService->getUserAgent())->get(self::API_URL.'/v1/map/stops', [
+        $response = Http::withUserAgent($this->versionService->getUserAgent())->get($this->apiUrl.'/v1/map/stops', [
             'min' => (string) $bbox->lowerRight,
             'max' => (string) $bbox->upperLeft,
         ]);
@@ -139,7 +140,7 @@ class TransitousRequestService
 
     public function getStopTimes(string $tripId): ?TripDto
     {
-        $response = Http::withUserAgent($this->versionService->getUserAgent())->get(self::API_URL.'/v5/trip/?tripId='.$tripId);
+        $response = Http::withUserAgent($this->versionService->getUserAgent())->get($this->apiUrl.'/v5/trip?tripId='.$tripId);
 
         if (! $response->ok()) {
             Log::error('Unknown response (getStopTimes)', [
@@ -180,7 +181,7 @@ class TransitousRequestService
             $request['place'] = $place->getLatitude().','.$place->getLongitude();
         }
 
-        $response = Http::withUserAgent($this->versionService->getUserAgent())->get(self::API_URL.'/v1/geocode', $request);
+        $response = Http::withUserAgent($this->versionService->getUserAgent())->get($this->apiUrl.'/v1/geocode', $request);
 
         if (! $response->ok()) {
             Log::error('Unknown response (geocode)', [

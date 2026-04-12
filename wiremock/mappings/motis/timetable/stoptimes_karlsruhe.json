@@ -1,0 +1,27 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/api/v5/stoptimes",
+    "queryParameters": {
+      "stopId": {
+        "equalTo": "de-test-karlsruhe"
+      },
+      "radius": {
+        "matches": "^1?[0-9]+$"
+      },
+      "n": {
+        "matches": "^1?[0-9]+$"
+      },
+      "time": {
+        "matches": "/(\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d+([+-][0-2]\\d:[0-5]\\d|Z))|(\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d([+-][0-2]\\d:[0-5]\\d|Z))|(\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d([+-][0-2]\\d:[0-5]\\d|Z))/"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "body": "{\n  \"stopTimes\": [\n    {\n      \"place\": {\n        \"name\": \"Karlsruhe Hbf\",\n        \"stopId\": \"de-test-karlsruhe\",\n        \"parentId\": \"de-test-karlsruhe\",\n        \"importance\": 1.7916390672326088E-2,\n        \"lat\": 4.8993570000000005E1,\n        \"lon\": 8.400430000000002E0,\n        \"level\": 1E0,\n        \"tz\": \"Europe/Berlin\",\n        \"arrival\": \"2026-03-18T02:59:00Z\",\n        \"departure\": \"2026-03-18T03:03:00Z\",\n        \"scheduledArrival\": \"2026-03-18T02:59:00Z\",\n        \"scheduledDeparture\": \"2026-03-18T03:03:00Z\",\n        \"vertexType\": \"TRANSIT\",\n        \"pickupType\": \"NORMAL\",\n        \"dropoffType\": \"NORMAL\",\n        \"cancelled\": false,\n        \"modes\": [\n          \"HIGHSPEED_RAIL\",\n          \"LONG_DISTANCE\",\n          \"REGIONAL_FAST_RAIL\",\n          \"REGIONAL_RAIL\",\n          \"SUBURBAN\",\n          \"TRAM\",\n          \"BUS\"\n        ]\n      },\n      \"mode\": \"REGIONAL_FAST_RAIL\",\n      \"realTime\": true,\n      \"headsign\": \"Zürich HB\",\n      \"tripFrom\": {\n        \"name\": \"Amsterdam Centraal\",\n        \"stopId\": \"nl-test-amsterdam\",\n        \"parentId\": \"nl-test-amsterdam\",\n        \"importance\": 7.034067809581757E-2,\n        \"lat\": 5.2378730000000004E1,\n        \"lon\": 4.900357700000001E0,\n        \"level\": -3E0,\n        \"tz\": \"Europe/Brussels\",\n        \"scheduledTrack\": \"4\",\n        \"track\": \"4\",\n        \"vertexType\": \"TRANSIT\",\n        \"pickupType\": \"NORMAL\",\n        \"dropoffType\": \"NOT_ALLOWED\",\n        \"cancelled\": false,\n        \"modes\": [\n          \"HIGHSPEED_RAIL\",\n          \"LONG_DISTANCE\",\n          \"NIGHT_RAIL\",\n          \"REGIONAL_FAST_RAIL\",\n          \"SUBWAY\",\n          \"TRAM\",\n          \"BUS\",\n          \"FERRY\"\n        ]\n      },\n      \"tripTo\": {\n        \"name\": \"Zürich HB\",\n        \"stopId\": \"ch-test-zurich\",\n        \"parentId\": \"ch-test-zurich\",\n        \"importance\": 8.845586329698563E-2,\n        \"lat\": 4.7377669999999995E1,\n        \"lon\": 8.540099999999999E0,\n        \"level\": 0E0,\n        \"tz\": \"Europe/Zurich\",\n        \"vertexType\": \"TRANSIT\",\n        \"pickupType\": \"NOT_ALLOWED\",\n        \"dropoffType\": \"NORMAL\",\n        \"cancelled\": false,\n        \"modes\": [\n          \"HIGHSPEED_RAIL\",\n          \"LONG_DISTANCE\",\n          \"NIGHT_RAIL\",\n          \"REGIONAL_FAST_RAIL\",\n          \"REGIONAL_RAIL\",\n          \"SUBURBAN\"\n        ]\n      },\n      \"agencyId\": \"test-agency\",\n      \"agencyName\": \"ACME Railways\",\n      \"agencyUrl\": \"http://www.exmple.com\",\n      \"routeId\": \"138965\",\n      \"directionId\": \"0\",\n      \"routeTextColor\": \"ffffff\",\n      \"tripId\": \"test-nightjet-403\",\n      \"routeType\": 2,\n      \"routeShortName\": \"Nightjet\",\n      \"routeLongName\": \"Amsterdam Centraal <-> Zürich HB NJ400\",\n      \"tripShortName\": \"403\",\n      \"displayName\": \"Nightjet\",\n      \"pickupDropoffType\": \"NORMAL\",\n      \"cancelled\": false,\n      \"tripCancelled\": false,\n      \"source\": \"test-data.gtfs.zip/stop_times.txt:1234567:1234567\"\n    }\n  ],\n  \"place\": {\n    \"name\": \"Karlsruhe Hbf\",\n    \"stopId\": \"de-test-karlsruhe\",\n    \"parentId\": \"de-test-karlsruhe\",\n    \"importance\": 1.7916390672326088E-2,\n    \"lat\": 4.8993570000000005E1,\n    \"lon\": 8.400430000000002E0,\n    \"level\": 1E0,\n    \"tz\": \"Europe/Berlin\",\n    \"vertexType\": \"TRANSIT\",\n    \"modes\": [\n      \"HIGHSPEED_RAIL\",\n      \"LONG_DISTANCE\",\n      \"REGIONAL_FAST_RAIL\",\n      \"REGIONAL_RAIL\",\n      \"SUBURBAN\",\n      \"TRAM\",\n      \"BUS\"\n    ]\n  },\n  \"previousPageCursor\": \"EARLIER|1773802920\",\n  \"nextPageCursor\": \"LATER|1773803040\"\n}",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
