@@ -46,7 +46,7 @@ class LikeController extends Controller
             $this->notificationRepository->notifyUser($post->user, new PostLiked($user, $post, $like));
         }
 
-        return new LikeDto($like->exists, $post->likesCount++);
+        return new LikeDto($like->exists, ++$post->likesCount);
     }
 
     public function destroy(User $user, string $postId): LikeDto
@@ -61,6 +61,6 @@ class LikeController extends Controller
         DeletePostLikedNotification::dispatch($post->user->id, $like->id);
         $destroyed = $this->likeRepository->destroy($like->id);
 
-        return new LikeDto(! $destroyed, $post->likesCount--);
+        return new LikeDto(! $destroyed, --$post->likesCount);
     }
 }

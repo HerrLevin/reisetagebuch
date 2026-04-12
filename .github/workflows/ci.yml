@@ -217,3 +217,103 @@ jobs:
       - name: Stop containers and remove volumes
         if: always()
         run: docker compose -f docker-compose.pipeline.yml down -v
+
+  e2e:
+    name: Cypress E2E Tests
+    runs-on: ubuntu-latest
+    needs: [install-node-dependencies, install-composer-dependencies]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.5
+          extensions: mbstring, ctype, fileinfo, json, openssl, pdo, tokenizer, xml
+
+      - name: Download vendor directory
+        uses: actions/download-artifact@v8
+        with:
+          name: vendor
+          path: vendor
+
+      - name: Download Vite build artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: vite-build
+          path: public/build
+
+      - name: Copy .env
+        run: |
+          cp .env.pipeline .env
+          echo "APP_REGISTRATION=true" >> .env
+          echo "APP_TESTING_CYPRESS=true" >> .env
+          echo "APP_TESTING_CYPRESS_TOKEN=testing" >> .env
+
+      - name: Directory Permissions
+        run: chmod -R 777 storage bootstrap/cache
+
+      - name: Start containers
+        run: docker compose -f docker-compose.pipeline.yml up -d
+
+      - name: Wait for database
+        run: while ! php artisan migrate --force; do sleep 5; done
+
+      - name: Generate application key
+        run: php artisan key:generate
+
+      - name: Generate passport keys
+        run: php artisan passport:keys
+
+      - name: Seed database
+        run: php artisan db:seed
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 25
+          cache: npm
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Start application server
+        run: php artisan serve &
+
+      - name: Wait for app readiness
+        run: |
+          for i in $(seq 1 30); do
+            if curl -s -o /dev/null -w "%{http_code}" http://localhost:8000 | grep -q "200"; then
+              echo "App is ready"
+              break
+            fi
+            echo "Waiting for app... ($i/30)"
+            sleep 5
+          done
+
+      - name: Run Cypress tests
+        run: npx cypress run --browser chrome
+        env:
+          CYPRESS_BASE_URL: http://localhost:8000
+
+      - name: Upload screenshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
+          retention-days: 7
+
+      - name: Upload videos on failure
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: cypress-videos
+          path: cypress/videos
+          retention-days: 7
+
+      - name: Stop containers and remove volumes
+        if: always()
+        run: docker compose -f docker-compose.pipeline.yml down -v

@@ -175,6 +175,7 @@ const submit = async () => {
                 </RouterLink>
 
                 <button
+                    type="submit"
                     class="btn btn-primary ms-4"
                     :class="{ 'opacity-25': processing }"
                     :disabled="processing"

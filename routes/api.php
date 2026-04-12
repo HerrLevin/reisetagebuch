@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AccountController;
 use App\Http\Controllers\Api\AppConfigurationController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CypressController;
 use App\Http\Controllers\Api\FollowController;
 use App\Http\Controllers\Api\ImprintController;
 use App\Http\Controllers\Api\InviteController;
@@ -180,3 +181,10 @@ Route::middleware('auth:api')->group(function () {
         });
     });
 });
+
+if (config('app.testing.cypress')) {
+    Route::prefix('cypress')->group(function () {
+        Route::post('/seed', [CypressController::class, 'seed']);
+        Route::post('/reset', [CypressController::class, 'reset']);
+    });
+}
