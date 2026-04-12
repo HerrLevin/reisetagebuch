@@ -1,4 +1,4 @@
-name: Docker Build & Push
+name: Docker Build
 
 on:
   push:
@@ -6,6 +6,7 @@ on:
       - "v*"
     branches:
       - main
+  pull_request:
   workflow_run:
     workflows: ["linter", "run-tests"]
     types:
@@ -25,9 +26,13 @@ on:
         type: string
 
 jobs:
-  build-and-push:
+  build:
+    name: 'Build the Docker image'
     runs-on: ubuntu-latest
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    outputs:
+      tags: ${{ steps.meta.outputs.tags }}
+      labels: ${{ steps.meta.outputs.labels }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -44,12 +49,6 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v4
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
       - name: Determine app version
         id: app_version
         run: |
@@ -59,13 +58,131 @@ jobs:
             echo "version=${{ github.sha }}" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Build and push Docker image
+      - name: Build Docker image
         uses: docker/build-push-action@v7
         with:
           context: ./
           file: Dockerfile
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags || 'latest' }}
+          load: true
+          push: false
+          tags: herrlevin/reisetagebuch:ci-test
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             APP_VERSION=${{ steps.app_version.outputs.version }}
+
+      - name: Save Docker image as artifact
+        run: docker save herrlevin/reisetagebuch:ci-test -o /tmp/docker-image.tar
+
+      - name: Upload Docker image artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: docker-image-ci-test
+          path: /tmp/docker-image.tar
+          retention-days: 1
+
+  test:
+    name: 'Test the Docker image with Cypress'
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Download Docker image artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: docker-image-ci-test
+          path: /tmp
+
+      - name: Load Docker image
+        run: docker load -i /tmp/docker-image.tar
+
+      - name: Start test containers
+        run: docker compose -f docker-compose.ci-docker-test.yml up -d --wait --wait-timeout 120
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 25
+          cache: npm
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Wait for app readiness
+        run: |
+          for i in $(seq 1 30); do
+            if curl -s -o /dev/null -w "%{http_code}" http://localhost:8080 | grep -q "200"; then
+              echo "App is ready"
+              exit 0
+            fi
+            echo "Waiting for app... ($i/30)"
+            sleep 5
+          done
+          echo "App failed to become ready"
+          docker compose -f docker-compose.ci-docker-test.yml logs
+          exit 1
+
+      - name: Run Cypress tests
+        run: npx cypress run --browser chrome
+        env:
+          CYPRESS_BASE_URL: http://localhost:8080
+
+      - name: Upload screenshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: docker-test-cypress-screenshots
+          path: cypress/screenshots
+          retention-days: 7
+
+      - name: Upload videos on failure
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: docker-test-cypress-videos
+          path: cypress/videos
+          retention-days: 7
+
+      - name: Dump container logs
+        if: failure()
+        run: docker compose -f docker-compose.ci-docker-test.yml logs
+
+      - name: Stop test containers
+        if: always()
+        run: docker compose -f docker-compose.ci-docker-test.yml down -v
+
+  push:
+    name: 'Push Docker image to registry'
+    runs-on: ubuntu-latest
+    needs: [build, test]
+    if: ${{ github.event_name != 'pull_request' && (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success') }}
+
+    steps:
+      - name: Download Docker image artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: docker-image-ci-test
+          path: /tmp
+
+      - name: Load Docker image
+        run: docker load -i /tmp/docker-image.tar
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Push Docker image
+        run: |
+          TAGS="${{ needs.build.outputs.tags }}"
+          if [ -z "$TAGS" ]; then
+            TAGS="herrlevin/reisetagebuch:latest"
+          fi
+          echo "$TAGS" | while IFS= read -r tag; do
+            [ -z "$tag" ] && continue
+            docker tag herrlevin/reisetagebuch:ci-test "$tag"
+            docker push "$tag"
+          done
