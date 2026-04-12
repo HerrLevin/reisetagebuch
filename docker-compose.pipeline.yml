@@ -36,6 +36,12 @@ services:
                 - ping
             retries: 3
             timeout: 5s
+    wiremock:
+      image: wiremock/wiremock
+      volumes:
+        - './wiremock/mappings:/home/wiremock/mappings'
+      ports:
+        - '8080:8080'
 volumes:
     sail-pgsql:
         driver: local

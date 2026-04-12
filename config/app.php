@@ -39,6 +39,7 @@ return [
     'motis' => [
         'radius' => env('APP_MOTIS_RADIUS', 500),
         'single_location_radius' => env('APP_MOTIS_SINGLE_LOCATION_RADIUS', 100),
+        'api_url' => env('APP_MOTIS_API_URL', 'https://api.transitous.org/api'),
     ],
 
     'nearby' => [

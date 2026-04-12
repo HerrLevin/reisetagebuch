@@ -1,0 +1,27 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/api/v5/stoptimes",
+    "queryParameters": {
+      "stopId": {
+        "equalTo": "de-test-ebertstr"
+      },
+      "radius": {
+        "matches": "^1?[0-9]+$"
+      },
+      "n": {
+        "matches": "^1?[0-9]+$"
+      },
+      "time": {
+        "matches": "/(\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d+([+-][0-2]\\d:[0-5]\\d|Z))|(\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d([+-][0-2]\\d:[0-5]\\d|Z))|(\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d([+-][0-2]\\d:[0-5]\\d|Z))/"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "body": "{\n  \"stopTimes\": [\n    {\n      \"place\": {\n        \"name\": \"Karlsruhe Ebertstraße\",\n        \"stopId\": \"de-test-ebertstr\",\n        \"parentId\": \"de-test-ebertstr\",\n        \"importance\": 1.634301501326263E-3,\n        \"lat\": 4.8994507E1,\n        \"lon\": 8.395502000000002E0,\n        \"level\": 0E0,\n        \"tz\": \"Europe/Berlin\",\n        \"arrival\": \"2026-03-17T15:07:00Z\",\n        \"departure\": \"2026-03-17T15:07:00Z\",\n        \"scheduledArrival\": \"2026-03-17T15:07:00Z\",\n        \"scheduledDeparture\": \"2026-03-17T15:07:00Z\",\n        \"scheduledTrack\": \"B\",\n        \"track\": \"B\",\n        \"description\": \"Bus B_50/51/55/62/M\",\n        \"vertexType\": \"TRANSIT\",\n        \"pickupType\": \"NORMAL\",\n        \"dropoffType\": \"NORMAL\",\n        \"cancelled\": false,\n        \"modes\": [\n          \"SUBURBAN\",\n          \"TRAM\",\n          \"BUS\"\n        ]\n      },\n      \"mode\": \"BUS\",\n      \"realTime\": false,\n      \"headsign\": \"Hauptbahnhof\",\n      \"tripFrom\": {\n        \"name\": \"Oberreut\",\n        \"stopId\": \"de-test-oberreut\",\n        \"parentId\": \"de-test-oberreut\",\n        \"importance\": 2.3448468709830195E-4,\n        \"lat\": 4.8985104E1,\n        \"lon\": 8.356174000000001E0,\n        \"level\": 0E0,\n        \"tz\": \"Europe/Berlin\",\n        \"vertexType\": \"TRANSIT\",\n        \"pickupType\": \"NORMAL\",\n        \"dropoffType\": \"NORMAL\",\n        \"cancelled\": false,\n        \"modes\": [\n          \"BUS\"\n        ]\n      },\n      \"tripTo\": {\n        \"name\": \"KA Hauptbahnhof (Vorplatz)\",\n        \"stopId\": \"de-test-karlsruhe\",\n        \"parentId\": \"de-test-karlsruhe\",\n        \"importance\": 2.13033314794302E-2,\n        \"lat\": 4.899461E1,\n        \"lon\": 8.399976E0,\n        \"level\": 0E0,\n        \"tz\": \"Europe/Berlin\",\n        \"scheduledTrack\": \"B\",\n        \"track\": \"B\",\n        \"description\": \"Bus B_50/51/62/NL14\",\n        \"vertexType\": \"TRANSIT\",\n        \"pickupType\": \"NORMAL\",\n        \"dropoffType\": \"NORMAL\",\n        \"cancelled\": false,\n        \"modes\": [\n          \"HIGHSPEED_RAIL\",\n          \"LONG_DISTANCE\",\n          \"REGIONAL_FAST_RAIL\",\n          \"REGIONAL_RAIL\",\n          \"SUBURBAN\",\n          \"TRAM\",\n          \"BUS\"\n        ]\n      },\n      \"agencyId\": \"7674\",\n      \"agencyName\": \"Bus VBK\",\n      \"agencyUrl\": \"\",\n      \"routeId\": \"de:kvv:00050_:_3\",\n      \"directionId\": \"1\",\n      \"routeColor\": \"874487\",\n      \"routeTextColor\": \"ffffff\",\n      \"tripId\": \"test-bus-50\",\n      \"routeType\": 3,\n      \"routeShortName\": \"50\",\n      \"routeLongName\": \"\",\n      \"tripShortName\": \"\",\n      \"displayName\": \"50\",\n      \"pickupDropoffType\": \"NORMAL\",\n      \"cancelled\": false,\n      \"tripCancelled\": false,\n      \"source\": \"test.gtfs.zip/stop_times.txt:12345678:12345678\"\n    }\n  ],\n  \"place\": {\n    \"name\": \"Karlsruhe Ebertstraße\",\n    \"stopId\": \"de-test-ebertstr\",\n    \"parentId\": \"de-test-ebertstr\",\n    \"importance\": 1.634301501326263E-3,\n    \"lat\": 4.8994617E1,\n    \"lon\": 8.394675E0,\n    \"level\": 0E0,\n    \"vertexType\": \"TRANSIT\",\n    \"modes\": [\n      \"SUBURBAN\",\n      \"TRAM\",\n      \"BUS\"\n    ]\n  },\n  \"previousPageCursor\": \"EARLIER|1773759960\",\n  \"nextPageCursor\": \"LATER|1773760080\"\n}",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

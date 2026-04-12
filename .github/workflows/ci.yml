@@ -251,6 +251,7 @@ jobs:
           echo "APP_REGISTRATION=true" >> .env
           echo "APP_TESTING_CYPRESS=true" >> .env
           echo "APP_TESTING_CYPRESS_TOKEN=testing" >> .env
+          echo "APP_MOTIS_API_URL=http://localhost:8080/api" >> .env
 
       - name: Directory Permissions
         run: chmod -R 777 storage bootstrap/cache
