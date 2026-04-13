@@ -76,6 +76,7 @@ services:
     wiremock:
         image: wiremock/wiremock
         volumes:
+            - './wiremock/__files:/home/wiremock/__files'
             - './wiremock/mappings:/home/wiremock/mappings'
         ports:
             - '8080:8080'

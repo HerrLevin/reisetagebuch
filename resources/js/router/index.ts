@@ -7,6 +7,7 @@ import Register from '@/Pages/Auth/Register.vue';
 import ResetPassword from '@/Pages/Auth/ResetPassword.vue';
 import VerifyEmail from '@/Pages/Auth/VerifyEmail.vue';
 import EditPost from '@/Pages/EditPost.vue';
+import Forbidden from '@/Pages/Errors/Forbidden.vue';
 import NotFound from '@/Pages/Errors/NotFound.vue';
 import Home from '@/Pages/Home.vue';
 import Imprint from '@/Pages/Imprint.vue';
@@ -221,6 +222,11 @@ const routes: RouteRecordRaw[] = [
         component: Imprint,
     },
     { path: '/:pathMatch(.*)*', name: 'not-found', component: NotFound },
+    {
+        path: '/403',
+        name: 'forbidden',
+        component: Forbidden,
+    },
 ];
 
 const router = createRouter({

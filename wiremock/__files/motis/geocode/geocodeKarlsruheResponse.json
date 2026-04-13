@@ -1,0 +1,78 @@
+[
+  {
+    "type": "STOP",
+    "tokens": [
+      [
+        0E0,
+        9E0
+      ],
+      [
+        1E1,
+        3E0
+      ]
+    ],
+    "name": "Karlsruhe Hauptbahnhof",
+    "id": "de-test-karlsruhe",
+    "lat": 4.8993515E1,
+    "lon": 8.402185E0,
+    "level": 1E0,
+    "country": "DE",
+    "zip": "76137",
+    "tz": "Europe/Berlin",
+    "areas": [
+      {
+        "name": "Deutschland",
+        "adminLevel": 2E0,
+        "matched": false,
+        "unique": false,
+        "default": false
+      },
+      {
+        "name": "Baden-Württemberg",
+        "adminLevel": 4E0,
+        "matched": false,
+        "unique": false,
+        "default": false
+      },
+      {
+        "name": "Regierungsbezirk Karlsruhe",
+        "adminLevel": 5E0,
+        "matched": false,
+        "unique": false,
+        "default": false
+      },
+      {
+        "name": "Karlsruhe",
+        "adminLevel": 6E0,
+        "matched": false,
+        "unique": false,
+        "default": true
+      },
+      {
+        "name": "Südweststadt",
+        "adminLevel": 1E1,
+        "matched": false,
+        "unique": false,
+        "default": false
+      },
+      {
+        "name": "Südweststadt Östlicher Teil",
+        "adminLevel": 1.1E1,
+        "matched": false,
+        "unique": false,
+        "default": false
+      }
+    ],
+    "score": -9.428000450134277E0,
+    "modes": [
+      "HIGHSPEED_RAIL",
+      "LONG_DISTANCE",
+      "REGIONAL_FAST_RAIL",
+      "REGIONAL_RAIL",
+      "SUBURBAN",
+      "TRAM",
+      "BUS"
+    ],
+    "importance": 1.7916390672326088E-2
+  }
+]

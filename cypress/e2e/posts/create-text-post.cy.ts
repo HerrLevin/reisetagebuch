@@ -4,7 +4,7 @@ describe('Create Text Post', () => {
     });
 
     it('creates a text post and redirects to the post page', () => {
-        cy.loginAndVisit('/posts/new');
+        cy.registerAndVisit('/posts/new');
 
         cy.get('textarea.textarea').type('Hello from Cypress!');
         cy.get('button[type="submit"].btn-primary').click();

@@ -27,8 +27,10 @@ class UserFactory extends Factory
     {
         return $this->afterCreating(function (User $user) {
             $user->statistics()->create();
+            $user->settings()->create();
         })->afterMaking(function (User $user) {
             $user->statistics()->make();
+            $user->settings()->make();
         });
     }
 

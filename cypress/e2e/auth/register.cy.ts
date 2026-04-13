@@ -19,8 +19,8 @@ describe('Register', () => {
         cy.get('#name').type('New User');
         cy.get('#username').type('newuser');
         cy.get('#email').type('newuser@example.com');
-        cy.get('#password').type('Password123!');
-        cy.get('#password_confirmation').type('Password123!');
+        cy.get('#password').type('password');
+        cy.get('#password_confirmation').type('password');
         cy.get('button[type="submit"]').click();
 
         cy.url().should('include', '/home');
@@ -33,8 +33,8 @@ describe('Register', () => {
         cy.get('#name').type('Duplicate User');
         cy.get('#username').type('dupeuser');
         cy.get('#email').type('test@example.com');
-        cy.get('#password').type('Password123!');
-        cy.get('#password_confirmation').type('Password123!');
+        cy.get('#password').type('password');
+        cy.get('#password_confirmation').type('password');
         cy.get('button[type="submit"]').click();
 
         cy.get('.text-error').should('be.visible');
@@ -46,8 +46,8 @@ describe('Register', () => {
         cy.get('#name').type('Mismatch User');
         cy.get('#username').type('mismatchuser');
         cy.get('#email').type('mismatch@example.com');
-        cy.get('#password').type('Password123!');
-        cy.get('#password_confirmation').type('DifferentPassword123!');
+        cy.get('#password').type('password');
+        cy.get('#password_confirmation').type('Differentpassword');
         cy.get('button[type="submit"]').click();
 
         cy.get('.text-error').should('be.visible');

@@ -4,7 +4,7 @@ describe('Timeline', () => {
     });
 
     it('renders the personal timeline', () => {
-        cy.loginAndVisit('/home');
+        cy.registerAndVisit('/home');
 
         cy.get('ul.list').should('exist');
     });
@@ -32,7 +32,7 @@ describe('Timeline', () => {
     });
 
     it('navigates between personal and global timeline', () => {
-        cy.loginAndVisit('/home');
+        cy.registerAndVisit('/home');
 
         // Click to navigate to global timeline
         cy.get('ul.list li').first().find('a').click();

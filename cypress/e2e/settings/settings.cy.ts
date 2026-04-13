@@ -4,7 +4,7 @@ describe('Settings', () => {
     });
 
     it('displays the settings form', () => {
-        cy.loginAndVisit('/settings');
+        cy.registerAndVisit('/settings');
 
         cy.get('#name').should('be.visible');
         cy.get('#username').should('be.visible');
@@ -12,7 +12,7 @@ describe('Settings', () => {
     });
 
     it('updates the display name', () => {
-        cy.loginAndVisit('/settings');
+        cy.registerAndVisit('/settings');
 
         cy.get('#name').clear().type('Updated Name');
         cy.get('button.btn-primary').first().click();
