@@ -15,7 +15,7 @@ describe('Login', () => {
         cy.visit('/login');
 
         cy.get('#email').type('test@example.com');
-        cy.get('#password').type('Password123!');
+        cy.get('#password').type('password');
         cy.get('button[type="submit"]').click();
 
         cy.url().should('include', '/home');
@@ -25,7 +25,7 @@ describe('Login', () => {
         cy.visit('/login');
 
         cy.get('#email').type('wrong@example.com');
-        cy.get('#password').type('WrongPassword123!');
+        cy.get('#password').type('Wrongpassword');
         cy.get('button[type="submit"]').click();
 
         cy.get('.text-error').should('be.visible');

@@ -1,22 +1,13 @@
 {
-  "request": {
-    "method": "GET",
-    "urlPath": "/api/v1/map/stops",
-    "queryParameters": {
-      "min": {
-        "equalTo": "48.990227,8.387761"
-      },
-      "max": {
-        "equalTo": "48.99921,8.401452"
-      }
+    "request": {
+        "method": "GET",
+        "urlPattern": "/api/v1/map/stops(.*)"
+    },
+    "response": {
+        "status": 200,
+        "body": "[]",
+        "headers": {
+            "Content-Type": "application/json"
+        }
     }
-  },
-  "response": {
-    "status": 200,
-    "body": "[\n  {\n    \"name\": \"KA Hauptbahnhof (Vorplatz)\",\n    \"stopId\": \"de-test-ka-vorplatz\",\n    \"parentId\": \"de-test-ka-vorplatz\",\n    \"importance\": 2.13033314794302E-2,\n    \"lat\": 4.89948E1,\n    \"lon\": 8.400703E0,\n    \"level\": 0E0,\n    \"scheduledTrack\": \"C\",\n    \"track\": \"C\",\n    \"description\": \"Bus C\",\n    \"vertexType\": \"TRANSIT\",\n    \"modes\": [\n      \"HIGHSPEED_RAIL\",\n      \"LONG_DISTANCE\",\n      \"REGIONAL_FAST_RAIL\",\n      \"REGIONAL_RAIL\",\n      \"SUBURBAN\",\n      \"TRAM\",\n      \"BUS\"\n    ]\n  },\n  {\n    \"name\": \"Karlsruhe Ebertstraße\",\n    \"stopId\": \"de-test-ebertstr\",\n    \"parentId\": \"de-test-ebertstr\",\n    \"importance\": 1.634301501326263E-3,\n    \"lat\": 4.8994553E1,\n    \"lon\": 8.395268E0,\n    \"level\": 0E0,\n    \"scheduledTrack\": \"A\",\n    \"track\": \"A\",\n    \"description\": \"Bus A\",\n    \"vertexType\": \"TRANSIT\",\n    \"modes\": [\n      \"SUBURBAN\",\n      \"TRAM\",\n      \"BUS\"\n    ]\n  },\n  {\n    \"name\": \"Karlsruhe Albtalbahnhof\",\n    \"stopId\": \"de-test-albtalbf\",\n    \"parentId\": \"de-test-albtalbf\",\n    \"importance\": 5.362561903893948E-3,\n    \"lat\": 4.899383E1,\n    \"lon\": 8.395520000000001E0,\n    \"level\": 0E0,\n    \"scheduledTrack\": \"A\",\n    \"track\": \"A\",\n    \"description\": \"Bus A\",\n    \"vertexType\": \"TRANSIT\",\n    \"modes\": [\n      \"SUBURBAN\",\n      \"BUS\"\n    ]\n  }\n]",
-    "headers": {
-      "Content-Type": "application/json"
-    }
-  }
 }
-

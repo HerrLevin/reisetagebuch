@@ -1,11 +1,12 @@
 {
+    "priority": 5,
     "request": {
         "method": "GET",
-        "urlPattern": "/api/v1/geocode\\?text=Karlsruhe.*"
+        "urlPath": "/api/v1/geocode.*"
     },
     "response": {
         "status": 200,
-        "bodyFileName": "motis/geocode/geocodeKarlsruheResponse.json",
+        "body": "[]",
         "headers": {
             "Content-Type": "application/json"
         }

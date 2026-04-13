@@ -4,7 +4,7 @@ describe('Logout', () => {
     });
 
     it('logs out and redirects to /login on phone', () => {
-        cy.loginAndVisit('/home');
+        cy.registerAndVisit('/home');
 
         // set viewport to mobile size
         cy.viewport('iphone-x');
@@ -20,7 +20,7 @@ describe('Logout', () => {
     });
 
     it('logs out and redirects to /login on PC', () => {
-        cy.loginAndVisit('/home');
+        cy.registerAndVisit('/home');
 
         cy.get('.card > .menu > li > button').first().click();
 

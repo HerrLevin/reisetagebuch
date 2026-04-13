@@ -649,6 +649,7 @@ namespace App\Models{
  * @property int|null $motis_radius
  * @property bool $requires_follow_request
  * @property-read \App\Models\User $user
+ * @method static \Database\Factories\UserSettingsFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings query()
