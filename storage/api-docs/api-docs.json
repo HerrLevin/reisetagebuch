@@ -1097,6 +1097,108 @@
                 }
             }
         },
+        "/locations/history": {
+            "get": {
+                "tags": [
+                    "Location"
+                ],
+                "summary": "Location history",
+                "description": "Return location history for the authenticated user for a given day",
+                "operationId": "locationHistory",
+                "parameters": [
+                    {
+                        "name": "when",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LocationHistoryDto"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Location"
+                ],
+                "summary": "Store location for history",
+                "description": "Store the current location in user history if allowed by user preferences",
+                "operationId": "createHistoryLocation",
+                "parameters": [
+                    {
+                        "name": "latitude",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "longitude",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "X-RTB-DISALLOW_HISTORY",
+                        "in": "header",
+                        "description": "Set to true to disallow storing this location in history",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "X-RTB-ALLOW_HISTORY",
+                        "in": "header",
+                        "description": "Set to true to allow storing this location in history",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "rtb_allow_history",
+                        "in": "cookie",
+                        "description": "Set to true to allow storing this location in history",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "rtb_disallow_history",
+                        "in": "cookie",
+                        "description": "Set to true to disallow storing this location in history",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        },
         "/location/prefetch": {
             "get": {
                 "tags": [
@@ -1122,6 +1224,42 @@
                         "schema": {
                             "type": "number",
                             "format": "float"
+                        }
+                    },
+                    {
+                        "name": "X-RTB-DISALLOW_HISTORY",
+                        "in": "header",
+                        "description": "Set to true to disallow storing this location in history",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "X-RTB-ALLOW_HISTORY",
+                        "in": "header",
+                        "description": "Set to true to allow storing this location in history",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "rtb_allow_history",
+                        "in": "cookie",
+                        "description": "Set to true to allow storing this location in history",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "rtb_disallow_history",
+                        "in": "cookie",
+                        "description": "Set to true to disallow storing this location in history",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
                         }
                     }
                 ],
@@ -1279,6 +1417,42 @@
                             "type": "number",
                             "format": "float"
                         }
+                    },
+                    {
+                        "name": "X-RTB-DISALLOW_HISTORY",
+                        "in": "header",
+                        "description": "Set to true to disallow storing this location in history",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "X-RTB-ALLOW_HISTORY",
+                        "in": "header",
+                        "description": "Set to true to allow storing this location in history",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "rtb_allow_history",
+                        "in": "cookie",
+                        "description": "Set to true to allow storing this location in history",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "rtb_disallow_history",
+                        "in": "cookie",
+                        "description": "Set to true to disallow storing this location in history",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
                     }
                 ],
                 "responses": {
@@ -1291,39 +1465,6 @@
                                     "items": {
                                         "$ref": "#/components/schemas/GeocodeResponseEntry"
                                     }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/locations/history": {
-            "get": {
-                "tags": [
-                    "Location"
-                ],
-                "summary": "Location history",
-                "description": "Return location history for the authenticated user for a given day",
-                "operationId": "locationHistory",
-                "parameters": [
-                    {
-                        "name": "when",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "format": "date"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/LocationHistoryDto"
                                 }
                             }
                         }

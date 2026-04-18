@@ -2522,17 +2522,42 @@ export class Api<
         ...params,
       }),
   };
-  location = {
+  locations = {
     /**
-     * @description Prefetch location data and optionally store user history
+     * @description Return location history for the authenticated user for a given day
      *
      * @tags Location
-     * @name PrefetchLocation
-     * @summary Prefetch location
-     * @request GET:/location/prefetch
+     * @name LocationHistory
+     * @summary Location history
+     * @request GET:/locations/history
      * @secure
      */
-    prefetchLocation: (
+    locationHistory: (
+      query?: {
+        /** @format date */
+        when?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<LocationHistoryDto, any>({
+        path: `/locations/history`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Store the current location in user history if allowed by user preferences
+     *
+     * @tags Location
+     * @name CreateHistoryLocation
+     * @summary Store location for history
+     * @request POST:/locations/history
+     * @secure
+     */
+    createHistoryLocation: (
       query: {
         /** @format float */
         latitude: number;
@@ -2542,41 +2567,13 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<void, any>({
-        path: `/location/prefetch`,
-        method: "GET",
+        path: `/locations/history`,
+        method: "POST",
         query: query,
         secure: true,
         ...params,
       }),
 
-    /**
-     * @description Return a recent location matching the requested coordinates
-     *
-     * @tags Location
-     * @name GetRecentRequestLocation
-     * @summary Get recent request location
-     * @request GET:/location/request-location
-     * @secure
-     */
-    getRecentRequestLocation: (
-      query: {
-        /** @format float */
-        latitude: number;
-        /** @format float */
-        longitude: number;
-      },
-      params: RequestParams = {},
-    ) =>
-      this.request<RequestLocationDto, any>({
-        path: `/location/request-location`,
-        method: "GET",
-        query: query,
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-  };
-  locations = {
     /**
      * @description Search for locations near a point or by query
      *
@@ -2598,31 +2595,6 @@ export class Api<
     ) =>
       this.request<LocationDto[], any>({
         path: `/locations/nearby`,
-        method: "GET",
-        query: query,
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Return location history for the authenticated user for a given day
-     *
-     * @tags Location
-     * @name LocationHistory
-     * @summary Location history
-     * @request GET:/locations/history
-     * @secure
-     */
-    locationHistory: (
-      query?: {
-        /** @format date */
-        when?: string;
-      },
-      params: RequestParams = {},
-    ) =>
-      this.request<LocationHistoryDto, any>({
-        path: `/locations/history`,
         method: "GET",
         query: query,
         secure: true,
@@ -2680,6 +2652,60 @@ export class Api<
     ) =>
       this.request<StopoversResponseDto, any>({
         path: `/locations/stopovers`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  location = {
+    /**
+     * @description Prefetch location data and optionally store user history
+     *
+     * @tags Location
+     * @name PrefetchLocation
+     * @summary Prefetch location
+     * @request GET:/location/prefetch
+     * @secure
+     */
+    prefetchLocation: (
+      query: {
+        /** @format float */
+        latitude: number;
+        /** @format float */
+        longitude: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<void, any>({
+        path: `/location/prefetch`,
+        method: "GET",
+        query: query,
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Return a recent location matching the requested coordinates
+     *
+     * @tags Location
+     * @name GetRecentRequestLocation
+     * @summary Get recent request location
+     * @request GET:/location/request-location
+     * @secure
+     */
+    getRecentRequestLocation: (
+      query: {
+        /** @format float */
+        latitude: number;
+        /** @format float */
+        longitude: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<RequestLocationDto, any>({
+        path: `/location/request-location`,
         method: "GET",
         query: query,
         secure: true,

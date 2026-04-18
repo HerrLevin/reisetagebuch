@@ -47,6 +47,33 @@ class LocationController extends Controller
         return false;
     }
 
+    #[OA\Post(
+        path: '/locations/history',
+        operationId: 'createHistoryLocation',
+        description: 'Store the current location in user history if allowed by user preferences',
+        summary: 'Store location for history',
+        tags: ['Location'],
+        parameters: [
+            new OA\Parameter(name: 'latitude', in: 'query', required: true, schema: new OA\Schema(type: 'number', format: 'float')),
+            new OA\Parameter(name: 'longitude', in: 'query', required: true, schema: new OA\Schema(type: 'number', format: 'float')),
+            new OA\Parameter(name: 'X-RTB-DISALLOW_HISTORY', description: 'Set to true to disallow storing this location in history', in: 'header', required: false, schema: new OA\Schema(type: 'boolean')),
+            new OA\Parameter(name: 'X-RTB-ALLOW_HISTORY', description: 'Set to true to allow storing this location in history', in: 'header', required: false, schema: new OA\Schema(type: 'boolean')),
+            new OA\Parameter(name: 'rtb_allow_history', description: 'Set to true to allow storing this location in history', in: 'cookie', required: false, schema: new OA\Schema(type: 'boolean')),
+            new OA\Parameter(name: 'rtb_disallow_history', description: 'Set to true to disallow storing this location in history', in: 'cookie', required: false, schema: new OA\Schema(type: 'boolean')),
+        ],
+        responses: [new OA\Response(response: 204, description: Controller::OA_DESC_NO_CONTENT)]
+    )]
+    public function createHistoryLocation(LocationRequest $request): void
+    {
+        $point = Point::makeGeodetic($request->latitude, $request->longitude);
+        if ($this->canStoreHistory($request)) {
+            $this->locationController->createTimestampedUserWaypoint($request->user()->id, $point);
+            abort('204');
+        }
+
+        abort('406');
+    }
+
     #[OA\Get(
         path: '/location/prefetch',
         operationId: 'prefetchLocation',
@@ -56,6 +83,10 @@ class LocationController extends Controller
         parameters: [
             new OA\Parameter(name: 'latitude', in: 'query', required: true, schema: new OA\Schema(type: 'number', format: 'float')),
             new OA\Parameter(name: 'longitude', in: 'query', required: true, schema: new OA\Schema(type: 'number', format: 'float')),
+            new OA\Parameter(name: 'X-RTB-DISALLOW_HISTORY', description: 'Set to true to disallow storing this location in history', in: 'header', required: false, schema: new OA\Schema(type: 'boolean')),
+            new OA\Parameter(name: 'X-RTB-ALLOW_HISTORY', description: 'Set to true to allow storing this location in history', in: 'header', required: false, schema: new OA\Schema(type: 'boolean')),
+            new OA\Parameter(name: 'rtb_allow_history', description: 'Set to true to allow storing this location in history', in: 'cookie', required: false, schema: new OA\Schema(type: 'boolean')),
+            new OA\Parameter(name: 'rtb_disallow_history', description: 'Set to true to disallow storing this location in history', in: 'cookie', required: false, schema: new OA\Schema(type: 'boolean')),
         ],
         responses: [new OA\Response(response: 204, description: Controller::OA_DESC_NO_CONTENT)]
     )]
@@ -138,6 +169,10 @@ class LocationController extends Controller
             new OA\Parameter(name: 'provider', in: 'query', required: false, schema: new OA\Schema(type: 'string')),
             new OA\Parameter(name: 'latitude', in: 'query', required: false, schema: new OA\Schema(type: 'number', format: 'float')),
             new OA\Parameter(name: 'longitude', in: 'query', required: false, schema: new OA\Schema(type: 'number', format: 'float')),
+            new OA\Parameter(name: 'X-RTB-DISALLOW_HISTORY', description: 'Set to true to disallow storing this location in history', in: 'header', required: false, schema: new OA\Schema(type: 'boolean')),
+            new OA\Parameter(name: 'X-RTB-ALLOW_HISTORY', description: 'Set to true to allow storing this location in history', in: 'header', required: false, schema: new OA\Schema(type: 'boolean')),
+            new OA\Parameter(name: 'rtb_allow_history', description: 'Set to true to allow storing this location in history', in: 'cookie', required: false, schema: new OA\Schema(type: 'boolean')),
+            new OA\Parameter(name: 'rtb_disallow_history', description: 'Set to true to disallow storing this location in history', in: 'cookie', required: false, schema: new OA\Schema(type: 'boolean')),
         ],
         responses: [new OA\Response(response: 200, description: Controller::OA_DESC_SUCCESS, content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: GeocodeResponseEntry::class)))]
     )]
