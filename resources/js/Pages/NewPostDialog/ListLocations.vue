@@ -34,12 +34,23 @@ function fetchRequestLocation() {
         .then((position) => {
             currentPosition.value = position;
             api.location
-                .getRecentRequestLocation({
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude,
-                })
-                .then((data) => {
-                    fetchingProgress.value = data.data;
+                .getRecentRequestLocation(
+                    {
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                    },
+                    {
+                        validateStatus: (status) =>
+                            status === 200 || status === 404,
+                    },
+                )
+                .then((response) => {
+                    if (response.status === 200 && response.data) {
+                        fetchingProgress.value = response.data;
+                    } else {
+                        // 404 -> no recent RequestLocation found (handle silently)
+                        fetchingProgress.value = null;
+                    }
                 })
                 .catch((error) => {
                     console.error('Failed to fetch request location:', error);
