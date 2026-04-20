@@ -1156,7 +1156,7 @@
                         }
                     },
                     {
-                        "name": "X-RTB-DISALLOW_HISTORY",
+                        "name": "X-RTB-DISALLOW-HISTORY",
                         "in": "header",
                         "description": "Set to true to disallow storing this location in history",
                         "required": false,
@@ -1165,7 +1165,7 @@
                         }
                     },
                     {
-                        "name": "X-RTB-ALLOW_HISTORY",
+                        "name": "X-RTB-ALLOW-HISTORY",
                         "in": "header",
                         "description": "Set to true to allow storing this location in history",
                         "required": false,
@@ -1227,7 +1227,7 @@
                         }
                     },
                     {
-                        "name": "X-RTB-DISALLOW_HISTORY",
+                        "name": "X-RTB-DISALLOW-HISTORY",
                         "in": "header",
                         "description": "Set to true to disallow storing this location in history",
                         "required": false,
@@ -1236,7 +1236,7 @@
                         }
                     },
                     {
-                        "name": "X-RTB-ALLOW_HISTORY",
+                        "name": "X-RTB-ALLOW-HISTORY",
                         "in": "header",
                         "description": "Set to true to allow storing this location in history",
                         "required": false,
@@ -1419,7 +1419,7 @@
                         }
                     },
                     {
-                        "name": "X-RTB-DISALLOW_HISTORY",
+                        "name": "X-RTB-DISALLOW-HISTORY",
                         "in": "header",
                         "description": "Set to true to disallow storing this location in history",
                         "required": false,
@@ -1428,7 +1428,7 @@
                         }
                     },
                     {
-                        "name": "X-RTB-ALLOW_HISTORY",
+                        "name": "X-RTB-ALLOW-HISTORY",
                         "in": "header",
                         "description": "Set to true to allow storing this location in history",
                         "required": false,
