@@ -2,9 +2,26 @@
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import LocaleChanger from '@/Components/LocaleChanger.vue';
 import { useAppConfigurationStore } from '@/stores/appConfiguration';
+import { computed } from 'vue';
 
 const config = useAppConfigurationStore();
 config.fetchConfig();
+
+const appVersion = computed(() => {
+    const version = config.appVersion();
+    return version && version !== '0.0.0' ? version : null;
+});
+
+const versionLink = computed(() => {
+    if (appVersion.value?.includes('.')) {
+        const version = appVersion.value.startsWith('v')
+            ? appVersion.value
+            : `v${appVersion.value}`;
+        return `https://github.com/HerrLevin/reisetagebuch/releases/tag/${version}`;
+    }
+
+    return `https://github.com/HerrLevin/reisetagebuch/commit/${appVersion.value}`;
+});
 </script>
 
 <template>
@@ -14,24 +31,25 @@ config.fetchConfig();
         <aside>
             <ApplicationLogo class="h-12 w-12 cursor-pointer md:inline-block" />
             <p>
-                {{ config.appName() }}
+                <a
+                    href="https://github.com/HerrLevin/reisetagebuch"
+                    class="link"
+                    target="_blank"
+                >
+                    {{ config.appName() }}
+                </a>
                 <br />
                 <a
-                    v-if="config.appVersion() !== '0.0.0'"
+                    v-if="appVersion"
                     class="link"
-                    :href="`https://github.com/HerrLevin/reisetagebuch/releases/tag/${config.appVersion()}`"
+                    :href="versionLink"
                     target="_blank"
                 >
                     {{ config.appVersion() }}
                 </a>
-                <a
-                    v-else
-                    class="link"
-                    href="https://github.com/HerrLevin/reisetagebuch"
-                    target="_blank"
-                >
+                <span v-else class="italic">
                     {{ $t('footer.version_unknown') }}
-                </a>
+                </span>
             </p>
         </aside>
         <nav></nav>

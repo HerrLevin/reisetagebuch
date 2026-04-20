@@ -70,7 +70,7 @@ const relativeCreatedAt = computed(() => {
             />
         </div>
     </div>
-    <div class="list-col-grow">
+    <div>
         <div class="mb-1 text-xs">
             <RouterLink
                 :to="`/profile/${localPost.user.username}`"

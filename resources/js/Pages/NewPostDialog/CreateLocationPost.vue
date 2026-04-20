@@ -63,7 +63,7 @@ function submitForm() {
                     :show-time-select="true"
                     :post-time="form.visitedAt"
                     :loading="loading"
-                    @cancel="useRouter().back()"
+                    @cancel="vueRouter.back()"
                     @select-travel-reason="
                         (travelReason) => (form.travelReason = travelReason)
                     "
