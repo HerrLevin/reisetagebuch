@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\ActivityPub;
 
 use ActivityPhp\Type;
-use App\Enums\Visibility;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\PostTypes\BasePost;
+use App\Http\Resources\PostTypes\LocationPost;
+use App\Http\Resources\PostTypes\TransportPost;
 use App\Http\Resources\UserDto;
 use App\Models\ActivityPubFollower;
 use App\Models\User;
@@ -108,14 +110,14 @@ class MastodonActivityPubController extends Controller
         }
 
         $outboxUrl = route('ap.outbox', ['username' => $user->username]);
-        $publicPostsQuery = $user->posts()->where('visibility', Visibility::PUBLIC);
+        $posts = $this->postRepository->getPostsForUserId($user->id);
 
         if (! $request->has('page') && ! $request->has('cursor')) {
             $collection = [
                 '@context' => 'https://www.w3.org/ns/activitystreams',
                 'id' => $outboxUrl,
                 'type' => 'OrderedCollection',
-                'totalItems' => $publicPostsQuery->count(),
+                'totalItems' => $user->statistics->posts_count,
                 'first' => $outboxUrl.'?page=true',
             ];
 
@@ -123,25 +125,25 @@ class MastodonActivityPubController extends Controller
                 ->header('Content-Type', 'application/activity+json');
         }
 
-        $posts = $publicPostsQuery->orderBy('created_at', 'desc')->orderBy('id', 'desc')->cursorPaginate(5);
         $followersCollectionUrl = route('ap.followers', ['username' => $user->username]);
         $actorUrl = route('ap.actor', ['username' => $user->username]);
 
         $items = [];
-        foreach ($posts as $post) {
+        /** @var BasePost|TransportPost|LocationPost $post */
+        foreach ($posts->items as $post) {
             $items[] = [
                 'id' => route('ap.post', ['id' => $post->id]).'/activity',
                 'type' => 'Create',
                 'actor' => $actorUrl,
-                'published' => $post->created_at->toISOString(),
+                'published' => $post->createdAt,
                 'to' => ['https://www.w3.org/ns/activitystreams#Public'],
                 'cc' => [$followersCollectionUrl],
                 'object' => [
                     'id' => route('ap.post-object', ['id' => $post->id]),
                     'type' => 'Note',
-                    'published' => $post->created_at->toISOString(),
+                    'published' => $post->publishedAt,
                     'attributedTo' => $actorUrl,
-                    'content' => $post->body,
+                    'content' => $post->getBody() ?? '',
                     'to' => ['https://www.w3.org/ns/activitystreams#Public'],
                     'cc' => [$followersCollectionUrl],
                 ],
@@ -156,11 +158,11 @@ class MastodonActivityPubController extends Controller
             'orderedItems' => $items,
         ];
 
-        if ($posts->nextPageUrl()) {
-            $page['next'] = $posts->nextPageUrl();
+        if ($posts->nextCursor) {
+            $page['next'] = url($outboxUrl.'?cursor='.$posts->nextCursor);
         }
-        if ($posts->previousPageUrl()) {
-            $page['prev'] = $posts->previousPageUrl();
+        if ($posts->previousCursor) {
+            $page['prev'] = url($outboxUrl.'?cursor='.$posts->previousCursor);
         }
 
         return response()->json(data: $page, options: JSON_UNESCAPED_SLASHES)
