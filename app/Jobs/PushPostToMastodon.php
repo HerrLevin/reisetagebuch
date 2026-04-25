@@ -2,10 +2,11 @@
 
 namespace App\Jobs;
 
-use App\Http\Resources\PostTypes\BasePost;
-use App\Http\Resources\PostTypes\LocationPost;
+use App\Enums\Visibility;
+use App\Hydrators\PostHydrator;
+use App\Hydrators\UserHydrator;
 use App\Models\ActivityPubFollower;
-use App\Models\TransportPost;
+use App\Models\Post;
 use App\Services\ActivityPubService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -15,44 +16,58 @@ class PushPostToMastodon implements ShouldQueue
 {
     use Queueable;
 
-    private readonly ActivityPubService $activityPub;
+    public int $tries = 3;
+
+    public array $backoff = [30, 120, 600];
 
     public function __construct(
-        private readonly BasePost|LocationPost|TransportPost $post,
-        ?ActivityPubService $activityPub = null
-    ) {
-        $this->activityPub = $activityPub ?? app(ActivityPubService::class);
-    }
+        private readonly string $postId
+    ) {}
 
-    public function handle(): void
+    public function handle(ActivityPubService $activityPub): void
     {
-        $user = $this->post->user;
-
-        // Get all followers
-        $followers = ActivityPubFollower::whereFollowedUserId($user->id)->get();
-
-        if ($followers->isEmpty()) {
-            Log::info('No followers to send activity to for user: '.$user->username);
+        $postModel = Post::with(['user', 'locationPost', 'transportPost'])->find($this->postId);
+        if (! $postModel) {
+            Log::warning('PushPostToMastodon: Post not found', ['postId' => $this->postId]);
 
             return;
         }
 
-        // Create the Create activity
+        if ($postModel->visibility !== Visibility::PUBLIC) {
+            Log::info('PushPostToMastodon: Skipping non-public post', ['postId' => $this->postId]);
+
+            return;
+        }
+
+        $postDto = app(PostHydrator::class)->modelToDto($postModel);
+        $userDto = app(UserHydrator::class)->modelToDto($postModel->user);
+
+        $followersCollectionUrl = route('ap.followers', ['username' => $postModel->user->username]);
+
+        $followers = ActivityPubFollower::whereFollowedUserId($postModel->user->id)->get();
+
+        if ($followers->isEmpty()) {
+            Log::info('No followers to send activity to for user: '.$postModel->user->username);
+
+            return;
+        }
+
         $createActivity = [
             '@context' => 'https://www.w3.org/ns/activitystreams',
-            'id' => route('ap.post', ['id' => $this->post->id]),
+            'id' => route('ap.post', ['id' => $postModel->id]).'/activity',
             'type' => 'Create',
-            'actor' => route('ap.actor', ['username' => $user->username]),
-            'published' => $this->post->publishedAt,
-            'url' => route('ap.post', ['id' => $this->post->id]),
+            'actor' => route('ap.actor', ['username' => $postModel->user->username]),
+            'published' => $postModel->created_at->toISOString(),
             'to' => ['https://www.w3.org/ns/activitystreams#Public'],
+            'cc' => [$followersCollectionUrl],
             'object' => [
-                'id' => route('ap.post-object', ['id' => $this->post->id]),
+                'id' => route('ap.post-object', ['id' => $postModel->id]),
                 'type' => 'Note',
-                'published' => $this->post->publishedAt,
-                'attributedTo' => route('ap.actor', ['username' => $user->username]),
-                'content' => $this->post->getBody(),
+                'published' => $postModel->created_at->toISOString(),
+                'attributedTo' => route('ap.actor', ['username' => $postModel->user->username]),
+                'content' => $postDto->getBody() ?? '',
                 'to' => ['https://www.w3.org/ns/activitystreams#Public'],
+                'cc' => [$followersCollectionUrl],
             ],
         ];
 
@@ -66,7 +81,7 @@ class PushPostToMastodon implements ShouldQueue
                 }
                 $usedInboxes[] = $inbox;
             }
-            $this->activityPub->deliverActivity($user, $follow->follower_actor_id, $inbox, $createActivity);
+            $activityPub->deliverActivity($userDto, $follow->follower_actor_id, $inbox, $createActivity);
         }
     }
 }
