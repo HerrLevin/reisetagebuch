@@ -25,6 +25,7 @@ use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
 use App\Jobs\CalculateStatsForTransportPost;
 use App\Jobs\PrefetchJob;
+use App\Jobs\PushDeleteToMastodon;
 use App\Jobs\PushPostToMastodon;
 use App\Jobs\TraewellingChangeExitJob;
 use App\Jobs\TraewellingCrossCheckInJob;
@@ -79,7 +80,7 @@ class PostController extends Controller
 
     private function dispatchPost(BasePost|LocationPost|TransportPost $post): void
     {
-        PushPostToMastodon::dispatch($post);
+        PushPostToMastodon::dispatch($post->id);
     }
 
     public function storeLocation(LocationBasePostRequest $request): BasePost|LocationPost|TransportPost
@@ -241,6 +242,8 @@ class PostController extends Controller
         if ($user->cannot('delete', $post)) {
             throw new AuthorizationException('You do not have permission to delete this post.');
         }
+
+        PushDeleteToMastodon::dispatch($postId, $user->id, $user->username);
 
         if ($post instanceof TransportPost) {
             TraewellingDeletePostJob::dispatch($post);
