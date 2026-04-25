@@ -107,61 +107,64 @@ class MastodonActivityPubController extends Controller
             return response()->json(['error' => 'User not found'], 404);
         }
 
+        $outboxUrl = route('ap.outbox', ['username' => $user->username]);
         $publicPostsQuery = $user->posts()->where('visibility', Visibility::PUBLIC);
 
         if (! $request->has('page') && ! $request->has('cursor')) {
-            $collection = Type::create('OrderedCollection', [
-                'id' => route('ap.outbox', ['username' => $user->username]),
+            $collection = [
+                '@context' => 'https://www.w3.org/ns/activitystreams',
+                'id' => $outboxUrl,
+                'type' => 'OrderedCollection',
                 'totalItems' => $publicPostsQuery->count(),
-                'first' => route('ap.outbox', ['username' => $user->username, 'page' => 'true']),
-            ]);
-            $collection->set('@context', 'https://www.w3.org/ns/activitystreams');
+                'first' => $outboxUrl.'?page=true',
+            ];
 
-            return response()->json(data: $collection->toArray(), options: JSON_UNESCAPED_SLASHES)->header('Content-Type', 'application/activity+json');
+            return response()->json(data: $collection, options: JSON_UNESCAPED_SLASHES)
+                ->header('Content-Type', 'application/activity+json');
         }
 
         $posts = $publicPostsQuery->orderBy('created_at', 'desc')->orderBy('id', 'desc')->cursorPaginate(5);
         $followersCollectionUrl = route('ap.followers', ['username' => $user->username]);
+        $actorUrl = route('ap.actor', ['username' => $user->username]);
 
         $items = [];
         foreach ($posts as $post) {
-            $note = Type::create('Note', [
-                'id' => route('ap.post-object', ['id' => $post->id]),
-                'published' => $post->created_at->toISOString(),
-                'attributedTo' => route('ap.actor', ['username' => $post->user->username]),
-                'content' => $post->body,
-                'to' => ['https://www.w3.org/ns/activitystreams#Public'],
-                'cc' => [$followersCollectionUrl],
-            ]);
-
-            $create = Type::create('Create', [
+            $items[] = [
                 'id' => route('ap.post', ['id' => $post->id]).'/activity',
-                'actor' => route('ap.actor', ['username' => $post->user->username]),
+                'type' => 'Create',
+                'actor' => $actorUrl,
                 'published' => $post->created_at->toISOString(),
                 'to' => ['https://www.w3.org/ns/activitystreams#Public'],
                 'cc' => [$followersCollectionUrl],
-                'object' => $note,
-            ]);
-
-            $items[] = $create;
+                'object' => [
+                    'id' => route('ap.post-object', ['id' => $post->id]),
+                    'type' => 'Note',
+                    'published' => $post->created_at->toISOString(),
+                    'attributedTo' => $actorUrl,
+                    'content' => $post->body,
+                    'to' => ['https://www.w3.org/ns/activitystreams#Public'],
+                    'cc' => [$followersCollectionUrl],
+                ],
+            ];
         }
 
-        $page = Type::create('OrderedCollectionPage', [
-            'id' => route('ap.outbox', ['username' => $user->username]),
+        $page = [
+            '@context' => 'https://www.w3.org/ns/activitystreams',
+            'id' => $outboxUrl.'?page=true',
+            'type' => 'OrderedCollectionPage',
+            'partOf' => $outboxUrl,
             'orderedItems' => $items,
-            'partOf' => route('ap.outbox', ['username' => $user->username]),
-        ]);
+        ];
 
         if ($posts->nextPageUrl()) {
-            $page->set('next', $posts->nextPageUrl());
+            $page['next'] = $posts->nextPageUrl();
         }
         if ($posts->previousPageUrl()) {
-            $page->set('prev', $posts->previousPageUrl());
+            $page['prev'] = $posts->previousPageUrl();
         }
 
-        $page->set('@context', 'https://www.w3.org/ns/activitystreams');
-
-        return response()->json($page->toArray())->header('Content-Type', 'application/activity+json');
+        return response()->json(data: $page, options: JSON_UNESCAPED_SLASHES)
+            ->header('Content-Type', 'application/activity+json');
     }
 
     public function inbox(Request $request, string $username): JsonResponse
