@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\ActivityPub;
 
 use ActivityPhp\Type;
+use App\Enums\Visibility;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserDto;
 use App\Models\ActivityPubFollower;
@@ -23,9 +24,11 @@ class MastodonActivityPubController extends Controller
         private readonly PostRepository $postRepository
     ) {}
 
-    private function checkHeader(Request $request)
+    private function checkHeader(Request $request): bool
     {
-        return ! (str_contains($request->header('accept'), 'application/ld+json') || str_contains($request->header('accept'), 'application/activity+json'));
+        $accept = $request->header('accept', '');
+
+        return ! (str_contains($accept, 'application/ld+json') || str_contains($accept, 'application/activity+json') || str_contains($accept, 'application/json'));
     }
 
     public function actor(Request $request, string $username): JsonResponse|RedirectResponse
@@ -38,23 +41,22 @@ class MastodonActivityPubController extends Controller
         $data = [
             'type' => 'Person',
             'id' => route('ap.actor', ['username' => $user->username]),
-            // 'following' => ,
-            // 'followers
+            'following' => route('ap.following', ['username' => $user->username]),
+            'followers' => route('ap.followers', ['username' => $user->username]),
             'inbox' => route('ap.inbox', ['username' => $user->username]),
             'outbox' => route('ap.outbox', ['username' => $user->username]),
             'preferredUsername' => $user->username,
             'name' => $user->name,
             'summary' => $user->bio ?? '',
             'url' => url('/@'.$user->username),
-            // 'manuallyApprovesFollowers' => $user->requiresFollowRequest,
-            // 'discoverable' => true,
-            // 'indexable' => true,
+            'manuallyApprovesFollowers' => $user->requiresFollowRequest,
+            'discoverable' => true,
             'published' => $user->createdAt,
-            // 'alsoKnownAs' => [
-            //    url('/profile/' . $user->username),
-            // ],
+            'endpoints' => [
+                'sharedInbox' => route('ap.shared-inbox'),
+            ],
             'publicKey' => [
-                'id' => route('ap.actor', ['username' => $user->username.'#main-key']),
+                'id' => route('ap.actor', ['username' => $user->username]).'#main-key',
                 'owner' => route('ap.actor', ['username' => $user->username]),
                 'publicKeyPem' => $user->publicKeyPem,
             ],
@@ -72,7 +74,7 @@ class MastodonActivityPubController extends Controller
             'https://www.w3.org/ns/activitystreams',
             'https://w3id.org/security/v1',
             [
-                // 'manuallyApprovesFollowers' => 'as:manuallyApprovesFollowers',
+                'manuallyApprovesFollowers' => 'as:manuallyApprovesFollowers',
                 'toot' => 'http://joinmastodon.org/ns#',
                 'schema' => 'http://schema.org#',
                 'PropertyValue' => 'schema:PropertyValue',
@@ -105,11 +107,12 @@ class MastodonActivityPubController extends Controller
             return response()->json(['error' => 'User not found'], 404);
         }
 
+        $publicPostsQuery = $user->posts()->where('visibility', Visibility::PUBLIC);
+
         if (! $request->has('page') && ! $request->has('cursor')) {
-            // First page request
             $collection = Type::create('OrderedCollection', [
                 'id' => route('ap.outbox', ['username' => $user->username]),
-                'totalItems' => $user->posts()->count(),
+                'totalItems' => $publicPostsQuery->count(),
                 'first' => route('ap.outbox', ['username' => $user->username, 'page' => 'true']),
             ]);
             $collection->set('@context', 'https://www.w3.org/ns/activitystreams');
@@ -117,7 +120,8 @@ class MastodonActivityPubController extends Controller
             return response()->json(data: $collection->toArray(), options: JSON_UNESCAPED_SLASHES)->header('Content-Type', 'application/activity+json');
         }
 
-        $posts = $user->posts()->orderBy('created_at', 'desc')->orderBy('id', 'desc')->cursorPaginate(5);
+        $posts = $publicPostsQuery->orderBy('created_at', 'desc')->orderBy('id', 'desc')->cursorPaginate(5);
+        $followersCollectionUrl = route('ap.followers', ['username' => $user->username]);
 
         $items = [];
         foreach ($posts as $post) {
@@ -127,13 +131,15 @@ class MastodonActivityPubController extends Controller
                 'attributedTo' => route('ap.actor', ['username' => $post->user->username]),
                 'content' => $post->body,
                 'to' => ['https://www.w3.org/ns/activitystreams#Public'],
+                'cc' => [$followersCollectionUrl],
             ]);
 
             $create = Type::create('Create', [
-                'id' => route('ap.post-object', ['id' => $post->id]),
+                'id' => route('ap.post', ['id' => $post->id]).'/activity',
                 'actor' => route('ap.actor', ['username' => $post->user->username]),
                 'published' => $post->created_at->toISOString(),
                 'to' => ['https://www.w3.org/ns/activitystreams#Public'],
+                'cc' => [$followersCollectionUrl],
                 'object' => $note,
             ]);
 
@@ -160,16 +166,70 @@ class MastodonActivityPubController extends Controller
 
     public function inbox(Request $request, string $username): JsonResponse
     {
-        Log::info('getting inbox request', [$request->all()]);
+        if (! $this->isActivityPubContentType($request)) {
+            return response()->json(['error' => 'Unsupported Media Type'], 415);
+        }
+
         $user = $this->userRepository->getUserByUsername($username);
+        $activity = $request->json()->all();
+
+        return $this->processActivity($activity, $user);
+    }
+
+    public function sharedInbox(Request $request): JsonResponse
+    {
+        if (! $this->isActivityPubContentType($request)) {
+            return response()->json(['error' => 'Unsupported Media Type'], 415);
+        }
 
         $activity = $request->json()->all();
-        Log::info('inbox request', [$request->all()]);
 
-        if ($activity['type'] === 'Follow') {
+        // Determine the target user from the activity
+        $targetActorId = null;
+        if (isset($activity['object']) && is_string($activity['object'])) {
+            $targetActorId = $activity['object'];
+        } elseif (isset($activity['object']['object']) && is_string($activity['object']['object'])) {
+            $targetActorId = $activity['object']['object'];
+        }
+
+        if (! $targetActorId) {
+            return response()->json('', 202);
+        }
+
+        // Extract username from actor URL
+        $actorRoute = route('ap.actor', ['username' => 'PLACEHOLDER']);
+        $prefix = str_replace('PLACEHOLDER', '', $actorRoute);
+        if (str_starts_with($targetActorId, $prefix)) {
+            $username = substr($targetActorId, strlen($prefix));
+            try {
+                $user = $this->userRepository->getUserByUsername($username);
+
+                return $this->processActivity($activity, $user);
+            } catch (\Exception) {
+                Log::warning('Shared inbox: user not found', ['targetActorId' => $targetActorId]);
+            }
+        }
+
+        return response()->json('', 202);
+    }
+
+    private function isActivityPubContentType(Request $request): bool
+    {
+        $contentType = $request->header('content-type', '');
+
+        return str_contains($contentType, 'application/activity+json')
+            || str_contains($contentType, 'application/ld+json')
+            || str_contains($contentType, 'application/json');
+    }
+
+    private function processActivity(array $activity, UserDto $user): JsonResponse
+    {
+        $type = $activity['type'] ?? null;
+
+        if ($type === 'Follow') {
             return $this->handleFollow($activity, $user);
         }
-        if ($activity['type'] === 'Undo' && $activity['object']['type'] === 'Follow') {
+        if ($type === 'Undo' && isset($activity['object']['type']) && $activity['object']['type'] === 'Follow') {
             return $this->handleUndoFollow($activity, $user);
         }
 
@@ -190,14 +250,18 @@ class MastodonActivityPubController extends Controller
 
         $inboxes = $this->activityPubService->getInbox($followerActorId);
 
-        $follow = ActivityPubFollower::firstOrCreate([
-            'follower_actor_id' => $followerActorId,
-            'followed_user_id' => $user->id,
-            'follower_shared_inbox_url' => $inboxes['sharedInbox'] ?? null,
-            'follower_inbox_url' => $inboxes['inbox'] ?? null,
-        ]);
+        $follow = ActivityPubFollower::updateOrCreate(
+            [
+                'follower_actor_id' => $followerActorId,
+                'followed_user_id' => $user->id,
+            ],
+            [
+                'follower_shared_inbox_url' => $inboxes['sharedInbox'] ?? null,
+                'follower_inbox_url' => $inboxes['inbox'] ?? null,
+            ]
+        );
 
-        $this->sendAccept($user, $activity, $follow, $follow->id);
+        $this->sendAccept($user, $activity, $follow);
 
         return response()->json('', 202);
     }
@@ -214,14 +278,20 @@ class MastodonActivityPubController extends Controller
             return response()->json(['error' => 'Invalid follow object'], 400);
         }
 
-        $delete = ActivityPubFollower::where([
+        $follower = ActivityPubFollower::where([
             'follower_actor_id' => $followerActorId,
             'followed_user_id' => $user->id,
-        ])->firstOrFail();
+        ])->first();
 
-        $delete->delete();
+        if (! $follower) {
+            // Already unfollowed — idempotent
+            return response()->json('', 202);
+        }
 
-        $this->sendAccept($user, $activity, null, $followedActorId);
+        $inboxUrl = $follower->follower_shared_inbox_url ?? $follower->follower_inbox_url;
+        $follower->delete();
+
+        $this->sendAcceptWithInbox($user, $activity, $inboxUrl);
 
         return response()->json('', 202);
     }
@@ -251,18 +321,70 @@ class MastodonActivityPubController extends Controller
         return $this->postData($request, $id);
     }
 
-    private function sendAccept(UserDto $user, array $followActivity, ?ActivityPubFollower $follower, ?string $id): void
+    private function sendAccept(UserDto $user, array $followActivity, ActivityPubFollower $follower): void
     {
-        $followerActorId = $followActivity['actor'];
+        $acceptId = route('ap.actor', ['username' => $user->username]).'#accepts/followers/'.$follower->id;
+        $inboxUrl = $follower->follower_shared_inbox_url ?? $follower->follower_inbox_url;
 
-        // Create Accept activity
         $accept = Type::create('Accept', [
-            'id' => route('ap.activity', ['id' => $id]),
+            'id' => $acceptId,
             'actor' => route('ap.actor', ['username' => $user->username]),
             'object' => $followActivity,
         ]);
         $accept->set('@context', 'https://www.w3.org/ns/activitystreams');
 
-        $this->activityPubService->deliverActivity($user, $followerActorId, $follower?->follower_shared_inbox_url ?? $follower?->follower_inbox_url ?? null, $accept->toArray());
+        $this->activityPubService->deliverActivity($user, $followActivity['actor'], $inboxUrl, $accept->toArray());
+    }
+
+    private function sendAcceptWithInbox(UserDto $user, array $activity, ?string $inboxUrl): void
+    {
+        $acceptId = route('ap.actor', ['username' => $user->username]).'#accepts/'.uniqid();
+
+        $accept = Type::create('Accept', [
+            'id' => $acceptId,
+            'actor' => route('ap.actor', ['username' => $user->username]),
+            'object' => $activity,
+        ]);
+        $accept->set('@context', 'https://www.w3.org/ns/activitystreams');
+
+        $this->activityPubService->deliverActivity($user, $activity['actor'], $inboxUrl, $accept->toArray());
+    }
+
+    public function followers(string $username): JsonResponse
+    {
+        $user = User::where('username', $username)->first();
+        if (! $user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        $count = ActivityPubFollower::where('followed_user_id', $user->id)->count();
+
+        $collection = [
+            '@context' => 'https://www.w3.org/ns/activitystreams',
+            'id' => route('ap.followers', ['username' => $user->username]),
+            'type' => 'OrderedCollection',
+            'totalItems' => $count,
+        ];
+
+        return response()->json(data: $collection, options: JSON_UNESCAPED_SLASHES)
+            ->header('Content-Type', 'application/activity+json');
+    }
+
+    public function following(string $username): JsonResponse
+    {
+        $user = User::where('username', $username)->first();
+        if (! $user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        $collection = [
+            '@context' => 'https://www.w3.org/ns/activitystreams',
+            'id' => route('ap.following', ['username' => $user->username]),
+            'type' => 'OrderedCollection',
+            'totalItems' => 0,
+        ];
+
+        return response()->json(data: $collection, options: JSON_UNESCAPED_SLASHES)
+            ->header('Content-Type', 'application/activity+json');
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\ActivityPub;
 
 use App\Http\Controllers\Controller;
 use App\Repositories\UserRepository;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -49,7 +50,11 @@ class WellKnownController extends Controller
             abort(400, 'Invalid domain');
         }
 
-        $user = $this->userRepository->getUserByUsername($username);
+        try {
+            $user = $this->userRepository->getUserByUsername($username);
+        } catch (ModelNotFoundException) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
 
         $links = [
             [
