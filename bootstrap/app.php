@@ -2,8 +2,8 @@
 
 use App\Console\Commands\FetchAirports;
 use App\Http\Middleware\ApiMiddleware;
-use App\Http\Middleware\RequestLogger;
 use App\Http\Middleware\EnsureUserIsAdmin;
+use App\Http\Middleware\RequestLogger;
 use App\Jobs\DeleteOldNearbyRequests;
 use App\Jobs\DispatchRefreshJobForActiveTrips;
 use Illuminate\Console\Scheduling\Schedule;

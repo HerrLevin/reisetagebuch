@@ -14,6 +14,30 @@
 namespace App\Models{
 /**
  * @property string $id
+ * @property string $follower_actor_id
+ * @property string $followed_user_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null $follower_inbox_url
+ * @property string|null $follower_shared_inbox_url
+ * @property-read \App\Models\User|null $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollower newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollower newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollower query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollower whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollower whereFollowedUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollower whereFollowerActorId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollower whereFollowerInboxUrl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollower whereFollowerSharedInboxUrl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollower whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollower whereUpdatedAt($value)
+ */
+	class ActivityPubFollower extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property string $id
  * @property string $origin_user_id
  * @property string $target_user_id
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -585,6 +609,10 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property bool $is_admin
+ * @property string $public_key
+ * @property string $private_key
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ActivityPubFollower> $activityPubFollowers
+ * @property-read int|null $activity_pub_followers_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Passport\Client> $clients
  * @property-read int|null $clients_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\FollowRequest> $followRequests
@@ -633,6 +661,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereIsAdmin($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User wherePassword($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User wherePrivateKey($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User wherePublicKey($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUsername($value)
