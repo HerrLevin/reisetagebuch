@@ -3,6 +3,7 @@
 use App\Http\Controllers\ActivityPub\MastodonActivityPubController;
 use App\Http\Controllers\ActivityPub\NodeInfoController;
 use App\Http\Controllers\ActivityPub\WellKnownController;
+use App\Http\Middleware\VerifyHttpSignature;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -31,15 +32,19 @@ Route::prefix('ap')
     // Laravel's VerifyCsrfToken middleware for this route group.
     ->withoutMiddleware([VerifyCsrfToken::class])
     ->group(function () {
-        Route::get('users/{username}#main-key', [MastodonActivityPubController::class, 'actor'])->name('actor-key');
         Route::get('users/{username}', [MastodonActivityPubController::class, 'actor'])->name('actor');
         Route::get('users/{username}/outbox', [MastodonActivityPubController::class, 'outbox'])->name('outbox');
-        Route::post('users/{username}/inbox', [MastodonActivityPubController::class, 'inbox'])->name('inbox');
+        Route::get('users/{username}/followers', [MastodonActivityPubController::class, 'followers'])->name('followers');
+        Route::get('users/{username}/following', [MastodonActivityPubController::class, 'following'])->name('following');
+        Route::post('users/{username}/inbox', [MastodonActivityPubController::class, 'inbox'])
+            ->middleware([VerifyHttpSignature::class, 'throttle:60,1'])
+            ->name('inbox');
+        Route::post('inbox', [MastodonActivityPubController::class, 'sharedInbox'])
+            ->middleware([VerifyHttpSignature::class, 'throttle:60,1'])
+            ->name('shared-inbox');
         Route::get('posts/{id}', [MastodonActivityPubController::class, 'postObject'])->name('post');
         Route::get('posts/{id}/object', [MastodonActivityPubController::class, 'postObject'])->name('post-object');
         Route::get('activities/{id}', function ($id) {
-            // This route can be used to fetch individual activities if needed
-            // For now, it can return a 404 or a placeholder response
             return response()->json(['error' => 'Not implemented'], 404);
         })->name('activity');
     });
