@@ -1,0 +1,3096 @@
+/* eslint-disable */
+/* tslint:disable */
+// @ts-nocheck
+/*
+ * ---------------------------------------------------------------
+ * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
+ * ##                                                           ##
+ * ## AUTHOR: acacode                                           ##
+ * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##
+ * ---------------------------------------------------------------
+ */
+
+/** Visibility levels for posts */
+export enum Visibility {
+  Public = "public",
+  Private = "private",
+  Unlisted = "unlisted",
+  OnlyAuthenticated = "only-authenticated",
+}
+
+/** Enumeration of transport modes */
+export enum TransportMode {
+  WALK = "WALK",
+  BIKE = "BIKE",
+  RENTAL = "RENTAL",
+  CAR = "CAR",
+  CAR_PARKING = "CAR_PARKING",
+  CAR_DROPOFF = "CAR_DROPOFF",
+  ODM = "ODM",
+  FLEX = "FLEX",
+  TRANSIT = "TRANSIT",
+  TRAM = "TRAM",
+  SUBWAY = "SUBWAY",
+  FERRY = "FERRY",
+  AIRPLANE = "AIRPLANE",
+  SUBURBAN = "SUBURBAN",
+  BUS = "BUS",
+  COACH = "COACH",
+  RAIL = "RAIL",
+  HIGHSPEED_RAIL = "HIGHSPEED_RAIL",
+  LONG_DISTANCE = "LONG_DISTANCE",
+  NIGHT_RAIL = "NIGHT_RAIL",
+  REGIONAL_FAST_RAIL = "REGIONAL_FAST_RAIL",
+  REGIONAL_RAIL = "REGIONAL_RAIL",
+  CABLE_CAR = "CABLE_CAR",
+  FUNICULAR = "FUNICULAR",
+  AERIAL_LIFT = "AERIAL_LIFT",
+  OTHER = "OTHER",
+  AREAL_LIFT = "AREAL_LIFT",
+  METRO = "METRO",
+}
+
+/** Enum representing different travel roles */
+export enum TravelRole {
+  Deadhead = "deadhead",
+  Operator = "operator",
+  Catering = "catering",
+}
+
+/** Reasons for travel associated with transport posts */
+export enum TravelReason {
+  Commute = "commute",
+  Business = "business",
+  Leisure = "leisure",
+  Crew = "crew",
+  Errand = "errand",
+  Other = "other",
+}
+
+export enum Feature {
+  Registration = "registration",
+  Invite = "invite",
+}
+
+/** Enumeration of notification types */
+export enum NotificationType {
+  PostLikedNotification = "PostLikedNotification",
+  UserFollowedNotification = "UserFollowedNotification",
+  TraewellingCrosspostFailedNotification = "TraewellingCrosspostFailedNotification",
+  UserRequestedFollowNotification = "UserRequestedFollowNotification",
+}
+
+export enum MotisLocationType {
+  ADDRESS = "ADDRESS",
+  PLACE = "PLACE",
+  STOP = "STOP",
+}
+
+export interface AppConfigurationDto {
+  /**
+   * The name of the application
+   * @example "Reisetagebuch"
+   */
+  appName: string;
+  /** List of feature flags and their statuses */
+  featureFlags: FeatureFlag[];
+  /**
+   * The version of the application
+   * @example "1.0.0"
+   */
+  appVersion?: string;
+}
+
+/**
+ * Authenticated User DTO
+ * Data Transfer Object representing the authenticated user
+ */
+export interface AuthenticatedUserDto {
+  /**
+   * The unique identifier of the user
+   * @format uuid
+   */
+  id: string;
+  /**
+   * The full name of the user
+   * @example "John Doe"
+   */
+  name: string;
+  /**
+   * The username of the user
+   * @example "john_doe"
+   */
+  username: string;
+  /**
+   * The email address of the user
+   * @format email
+   * @example "user@reisetagebu.ch"
+   */
+  email: string;
+  /**
+   * The URL of the user avatar image
+   * @format uri
+   * @example "https://example.com/avatars/john_doe.png"
+   */
+  avatar: string | null;
+  /**
+   * Indicates whether the user must verify their email address
+   * @example false
+   */
+  mustVerifyEmail: boolean;
+  /**
+   * Indicates whether the user has permission to invite other users
+   * @example true
+   */
+  canInviteUsers: boolean;
+  /**
+   * Indicates whether the user has connected their Traewelling account
+   * @example false
+   */
+  traewellingConnected: boolean;
+  /** Data Transfer Object representing user settings */
+  settings: UserSettingsDto;
+  /**
+   * Indicates whether the user has administrative privileges on this instance
+   * @example false
+   */
+  isAdmin: boolean;
+}
+
+/** Data Transfer Object for Departures at a Stop */
+export interface DeparturesDto {
+  /** Data Transfer Object for a Stop */
+  stop: MotisStopDto;
+  /** Collection of departure stop times */
+  departures: StopTimeDto[];
+}
+
+/** Data Transfer Object for Departures Response */
+export interface DeparturesResponseDto {
+  /** Data Transfer Object for Departures at a Stop */
+  departures: DeparturesDto;
+  /** Filter modes applied to the request */
+  modes: TransportMode[];
+  /**
+   * Time when the request was made
+   * @format date-time
+   */
+  requestTime: string;
+  /** Unique identifier for the request */
+  requestIdentifier: string | null;
+  /**
+   * Latitude of the request location
+   * @format float
+   */
+  requestLatitude: number;
+  /**
+   * Longitude of the request location
+   * @format float
+   */
+  requestLongitude: number;
+}
+
+export interface FeatureFlag {
+  name: Feature;
+  /**
+   * Indicates if the feature flag is enabled
+   * @example true
+   */
+  enabled: boolean;
+}
+
+/** Pagination DTO specifically for posts */
+export type FilteredPostPaginationDto = PostPaginationDto & {
+  availableTags: string[];
+  /** Array of post items on the current page */
+  items: (LocationPost | BasePost | TransportPost)[];
+};
+
+/**
+ * Imprint DTO
+ * Data Transfer Object representing the configured imprint text
+ */
+export interface ImprintDto {
+  /** The imprint content, rendered as free-form text */
+  content: string | null;
+}
+
+export interface LikeResponseDto {
+  /** Indicates if the post is liked by the user */
+  likedByUser: boolean;
+  /** Total number of likes on the post */
+  likeCount: number;
+}
+
+/** Data Transfer Object for Location History */
+export interface LocationHistoryDto {
+  /** Collection of location history entries */
+  locations: LocationHistoryEntryDto[];
+  /** Collection of trip history entries */
+  trips: TripHistoryEntryDto[];
+}
+
+/** Data Transfer Object for an Area in the Motis API */
+export interface AreaDto {
+  /** Name of the area */
+  name: string;
+  /** Administrative level of the area */
+  adminLevel: number;
+  /** Indicates if the area was matched to a known location */
+  matched: boolean;
+  /** Indicates if the area is unique (not shared with other locations) */
+  unique: boolean | null;
+  /** Indicates if the area is a default area (used when no specific area is matched) */
+  default: boolean | null;
+}
+
+export interface GeocodeResponseEntry {
+  type: MotisLocationType;
+  /** An array of tokens representing parts of the location name or identifier */
+  tokens: string[];
+  /** The name of the location */
+  name: string;
+  /** A unique identifier for the location */
+  identifier: string;
+  /** The ID of the location */
+  id: string | null;
+  /**
+   * The latitude of the location
+   * @format float
+   */
+  lat: number;
+  /**
+   * The longitude of the location
+   * @format float
+   */
+  lon: number;
+  /** The level or floor of the location, if applicable */
+  level: string | null;
+  /** The street name of the location, if applicable */
+  street: string | null;
+  /** The house number of the location, if applicable */
+  houseNumber: string | null;
+  /** The ZIP code of the location, if applicable */
+  zip: string | null;
+  /** An array of area names or identifiers associated with the location */
+  areas: AreaDto[];
+  /**
+   * The confidence score of the geocode result
+   * @format float
+   */
+  score: number;
+  /** An array of location identifiers */
+  identifiers: LocationIdentifierDto[];
+}
+
+/** Data Transfer Object for a Leg of a Trip in the Motis API */
+export interface LegDto {
+  /** Enumeration of transport modes */
+  mode: TransportMode;
+  /** Data Transfer Object for a Stop Place in the Motis API */
+  from: StopPlaceDto;
+  /** Data Transfer Object for a Stop Place in the Motis API */
+  to: StopPlaceDto;
+  /** Duration of the leg in seconds */
+  duration: number;
+  /**
+   * Start time of the leg, if available
+   * @format date-time
+   */
+  startTime: string | null;
+  /**
+   * End time of the leg, if available
+   * @format date-time
+   */
+  endTime: string | null;
+  /**
+   * Scheduled start time of the leg, if available
+   * @format date-time
+   */
+  scheduledStartTime: string | null;
+  /**
+   * Scheduled end time of the leg, if available
+   * @format date-time
+   */
+  scheduledEndTime: string | null;
+  /** Indicates if the times are real-time or scheduled */
+  realTime: boolean;
+  /** Head sign for the leg, if available */
+  headSign: string;
+  /** Name of the agency associated with this leg, if available */
+  agencyName: string | null;
+  /** Identifier for the agency associated with this leg, if available */
+  agencyId: string | null;
+  /** Identifier for the trip associated with this leg */
+  tripId: string;
+  /** Short name for the route, if available */
+  routeShortName: string;
+  /** Long name for the route, if available */
+  routeLongName: string | null;
+  /** Short name for the trip, if available */
+  tripShortName: string | null;
+  /** Display name for the leg, if available */
+  displayName: string | null;
+  /** Color for the route, if available */
+  routeColor: string | null;
+  /** Text color for the route, if available */
+  routeTextColor: string | null;
+  /** Source of the leg information (e.g., "motis", "gtfs") */
+  source: string;
+  /** List of intermediate stops for the leg, if available */
+  intermediateStops: StopPlaceDto[];
+}
+
+/** Data Transfer Object for a Stop */
+export interface MotisStopDto {
+  /** Unique identifier for the stop */
+  stopId: string;
+  /** Trip-specific identifier for the stop */
+  tripStopId: string | null;
+  /** Name of the stop */
+  name: string;
+  /**
+   * Latitude of the stop
+   * @format float
+   */
+  latitude: number;
+  /**
+   * Longitude of the stop
+   * @format float
+   */
+  longitude: number;
+  /** Distance to the stop in meters */
+  distance: number | null;
+}
+
+/** Data Transfer Object for a Stop Place in the Motis API */
+export type StopPlaceDto = MotisStopDto & {
+  /**
+   * Actual arrival time at the stop place, if available
+   * @format date-time
+   */
+  arrival: string | null;
+  /**
+   * Actual departure time from the stop place, if available
+   * @format date-time
+   */
+  departure: string | null;
+  /**
+   * Scheduled arrival time at the stop place
+   * @format date-time
+   */
+  scheduledArrival: string | null;
+  /**
+   * Scheduled departure time from the stop place
+   * @format date-time
+   */
+  scheduledDeparture: string | null;
+  /** Indicates if the stop place is cancelled */
+  cancelled: boolean | null;
+};
+
+/** Data Transfer Object for a Stop Time in the Motis API */
+export interface StopTimeDto {
+  /** Data Transfer Object for a Stop Place in the Motis API */
+  place: StopPlaceDto;
+  /** Enumeration of transport modes */
+  mode: TransportMode;
+  /** Indicates if the stop time is based on real-time data */
+  realTime: boolean;
+  /** Head sign for the stop time, if available */
+  headSign: string;
+  /** Name of the agency associated with this stop time, if available */
+  agencyName: string | null;
+  /** Identifier for the agency associated with this stop time, if available */
+  agencyId: string | null;
+  /** Identifier for the trip associated with this stop time */
+  tripId: string;
+  /** Short name for the route, if available */
+  routeShortName: string;
+  /** Long name for the route, if available */
+  routeLongName: string | null;
+  /** Short name for the trip, if available */
+  tripShortName: string | null;
+  /** Color for the route, if available */
+  routeColor: string | null;
+  /** Text color for the route, if available */
+  routeTextColor: string | null;
+  /** Display name for the stop time, if available */
+  displayName: string | null;
+  /** Source of the stop time information */
+  source: string;
+}
+
+/** Data Transfer Object for a Trip in the Motis API */
+export interface MotisTripDto {
+  /** Total duration of the trip in seconds */
+  duration: number;
+  /**
+   * Start time of the trip
+   * @format date-time
+   */
+  startTime: string;
+  /**
+   * End time of the trip
+   * @format date-time
+   */
+  endTime: string;
+  /** Number of transfers during the trip */
+  transfers: number;
+  /** List of legs that make up the trip */
+  legs: LegDto[];
+}
+
+/** A wrapper for notification data */
+export interface NotificationWrapper {
+  /**
+   * Unique identifier for the notification
+   * @format uuid
+   */
+  id: string;
+  /** Enumeration of notification types */
+  type: NotificationType;
+  /**
+   * Timestamp when the notification was created
+   * @format date-time
+   */
+  createdAt: string;
+  /**
+   * Timestamp when the notification was last updated
+   * @format date-time
+   */
+  updatedAt: string;
+  /**
+   * Timestamp when the notification was read
+   * @format date-time
+   */
+  readAt: string | null;
+  /** Additional data associated with the notification */
+  data: PostLikedData | UserFollowedData | null;
+}
+
+/** Data for a post liked notification */
+export interface PostLikedData {
+  /**
+   * ID of the liked post
+   * @format uuid
+   */
+  postId: string;
+  /**
+   * Body content of the liked post
+   * @format text
+   */
+  postBody: string;
+  /**
+   * ID of the user who liked the post
+   * @format uuid
+   */
+  likedByUserId: string;
+  /**
+   * Username of the user who liked the post
+   * @example "johndoe"
+   */
+  likedByUserName: string;
+  /**
+   * Display name of the user who liked the post
+   * @example "John Doe"
+   */
+  likedByUserDisplayName: string;
+  /**
+   * Avatar URL of the user who liked the post
+   * @format uri
+   */
+  likedByUserAvatarUrl: string;
+  /** Optional summary of the liked post */
+  postSummary: string | null;
+}
+
+/** Data for a traewelling crosspost failed notification */
+export interface TraewellingCrosspostFailedData {
+  /**
+   * ID of the liked post
+   * @format uuid
+   */
+  postId: string;
+  /**
+   * Error message describing the reason for the crosspost failure
+   * @format text
+   */
+  errorMessage?: string;
+}
+
+/** Data for a user followed notification */
+export interface UserFollowedData {
+  /**
+   * ID of the user who followed you
+   * @format uuid
+   */
+  followerUserId: string;
+  /**
+   * Username of the user who followed you
+   * @example "johndoe"
+   */
+  followerUserName: string;
+  /**
+   * Display name of the user who followed you
+   * @example "John Doe"
+   */
+  followerUserDisplayName: string;
+  /**
+   * Avatar URL of the user who followed you
+   * @format uri
+   */
+  followerUserAvatarUrl: string;
+}
+
+/** Data for a user requested follow notification */
+export interface UserRequestedFollowData {
+  /**
+   * ID of the user who followed you
+   * @format uuid
+   */
+  followerUserId: string;
+  /**
+   * Username of the user who followed you
+   * @example "johndoe"
+   */
+  followerUserName: string;
+  /**
+   * Display name of the user who followed you
+   * @example "John Doe"
+   */
+  followerUserDisplayName: string;
+  /**
+   * Avatar URL of the user who followed you
+   * @format uri
+   */
+  followerUserAvatarUrl: string;
+}
+
+/** A generic pagination DTO */
+export interface PaginationDto {
+  /** Number of items per page */
+  perPage: number;
+  /** Cursor for the next page */
+  nextCursor: string | null;
+  /** Cursor for the previous page */
+  previousCursor: string | null;
+}
+
+/** Pagination DTO specifically for posts */
+export type PostPaginationDto = PaginationDto & {
+  /** Array of post items on the current page */
+  items: (LocationPost | BasePost | TransportPost)[];
+};
+
+/** Data Transfer Object for Request Location */
+export interface RequestLocationDto {
+  /** Number of locations fetched */
+  fetched: number;
+  /** Number of locations to fetch */
+  toFetch: number;
+  /**
+   * Last update time of the request location data
+   * @format date-time
+   */
+  updatedAt: string;
+  /**
+   * Last time a request was made for location data
+   * @format date-time
+   */
+  lastRequestedAt: string | null;
+}
+
+/** Data Transfer Object for Stopovers Response */
+export interface StopoversResponseDto {
+  /** Data Transfer Object for a Trip in the Motis API */
+  trip: MotisTripDto;
+  /**
+   * Start time of the trip
+   * @format date-time
+   */
+  startTime: string;
+  /** Identifier for the start location */
+  startId: string;
+  /** Unique identifier for the trip */
+  tripId: string;
+}
+
+/**
+ * Authenticated User Token DTO
+ * Data Transfer Object representing the authenticated user
+ */
+export interface TokenResponseDto {
+  /**
+   * The access token for the authenticated user
+   * @example "eyJ"
+   */
+  token: string;
+  /** Data Transfer Object representing the authenticated user */
+  user: AuthenticatedUserDto;
+  /**
+   * The expiration time of the token
+   * @format date-time
+   * @example "2024-12-31T23:59:59Z"
+   */
+  expiresAt?: string;
+}
+
+/** Data Transfer Object for Trip Creation Response */
+export interface TripCreationResponseDto {
+  /**
+   * The identifier of the created trip (foreign trip id)
+   * @example "trip_12345"
+   */
+  tripId: string;
+  /**
+   * The identifier of the starting location of the trip
+   * @example "loc_67890"
+   */
+  startId: string;
+  /**
+   * The departure time of the trip in ISO 8601 format
+   * @example "2024-07-01T10:00:00Z"
+   */
+  startTime: string;
+}
+
+/**
+ * User Settings DTO
+ * Data Transfer Object representing user settings
+ */
+export interface UserSettingsDto {
+  /**
+   * Radius for Motis suggestions in meters
+   * @example 500
+   */
+  motisRadius: number | null;
+  /**
+   * Requires follow request
+   * @example true
+   */
+  requiresFollowRequest: boolean;
+}
+
+export interface BasePostRequest {
+  /**
+   * ID of the pot. Required if post is edited.
+   * @format uuid
+   */
+  id?: string;
+  body?: any;
+  /** Visibility levels for posts */
+  visibility: Visibility;
+  /** Reasons for travel associated with transport posts */
+  travelReason: TravelReason;
+  tags?: string[];
+  vehicleIds?: string[];
+}
+
+/** Request to upload an image */
+export interface ImageUploadRequest {
+  /**
+   * Image file to upload (max 2MB)
+   * @format binary
+   */
+  image?: File;
+}
+
+/** Request to update the instance imprint */
+export interface ImprintUpdateRequest {
+  /** The imprint content */
+  content: string | null;
+}
+
+export type LocationPostRequest = BasePostRequest & {
+  /** @format uuid */
+  location: string;
+  /** @format date-time */
+  visitedAt: string | null;
+};
+
+/**
+ * Profile Update Request
+ * Request schema for updating user profile information
+ */
+export interface ProfileUpdateRequest {
+  /**
+   * The full name of the user
+   * @maxLength 255
+   * @example "John Doe"
+   */
+  name: string;
+  /**
+   * The unique username for the user (lowercase, alphanumeric, dashes, and underscores only)
+   * @maxLength 30
+   * @example "john_doe"
+   */
+  username: string;
+  /**
+   * The email address of the user (lowercase)
+   * @format email
+   * @maxLength 255
+   * @example "mail@example.com"
+   */
+  email: string;
+}
+
+/** Request to update user settings */
+export interface SettingsUpdateRequest {
+  /**
+   * Radius for Motis suggestions in meters (allowed values: 50, 100, 200, 300, 400, 500)
+   * @example 100
+   */
+  motisRadius?: 50 | 100 | 200 | 300 | 400 | 500 | null;
+  /** Requires following request */
+  requiresFollowRequest?: boolean | null;
+}
+
+export interface StoreInviteCodeRequest {
+  /**
+   * The expiration date of the invite code
+   * @format date-time
+   */
+  expires_at?: string | null;
+}
+
+export interface StoreTripRequest {
+  /** The mode of transport for the trip. */
+  mode:
+    | "WALK"
+    | "BIKE"
+    | "RENTAL"
+    | "CAR"
+    | "CAR_PARKING"
+    | "CAR_DROPOFF"
+    | "ODM"
+    | "FLEX"
+    | "TRANSIT"
+    | "TRAM"
+    | "SUBWAY"
+    | "FERRY"
+    | "AIRPLANE"
+    | "SUBURBAN"
+    | "BUS"
+    | "COACH"
+    | "RAIL"
+    | "HIGHSPEED_RAIL"
+    | "LONG_DISTANCE"
+    | "NIGHT_RAIL"
+    | "REGIONAL_FAST_RAIL"
+    | "REGIONAL_RAIL"
+    | "CABLE_CAR"
+    | "FUNICULAR"
+    | "AERIAL_LIFT"
+    | "OTHER"
+    | "AREAL_LIFT"
+    | "METRO";
+  /** The name of the line. */
+  lineName?: string | null;
+  /** The long name of the route. */
+  routeLongName?: string | null;
+  /** The short name of the trip. */
+  tripShortName?: string | null;
+  /** The display name of the trip. */
+  displayName?: string | null;
+  /** The origin location of the trip. */
+  origin: string;
+  /** The type of identifier used for the origin (id or identifier). */
+  originType?: string | null;
+  /** The destination location of the trip. */
+  destination: string;
+  /** The type of identifier used for the destination (id or identifier). */
+  destinationType?: string | null;
+  /**
+   * The departure time of the trip.
+   * @format date-time
+   */
+  departureTime: string;
+  /**
+   * The arrival time of the trip.
+   * @format date-time
+   */
+  arrivalTime: string;
+  /** An array of stops for the trip. */
+  stops?: {
+    /** The identifier of the stop. */
+    identifier?: string;
+    /** The type of identifier used for the stop (id or identifier). */
+    identifierType?: string | null;
+    /** The order of the stop in the trip sequence. */
+    order?: number;
+  }[];
+}
+
+export type TransportPostRequest = BasePostRequest & {
+  tripId: string;
+  startId: string;
+  /** @format date-time */
+  startTime: string;
+  stopId: string;
+  /** @format date-time */
+  stopTime: string;
+  vehicleIds?: string[];
+  travelRole?: TravelRole | null;
+  metaTripId?: string | null;
+};
+
+export interface TransportPostExitUpdateRequest {
+  /**
+   * The ID of the transport trip stop, the user wants to exit at.
+   * @example "123e4567-e89b-12d3-a456-426614174000"
+   */
+  stopId: string;
+}
+
+export interface TransportTimesUpdateRequest {
+  /**
+   * The manually set departure time for the transport post.
+   * @format date-time
+   * @example "2024-08-01T10:00:00Z"
+   */
+  manualDepartureTime?: string | null;
+  /**
+   * The manually set arrival time for the transport post.
+   * @format date-time
+   * @example "2024-08-01T12:00:00Z"
+   */
+  manualArrivalTime?: string | null;
+}
+
+/** Request to upload a GPX or GeoJSON track file */
+export interface TransportTrackUploadRequest {
+  /**
+   * GPX or GeoJSON track file (max 5MB)
+   * @format binary
+   */
+  track: File;
+}
+
+/** Request to update user profile */
+export interface UpdateProfileRequest {
+  /**
+   * Full name of the user
+   * @maxLength 255
+   */
+  name: string;
+  /**
+   * Biography of the user
+   * @maxLength 500
+   */
+  bio?: string | null;
+  /**
+   * Website URL of the user
+   * @format uri
+   * @maxLength 255
+   */
+  website?: string | null;
+}
+
+export interface InviteDto {
+  /** The unique identifier of the invite code */
+  id: string;
+  /**
+   * The creation timestamp of the invite code
+   * @format date-time
+   */
+  createdAt: string | null;
+  /**
+   * The expiration timestamp of the invite code
+   * @format date-time
+   */
+  expiresAt: string | null;
+  /**
+   * The timestamp when the invite code was used
+   * @format date-time
+   */
+  usedAt: string | null;
+}
+
+/** Location Data Object */
+export interface LocationDto {
+  /**
+   * Location ID
+   * @format uuid
+   */
+  id: string;
+  /** Name of the location */
+  name: string;
+  /**
+   * Latitude of the location
+   * @format float
+   */
+  latitude: number;
+  /**
+   * Longitude of the location
+   * @format float
+   */
+  longitude: number;
+  /** Distance to the location in meters */
+  distance: number | null;
+  /** List of location identifiers */
+  identifiers: LocationIdentifierDto[];
+  /** List of location tags */
+  tags: LocationTagDto[];
+}
+
+/** Location History Entry Data Transfer Object */
+export interface LocationHistoryEntryDto {
+  /**
+   * Location ID
+   * @format uuid
+   */
+  id: string;
+  /** Name of the location */
+  name: string | null;
+  /**
+   * Latitude of the location
+   * @format float
+   */
+  latitude: number;
+  /**
+   * Longitude of the location
+   * @format float
+   */
+  longitude: number;
+  /** Type of the location history entry */
+  type: string;
+  /**
+   * Timestamp of the location history entry in ISO 8601 format
+   * @format date-time
+   */
+  timestamp: string;
+}
+
+/** Location Identifier Data Object */
+export interface LocationIdentifierDto {
+  /** Type of the location identifier */
+  type: string;
+  /** Origin of the location identifier */
+  origin: string;
+  /** The location identifier value */
+  identifier: string;
+}
+
+/** Location Tag Data Object */
+export interface LocationTagDto {
+  /** Key of the location tag */
+  key: string;
+  /** Value of the location tag */
+  value: string;
+}
+
+/** Base Post Resource */
+export interface BasePost {
+  /**
+   * Post ID
+   * @format uuid
+   */
+  id: string;
+  /** User Data Object */
+  user: UserDto;
+  /** Post body content */
+  body: string | null;
+  /** Visibility levels for posts */
+  visibility: Visibility;
+  /**
+   * Post published at timestamp
+   * @format date-time
+   */
+  publishedAt: string;
+  /**
+   * Post created at timestamp
+   * @format date-time
+   */
+  createdAt: string;
+  /**
+   * Post updated at timestamp
+   * @format date-time
+   */
+  updatedAt: string;
+  /** List of hashtags associated with the post */
+  hashTags: string[];
+  /** Number of likes on the post */
+  likesCount: number;
+  /** Indicates if the post is liked by the current user */
+  likedByUser: boolean;
+  /** Additional meta information associated with the post */
+  metaInfos: Record<string, string | string[]>;
+}
+
+/** Location Post Resource */
+export type LocationPost = BasePost & {
+  /** Location Data Object */
+  location: LocationDto;
+  /** Reason for travel associated with the location post */
+  travelReason: TravelReason | null;
+  /** @format date-time */
+  visitedAt: string | null;
+};
+
+/** Transport Post Resource */
+export type TransportPost = BasePost & {
+  /** Data Transfer Object for a Transport Trip Stop */
+  originStop: StopDto;
+  /** Data Transfer Object for a Transport Trip Stop */
+  destinationStop: StopDto;
+  /** Data Transfer Object for a Transport Trip */
+  trip: TripDto;
+  /**
+   * Manually specified departure time in ISO 8601 format
+   * @format date-time
+   */
+  manualDepartureTime: string | null;
+  /**
+   * Manually specified arrival time in ISO 8601 format
+   * @format date-time
+   */
+  manualArrivalTime: string | null;
+  /** Reason for travel associated with the transport post */
+  travelReason: TravelReason | null;
+  /** Distance traveled in meters */
+  distance: number;
+  /** Duration of the trip in seconds */
+  duration: number;
+  /** User-uploaded track geometry as GeoJSON */
+  userGeometry: object | null;
+};
+
+/** Data Transfer Object for a Transport Trip Stop */
+export interface StopDto {
+  /**
+   * Unique identifier for the stop
+   * @format uuid
+   */
+  id: string;
+  /** Name of the stop */
+  name: string;
+  /** Location Data Object */
+  location: LocationDto;
+  /**
+   * Scheduled arrival time in ISO 8601 format
+   * @format date-time
+   */
+  arrivalTime: string | null;
+  /**
+   * Scheduled departure time in ISO 8601 format
+   * @format date-time
+   */
+  departureTime: string | null;
+  /** Arrival delay in minutes */
+  arrivalDelay: number | null;
+  /** Departure delay in minutes */
+  departureDelay: number | null;
+}
+
+/** Data Transfer Object for a Transport Trip */
+export interface TripDto {
+  /**
+   * Unique identifier for the trip
+   * @format uuid
+   */
+  id: string;
+  /** Foreign identifier for the trip */
+  foreignId: string | null;
+  /** Enumeration of transport modes */
+  mode: TransportMode;
+  /** Name of the line */
+  lineName: string | null;
+  /** Long name of the route */
+  routeLongName: string | null;
+  /** Short name of the trip */
+  tripShortName: string | null;
+  /** Display name of the trip */
+  displayName: string | null;
+  /** Color of the route in HEX format */
+  routeColor: string | null;
+  /** Text color of the route in HEX format */
+  routeTextColor: string | null;
+}
+
+/** Trip History Entry Data Transfer Object */
+export interface TripHistoryEntryDto {
+  /**
+   * Transport Post ID
+   * @format uuid
+   */
+  id: string;
+  /** Geometry of the trip as a GeoJSON LineString */
+  geometry: object | null;
+  /** Data Transfer Object for a Transport Trip */
+  trip: TripDto;
+}
+
+/** User Data Object */
+export interface UserDto {
+  /**
+   * User ID
+   * @format uuid
+   */
+  id: string;
+  /** Full name of the user */
+  name: string;
+  /** Username of the user */
+  username: string;
+  /**
+   * URL of the user avatar image
+   * @format uri
+   */
+  avatar: string | null;
+  /**
+   * URL of the user header image
+   * @format uri
+   */
+  header: string | null;
+  /** Biography of the user */
+  bio: string | null;
+  /**
+   * Website URL of the user
+   * @format uri
+   */
+  website: string | null;
+  /** Indicates if the current user is following this user */
+  isFollowed?: boolean;
+  /** Indicates if the current user has requested to follow this user */
+  isFollowRequested?: boolean;
+  /** Indicates if following this user requires approval */
+  requiresFollowRequest?: boolean;
+  /** User Statistics Data Object */
+  statistics: UserStatisticsDto;
+  /**
+   * Account creation timestamp
+   * @format date-time
+   */
+  createdAt: string;
+}
+
+/** User Statistics Data Object */
+export interface UserStatisticsDto {
+  /**
+   * Total number of posts by the user
+   * @format int32
+   */
+  postsCount: number;
+  /**
+   * Number of transport-related posts by the user
+   * @format int32
+   */
+  transportPostsCount: number;
+  /**
+   * Number of location-related posts by the user
+   * @format int32
+   */
+  locationPostsCount: number;
+  /**
+   * Number of followers the user has
+   * @format int32
+   */
+  followersCount: number;
+  /**
+   * Number of users the user is following
+   * @format int32
+   */
+  followingCount: number;
+  /**
+   * Total distance travelled by the user in meters
+   * @format int32
+   */
+  travelledDistance: number;
+  /**
+   * Total duration of travel by the user in seconds
+   * @format int32
+   */
+  travelledDuration: number;
+  /**
+   * Number of distinct countries visited by the user
+   * @format int32
+   */
+  visitedCountriesCount: number;
+  /**
+   * Number of distinct locations visited by the user
+   * @format int32
+   */
+  visitedLocationsCount: number;
+}
+
+export type QueryParamsType = Record<string | number, any>;
+export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
+
+export interface FullRequestParams extends Omit<RequestInit, "body"> {
+  /** set parameter to `true` for call `securityWorker` for this request */
+  secure?: boolean;
+  /** request path */
+  path: string;
+  /** content type of request body */
+  type?: ContentType;
+  /** query params */
+  query?: QueryParamsType;
+  /** format of response (i.e. response.json() -> format: "json") */
+  format?: ResponseFormat;
+  /** request body */
+  body?: unknown;
+  /** base url */
+  baseUrl?: string;
+  /** request cancellation token */
+  cancelToken?: CancelToken;
+}
+
+export type RequestParams = Omit<
+  FullRequestParams,
+  "body" | "method" | "query" | "path"
+>;
+
+export interface ApiConfig<SecurityDataType = unknown> {
+  baseUrl?: string;
+  baseApiParams?: Omit<RequestParams, "baseUrl" | "cancelToken" | "signal">;
+  securityWorker?: (
+    securityData: SecurityDataType | null,
+  ) => Promise<RequestParams | void> | RequestParams | void;
+  customFetch?: typeof fetch;
+}
+
+export interface HttpResponse<D extends unknown, E extends unknown = unknown>
+  extends Response {
+  data: D;
+  error: E;
+}
+
+type CancelToken = Symbol | string | number;
+
+export enum ContentType {
+  Json = "application/json",
+  JsonApi = "application/vnd.api+json",
+  FormData = "multipart/form-data",
+  UrlEncoded = "application/x-www-form-urlencoded",
+  Text = "text/plain",
+}
+
+export class HttpClient<SecurityDataType = unknown> {
+  public baseUrl: string = "http://localhost/api";
+  private securityData: SecurityDataType | null = null;
+  private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"];
+  private abortControllers = new Map<CancelToken, AbortController>();
+  private customFetch = (...fetchParams: Parameters<typeof fetch>) =>
+    fetch(...fetchParams);
+
+  private baseApiParams: RequestParams = {
+    credentials: "same-origin",
+    headers: {},
+    redirect: "follow",
+    referrerPolicy: "no-referrer",
+  };
+
+  constructor(apiConfig: ApiConfig<SecurityDataType> = {}) {
+    Object.assign(this, apiConfig);
+  }
+
+  public setSecurityData = (data: SecurityDataType | null) => {
+    this.securityData = data;
+  };
+
+  protected encodeQueryParam(key: string, value: any) {
+    const encodedKey = encodeURIComponent(key);
+    return `${encodedKey}=${encodeURIComponent(typeof value === "number" ? value : `${value}`)}`;
+  }
+
+  protected addQueryParam(query: QueryParamsType, key: string) {
+    return this.encodeQueryParam(key, query[key]);
+  }
+
+  protected addArrayQueryParam(query: QueryParamsType, key: string) {
+    const value = query[key];
+    return value.map((v: any) => this.encodeQueryParam(key, v)).join("&");
+  }
+
+  protected toQueryString(rawQuery?: QueryParamsType): string {
+    const query = rawQuery || {};
+    const keys = Object.keys(query).filter(
+      (key) => "undefined" !== typeof query[key],
+    );
+    return keys
+      .map((key) =>
+        Array.isArray(query[key])
+          ? this.addArrayQueryParam(query, key)
+          : this.addQueryParam(query, key),
+      )
+      .join("&");
+  }
+
+  protected addQueryParams(rawQuery?: QueryParamsType): string {
+    const queryString = this.toQueryString(rawQuery);
+    return queryString ? `?${queryString}` : "";
+  }
+
+  private contentFormatters: Record<ContentType, (input: any) => any> = {
+    [ContentType.Json]: (input: any) =>
+      input !== null && (typeof input === "object" || typeof input === "string")
+        ? JSON.stringify(input)
+        : input,
+    [ContentType.JsonApi]: (input: any) =>
+      input !== null && (typeof input === "object" || typeof input === "string")
+        ? JSON.stringify(input)
+        : input,
+    [ContentType.Text]: (input: any) =>
+      input !== null && typeof input !== "string"
+        ? JSON.stringify(input)
+        : input,
+    [ContentType.FormData]: (input: any) => {
+      if (input instanceof FormData) {
+        return input;
+      }
+
+      return Object.keys(input || {}).reduce((formData, key) => {
+        const property = input[key];
+        formData.append(
+          key,
+          property instanceof Blob
+            ? property
+            : typeof property === "object" && property !== null
+              ? JSON.stringify(property)
+              : `${property}`,
+        );
+        return formData;
+      }, new FormData());
+    },
+    [ContentType.UrlEncoded]: (input: any) => this.toQueryString(input),
+  };
+
+  protected mergeRequestParams(
+    params1: RequestParams,
+    params2?: RequestParams,
+  ): RequestParams {
+    return {
+      ...this.baseApiParams,
+      ...params1,
+      ...(params2 || {}),
+      headers: {
+        ...(this.baseApiParams.headers || {}),
+        ...(params1.headers || {}),
+        ...((params2 && params2.headers) || {}),
+      },
+    };
+  }
+
+  protected createAbortSignal = (
+    cancelToken: CancelToken,
+  ): AbortSignal | undefined => {
+    if (this.abortControllers.has(cancelToken)) {
+      const abortController = this.abortControllers.get(cancelToken);
+      if (abortController) {
+        return abortController.signal;
+      }
+      return void 0;
+    }
+
+    const abortController = new AbortController();
+    this.abortControllers.set(cancelToken, abortController);
+    return abortController.signal;
+  };
+
+  public abortRequest = (cancelToken: CancelToken) => {
+    const abortController = this.abortControllers.get(cancelToken);
+
+    if (abortController) {
+      abortController.abort();
+      this.abortControllers.delete(cancelToken);
+    }
+  };
+
+  public request = async <T = any, E = any>({
+    body,
+    secure,
+    path,
+    type,
+    query,
+    format,
+    baseUrl,
+    cancelToken,
+    ...params
+  }: FullRequestParams): Promise<HttpResponse<T, E>> => {
+    const secureParams =
+      ((typeof secure === "boolean" ? secure : this.baseApiParams.secure) &&
+        this.securityWorker &&
+        (await this.securityWorker(this.securityData))) ||
+      {};
+    const requestParams = this.mergeRequestParams(params, secureParams);
+    const queryString = query && this.toQueryString(query);
+    const payloadFormatter = this.contentFormatters[type || ContentType.Json];
+    const responseFormat = format || requestParams.format;
+
+    return this.customFetch(
+      `${baseUrl || this.baseUrl || ""}${path}${queryString ? `?${queryString}` : ""}`,
+      {
+        ...requestParams,
+        headers: {
+          ...(requestParams.headers || {}),
+          ...(type && type !== ContentType.FormData
+            ? { "Content-Type": type }
+            : {}),
+        },
+        signal:
+          (cancelToken
+            ? this.createAbortSignal(cancelToken)
+            : requestParams.signal) || null,
+        body:
+          typeof body === "undefined" || body === null
+            ? null
+            : payloadFormatter(body),
+      },
+    ).then(async (response) => {
+      const r = response as HttpResponse<T, E>;
+      r.data = null as unknown as T;
+      r.error = null as unknown as E;
+
+      const responseToParse = responseFormat ? response.clone() : response;
+      const data = !responseFormat
+        ? r
+        : await responseToParse[responseFormat]()
+            .then((data) => {
+              if (r.ok) {
+                r.data = data;
+              } else {
+                r.error = data;
+              }
+              return r;
+            })
+            .catch((e) => {
+              r.error = e;
+              return r;
+            });
+
+      if (cancelToken) {
+        this.abortControllers.delete(cancelToken);
+      }
+
+      if (!response.ok) throw data;
+      return data;
+    });
+  };
+}
+
+/**
+ * @title Reisetagebuch API Draft
+ * @version 0.1.0-draft
+ * @license MIT (https://opensource.org/licenses/MIT)
+ * @baseUrl http://localhost/api
+ *
+ * This is a draft version of the Reisetagebuch API documentation. The API is still under development and may change in future releases. Use at your own risk!
+ */
+export class Api<
+  SecurityDataType extends unknown,
+> extends HttpClient<SecurityDataType> {
+  account = {
+    /**
+     * @description Get account details
+     *
+     * @tags Account
+     * @name GetAccount
+     * @summary Get account
+     * @request GET:/account
+     * @secure
+     */
+    getAccount: (params: RequestParams = {}) =>
+      this.request<
+        {
+          /**
+           * Indicates if the user must verify their email address
+           * @example true
+           */
+          mustVerifyEmail?: boolean;
+          /**
+           * Indicates if the user has connected their Traewelling account
+           * @example false
+           */
+          traewellingConnected?: boolean;
+        },
+        void
+      >({
+        path: `/account`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Delete the authenticated account
+     *
+     * @tags Account
+     * @name DeleteAccount
+     * @summary Delete account
+     * @request DELETE:/account
+     * @secure
+     */
+    deleteAccount: (
+      data: {
+        /**
+         * Current password of the account
+         * @example "your-current-password"
+         */
+        password?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<void, void>({
+        path: `/account`,
+        method: "DELETE",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description Update account details
+     *
+     * @tags Account
+     * @name UpdateAccount
+     * @summary Update account
+     * @request PATCH:/account
+     * @secure
+     */
+    updateAccount: (data: ProfileUpdateRequest, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/account`,
+        method: "PATCH",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description Disconnect Traewelling from account
+     *
+     * @tags Account
+     * @name DisconnectTraewelling
+     * @summary Disconnect Traewelling
+     * @request DELETE:/account/socialite/traewelling
+     * @secure
+     */
+    disconnectTraewelling: (params: RequestParams = {}) =>
+      this.request<void, void>({
+        path: `/account/socialite/traewelling`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Update profile for authenticated user
+     *
+     * @tags Profile
+     * @name UpdateProfile
+     * @summary Update profile
+     * @request PATCH:/account/profile
+     * @secure
+     */
+    updateProfile: (data: UpdateProfileRequest, params: RequestParams = {}) =>
+      this.request<UserDto, any>({
+        path: `/account/profile`,
+        method: "PATCH",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Update avatar for authenticated user
+     *
+     * @tags Profile
+     * @name UpdateAvatar
+     * @summary Update avatar
+     * @request POST:/account/profile/avatar
+     * @secure
+     */
+    updateAvatar: (data: ImageUploadRequest, params: RequestParams = {}) =>
+      this.request<UserDto, any>({
+        path: `/account/profile/avatar`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.FormData,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Delete avatar for authenticated user
+     *
+     * @tags Profile
+     * @name DeleteAvatar
+     * @summary Delete avatar
+     * @request DELETE:/account/profile/avatar
+     * @secure
+     */
+    deleteAvatar: (params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/account/profile/avatar`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Update header for authenticated user
+     *
+     * @tags Profile
+     * @name UpdateHeader
+     * @summary Update header
+     * @request POST:/account/profile/header
+     * @secure
+     */
+    updateHeader: (data: ImageUploadRequest, params: RequestParams = {}) =>
+      this.request<UserDto, any>({
+        path: `/account/profile/header`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.FormData,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Delete header for authenticated user
+     *
+     * @tags Profile
+     * @name DeleteHeader
+     * @summary Delete header
+     * @request DELETE:/account/profile/header
+     * @secure
+     */
+    deleteHeader: (params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/account/profile/header`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Update user settings
+     *
+     * @tags Account
+     * @name UpdateSettings
+     * @summary Update settings
+     * @request PATCH:/account/settings
+     * @secure
+     */
+    updateSettings: (data: SettingsUpdateRequest, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/account/settings`,
+        method: "PATCH",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+  };
+  app = {
+    /**
+     * No description
+     *
+     * @tags App Configuration
+     * @name GetAppConfiguration
+     * @summary Get application configuration
+     * @request GET:/app/configuration
+     * @secure
+     */
+    getAppConfiguration: (params: RequestParams = {}) =>
+      this.request<AppConfigurationDto, any>({
+        path: `/app/configuration`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags App
+     * @name GetImprint
+     * @summary Get the instance imprint
+     * @request GET:/app/imprint
+     * @secure
+     */
+    getImprint: (params: RequestParams = {}) =>
+      this.request<ImprintDto, any>({
+        path: `/app/imprint`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Update the instance imprint. Requires admin privileges.
+     *
+     * @tags App
+     * @name UpdateImprint
+     * @summary Update the instance imprint
+     * @request PATCH:/app/imprint
+     * @secure
+     */
+    updateImprint: (data: ImprintUpdateRequest, params: RequestParams = {}) =>
+      this.request<ImprintDto, void>({
+        path: `/app/imprint`,
+        method: "PATCH",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+  };
+  auth = {
+    /**
+     * @description Get the currently authenticated user
+     *
+     * @tags Authentication
+     * @name GetAuthenticatedUser
+     * @summary Get authenticated user
+     * @request GET:/auth/user
+     * @secure
+     */
+    getAuthenticatedUser: (params: RequestParams = {}) =>
+      this.request<AuthenticatedUserDto, any>({
+        path: `/auth/user`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Authenticate a user and return an access token
+     *
+     * @tags Authentication
+     * @name Login
+     * @summary User login
+     * @request POST:/auth/login
+     * @secure
+     */
+    login: (
+      data: {
+        /**
+         * @format email
+         * @example "mail@example.com"
+         */
+        email: string;
+        /**
+         * @format password
+         * @example "secret"
+         */
+        password: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<TokenResponseDto, void>({
+        path: `/auth/login`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Register a new user and return an access token
+     *
+     * @tags Authentication
+     * @name Register
+     * @summary User registration
+     * @request POST:/auth/register
+     * @secure
+     */
+    register: (
+      data: {
+        /** @example "John Doe" */
+        name: string;
+        /** @example "john_doe" */
+        username: string;
+        /**
+         * @format email
+         * @example "mail@example.com"
+         */
+        email: string;
+        /**
+         * @format password
+         * @example "secret"
+         */
+        password: string;
+        /**
+         * @format password
+         * @example "secret"
+         */
+        password_confirmation: string;
+        /**
+         * Optional invite code required if open registration is disabled
+         * @example "INVITE_CODE_123"
+         */
+        invite?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<TokenResponseDto, void>({
+        path: `/auth/register`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Logout the authenticated user by revoking their access token
+     *
+     * @tags Authentication
+     * @name Logout
+     * @summary User logout
+     * @request POST:/auth/logout
+     * @secure
+     */
+    logout: (params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/auth/logout`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Send a password reset link to the user's email address
+     *
+     * @tags Authentication
+     * @name ForgotPassword
+     * @summary Forgot password
+     * @request POST:/auth/forgot-password
+     * @secure
+     */
+    forgotPassword: (
+      data: {
+        /**
+         * @format email
+         * @example "mail@example.com"
+         */
+        email: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<void, void>({
+        path: `/auth/forgot-password`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description Reset the user's password using the provided token and new password
+     *
+     * @tags Authentication
+     * @name ResetPassword
+     * @summary Reset password
+     * @request POST:/auth/reset-password
+     * @secure
+     */
+    resetPassword: (
+      data: {
+        /** @example "RESET_TOKEN_123" */
+        token: string;
+        /**
+         * @format email
+         * @example "mail@example.com"
+         */
+        email: string;
+        /**
+         * @format password
+         * @example "new_secret"
+         */
+        password: string;
+        /**
+         * @format password
+         * @example "new_secret"
+         */
+        password_confirmation: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<void, void>({
+        path: `/auth/reset-password`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description Update the authenticated user's password by providing the current password and a new password
+     *
+     * @tags Authentication
+     * @name UpdatePassword
+     * @summary Update password
+     * @request PUT:/auth/password
+     * @secure
+     */
+    updatePassword: (
+      data: {
+        /**
+         * @format password
+         * @example "current_secret"
+         */
+        current_password: string;
+        /**
+         * @format password
+         * @example "new_secret"
+         */
+        password: string;
+        /**
+         * @format password
+         * @example "new_secret"
+         */
+        password_confirmation: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<void, void>({
+        path: `/auth/password`,
+        method: "PUT",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description Verify the user's email address using the provided verification link parameters
+     *
+     * @tags Authentication
+     * @name VerifyEmail
+     * @summary Verify email
+     * @request POST:/auth/email/verify/{id}/{hash}
+     * @secure
+     */
+    verifyEmail: (id: string, hash: string, params: RequestParams = {}) =>
+      this.request<void, void>({
+        path: `/auth/email/verify/${id}/${hash}`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Resend the email verification link to the authenticated user if their email address is not yet verified
+     *
+     * @tags Authentication
+     * @name ResendVerificationEmail
+     * @summary Resend email verification
+     * @request POST:/auth/email/resend
+     * @secure
+     */
+    resendVerificationEmail: (params: RequestParams = {}) =>
+      this.request<void, void>({
+        path: `/auth/email/resend`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Validate an invite code and return information about the invite if it is valid
+     *
+     * @tags Authentication
+     * @name ValidateInvite
+     * @summary Validate invite code
+     * @request GET:/auth/invite/{code}
+     * @secure
+     */
+    validateInvite: (code: string, params: RequestParams = {}) =>
+      this.request<
+        {
+          /** Indicates whether the invite code is valid */
+          valid?: boolean;
+          /** The name of the user who created the invite, or null if the inviter user no longer exists */
+          invitedBy?: string | null;
+        },
+        any
+      >({
+        path: `/auth/invite/${code}`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  users = {
+    /**
+     * @description Return the users, that follow a user
+     *
+     * @tags Follows
+     * @name GetFollowers
+     * @summary Get followers data
+     * @request GET:/users/{userId}/followers
+     * @secure
+     */
+    getFollowers: (userId: string, params: RequestParams = {}) =>
+      this.request<UserDto[], any>({
+        path: `/users/${userId}/followers`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Return the users, that a user follows
+     *
+     * @tags Follows
+     * @name GetFollowings
+     * @summary Get followings data
+     * @request GET:/users/{userId}/followings
+     * @secure
+     */
+    getFollowings: (userId: string, params: RequestParams = {}) =>
+      this.request<UserDto[], any>({
+        path: `/users/${userId}/followings`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Create a follow relationship between two users
+     *
+     * @tags Follows
+     * @name CreateFollow
+     * @summary Create follow relationship
+     * @request POST:/users/{userId}/followers/{targetId}
+     * @secure
+     */
+    createFollow: (
+      userId: string,
+      targetId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, void>({
+        path: `/users/${userId}/followers/${targetId}`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Delete a follow relationship between two users
+     *
+     * @tags Follows
+     * @name DeleteFollow
+     * @summary Delete follow relationship
+     * @request DELETE:/users/{userId}/followers/{targetId}
+     * @secure
+     */
+    deleteFollow: (
+      userId: string,
+      targetId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, void>({
+        path: `/users/${userId}/followers/${targetId}`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Approve a follow request between two users
+     *
+     * @tags Follows
+     * @name ApproveFollowRequest
+     * @summary Approve follow request
+     * @request PUT:/users/{userId}/follow-requests/{targetId}
+     * @secure
+     */
+    approveFollowRequest: (
+      userId: string,
+      targetId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, void>({
+        path: `/users/${userId}/follow-requests/${targetId}`,
+        method: "PUT",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Create a follow request between two users
+     *
+     * @tags Follows
+     * @name CreateFollowRequest
+     * @summary Create follow request
+     * @request POST:/users/{userId}/follow-requests/{targetId}
+     * @secure
+     */
+    createFollowRequest: (
+      userId: string,
+      targetId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, void>({
+        path: `/users/${userId}/follow-requests/${targetId}`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Delete a follow request between two users
+     *
+     * @tags Follows
+     * @name DeleteFollowRequest
+     * @summary Delete follow relationship
+     * @request DELETE:/users/{userId}/follow-requests/{targetId}
+     * @secure
+     */
+    deleteFollowRequest: (
+      userId: string,
+      targetId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, void>({
+        path: `/users/${userId}/follow-requests/${targetId}`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Returns paginated posts for a specific user
+     *
+     * @tags Posts
+     * @name PostsForUser
+     * @summary Get posts for a specific user
+     * @request GET:/users/{userId}/posts
+     * @secure
+     */
+    postsForUser: (
+      userId: string,
+      query?: {
+        /** Pagination cursor */
+        cursor?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<PostPaginationDto, void>({
+        path: `/users/${userId}/posts`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Return GeoJSON map data for a user
+     *
+     * @tags Profile
+     * @name GetProfileMapData
+     * @summary Profile map data
+     * @request GET:/users/{userId}/map-data
+     * @secure
+     */
+    getProfileMapData: (userId: string, params: RequestParams = {}) =>
+      this.request<object, any>({
+        path: `/users/${userId}/map-data`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  invites = {
+    /**
+     * @description List invite codes for the authenticated user
+     *
+     * @tags Invites
+     * @name ListInvites
+     * @summary List invites
+     * @request GET:/invites
+     * @secure
+     */
+    listInvites: (params: RequestParams = {}) =>
+      this.request<InviteDto[], void>({
+        path: `/invites`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Create a new invite code
+     *
+     * @tags Invites
+     * @name CreateInvite
+     * @summary Create invite
+     * @request POST:/invites
+     * @secure
+     */
+    createInvite: (data: StoreInviteCodeRequest, params: RequestParams = {}) =>
+      this.request<void, void>({
+        path: `/invites`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description Delete an invite code
+     *
+     * @tags Invites
+     * @name DeleteInvite
+     * @summary Delete invite
+     * @request DELETE:/invites/{inviteCode}
+     * @secure
+     */
+    deleteInvite: (inviteCode: string, params: RequestParams = {}) =>
+      this.request<void, void>({
+        path: `/invites/${inviteCode}`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+  };
+  posts = {
+    /**
+     * @description Get users who liked a post
+     *
+     * @tags Posts
+     * @name GetPostLikes
+     * @summary Get post likes
+     * @request GET:/posts/{postId}/likes
+     * @secure
+     */
+    getPostLikes: (postId: string, params: RequestParams = {}) =>
+      this.request<UserDto[], void>({
+        path: `/posts/${postId}/likes`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Like a post
+     *
+     * @tags Posts
+     * @name LikePost
+     * @summary Like post
+     * @request POST:/posts/{postId}/likes
+     * @secure
+     */
+    likePost: (postId: string, params: RequestParams = {}) =>
+      this.request<LikeResponseDto, void>({
+        path: `/posts/${postId}/likes`,
+        method: "POST",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Remove like from a post
+     *
+     * @tags Posts
+     * @name UnlikePost
+     * @summary Unlike post
+     * @request DELETE:/posts/{postId}/likes
+     * @secure
+     */
+    unlikePost: (postId: string, params: RequestParams = {}) =>
+      this.request<LikeResponseDto, void>({
+        path: `/posts/${postId}/likes`,
+        method: "DELETE",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Returns post data
+     *
+     * @tags Posts
+     * @name ShowPost
+     * @summary Get post by ID
+     * @request GET:/posts/{id}
+     * @secure
+     */
+    showPost: (id: string, params: RequestParams = {}) =>
+      this.request<BasePost | TransportPost | LocationPost, void>({
+        path: `/posts/${id}`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Delete a post by id
+     *
+     * @tags Posts
+     * @name DeletePost
+     * @summary Delete post
+     * @request DELETE:/posts/{id}
+     * @secure
+     */
+    deletePost: (id: string, params: RequestParams = {}) =>
+      this.request<void, void>({
+        path: `/posts/${id}`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Update a post (text, transport or location)
+     *
+     * @tags Posts
+     * @name UpdatePost
+     * @summary Update post
+     * @request PATCH:/posts/{id}
+     * @secure
+     */
+    updatePost: (
+      id: string,
+      data: BasePostRequest | LocationPostRequest | TransportPostRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<BasePost | TransportPost | LocationPost, void>({
+        path: `/posts/${id}`,
+        method: "PATCH",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Returns filtered posts
+     *
+     * @tags Posts
+     * @name FilterPosts
+     * @summary Filter posts
+     * @request GET:/posts
+     * @secure
+     */
+    filterPosts: (
+      query?: {
+        /** Pagination cursor */
+        cursor?: string;
+        /**
+         * Filter posts from this date (YYYY-MM-DD)
+         * @format date
+         */
+        dateFrom?: string;
+        /**
+         * Filter posts to this date (YYYY-MM-DD)
+         * @format date
+         */
+        dateTo?: string;
+        /** Filter by visibility (e.g., PUBLIC, PRIVATE) */
+        visibility?: Visibility[];
+        /** Filter by travel reason (e.g., WORK, LEISURE) */
+        travelReason?: TravelReason[];
+        /** Filter by tags */
+        tags?: string[];
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<FilteredPostPaginationDto, void>({
+        path: `/posts`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Mass edit multiple posts
+     *
+     * @tags Posts
+     * @name MassEditPosts
+     * @summary Mass edit posts
+     * @request POST:/posts/mass-edit
+     * @secure
+     */
+    massEditPosts: (data: any, params: RequestParams = {}) =>
+      this.request<string[], void>({
+        path: `/posts/mass-edit`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Create a transport post
+     *
+     * @tags Posts
+     * @name StoreTransportPost
+     * @summary Create transport post
+     * @request POST:/posts/transport
+     * @secure
+     */
+    storeTransportPost: (
+      data: TransportPostRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<TransportPost, void>({
+        path: `/posts/transport`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Create a text post
+     *
+     * @tags Posts
+     * @name StoreTextPost
+     * @summary Create text post
+     * @request POST:/posts/text
+     * @secure
+     */
+    storeTextPost: (data: BasePostRequest, params: RequestParams = {}) =>
+      this.request<BasePost, void>({
+        path: `/posts/text`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Create a location post
+     *
+     * @tags Posts
+     * @name StoreLocationPost
+     * @summary Create location post
+     * @request POST:/posts/location
+     * @secure
+     */
+    storeLocationPost: (
+      data: LocationPostRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<LocationPost, void>({
+        path: `/posts/location`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Update transport-specific fields of a post
+     *
+     * @tags Posts, TransportPosts
+     * @name UpdateTransportPostExit
+     * @summary Update transport post
+     * @request PUT:/posts/{id}/transport/exit
+     * @secure
+     */
+    updateTransportPostExit: (
+      id: string,
+      data: TransportPostExitUpdateRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<TransportPost, void>({
+        path: `/posts/${id}/transport/exit`,
+        method: "PUT",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Update transport times for a transport post
+     *
+     * @tags Posts, TransportPosts
+     * @name UpdateTransportTimes
+     * @summary Update transport times
+     * @request PUT:/posts/{id}/transport/times
+     * @secure
+     */
+    updateTransportTimes: (
+      id: string,
+      data: TransportTimesUpdateRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<TransportPost, void>({
+        path: `/posts/${id}/transport/times`,
+        method: "PUT",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Upload a GPX or GeoJSON track file for a transport post
+     *
+     * @tags Posts, TransportPosts
+     * @name UploadTransportTrack
+     * @summary Upload transport track
+     * @request POST:/posts/{id}/transport/track
+     * @secure
+     */
+    uploadTransportTrack: (
+      id: string,
+      data: TransportTrackUploadRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<TransportPost, void>({
+        path: `/posts/${id}/transport/track`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.FormData,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Remove the uploaded track from a transport post
+     *
+     * @tags Posts, TransportPosts
+     * @name DeleteTransportTrack
+     * @summary Delete transport track
+     * @request DELETE:/posts/{id}/transport/track
+     * @secure
+     */
+    deleteTransportTrack: (id: string, params: RequestParams = {}) =>
+      this.request<TransportPost, void>({
+        path: `/posts/${id}/transport/track`,
+        method: "DELETE",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  locations = {
+    /**
+     * @description Return location history for the authenticated user for a given day
+     *
+     * @tags Location
+     * @name LocationHistory
+     * @summary Location history
+     * @request GET:/locations/history
+     * @secure
+     */
+    locationHistory: (
+      query?: {
+        /** @format date */
+        when?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<LocationHistoryDto, any>({
+        path: `/locations/history`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Store the current location in user history if allowed by user preferences
+     *
+     * @tags Location
+     * @name CreateHistoryLocation
+     * @summary Store location for history
+     * @request POST:/locations/history
+     * @secure
+     */
+    createHistoryLocation: (
+      query: {
+        /** @format float */
+        latitude: number;
+        /** @format float */
+        longitude: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<void, any>({
+        path: `/locations/history`,
+        method: "POST",
+        query: query,
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Search for locations near a point or by query
+     *
+     * @tags Location
+     * @name SearchLocations
+     * @summary Search locations
+     * @request GET:/locations/nearby
+     * @secure
+     */
+    searchLocations: (
+      query: {
+        /** @format float */
+        latitude: number;
+        /** @format float */
+        longitude: number;
+        query?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<LocationDto[], any>({
+        path: `/locations/nearby`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Return departures for a given point or station identifier
+     *
+     * @tags Location
+     * @name Departures
+     * @summary Departures
+     * @request GET:/locations/departures
+     * @secure
+     */
+    departures: (
+      query?: {
+        /** @format float */
+        latitude?: number;
+        /** @format float */
+        longitude?: number;
+        identifier?: string;
+        /** @format date-time */
+        when?: string;
+        modes?: TransportMode[];
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<DeparturesResponseDto, any>({
+        path: `/locations/departures`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Return stopovers for a given trip start
+     *
+     * @tags Location
+     * @name Stopovers
+     * @summary Stopovers
+     * @request GET:/locations/stopovers
+     * @secure
+     */
+    stopovers: (
+      query: {
+        tripId: string;
+        startId: string;
+        startTime: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<StopoversResponseDto, any>({
+        path: `/locations/stopovers`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  location = {
+    /**
+     * @description Prefetch location data and optionally store user history
+     *
+     * @tags Location
+     * @name PrefetchLocation
+     * @summary Prefetch location
+     * @request GET:/location/prefetch
+     * @secure
+     */
+    prefetchLocation: (
+      query: {
+        /** @format float */
+        latitude: number;
+        /** @format float */
+        longitude: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<void, any>({
+        path: `/location/prefetch`,
+        method: "GET",
+        query: query,
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Return a recent location matching the requested coordinates
+     *
+     * @tags Location
+     * @name GetRecentRequestLocation
+     * @summary Get recent request location
+     * @request GET:/location/request-location
+     * @secure
+     */
+    getRecentRequestLocation: (
+      query: {
+        /** @format float */
+        latitude: number;
+        /** @format float */
+        longitude: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<RequestLocationDto, any>({
+        path: `/location/request-location`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  geocode = {
+    /**
+     * @description Geocode a query using configured providers
+     *
+     * @tags Location
+     * @name Geocode
+     * @summary Geocode
+     * @request GET:/geocode
+     * @secure
+     */
+    geocode: (
+      query: {
+        query: string;
+        provider?: string;
+        /** @format float */
+        latitude?: number;
+        /** @format float */
+        longitude?: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<GeocodeResponseEntry[], any>({
+        path: `/geocode`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  map = {
+    /**
+     * @description Get a LineString geometry between two locations
+     *
+     * @tags Map
+     * @name GetLineStringBetween
+     * @summary Get linestring
+     * @request GET:/map/linestring
+     * @secure
+     */
+    getLineStringBetween: (
+      query: {
+        from: string;
+        to: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<object, any>({
+        path: `/map/linestring`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Get stop points between two locations as MultiPoint geometry
+     *
+     * @tags Map
+     * @name GetStopsBetween
+     * @summary Get stopovers
+     * @request GET:/map/stopovers
+     * @secure
+     */
+    getStopsBetween: (
+      query: {
+        from: string;
+        to: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<object, any>({
+        path: `/map/stopovers`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  notifications = {
+    /**
+     * @description List notifications for authenticated user
+     *
+     * @tags Notifications
+     * @name ListNotifications
+     * @summary List notifications
+     * @request GET:/notifications/list
+     * @secure
+     */
+    listNotifications: (params: RequestParams = {}) =>
+      this.request<NotificationWrapper[], any>({
+        path: `/notifications/list`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Get unread notifications count
+     *
+     * @tags Notifications
+     * @name UnreadNotificationCount
+     * @summary Unread count
+     * @request GET:/notifications/unread-count
+     * @secure
+     */
+    unreadNotificationCount: (params: RequestParams = {}) =>
+      this.request<
+        {
+          /** Number of unread notifications */
+          count: number;
+        },
+        any
+      >({
+        path: `/notifications/unread-count`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Mark a notification as read
+     *
+     * @tags Notifications
+     * @name MarkNotificationAsRead
+     * @summary Mark as read
+     * @request POST:/notifications/{id}/read
+     * @secure
+     */
+    markNotificationAsRead: (id: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/notifications/${id}/read`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Mark all notifications as read
+     *
+     * @tags Notifications
+     * @name MarkAllNotificationsAsRead
+     * @summary Mark all as read
+     * @request POST:/notifications/read-all
+     * @secure
+     */
+    markAllNotificationsAsRead: (params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/notifications/read-all`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+  };
+  timeline = {
+    /**
+     * @description Returns paginated posts for the authenticated user timeline
+     *
+     * @tags Posts
+     * @name Timeline
+     * @summary Get timeline posts
+     * @request GET:/timeline
+     * @secure
+     */
+    timeline: (
+      query?: {
+        /** Pagination cursor */
+        cursor?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<PostPaginationDto, void>({
+        path: `/timeline`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Returns paginated posts for the authenticated user / global public timeline
+     *
+     * @tags Posts
+     * @name GetGlobalTimeline
+     * @summary Get timeline posts
+     * @request GET:/timeline/global
+     * @secure
+     */
+    getGlobalTimeline: (
+      query?: {
+        /** Pagination cursor */
+        cursor?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<PostPaginationDto, void>({
+        path: `/timeline/global`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  socialite = {
+    /**
+     * No description
+     *
+     * @tags Socialite
+     * @name ConnectTraewelling
+     * @summary Redirects the user to Traewelling for OAuth authentication
+     * @request GET:/socialite/traewelling/connect
+     * @secure
+     */
+    connectTraewelling: (params: RequestParams = {}) =>
+      this.request<
+        {
+          /** The URL to redirect the user to for Traewelling authentication */
+          url: string;
+        },
+        void
+      >({
+        path: `/socialite/traewelling/connect`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Socialite
+     * @name HandleTraewellingCallback
+     * @summary Handles the callback from Traewelling after OAuth authentication
+     * @request GET:/socialite/traewelling/callback
+     * @secure
+     */
+    handleTraewellingCallback: (
+      query: {
+        /** The authorization code returned by Traewelling after successful authentication */
+        code: string;
+        /** The state parameter to prevent CSRF attacks (optional) */
+        state?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<void, void>({
+        path: `/socialite/traewelling/callback`,
+        method: "GET",
+        query: query,
+        secure: true,
+        ...params,
+      }),
+  };
+  trips = {
+    /**
+     * @description Create a new trip
+     *
+     * @tags Trips
+     * @name StoreTrip
+     * @summary Store trip
+     * @request POST:/trips
+     * @secure
+     */
+    storeTrip: (data: StoreTripRequest, params: RequestParams = {}) =>
+      this.request<TripCreationResponseDto, void>({
+        path: `/trips`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+  };
+  profile = {
+    /**
+     * @description Return profile data for a user
+     *
+     * @tags Profile
+     * @name GetProfile
+     * @summary Get profile
+     * @request GET:/profile/{username}
+     * @secure
+     */
+    getProfile: (username: string, params: RequestParams = {}) =>
+      this.request<UserDto, any>({
+        path: `/profile/${username}`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+}
