@@ -20,7 +20,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property string|null $follower_inbox_url
  * @property string|null $follower_shared_inbox_url
- * @property-read \App\Models\User|null $user
+ * @property-read \App\Models\User $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollower newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollower newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollower query()

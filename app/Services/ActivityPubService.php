@@ -55,30 +55,29 @@ class ActivityPubService
         $signature = $this->createSignature($user, 'POST', parse_url($inbox, PHP_URL_PATH), $host, $date, $digest);
 
         // Send to inbox
-        try {
-            $data = Http::withHeaders([
-                'Content-Type' => 'application/activity+json',
-                'Date' => $date,
-                'Digest' => $digest,
-                'Signature' => $signature,
-            ])->withBody($body)->post($inbox);
-            Log::info('Delivered Activity to inbox: '.$inbox.' Response status: '.$data->status(), [
-                'body' => $body,
-                'Content-Type' => 'application/activity+json',
-                'Date' => $date,
-                'Digest' => $digest,
-                'Signature' => $signature,
-            ]);
-            Log::info($data->body());
-        } catch (\Exception $e) {
-            Log::error($e->getMessage());
-            // Log error or handle
+        $data = Http::withHeaders([
+            'Content-Type' => 'application/activity+json',
+            'Date' => $date,
+            'Digest' => $digest,
+            'Signature' => $signature,
+        ])->withBody($body)->post($inbox);
+        Log::info('Delivered Activity to inbox: '.$inbox.' Response status: '.$data->status(), [
+            'body' => $body,
+            'Content-Type' => 'application/activity+json',
+            'Date' => $date,
+            'Digest' => $digest,
+            'Signature' => $signature,
+        ]);
+        Log::info($data->body());
+
+        if ($data->serverError()) {
+            throw new \RuntimeException('Failed to deliver activity to '.$inbox.': '.$data->status());
         }
     }
 
     private function createSignature(UserDto $user, string $method, string $path, string $host, string $date, string $digest): string
     {
-        $keyId = route('ap.actor-key', ['username' => $user->username]);
+        $keyId = route('ap.actor', ['username' => $user->username]).'#main-key';
         $headers = '(request-target) host date digest';
         $stringToSign = '(request-target): '.strtolower($method)." {$path}\nhost: {$host}\ndate: {$date}\ndigest: {$digest}";
 
