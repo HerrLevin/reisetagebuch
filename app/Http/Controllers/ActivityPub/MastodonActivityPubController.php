@@ -233,7 +233,7 @@ class MastodonActivityPubController extends Controller
         $note = Type::create('Note', [
             'id' => route('ap.post-object', ['id' => $id]),
             'published' => $post->publishedAt,
-            'attributedTo' => route('ap.actor', ['username' => $id]),
+            'attributedTo' => route('ap.actor', ['username' => $post->user->username]),
             'content' => $post->getBody() ?? '',
             'to' => ['https://www.w3.org/ns/activitystreams#Public'],
         ]);
