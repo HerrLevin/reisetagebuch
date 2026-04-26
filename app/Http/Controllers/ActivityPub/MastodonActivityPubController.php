@@ -266,7 +266,19 @@ class MastodonActivityPubController extends Controller
             ]
         );
 
-        $this->sendAccept($user, $activity, $follow);
+        $inboxUrl = $follow->follower_shared_inbox_url ?? $follow->follower_inbox_url;
+        if ($inboxUrl) {
+            try {
+                $this->sendAccept($user, $activity, $inboxUrl);
+            } catch (\Exception $e) {
+                Log::error('Failed to send Accept for follow', [
+                    'follower' => $followerActorId,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        } else {
+            Log::warning('No inbox URL available to send Accept', ['follower' => $followerActorId]);
+        }
 
         return response()->json('', 202);
     }
@@ -296,7 +308,16 @@ class MastodonActivityPubController extends Controller
         $inboxUrl = $follower->follower_shared_inbox_url ?? $follower->follower_inbox_url;
         $follower->delete();
 
-        $this->sendAcceptWithInbox($user, $activity, $inboxUrl);
+        if ($inboxUrl) {
+            try {
+                $this->sendAcceptToInbox($user, $activity, $inboxUrl);
+            } catch (\Exception $e) {
+                Log::error('Failed to send Accept for undo follow', [
+                    'follower' => $followerActorId,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
 
         return response()->json('', 202);
     }
@@ -326,33 +347,35 @@ class MastodonActivityPubController extends Controller
         return $this->postData($request, $id);
     }
 
-    private function sendAccept(UserDto $user, array $followActivity, ActivityPubFollower $follower): void
+    private function buildAcceptActivity(UserDto $user, string $acceptId, array $originalActivity): array
     {
-        $acceptId = route('ap.actor', ['username' => $user->username]).'#accepts/followers/'.$follower->id;
-        $inboxUrl = $follower->follower_shared_inbox_url ?? $follower->follower_inbox_url;
+        // Strip @context from the nested activity — it belongs only at the top level
+        $object = $originalActivity;
+        unset($object['@context']);
 
-        $accept = Type::create('Accept', [
+        return [
+            '@context' => 'https://www.w3.org/ns/activitystreams',
             'id' => $acceptId,
+            'type' => 'Accept',
             'actor' => route('ap.actor', ['username' => $user->username]),
-            'object' => $followActivity,
-        ]);
-        $accept->set('@context', 'https://www.w3.org/ns/activitystreams');
-
-        $this->activityPubService->deliverActivity($user, $followActivity['actor'], $inboxUrl, $accept->toArray());
+            'object' => $object,
+        ];
     }
 
-    private function sendAcceptWithInbox(UserDto $user, array $activity, ?string $inboxUrl): void
+    private function sendAccept(UserDto $user, array $followActivity, string $inboxUrl): void
     {
         $acceptId = route('ap.actor', ['username' => $user->username]).'#accepts/'.uniqid();
+        $accept = $this->buildAcceptActivity($user, $acceptId, $followActivity);
 
-        $accept = Type::create('Accept', [
-            'id' => $acceptId,
-            'actor' => route('ap.actor', ['username' => $user->username]),
-            'object' => $activity,
-        ]);
-        $accept->set('@context', 'https://www.w3.org/ns/activitystreams');
+        $this->activityPubService->deliverActivity($user, $followActivity['actor'], $inboxUrl, $accept);
+    }
 
-        $this->activityPubService->deliverActivity($user, $activity['actor'], $inboxUrl, $accept->toArray());
+    private function sendAcceptToInbox(UserDto $user, array $activity, string $inboxUrl): void
+    {
+        $acceptId = route('ap.actor', ['username' => $user->username]).'#accepts/'.uniqid();
+        $accept = $this->buildAcceptActivity($user, $acceptId, $activity);
+
+        $this->activityPubService->deliverActivity($user, $activity['actor'], $inboxUrl, $accept);
     }
 
     public function followers(string $username): JsonResponse
