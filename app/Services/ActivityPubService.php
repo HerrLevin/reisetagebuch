@@ -45,8 +45,14 @@ class ActivityPubService
         // Fetch the follower's actor to get their inbox
         $inbox = $inbox ?? $this->getInbox($followerActorId)['inbox'] ?? null;
 
+        if (! $inbox) {
+            Log::warning('No inbox URL to deliver activity', ['actor' => $followerActorId]);
+
+            return;
+        }
+
         // Prepare the request
-        $body = json_encode($activity);
+        $body = json_encode($activity, JSON_UNESCAPED_SLASHES);
         $date = now()->toRfc7231String();
         $digest = 'SHA-256='.base64_encode(hash('sha256', $body, true));
         $host = parse_url($inbox, PHP_URL_HOST);
