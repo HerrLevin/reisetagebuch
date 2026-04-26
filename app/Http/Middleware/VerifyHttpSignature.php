@@ -15,14 +15,20 @@ class VerifyHttpSignature
     {
         $signatureHeader = $request->header('Signature');
         if (! $signatureHeader) {
-            Log::warning('Inbox request missing Signature header');
+            Log::warning('VerifyHttpSignature: missing Signature header', [
+                'uri' => $request->getRequestUri(),
+                'ip' => $request->ip(),
+            ]);
 
             return response()->json(['error' => 'Missing Signature header'], 401);
         }
 
         $params = $this->parseSignatureHeader($signatureHeader);
         if (! $params || ! isset($params['keyId'], $params['signature'], $params['headers'])) {
-            Log::warning('Invalid Signature header format');
+            Log::warning('VerifyHttpSignature: invalid Signature header format', [
+                'uri' => $request->getRequestUri(),
+                'signature_header' => $signatureHeader,
+            ]);
 
             return response()->json(['error' => 'Invalid Signature header'], 401);
         }
@@ -32,7 +38,11 @@ class VerifyHttpSignature
         if ($digestHeader) {
             $expectedDigest = 'SHA-256='.base64_encode(hash('sha256', $request->getContent(), true));
             if (! hash_equals($expectedDigest, $digestHeader)) {
-                Log::warning('Digest mismatch', ['expected' => $expectedDigest, 'actual' => $digestHeader]);
+                Log::warning('VerifyHttpSignature: digest mismatch', [
+                    'keyId' => $params['keyId'],
+                    'expected' => $expectedDigest,
+                    'actual' => $digestHeader,
+                ]);
 
                 return response()->json(['error' => 'Digest mismatch'], 401);
             }
@@ -41,7 +51,7 @@ class VerifyHttpSignature
         // Fetch the public key
         $publicKeyPem = $this->fetchPublicKey($params['keyId']);
         if (! $publicKeyPem) {
-            Log::warning('Could not fetch public key', ['keyId' => $params['keyId']]);
+            Log::warning('VerifyHttpSignature: could not fetch public key', ['keyId' => $params['keyId']]);
 
             return response()->json(['error' => 'Could not fetch public key'], 401);
         }
@@ -70,21 +80,26 @@ class VerifyHttpSignature
         $decodedSignature = base64_decode($params['signature']);
         $publicKey = openssl_pkey_get_public($publicKeyPem);
         if (! $publicKey) {
-            Log::warning('Invalid public key PEM');
+            Log::warning('VerifyHttpSignature: invalid public key PEM', ['keyId' => $params['keyId']]);
 
             return response()->json(['error' => 'Invalid public key'], 401);
         }
 
         $algorithm = $params['algorithm'] ?? 'rsa-sha256';
         $opensslAlgo = match ($algorithm) {
-            'rsa-sha256' => OPENSSL_ALGO_SHA256,
+            'rsa-sha256', 'hs2019' => OPENSSL_ALGO_SHA256,
             'rsa-sha512' => OPENSSL_ALGO_SHA512,
             default => OPENSSL_ALGO_SHA256,
         };
 
         $verified = openssl_verify($signingString, $decodedSignature, $publicKey, $opensslAlgo);
         if ($verified !== 1) {
-            Log::warning('HTTP Signature verification failed', ['keyId' => $params['keyId']]);
+            Log::warning('VerifyHttpSignature: signature verification failed', [
+                'keyId' => $params['keyId'],
+                'algorithm' => $algorithm,
+                'signed_headers' => $params['headers'],
+                'signing_string' => $signingString,
+            ]);
 
             return response()->json(['error' => 'Invalid signature'], 401);
         }
@@ -109,25 +124,47 @@ class VerifyHttpSignature
     {
         // Strip fragment to get actor URL
         $actorUrl = strtok($keyId, '#');
+        $cacheKey = 'ap_public_key:'.md5($keyId);
 
-        return Cache::remember('ap_public_key:'.md5($keyId), 3600, function () use ($actorUrl, $keyId) {
-            try {
-                $response = Http::withHeaders([
-                    'Accept' => 'application/activity+json',
-                ])->timeout(10)->get($actorUrl);
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
 
-                if ($response->successful()) {
-                    $actor = $response->json();
-                    $publicKey = $actor['publicKey'] ?? null;
-                    if ($publicKey && ($publicKey['id'] === $keyId) && isset($publicKey['publicKeyPem'])) {
-                        return $publicKey['publicKeyPem'];
-                    }
+        try {
+            $response = Http::withHeaders([
+                'Accept' => 'application/activity+json',
+            ])->timeout(10)->get($actorUrl);
+
+            if ($response->successful()) {
+                $actor = $response->json();
+                $publicKey = $actor['publicKey'] ?? null;
+                if ($publicKey && ($publicKey['id'] === $keyId) && isset($publicKey['publicKeyPem'])) {
+                    Cache::put($cacheKey, $publicKey['publicKeyPem'], 3600);
+
+                    return $publicKey['publicKeyPem'];
                 }
-            } catch (\Exception $e) {
-                Log::error('Error fetching public key: '.$e->getMessage());
-            }
 
-            return null;
-        });
+                Log::warning('VerifyHttpSignature: public key not found or keyId mismatch in actor response', [
+                    'keyId' => $keyId,
+                    'actor_url' => $actorUrl,
+                    'has_public_key' => isset($actor['publicKey']),
+                    'actor_key_id' => $actor['publicKey']['id'] ?? null,
+                ]);
+            } else {
+                Log::warning('VerifyHttpSignature: failed to fetch actor', [
+                    'actor_url' => $actorUrl,
+                    'status' => $response->status(),
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('VerifyHttpSignature: error fetching public key', [
+                'actor_url' => $actorUrl,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        // Don't cache failures — allow retry on next request
+        return null;
     }
 }

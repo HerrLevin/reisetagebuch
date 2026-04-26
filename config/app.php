@@ -5,6 +5,7 @@ return [
     'version' => env('APP_VERSION', '0.0.0'),
     'env' => env('APP_ENV', 'production'),
 
+    'log_requests' => (bool) env('APP_LOG_REQUESTS', false),
     'debug' => (bool) env('APP_DEBUG', false),
     'url' => env('APP_URL', 'http://localhost'),
     'timezone' => 'UTC',

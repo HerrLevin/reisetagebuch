@@ -14,7 +14,7 @@ class RequestLogger
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (true) {
+        if (config('app.log_requests', false) === false) {
             return $next($request);
         }
 
