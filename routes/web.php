@@ -4,7 +4,7 @@ use App\Http\Controllers\ActivityPub\MastodonActivityPubController;
 use App\Http\Controllers\ActivityPub\NodeInfoController;
 use App\Http\Controllers\ActivityPub\WellKnownController;
 use App\Http\Middleware\VerifyHttpSignature;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -30,7 +30,7 @@ Route::prefix('ap')
     // ActivityPub endpoints are meant to be accessed by federated systems and
     // external actors, so they should not require a web CSRF token. Exclude
     // Laravel's VerifyCsrfToken middleware for this route group.
-    ->withoutMiddleware([VerifyCsrfToken::class])
+    ->withoutMiddleware([PreventRequestForgery::class])
     ->group(function () {
         Route::get('users/{username}', [MastodonActivityPubController::class, 'actor'])->name('actor');
         Route::get('users/{username}/outbox', [MastodonActivityPubController::class, 'outbox'])->name('outbox');
