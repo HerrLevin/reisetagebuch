@@ -26,6 +26,9 @@
             "lead": "{user} requested to follow you",
             "accept": "Accept",
             "decline": "Decline"
+        },
+        "ap_follower": {
+            "lead": "{user} started following you from the fediverse"
         }
     },
     "trip_details": {

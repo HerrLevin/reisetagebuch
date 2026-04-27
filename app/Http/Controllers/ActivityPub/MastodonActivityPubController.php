@@ -10,6 +10,8 @@ use App\Http\Resources\PostTypes\TransportPost;
 use App\Http\Resources\UserDto;
 use App\Models\ActivityPubFollower;
 use App\Models\User;
+use App\Notifications\ActivityPubUserFollowedNotification;
+use App\Repositories\NotificationRepository;
 use App\Repositories\PostRepository;
 use App\Repositories\UserRepository;
 use App\Services\ActivityPubService;
@@ -23,7 +25,8 @@ class MastodonActivityPubController extends Controller
     public function __construct(
         private readonly ActivityPubService $activityPubService,
         private readonly UserRepository $userRepository,
-        private readonly PostRepository $postRepository
+        private readonly PostRepository $postRepository,
+        private readonly NotificationRepository $notificationRepository,
     ) {}
 
     private function checkHeader(Request $request): bool
@@ -253,7 +256,7 @@ class MastodonActivityPubController extends Controller
             return response()->json(['error' => 'Invalid follow object'], 400);
         }
 
-        $inboxes = $this->activityPubService->getInbox($followerActorId);
+        $actorProfile = $this->activityPubService->getActorProfile($followerActorId);
 
         $follow = ActivityPubFollower::updateOrCreate(
             [
@@ -261,10 +264,23 @@ class MastodonActivityPubController extends Controller
                 'followed_user_id' => $user->id,
             ],
             [
-                'follower_shared_inbox_url' => $inboxes['sharedInbox'] ?? null,
-                'follower_inbox_url' => $inboxes['inbox'] ?? null,
+                'follower_shared_inbox_url' => $actorProfile['sharedInbox'] ?? null,
+                'follower_inbox_url' => $actorProfile['inbox'] ?? null,
             ]
         );
+
+        if ($follow->wasRecentlyCreated) {
+            $this->notificationRepository->notifyUser(
+                $user,
+                new ActivityPubUserFollowedNotification(
+                    followerActorId: $followerActorId,
+                    followerPreferredUsername: $actorProfile['preferredUsername'] ?? $followerActorId,
+                    followerDisplayName: $actorProfile['name'] ?? null,
+                    followerIconUrl: $actorProfile['iconUrl'] ?? null,
+                    followerProfileUrl: $actorProfile['url'] ?? null,
+                )
+            );
+        }
 
         $inboxUrl = $follow->follower_shared_inbox_url ?? $follow->follower_inbox_url;
         if ($inboxUrl) {
