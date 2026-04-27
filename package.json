@@ -36,7 +36,7 @@
         "laravel-vite-plugin": "^2.0.0",
         "prettier": "^3.3.0",
         "prettier-plugin-organize-imports": "^4.0.0",
-        "prettier-plugin-tailwindcss": "^0.7.0",
+        "prettier-plugin-tailwindcss": "^0.8.0",
         "swagger-typescript-api": "^13.1.1",
         "tailwindcss": "^4.0.0",
         "typescript": "^6.0.0",
