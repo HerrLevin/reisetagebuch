@@ -80,6 +80,9 @@ class BasePost
 
     public function __construct(Post $post, UserDto $userDto)
     {
+        $likes = $post->likes_count ?? 0;
+        $apLikes = $post->activity_pub_likes_count ?? 0;
+
         $this->id = $post->id;
         $this->body = $post->body;
         $this->user = $userDto;
@@ -88,7 +91,7 @@ class BasePost
         $this->createdAt = $post->created_at->toIso8601String();
         $this->updatedAt = $post->updated_at->toIso8601String();
         $this->hashTags = $post->hashTags?->map(fn ($hashTag) => $hashTag->value)->toArray() ?? [];
-        $this->likesCount = $post->likes_count ?? 0;
+        $this->likesCount = $likes + $apLikes;
         $this->likedByUser = $post->liked_by_user ?? false;
         $this->metaInfos = $post->metaInfos?->groupBy(fn ($metaInfo) => $metaInfo->key->value)
             ->map(function ($group) {

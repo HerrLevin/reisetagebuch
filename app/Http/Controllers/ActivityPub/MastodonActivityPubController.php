@@ -8,8 +8,11 @@ use App\Http\Resources\PostTypes\BasePost;
 use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
 use App\Http\Resources\UserDto;
+use App\Hydrators\PostHydrator;
 use App\Models\ActivityPubFollower;
+use App\Models\ActivityPubLike;
 use App\Models\User;
+use App\Notifications\ActivityPubPostLikedNotification;
 use App\Notifications\ActivityPubUserFollowedNotification;
 use App\Repositories\NotificationRepository;
 use App\Repositories\PostRepository;
@@ -237,8 +240,14 @@ class MastodonActivityPubController extends Controller
         if ($type === 'Follow') {
             return $this->handleFollow($activity, $user);
         }
+        if ($type === 'Like') {
+            return $this->handleLike($activity, $user);
+        }
         if ($type === 'Undo' && isset($activity['object']['type']) && $activity['object']['type'] === 'Follow') {
             return $this->handleUndoFollow($activity, $user);
+        }
+        if ($type === 'Undo' && isset($activity['object']['type']) && $activity['object']['type'] === 'Like') {
+            return $this->handleUndoLike($activity, $user);
         }
 
         // For other activities, just accept
@@ -334,6 +343,111 @@ class MastodonActivityPubController extends Controller
                 ]);
             }
         }
+
+        return response()->json('', 202);
+    }
+
+    private function parsePostIdFromUrl(string $url): ?string
+    {
+        // Match URLs like https://example.com/ap/posts/{id} or /ap/posts/{id}/object
+        $postRoute = route('ap.post', ['id' => 'PLACEHOLDER']);
+        $prefix = str_replace('PLACEHOLDER', '', $postRoute);
+
+        if (str_starts_with($url, $prefix)) {
+            $remainder = substr($url, strlen($prefix));
+            // Remove trailing /object if present
+            $postId = rtrim($remainder, '/');
+            $postId = preg_replace('#/object$#', '', $postId);
+
+            return $postId ?: null;
+        }
+
+        return null;
+    }
+
+    private function handleLike(array $activity, UserDto $user): JsonResponse
+    {
+        $actorId = $activity['actor'] ?? null;
+        $objectUrl = $activity['object'] ?? null;
+
+        if (! $actorId || ! is_string($objectUrl)) {
+            return response()->json('', 202);
+        }
+
+        $postId = $this->parsePostIdFromUrl($objectUrl);
+        if (! $postId) {
+            Log::info('Like activity: could not parse post ID from object URL', ['object' => $objectUrl]);
+
+            return response()->json('', 202);
+        }
+
+        $post = $this->postRepository->internalGetById($postId);
+        if (! $post || $post->user_id !== $user->id) {
+            Log::info('Like activity: post not found or does not belong to user', ['postId' => $postId, 'userId' => $user->id]);
+
+            return response()->json('', 202);
+        }
+
+        $like = ActivityPubLike::updateOrCreate(
+            [
+                'actor_id' => $actorId,
+                'post_id' => $postId,
+            ],
+            [
+                'activity_id' => $activity['id'] ?? null,
+            ]
+        );
+
+        if ($like->wasRecentlyCreated) {
+            try {
+                $actorProfile = $this->activityPubService->getActorProfile($actorId);
+                $postHydrator = new PostHydrator;
+                $postDto = $postHydrator->modelToDto($post);
+
+                $this->notificationRepository->notifyUser(
+                    $user,
+                    new ActivityPubPostLikedNotification(
+                        actorId: $actorId,
+                        preferredUsername: $actorProfile['preferredUsername'] ?? $actorId,
+                        displayName: $actorProfile['name'] ?? null,
+                        iconUrl: $actorProfile['iconUrl'] ?? null,
+                        profileUrl: $actorProfile['url'] ?? null,
+                        postId: $postId,
+                        postBody: $postDto->body ? substr($postDto->body, 0, 50) : null,
+                        postSummary: $postDto->getBody(),
+                    )
+                );
+            } catch (\Exception $e) {
+                Log::error('Failed to send notification for AP like', [
+                    'actor' => $actorId,
+                    'postId' => $postId,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        return response()->json('', 202);
+    }
+
+    private function handleUndoLike(array $activity, UserDto $user): JsonResponse
+    {
+        $object = $activity['object'] ?? [];
+        $actorId = $object['actor'] ?? $activity['actor'] ?? null;
+        $objectUrl = $object['object'] ?? null;
+
+        if (! $actorId || ! is_string($objectUrl)) {
+            return response()->json('', 202);
+        }
+
+        $postId = $this->parsePostIdFromUrl($objectUrl);
+        if (! $postId) {
+            return response()->json('', 202);
+        }
+
+        ActivityPubLike::where([
+            'actor_id' => $actorId,
+            'post_id' => $postId,
+        ])->delete();
 
         return response()->json('', 202);
     }

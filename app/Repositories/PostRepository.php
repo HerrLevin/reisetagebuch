@@ -286,7 +286,8 @@ class PostRepository
             'transportPost.originStop', 'transportPost.destinationStop',
             'transportPost.originStop.location', 'transportPost.destinationStop.location', 'transportPost.transportTrip', 'hashTags',
         ])
-            ->withCount('likes');
+            ->withCount('likes')
+            ->withCount('activityPubLikes');
     }
 
     private function timelineQueryForUser(User $user): Builder
@@ -351,6 +352,7 @@ class PostRepository
     {
         $posts = Post::with(['user', 'locationPost.location', 'locationPost.location.tags', 'transportPost', 'transportPost.origin', 'transportPost.destination', 'hashTags'])
             ->withCount('likes')
+            ->withCount('activityPubLikes')
             ->where('user_id', $userId);
 
         if ($visitingUser) {
