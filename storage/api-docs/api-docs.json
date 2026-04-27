@@ -3678,6 +3678,98 @@
                 },
                 "type": "object"
             },
+            "ActivityPubPostLikedData": {
+                "description": "Data for an ActivityPub post liked notification",
+                "required": [
+                    "actorId",
+                    "preferredUsername",
+                    "postId"
+                ],
+                "properties": {
+                    "actorId": {
+                        "description": "ActivityPub actor ID (URI) of the remote user who liked the post",
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    "preferredUsername": {
+                        "description": "Preferred username of the remote user",
+                        "type": "string",
+                        "example": "johndoe"
+                    },
+                    "displayName": {
+                        "description": "Display name of the remote user",
+                        "type": "string",
+                        "example": "John Doe",
+                        "nullable": true
+                    },
+                    "iconUrl": {
+                        "description": "Avatar URL of the remote user",
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
+                    },
+                    "profileUrl": {
+                        "description": "Profile URL of the remote user",
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
+                    },
+                    "postId": {
+                        "description": "ID of the liked post",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "postBody": {
+                        "description": "Body content of the liked post",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "postSummary": {
+                        "description": "Summary of the liked post",
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "ActivityPubUserFollowedData": {
+                "description": "Data for an ActivityPub user followed notification",
+                "required": [
+                    "followerActorId",
+                    "followerPreferredUsername"
+                ],
+                "properties": {
+                    "followerActorId": {
+                        "description": "ActivityPub actor ID (URI) of the remote follower",
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    "followerPreferredUsername": {
+                        "description": "Preferred username of the remote follower",
+                        "type": "string",
+                        "example": "johndoe"
+                    },
+                    "followerDisplayName": {
+                        "description": "Display name of the remote follower",
+                        "type": "string",
+                        "example": "John Doe",
+                        "nullable": true
+                    },
+                    "followerIconUrl": {
+                        "description": "Avatar URL of the remote follower",
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
+                    },
+                    "followerProfileUrl": {
+                        "description": "Profile URL of the remote follower",
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
             "NotificationWrapper": {
                 "description": "A wrapper for notification data",
                 "required": [
@@ -3723,6 +3815,12 @@
                             },
                             {
                                 "$ref": "#/components/schemas/UserFollowedData"
+                            },
+                            {
+                                "$ref": "#/components/schemas/ActivityPubUserFollowedData"
+                            },
+                            {
+                                "$ref": "#/components/schemas/ActivityPubPostLikedData"
                             }
                         ]
                     }
@@ -4062,7 +4160,9 @@
                     "PostLikedNotification",
                     "UserFollowedNotification",
                     "TraewellingCrosspostFailedNotification",
-                    "UserRequestedFollowNotification"
+                    "UserRequestedFollowNotification",
+                    "ActivityPubUserFollowedNotification",
+                    "ActivityPubPostLikedNotification"
                 ]
             },
             "Feature": {
@@ -5092,6 +5192,10 @@
                     },
                     "statistics": {
                         "$ref": "#/components/schemas/UserStatisticsDto"
+                    },
+                    "publicKeyPem": {
+                        "description": "Public Key PEM",
+                        "type": "string"
                     },
                     "createdAt": {
                         "description": "Account creation timestamp",

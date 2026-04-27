@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import ActivityPubPostLikedNotification from '@/Pages/Notifications/Partials/ActivityPubPostLikedNotification.vue';
 import ActivityPubUserFollowedNotification from '@/Pages/Notifications/Partials/ActivityPubUserFollowedNotification.vue';
 import PostLikedNotification from '@/Pages/Notifications/Partials/PostLikedNotification.vue';
 import TraewellingCrosspostFailedNotification from '@/Pages/Notifications/Partials/TraewellingCrosspostFailedNotification.vue';
@@ -9,6 +10,7 @@ import UserRequestedFollowNotification from '@/Pages/Notifications/Partials/User
 import { useNotificationStore } from '@/stores/notifications';
 import {
     getTypedNotificationData,
+    isActivityPubPostLikedNotification,
     isActivityPubUserFollowedNotification,
     isPostLikedNotification,
     isTraewellingCrosspostFailedNotification,
@@ -43,6 +45,9 @@ const getNotificationComponent = (notification: NotificationWrapper) => {
     }
     if (isActivityPubUserFollowedNotification(notification)) {
         return ActivityPubUserFollowedNotification;
+    }
+    if (isActivityPubPostLikedNotification(notification)) {
+        return ActivityPubPostLikedNotification;
     }
     return null;
 };

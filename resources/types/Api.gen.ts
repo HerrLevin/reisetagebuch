@@ -79,6 +79,7 @@ export enum NotificationType {
   TraewellingCrosspostFailedNotification = "TraewellingCrosspostFailedNotification",
   UserRequestedFollowNotification = "UserRequestedFollowNotification",
   ActivityPubUserFollowedNotification = "ActivityPubUserFollowedNotification",
+  ActivityPubPostLikedNotification = "ActivityPubPostLikedNotification",
 }
 
 export enum MotisLocationType {
@@ -442,6 +443,73 @@ export interface MotisTripDto {
   legs: LegDto[];
 }
 
+/** Data for an ActivityPub post liked notification */
+export interface ActivityPubPostLikedData {
+  /**
+   * ActivityPub actor ID (URI) of the remote user who liked the post
+   * @format uri
+   */
+  actorId: string;
+  /**
+   * Preferred username of the remote user
+   * @example "johndoe"
+   */
+  preferredUsername: string;
+  /**
+   * Display name of the remote user
+   * @example "John Doe"
+   */
+  displayName?: string | null;
+  /**
+   * Avatar URL of the remote user
+   * @format uri
+   */
+  iconUrl?: string | null;
+  /**
+   * Profile URL of the remote user
+   * @format uri
+   */
+  profileUrl?: string | null;
+  /**
+   * ID of the liked post
+   * @format uuid
+   */
+  postId: string;
+  /** Body content of the liked post */
+  postBody?: string | null;
+  /** Summary of the liked post */
+  postSummary?: string | null;
+}
+
+/** Data for an ActivityPub user followed notification */
+export interface ActivityPubUserFollowedData {
+  /**
+   * ActivityPub actor ID (URI) of the remote follower
+   * @format uri
+   */
+  followerActorId: string;
+  /**
+   * Preferred username of the remote follower
+   * @example "johndoe"
+   */
+  followerPreferredUsername: string;
+  /**
+   * Display name of the remote follower
+   * @example "John Doe"
+   */
+  followerDisplayName?: string | null;
+  /**
+   * Avatar URL of the remote follower
+   * @format uri
+   */
+  followerIconUrl?: string | null;
+  /**
+   * Profile URL of the remote follower
+   * @format uri
+   */
+  followerProfileUrl?: string | null;
+}
+
 /** A wrapper for notification data */
 export interface NotificationWrapper {
   /**
@@ -467,7 +535,12 @@ export interface NotificationWrapper {
    */
   readAt: string | null;
   /** Additional data associated with the notification */
-  data: PostLikedData | UserFollowedData | ActivityPubUserFollowedData | null;
+  data:
+    | PostLikedData
+    | UserFollowedData
+    | ActivityPubUserFollowedData
+    | ActivityPubPostLikedData
+    | null;
 }
 
 /** Data for a post liked notification */
@@ -566,35 +639,6 @@ export interface UserRequestedFollowData {
    * @format uri
    */
   followerUserAvatarUrl: string;
-}
-
-/** Data for an ActivityPub user followed notification */
-export interface ActivityPubUserFollowedData {
-  /**
-   * ActivityPub actor ID (URI) of the remote follower
-   * @format uri
-   */
-  followerActorId: string;
-  /**
-   * Preferred username of the remote follower
-   * @example "johndoe"
-   */
-  followerPreferredUsername: string;
-  /**
-   * Display name of the remote follower
-   * @example "John Doe"
-   */
-  followerDisplayName: string | null;
-  /**
-   * Avatar URL of the remote follower
-   * @format uri
-   */
-  followerIconUrl: string | null;
-  /**
-   * Profile URL of the remote follower
-   * @format uri
-   */
-  followerProfileUrl: string | null;
 }
 
 /** A generic pagination DTO */
@@ -842,14 +886,16 @@ export interface StoreTripRequest {
    */
   arrivalTime: string;
   /** An array of stops for the trip. */
-  stops?: {
-    /** The identifier of the stop. */
-    identifier?: string;
-    /** The type of identifier used for the stop (id or identifier). */
-    identifierType?: string | null;
-    /** The order of the stop in the trip sequence. */
-    order?: number;
-  }[];
+  stops?:
+    | {
+        /** The identifier of the stop. */
+        identifier?: string;
+        /** The type of identifier used for the stop (id or identifier). */
+        identifierType?: string | null;
+        /** The order of the stop in the trip sequence. */
+        order?: number;
+      }[]
+    | null;
 }
 
 export type TransportPostRequest = BasePostRequest & {
@@ -1187,6 +1233,8 @@ export interface UserDto {
   requiresFollowRequest?: boolean;
   /** User Statistics Data Object */
   statistics: UserStatisticsDto;
+  /** Public Key PEM */
+  publicKeyPem?: string;
   /**
    * Account creation timestamp
    * @format date-time

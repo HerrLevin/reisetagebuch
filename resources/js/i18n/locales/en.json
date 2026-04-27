@@ -29,6 +29,9 @@
         },
         "ap_follower": {
             "lead": "{user} started following you from the fediverse"
+        },
+        "ap_liked": {
+            "lead": "{user} liked your post from the fediverse"
         }
     },
     "trip_details": {
