@@ -13,30 +13,55 @@ class ActivityPubService
     #[ArrayShape(['inbox' => 'string|null', 'sharedInbox' => 'string|null'])]
     public function getInbox(string $followerActorId): ?array
     {
-        $followerActor = null;
+        $profile = $this->getActorProfile($followerActorId);
+        if ($profile === null) {
+            return null;
+        }
+
+        return [
+            'inbox' => $profile['inbox'],
+            'sharedInbox' => $profile['sharedInbox'],
+        ];
+    }
+
+    #[ArrayShape([
+        'inbox' => 'string|null',
+        'sharedInbox' => 'string|null',
+        'preferredUsername' => 'string|null',
+        'name' => 'string|null',
+        'iconUrl' => 'string|null',
+        'url' => 'string|null',
+    ])]
+    public function getActorProfile(string $actorId): ?array
+    {
+        $actor = null;
         try {
             $response = Http::withHeaders([
                 'Accept' => 'application/activity+json',
-            ])->get($followerActorId);
+            ])->get($actorId);
 
             if ($response->successful()) {
-                $followerActor = $response->json();
-                $inbox = $followerActor['inbox'] ?? null;
-                $endpoints = $followerActor['endpoints'] ?? [];
+                $actor = $response->json();
+                $inbox = $actor['inbox'] ?? null;
+                $endpoints = $actor['endpoints'] ?? [];
                 $sharedInbox = $endpoints['sharedInbox'] ?? null;
                 if ($inbox) {
                     return [
                         'inbox' => $inbox,
                         'sharedInbox' => $sharedInbox,
+                        'preferredUsername' => $actor['preferredUsername'] ?? null,
+                        'name' => $actor['name'] ?? null,
+                        'iconUrl' => $actor['icon']['url'] ?? null,
+                        'url' => $actor['url'] ?? null,
                     ];
                 }
             }
-            Log::warning('No inbox found for actor: '.$followerActorId, ['followerActor' => $followerActor, 'response' => $response->body()]);
+            Log::warning('No inbox found for actor: '.$actorId, ['actor' => $actor, 'response' => $response->body()]);
         } catch (\Exception $e) {
-            Log::error('Error fetching actor: '.$followerActorId.' Error: '.$e->getMessage());
+            Log::error('Error fetching actor: '.$actorId.' Error: '.$e->getMessage());
         }
 
-        return null; // Error fetching
+        return null;
     }
 
     public function deliverActivity(UserDto $user, string $followerActorId, ?string $inbox, array $activity): void

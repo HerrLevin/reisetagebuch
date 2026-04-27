@@ -26,6 +26,9 @@
             "lead": "{user} möchte dir folgen",
             "accept": "Anfrage akzeptieren",
             "decline": "Anfrage ablehnen"
+        },
+        "ap_follower": {
+            "lead": "{user} folgt dir jetzt aus dem Fediverse"
         }
     },
     "trip_details": {

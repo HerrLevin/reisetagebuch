@@ -1,4 +1,5 @@
 import {
+    ActivityPubUserFollowedData,
     NotificationType,
     NotificationWrapper,
     PostLikedData,
@@ -51,9 +52,21 @@ export const isTraewellingCrosspostFailedNotification = (
     );
 };
 
+export const isActivityPubUserFollowedNotification = (
+    notification: NotificationWrapper,
+) => {
+    const data = notification.data;
+    return (
+        notification.data !== null &&
+        notification.type ===
+            NotificationType.ActivityPubUserFollowedNotification &&
+        (data as ActivityPubUserFollowedData).followerActorId !== undefined
+    );
+};
+
 export const getTypedNotificationData = (
     notification: NotificationWrapper,
-): PostLikedData | UserFollowedData | null => {
+): PostLikedData | UserFollowedData | ActivityPubUserFollowedData | null => {
     if (isPostLikedNotification(notification)) {
         return notification.data;
     }
@@ -64,6 +77,9 @@ export const getTypedNotificationData = (
         return notification.data;
     }
     if (isUserRequestedFollowNotification(notification)) {
+        return notification.data;
+    }
+    if (isActivityPubUserFollowedNotification(notification)) {
         return notification.data;
     }
     return null;

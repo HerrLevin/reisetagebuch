@@ -78,6 +78,7 @@ export enum NotificationType {
   UserFollowedNotification = "UserFollowedNotification",
   TraewellingCrosspostFailedNotification = "TraewellingCrosspostFailedNotification",
   UserRequestedFollowNotification = "UserRequestedFollowNotification",
+  ActivityPubUserFollowedNotification = "ActivityPubUserFollowedNotification",
 }
 
 export enum MotisLocationType {
@@ -466,7 +467,7 @@ export interface NotificationWrapper {
    */
   readAt: string | null;
   /** Additional data associated with the notification */
-  data: PostLikedData | UserFollowedData | null;
+  data: PostLikedData | UserFollowedData | ActivityPubUserFollowedData | null;
 }
 
 /** Data for a post liked notification */
@@ -565,6 +566,35 @@ export interface UserRequestedFollowData {
    * @format uri
    */
   followerUserAvatarUrl: string;
+}
+
+/** Data for an ActivityPub user followed notification */
+export interface ActivityPubUserFollowedData {
+  /**
+   * ActivityPub actor ID (URI) of the remote follower
+   * @format uri
+   */
+  followerActorId: string;
+  /**
+   * Preferred username of the remote follower
+   * @example "johndoe"
+   */
+  followerPreferredUsername: string;
+  /**
+   * Display name of the remote follower
+   * @example "John Doe"
+   */
+  followerDisplayName: string | null;
+  /**
+   * Avatar URL of the remote follower
+   * @format uri
+   */
+  followerIconUrl: string | null;
+  /**
+   * Profile URL of the remote follower
+   * @format uri
+   */
+  followerProfileUrl: string | null;
 }
 
 /** A generic pagination DTO */
