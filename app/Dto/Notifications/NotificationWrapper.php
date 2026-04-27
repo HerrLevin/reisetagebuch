@@ -48,6 +48,7 @@ use OpenApi\Attributes as OA;
                 new OA\Schema(ref: PostLikedData::class),
                 new OA\Schema(ref: UserFollowedData::class),
                 new OA\Schema(ref: ActivityPubUserFollowedData::class),
+                new OA\Schema(ref: ActivityPubPostLikedData::class),
             ]
         ),
     ]
