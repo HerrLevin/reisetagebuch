@@ -29,6 +29,9 @@
         },
         "ap_follower": {
             "lead": "{user} folgt dir jetzt aus dem Fediverse"
+        },
+        "ap_liked": {
+            "lead": "{user} hat deinen Post aus dem Fediverse geliked"
         }
     },
     "trip_details": {
