@@ -2,11 +2,13 @@
 
 namespace App\Enums;
 
+use App\Hydrators\Notifications\ActivityPubPostLikedHydrator;
 use App\Hydrators\Notifications\ActivityPubUserFollowedHydrator;
 use App\Hydrators\Notifications\PostLikedDataHydrator;
 use App\Hydrators\Notifications\TraewellingCrosspostFailedHydrator;
 use App\Hydrators\Notifications\UserFollowedHydrator;
 use App\Hydrators\Notifications\UserRequestedFollowHydrator;
+use App\Notifications\ActivityPubPostLikedNotification;
 use App\Notifications\ActivityPubUserFollowedNotification;
 use App\Notifications\PostLiked;
 use App\Notifications\TraewellingCrosspostFailedNotification;
@@ -27,6 +29,7 @@ enum DatabaseNotificationType: string
     case TraewellingCrosspostFailed = 'TraewellingCrosspostFailedNotification';
     case UserRequestedFollow = 'UserRequestedFollowNotification';
     case ActivityPubUserFollowed = 'ActivityPubUserFollowedNotification';
+    case ActivityPubPostLiked = 'ActivityPubPostLikedNotification';
 
     public function getClassName(): string
     {
@@ -36,6 +39,7 @@ enum DatabaseNotificationType: string
             self::TraewellingCrosspostFailed => TraewellingCrosspostFailedNotification::class,
             self::UserRequestedFollow => UserRequestedFollowNotification::class,
             self::ActivityPubUserFollowed => ActivityPubUserFollowedNotification::class,
+            self::ActivityPubPostLiked => ActivityPubPostLikedNotification::class,
         };
     }
 
@@ -47,6 +51,7 @@ enum DatabaseNotificationType: string
             self::TraewellingCrosspostFailed => TraewellingCrosspostFailedHydrator::class,
             self::UserRequestedFollow => UserRequestedFollowHydrator::class,
             self::ActivityPubUserFollowed => ActivityPubUserFollowedHydrator::class,
+            self::ActivityPubPostLiked => ActivityPubPostLikedHydrator::class,
         };
     }
 }

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+    isActivityPubPostLikedNotification,
     isActivityPubUserFollowedNotification,
     isPostLikedNotification,
     isTraewellingCrosspostFailedNotification,
@@ -8,6 +9,7 @@ import {
 import { computed, PropType } from 'vue';
 import { RouterLink } from 'vue-router';
 import {
+    ActivityPubPostLikedData,
     ActivityPubUserFollowedData,
     NotificationWrapper,
     PostLikedData,
@@ -55,6 +57,18 @@ const getNotificationLink = (
     if (isActivityPubUserFollowedNotification(notification)) {
         const data = notification.data as ActivityPubUserFollowedData;
         return data.followerProfileUrl ?? '#';
+    }
+    if (isActivityPubPostLikedNotification(notification)) {
+        const data = notification.data as ActivityPubPostLikedData;
+        if (data.postId) {
+            return {
+                name: 'posts.show',
+                params: {
+                    postId: data.postId,
+                },
+            };
+        }
+        return '#';
     }
     return '#';
 };

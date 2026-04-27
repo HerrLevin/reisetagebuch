@@ -37,6 +37,16 @@ namespace App\Models{
 
 namespace App\Models{
 /**
+ * @property-read \App\Models\Post|null $post
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubLike newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubLike newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubLike query()
+ */
+	class ActivityPubLike extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
  * @property string $id
  * @property string $origin_user_id
  * @property string $target_user_id
@@ -275,6 +285,8 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \App\Enums\Visibility $visibility
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ActivityPubLike> $activityPubLikes
+ * @property-read int|null $activity_pub_likes_count
  * @property-read \App\Models\PostsHashTagsMap|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\HashTag> $hashTags
  * @property-read int|null $hash_tags_count
