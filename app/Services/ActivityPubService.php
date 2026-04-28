@@ -91,7 +91,7 @@ class ActivityPubService
             'Date' => $date,
             'Digest' => $digest,
             'Signature' => $signature,
-        ])->withBody($body)->post($inbox);
+        ])->withBody($body, 'application/activity+json')->post($inbox);
         Log::info('Delivered Activity to inbox: '.$inbox.' Response status: '.$data->status(), [
             'body' => $body,
             'Content-Type' => 'application/activity+json',

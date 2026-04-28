@@ -51,11 +51,11 @@ class UserRepositoryTest extends TestCase
         $this->assertEquals('New Bio', $updatedUser->bio);
         $this->assertEquals('New Website', $updatedUser->website);
 
-        $updatedUser = $repository->updateAvatar($user, 'new_avatar.png');
+        $updatedUser = $repository->updateAvatar($user, 'new_avatar.png', 'image/png');
 
         $this->assertEquals(url('/files/new_avatar.png'), $updatedUser->avatar);
 
-        $updatedUser = $repository->updateHeader($user, 'new_header.png');
+        $updatedUser = $repository->updateHeader($user, 'new_header.png', 'image/png');
         $this->assertEquals(url('/files/new_header.png'), $updatedUser->header);
 
         $this->assertEquals($user->id, $updatedUser->id);
@@ -65,13 +65,17 @@ class UserRepositoryTest extends TestCase
         $this->assertNull($updatedUser->bio);
         $this->assertNull($updatedUser->website);
         $this->assertNotNull($updatedUser->avatar);
+        $this->assertNotNull($updatedUser->avatarMimeType);
         $this->assertNotNull($updatedUser->header);
+        $this->assertNotNull($updatedUser->headerMimeType);
 
-        $repository->updateAvatar($user, null);
-        $updatedUser = $repository->updateHeader($user, null);
+        $repository->updateAvatar($user, null, null);
+        $updatedUser = $repository->updateHeader($user, null, null);
 
         $this->assertNull($updatedUser->avatar);
+        $this->assertNull($updatedUser->avatarMimeType);
         $this->assertNull($updatedUser->header);
+        $this->assertNull($updatedUser->headerMimeType);
     }
 
     public function test_create_profile_if_not_exists()
