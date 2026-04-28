@@ -21,6 +21,7 @@ namespace App\Models{
  * @property string|null $follower_inbox_url
  * @property string|null $follower_shared_inbox_url
  * @property-read \App\Models\User $user
+ * @method static \Database\Factories\ActivityPubFollowerFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollower newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollower newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollower query()
@@ -37,10 +38,22 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * @property-read \App\Models\Post|null $post
+ * @property string $id
+ * @property string $actor_id
+ * @property string $post_id
+ * @property string|null $activity_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Post $post
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubLike newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubLike newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubLike query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubLike whereActivityId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubLike whereActorId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubLike whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubLike whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubLike wherePostId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubLike whereUpdatedAt($value)
  */
 	class ActivityPubLike extends \Eloquent {}
 }
@@ -368,15 +381,19 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property string|null $header
+ * @property string|null $avatar_mime_type
+ * @property string|null $header_mime_type
  * @property-read \App\Models\User $user
  * @method static \Database\Factories\ProfileFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile whereAvatar($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile whereAvatarMimeType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile whereBio($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile whereHeader($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile whereHeaderMimeType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile whereUserId($value)

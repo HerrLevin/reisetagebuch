@@ -3,14 +3,16 @@
 namespace App\Jobs;
 
 use App\Enums\Visibility;
-use App\Hydrators\PostHydrator;
-use App\Hydrators\UserHydrator;
+use App\Hydrators\ActivityPub\CreateHydrator;
+use App\Hydrators\ActivityPub\NoteHydrator;
 use App\Models\ActivityPubFollower;
-use App\Models\Post;
+use App\Repositories\PostRepository;
 use App\Services\ActivityPubService;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class PushPostToMastodon implements ShouldQueue
 {
@@ -26,50 +28,33 @@ class PushPostToMastodon implements ShouldQueue
 
     public function handle(ActivityPubService $activityPub): void
     {
-        $postModel = Post::with(['user', 'locationPost', 'transportPost'])->find($this->postId);
-        if (! $postModel) {
-            Log::warning('PushPostToMastodon: Post not found', ['postId' => $this->postId]);
+        try {
+            $postDto = app(PostRepository::class)->getById($this->postId, null, false);
+        } catch (HttpException|ModelNotFoundException $e) {
+            Log::error('PushPostToMastodon: Failed to fetch post', ['postId' => $this->postId, 'error' => $e->getMessage()]);
 
             return;
         }
 
-        if ($postModel->visibility !== Visibility::PUBLIC) {
+        if ($postDto->visibility !== Visibility::PUBLIC) {
             Log::info('PushPostToMastodon: Skipping non-public post', ['postId' => $this->postId]);
 
             return;
         }
 
-        $postDto = app(PostHydrator::class)->modelToDto($postModel);
-        $userDto = app(UserHydrator::class)->modelToDto($postModel->user);
+        $followersCollectionUrl = route('ap.followers', ['username' => $postDto->user->username]);
 
-        $followersCollectionUrl = route('ap.followers', ['username' => $postModel->user->username]);
-
-        $followers = ActivityPubFollower::whereFollowedUserId($postModel->user->id)->get();
+        $followers = ActivityPubFollower::whereFollowedUserId($postDto->user->id)->get();
 
         if ($followers->isEmpty()) {
-            Log::info('No followers to send activity to for user: '.$postModel->user->username);
+            Log::info('No followers to send activity to for user: '.$postDto->user->username);
 
             return;
         }
 
-        $createActivity = [
-            '@context' => 'https://www.w3.org/ns/activitystreams',
-            'id' => route('ap.post', ['id' => $postModel->id]).'/activity',
-            'type' => 'Create',
-            'actor' => route('ap.actor', ['username' => $postModel->user->username]),
-            'published' => $postModel->created_at->toISOString(),
-            'to' => ['https://www.w3.org/ns/activitystreams#Public'],
-            'cc' => [$followersCollectionUrl],
-            'object' => [
-                'id' => route('ap.post-object', ['id' => $postModel->id]),
-                'type' => 'Note',
-                'published' => $postModel->created_at->toISOString(),
-                'attributedTo' => route('ap.actor', ['username' => $postModel->user->username]),
-                'content' => $postDto->getBody() ?? '',
-                'to' => ['https://www.w3.org/ns/activitystreams#Public'],
-                'cc' => [$followersCollectionUrl],
-            ],
-        ];
+        $actorUrl = route('ap.actor', ['username' => $postDto->user->username]);
+        $note = new NoteHydrator()->hydrate($postDto, $actorUrl, $followersCollectionUrl);
+        $createActivity = new CreateHydrator()->hydrate($actorUrl, $note, true)->toArray();
 
         $usedInboxes = [];
 
@@ -81,7 +66,7 @@ class PushPostToMastodon implements ShouldQueue
                 }
                 $usedInboxes[] = $inbox;
             }
-            $activityPub->deliverActivity($userDto, $follow->follower_actor_id, $inbox, $createActivity);
+            $activityPub->deliverActivity($postDto->user, $follow->follower_actor_id, $inbox, $createActivity);
         }
     }
 }
