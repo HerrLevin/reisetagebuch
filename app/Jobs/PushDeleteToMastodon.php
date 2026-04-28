@@ -2,6 +2,8 @@
 
 namespace App\Jobs;
 
+use App\Dto\ActivityPub\Objects\TombStone;
+use App\Hydrators\ActivityPub\DeleteHydrator;
 use App\Hydrators\UserHydrator;
 use App\Models\ActivityPubFollower;
 use App\Models\User;
@@ -41,18 +43,13 @@ class PushDeleteToMastodon implements ShouldQueue
         }
 
         $postObjectUrl = route('ap.post-object', ['id' => $this->postId]);
-
-        $deleteActivity = [
-            '@context' => 'https://www.w3.org/ns/activitystreams',
-            'id' => route('ap.post', ['id' => $this->postId]).'/delete',
-            'type' => 'Delete',
-            'actor' => route('ap.actor', ['username' => $this->username]),
-            'to' => ['https://www.w3.org/ns/activitystreams#Public'],
-            'object' => [
-                'id' => $postObjectUrl,
-                'type' => 'Tombstone',
-            ],
-        ];
+        $deleteActivity = new DeleteHydrator()
+            ->hydrate(
+                route('ap.actor', ['username' => $this->username]),
+                new TombStone($postObjectUrl),
+                true
+            )
+            ->toArray();
 
         $usedInboxes = [];
 
