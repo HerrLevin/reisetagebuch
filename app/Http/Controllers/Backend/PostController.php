@@ -27,6 +27,7 @@ use App\Jobs\CalculateStatsForTransportPost;
 use App\Jobs\PrefetchJob;
 use App\Jobs\PushDeleteToMastodon;
 use App\Jobs\PushPostToMastodon;
+use App\Jobs\PushUpdateToMastodon;
 use App\Jobs\TraewellingChangeExitJob;
 use App\Jobs\TraewellingCrossCheckInJob;
 use App\Jobs\TraewellingDeletePostJob;
@@ -81,6 +82,11 @@ class PostController extends Controller
     private function dispatchPost(BasePost|LocationPost|TransportPost $post): void
     {
         PushPostToMastodon::dispatch($post->id);
+    }
+
+    private function dispatchUpdate(BasePost|LocationPost|TransportPost $post): void
+    {
+        PushUpdateToMastodon::dispatch($post->id);
     }
 
     public function storeLocation(LocationBasePostRequest $request): BasePost|LocationPost|TransportPost
@@ -230,6 +236,8 @@ class PostController extends Controller
             );
         }
 
+        $this->dispatchUpdate($post);
+
         return $post;
     }
 
@@ -288,6 +296,7 @@ class PostController extends Controller
         $this->calculateTransportStatsController->calculateStatsForPost($post->id);
 
         TraewellingEditPostJob::dispatch($post);
+        $this->dispatchUpdate($post);
 
         return $post;
     }
@@ -321,6 +330,7 @@ class PostController extends Controller
         }
 
         TraewellingChangeExitJob::dispatch($post);
+        $this->dispatchUpdate($post);
         $this->calculateTransportStatsController->calculateStatsForPost($post->id);
 
         return $post;
@@ -393,6 +403,7 @@ class PostController extends Controller
         $internalPost = $this->postRepository->internalGetById($postId);
         $this->postRepository->updateTransportGeometry($internalPost->transportPost, $geometry);
         $this->calculateTransportStatsController->calculateStatsForPost($post->id);
+        $this->dispatchUpdate($post);
 
         return $this->postRepository->getById($postId, $user);
     }
@@ -426,6 +437,7 @@ class PostController extends Controller
         $this->postRepository->updateTransportGeometry($internalPost->transportPost, null);
 
         $this->calculateTransportStatsController->calculateStatsForPost($post->id);
+        $this->dispatchUpdate($post);
 
         return $this->postRepository->getById($postId, $user);
     }

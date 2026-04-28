@@ -18,6 +18,8 @@ class Note extends BaseObject
 
     public string $published;
 
+    public string $updated;
+
     public function __construct()
     {
         $this->type = 'Note';

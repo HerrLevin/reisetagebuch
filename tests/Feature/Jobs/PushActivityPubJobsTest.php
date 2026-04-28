@@ -5,6 +5,7 @@ namespace Tests\Unit\Jobs;
 use App\Enums\Visibility;
 use App\Jobs\PushDeleteToMastodon;
 use App\Jobs\PushPostToMastodon;
+use App\Jobs\PushUpdateToMastodon;
 use App\Models\ActivityPubFollower;
 use App\Models\Post;
 use App\Models\User;
@@ -533,6 +534,271 @@ class PushActivityPubJobsTest extends TestCase
             $signature = $request->header('Signature')[0] ?? '';
 
             return str_contains($signature, "keyId=\"{$expectedKeyId}\"");
+        });
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    // PushUpdateToMastodon – Retry-Konfiguration
+    // ──────────────────────────────────────────────────────────────────────────
+
+    public function test_push_update_job_has_correct_retry_configuration(): void
+    {
+        $job = new PushUpdateToMastodon('some-id');
+
+        $this->assertSame(3, $job->tries);
+        $this->assertSame([30, 120, 600], $job->backoff);
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    // PushUpdateToMastodon – Bedingungen zum Abbruch ohne Zustellung
+    // ──────────────────────────────────────────────────────────────────────────
+
+    public function test_push_update_does_nothing_when_post_not_found(): void
+    {
+        Http::fake();
+
+        $service = $this->createMock(ActivityPubService::class);
+        $service->expects($this->never())->method('deliverActivity');
+
+        (new PushUpdateToMastodon('00000000-0000-7000-8000-000000000000'))->handle($service);
+
+        Http::assertNothingSent();
+    }
+
+    public function test_push_update_skips_private_post(): void
+    {
+        $user = $this->createUserWithKeys();
+        $post = Post::factory()->create([
+            'user_id' => $user->id,
+            'visibility' => Visibility::PRIVATE,
+        ]);
+
+        $service = $this->createMock(ActivityPubService::class);
+        $service->expects($this->never())->method('deliverActivity');
+
+        (new PushUpdateToMastodon($post->id))->handle($service);
+    }
+
+    public function test_push_update_skips_unlisted_post(): void
+    {
+        $user = $this->createUserWithKeys();
+        $post = Post::factory()->create([
+            'user_id' => $user->id,
+            'visibility' => Visibility::UNLISTED,
+        ]);
+
+        $service = $this->createMock(ActivityPubService::class);
+        $service->expects($this->never())->method('deliverActivity');
+
+        (new PushUpdateToMastodon($post->id))->handle($service);
+    }
+
+    public function test_push_update_skips_only_authenticated_post(): void
+    {
+        $user = $this->createUserWithKeys();
+        $post = Post::factory()->create([
+            'user_id' => $user->id,
+            'visibility' => Visibility::ONLY_AUTHENTICATED,
+        ]);
+
+        $service = $this->createMock(ActivityPubService::class);
+        $service->expects($this->never())->method('deliverActivity');
+
+        (new PushUpdateToMastodon($post->id))->handle($service);
+    }
+
+    public function test_push_update_skips_when_user_has_no_followers(): void
+    {
+        $user = $this->createUserWithKeys();
+        $post = Post::factory()->create([
+            'user_id' => $user->id,
+            'visibility' => Visibility::PUBLIC,
+        ]);
+
+        $service = $this->createMock(ActivityPubService::class);
+        $service->expects($this->never())->method('deliverActivity');
+
+        (new PushUpdateToMastodon($post->id))->handle($service);
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    // PushUpdateToMastodon – Zustellung
+    // ──────────────────────────────────────────────────────────────────────────
+
+    public function test_push_update_delivers_update_activity_to_each_follower_inbox(): void
+    {
+        $user = $this->createUserWithKeys(['username' => 'alice']);
+        $post = Post::factory()->create([
+            'user_id' => $user->id,
+            'visibility' => Visibility::PUBLIC,
+        ]);
+
+        $this->createFollower($user, 'https://server-a.example/users/bob', 'https://server-a.example/users/bob/inbox');
+        $this->createFollower($user, 'https://server-b.example/users/carol', 'https://server-b.example/users/carol/inbox');
+
+        $service = $this->createMock(ActivityPubService::class);
+        $service->expects($this->exactly(2))->method('deliverActivity');
+
+        (new PushUpdateToMastodon($post->id))->handle($service);
+    }
+
+    public function test_push_update_deduplicates_shared_inbox(): void
+    {
+        $user = $this->createUserWithKeys(['username' => 'alice']);
+        $post = Post::factory()->create([
+            'user_id' => $user->id,
+            'visibility' => Visibility::PUBLIC,
+        ]);
+
+        $sharedInbox = 'https://mastodon.example/inbox';
+        $this->createFollower($user, 'https://mastodon.example/users/bob', 'https://mastodon.example/users/bob/inbox', $sharedInbox);
+        $this->createFollower($user, 'https://mastodon.example/users/carol', 'https://mastodon.example/users/carol/inbox', $sharedInbox);
+
+        $service = $this->createMock(ActivityPubService::class);
+        $service->expects($this->once())->method('deliverActivity');
+
+        (new PushUpdateToMastodon($post->id))->handle($service);
+    }
+
+    public function test_push_update_prefers_shared_inbox_over_personal_inbox(): void
+    {
+        $user = $this->createUserWithKeys(['username' => 'alice']);
+        $post = Post::factory()->create([
+            'user_id' => $user->id,
+            'visibility' => Visibility::PUBLIC,
+        ]);
+
+        $sharedInbox = 'https://mastodon.example/inbox';
+        $this->createFollower($user, 'https://mastodon.example/users/bob', 'https://mastodon.example/users/bob/inbox', $sharedInbox);
+
+        $capturedInbox = null;
+        $service = $this->createMock(ActivityPubService::class);
+        $service->expects($this->once())
+            ->method('deliverActivity')
+            ->willReturnCallback(function ($userDto, $actorId, $inbox) use (&$capturedInbox) {
+                $capturedInbox = $inbox;
+            });
+
+        (new PushUpdateToMastodon($post->id))->handle($service);
+
+        $this->assertSame($sharedInbox, $capturedInbox);
+    }
+
+    public function test_push_update_falls_back_to_personal_inbox_when_no_shared_inbox(): void
+    {
+        $user = $this->createUserWithKeys(['username' => 'alice']);
+        $post = Post::factory()->create(['user_id' => $user->id, 'visibility' => Visibility::PUBLIC]);
+        $personalInbox = 'https://remote.example/users/bob/inbox';
+
+        $this->createFollower($user, 'https://remote.example/users/bob', $personalInbox, null);
+
+        $capturedInbox = null;
+        $service = $this->createMock(ActivityPubService::class);
+        $service->expects($this->once())
+            ->method('deliverActivity')
+            ->willReturnCallback(function ($userDto, $actorId, $inbox) use (&$capturedInbox) {
+                $capturedInbox = $inbox;
+            });
+
+        (new PushUpdateToMastodon($post->id))->handle($service);
+
+        $this->assertSame($personalInbox, $capturedInbox);
+    }
+
+    public function test_push_update_activity_has_correct_structure(): void
+    {
+        $user = $this->createUserWithKeys(['username' => 'alice']);
+        $post = Post::factory()->create([
+            'user_id' => $user->id,
+            'visibility' => Visibility::PUBLIC,
+            'body' => 'Updated post content!',
+        ]);
+
+        $this->createFollower($user, 'https://remote.example/users/bob', 'https://remote.example/users/bob/inbox');
+
+        $capturedActivity = null;
+        $service = $this->createMock(ActivityPubService::class);
+        $service->expects($this->once())
+            ->method('deliverActivity')
+            ->willReturnCallback(function ($userDto, $actorId, $inbox, $activity) use (&$capturedActivity) {
+                $capturedActivity = $activity;
+            });
+
+        (new PushUpdateToMastodon($post->id))->handle($service);
+
+        $this->assertNotNull($capturedActivity);
+        $this->assertSame('Update', $capturedActivity['type']);
+        $this->assertSame('Note', $capturedActivity['object']['type']);
+        $this->assertStringContainsString('alice', $capturedActivity['actor']);
+        $this->assertStringContainsString($post->id, $capturedActivity['id']);
+        $this->assertStringContainsString($post->id, $capturedActivity['object']['id']);
+        $this->assertContains('https://www.w3.org/ns/activitystreams#Public', $capturedActivity['to']);
+        $this->assertArrayHasKey('@context', $capturedActivity);
+        $this->assertArrayHasKey('updated', $capturedActivity['object']);
+    }
+
+    public function test_push_update_activity_actor_matches_post_author(): void
+    {
+        $user = $this->createUserWithKeys(['username' => 'alice']);
+        $post = Post::factory()->create(['user_id' => $user->id, 'visibility' => Visibility::PUBLIC]);
+
+        $this->createFollower($user, 'https://remote.example/users/bob', 'https://remote.example/users/bob/inbox');
+
+        $capturedActivity = null;
+        $service = $this->createMock(ActivityPubService::class);
+        $service->method('deliverActivity')
+            ->willReturnCallback(function ($u, $a, $i, $activity) use (&$capturedActivity) {
+                $capturedActivity = $activity;
+            });
+
+        (new PushUpdateToMastodon($post->id))->handle($service);
+
+        $expectedActorUrl = route('ap.actor', ['username' => 'alice']);
+        $this->assertSame($expectedActorUrl, $capturedActivity['actor']);
+        $this->assertSame($expectedActorUrl, $capturedActivity['object']['attributedTo']);
+    }
+
+    public function test_push_update_does_not_mix_up_followers_of_different_users(): void
+    {
+        $alice = $this->createUserWithKeys(['username' => 'alice']);
+        $bob = $this->createUserWithKeys(['username' => 'bob']);
+        $alicePost = Post::factory()->create(['user_id' => $alice->id, 'visibility' => Visibility::PUBLIC]);
+
+        // Nur Bob hat Follower, Alice nicht
+        $this->createFollower($bob, 'https://remote.example/users/carol', 'https://remote.example/users/carol/inbox');
+
+        $service = $this->createMock(ActivityPubService::class);
+        $service->expects($this->never())->method('deliverActivity');
+
+        (new PushUpdateToMastodon($alicePost->id))->handle($service);
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    // PushUpdateToMastodon – HTTP-Integration
+    // ──────────────────────────────────────────────────────────────────────────
+
+    public function test_deliver_activity_sends_update_activity_body_to_inbox(): void
+    {
+        $user = $this->createUserWithKeys(['username' => 'alice']);
+        $post = Post::factory()->create([
+            'user_id' => $user->id,
+            'visibility' => Visibility::PUBLIC,
+            'body' => 'Updated post body',
+        ]);
+
+        $inboxUrl = 'https://remote.example/users/bob/inbox';
+        $this->createFollower($user, 'https://remote.example/users/bob', $inboxUrl);
+
+        Http::fake(['*' => Http::response('', 202)]);
+
+        (new PushUpdateToMastodon($post->id))->handle(app(ActivityPubService::class));
+
+        Http::assertSent(function ($request) use ($inboxUrl) {
+            $body = json_decode($request->body(), true);
+
+            return $request->url() === $inboxUrl
+                && isset($body['type']) && $body['type'] === 'Update'
+                && isset($body['object']['type']) && $body['object']['type'] === 'Note';
         });
     }
 }
