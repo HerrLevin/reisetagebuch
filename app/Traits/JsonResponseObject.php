@@ -22,6 +22,10 @@ trait JsonResponseObject
             }
         }
 
+        if (method_exists($this, 'prependRaw')) {
+            return array_merge($this->prependRaw(), $array);
+        }
+
         return $array;
     }
 }

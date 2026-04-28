@@ -402,12 +402,14 @@ class PostRepository
         TransportPostModel::where('post_id', $transportPost->post_id)->update(['user_geometry' => $geometry]);
     }
 
-    public function getById(string $postId, ?User $visitingUser = null): BasePost|LocationPost|TransportPost
+    public function getById(string $postId, ?User $visitingUser = null, bool $withVisitingUser = true): BasePost|LocationPost|TransportPost
     {
         $post = $this->basePostQuery()
-            ->when($visitingUser, function ($query) use ($visitingUser) {
-                $query->withExists(['likes as liked_by_user' => function ($q) use ($visitingUser) {
-                    $q->where('user_id', $visitingUser->id);
+            ->when($visitingUser, function ($query) use ($visitingUser, $withVisitingUser) {
+                $query->withExists(['likes as liked_by_user' => function ($q) use ($visitingUser, $withVisitingUser) {
+                    if ($withVisitingUser) {
+                        $q->where('user_id', $visitingUser->id);
+                    }
                 }]);
             })
             ->where('id', $postId)

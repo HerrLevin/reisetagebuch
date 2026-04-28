@@ -26,7 +26,9 @@ class UserHydrator
         $dto->name = $user->name;
         $dto->username = $user->username;
         $dto->avatar = $user->profile?->avatar ? $this->urlGenerator->to('/files/'.$user->profile?->avatar) : null;
+        $dto->avatarMimeType = $user->profile?->avatar_mime_type;
         $dto->header = $user->profile?->header ? $this->urlGenerator->to('/files/'.$user->profile?->header) : null;
+        $dto->headerMimeType = $user->profile?->header_mime_type;
         $dto->bio = $user->profile?->bio;
         $dto->website = $user->profile?->website;
         $dto->isFollowed = $user->is_followed;

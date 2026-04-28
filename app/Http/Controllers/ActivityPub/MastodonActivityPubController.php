@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers\ActivityPub;
 
-use ActivityPhp\Type;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PostTypes\BasePost;
 use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
 use App\Http\Resources\UserDto;
+use App\Hydrators\ActivityPub\AcceptHydrator;
+use App\Hydrators\ActivityPub\CreateHydrator;
+use App\Hydrators\ActivityPub\NoteHydrator;
+use App\Hydrators\ActivityPub\OrderedCollectionHydrator;
+use App\Hydrators\ActivityPub\OrderedCollectionPageHydrator;
+use App\Hydrators\ActivityPub\PersonHydrator;
 use App\Hydrators\PostHydrator;
 use App\Models\ActivityPubFollower;
 use App\Models\ActivityPubLike;
@@ -46,66 +51,11 @@ class MastodonActivityPubController extends Controller
         }
         $user = $this->userRepository->getUserByUsername($username);
 
-        $data = [
-            'type' => 'Person',
-            'id' => route('ap.actor', ['username' => $user->username]),
-            'following' => route('ap.following', ['username' => $user->username]),
-            'followers' => route('ap.followers', ['username' => $user->username]),
-            'inbox' => route('ap.inbox', ['username' => $user->username]),
-            'outbox' => route('ap.outbox', ['username' => $user->username]),
-            'preferredUsername' => $user->username,
-            'name' => $user->name,
-            'summary' => $user->bio ?? '',
-            'url' => url('/@'.$user->username),
-            'manuallyApprovesFollowers' => $user->requiresFollowRequest,
-            'discoverable' => true,
-            'published' => $user->createdAt,
-            'endpoints' => [
-                'sharedInbox' => route('ap.shared-inbox'),
-            ],
-            'publicKey' => [
-                'id' => route('ap.actor', ['username' => $user->username]).'#main-key',
-                'owner' => route('ap.actor', ['username' => $user->username]),
-                'publicKeyPem' => $user->publicKeyPem,
-            ],
-        ];
+        $hydrator = new PersonHydrator;
+        $person = $hydrator->hydrate($user)->toArray();
+        Log::info('actor response', $person);
 
-        if ($user->avatar) {
-            $data['icon'] = [
-                'type' => 'Image',
-                'mediaType' => 'image/jpeg',
-                'url' => url($user->avatar),
-            ];
-        }
-
-        $data['@context'] = [
-            'https://www.w3.org/ns/activitystreams',
-            'https://w3id.org/security/v1',
-            [
-                'manuallyApprovesFollowers' => 'as:manuallyApprovesFollowers',
-                'toot' => 'http://joinmastodon.org/ns#',
-                'schema' => 'http://schema.org#',
-                'PropertyValue' => 'schema:PropertyValue',
-                'value' => 'schema:value',
-                'discoverable' => 'toot:discoverable',
-                'indexable' => 'toot:indexable',
-                'attributionDomains' => [
-                    '@id' => 'toot:attributionDomains',
-                    '@type' => '@id',
-                ],
-                'focalPoint' => [
-                    '@container' => '@list',
-                    '@id' => 'toot:focalPoint',
-                ],
-                'alsoKnownAs' => [
-                    '@id' => 'toot:alsoKnownAs',
-                    '@type' => '@id',
-                ],
-            ],
-        ];
-        Log::info('actor response', $data);
-
-        return response()->json(data: $data, options: JSON_UNESCAPED_SLASHES)->header('Content-Type', 'application/activity+json');
+        return response()->json(data: $person, options: JSON_UNESCAPED_SLASHES)->header('Content-Type', 'application/activity+json');
     }
 
     public function outbox(Request $request, string $username): JsonResponse
@@ -119,13 +69,11 @@ class MastodonActivityPubController extends Controller
         $posts = $this->postRepository->getPostsForUserId($user->id);
 
         if (! $request->has('page') && ! $request->has('cursor')) {
-            $collection = [
-                '@context' => 'https://www.w3.org/ns/activitystreams',
-                'id' => $outboxUrl,
-                'type' => 'OrderedCollection',
-                'totalItems' => $user->statistics->posts_count,
-                'first' => $outboxUrl.'?page=true',
-            ];
+            $collection = new OrderedCollectionHydrator()->hydrate(
+                id: $outboxUrl,
+                totalItems: $user->statistics->posts_count,
+                first: $outboxUrl.'?page=true',
+            )->toArray();
 
             return response()->json(data: $collection, options: JSON_UNESCAPED_SLASHES)
                 ->header('Content-Type', 'application/activity+json');
@@ -137,39 +85,20 @@ class MastodonActivityPubController extends Controller
         $items = [];
         /** @var BasePost|TransportPost|LocationPost $post */
         foreach ($posts->items as $post) {
-            $items[] = [
-                'id' => route('ap.post', ['id' => $post->id]).'/activity',
-                'type' => 'Create',
-                'actor' => $actorUrl,
-                'published' => $post->createdAt,
-                'to' => ['https://www.w3.org/ns/activitystreams#Public'],
-                'cc' => [$followersCollectionUrl],
-                'object' => [
-                    'id' => route('ap.post-object', ['id' => $post->id]),
-                    'type' => 'Note',
-                    'published' => $post->publishedAt,
-                    'attributedTo' => $actorUrl,
-                    'content' => $post->getBody() ?? '',
-                    'to' => ['https://www.w3.org/ns/activitystreams#Public'],
-                    'cc' => [$followersCollectionUrl],
-                ],
-            ];
+            $note = new NoteHydrator()->hydrate($post, $actorUrl, $followersCollectionUrl);
+            $items[] = new CreateHydrator()->hydrate(
+                $actorUrl,
+                $note
+            );
         }
 
-        $page = [
-            '@context' => 'https://www.w3.org/ns/activitystreams',
-            'id' => $outboxUrl.'?page=true',
-            'type' => 'OrderedCollectionPage',
-            'partOf' => $outboxUrl,
-            'orderedItems' => $items,
-        ];
-
-        if ($posts->nextCursor) {
-            $page['next'] = url($outboxUrl.'?cursor='.$posts->nextCursor);
-        }
-        if ($posts->previousCursor) {
-            $page['prev'] = url($outboxUrl.'?cursor='.$posts->previousCursor);
-        }
+        $page = new OrderedCollectionPageHydrator()->hydrate(
+            id: $outboxUrl.'?page=true',
+            partOf: $outboxUrl,
+            items: $items,
+            next: $posts->nextCursor ? url($outboxUrl.'?cursor='.$posts->nextCursor) : null,
+            prev: $posts->previousCursor ? url($outboxUrl.'?cursor='.$posts->previousCursor) : null,
+        )->toArray();
 
         return response()->json(data: $page, options: JSON_UNESCAPED_SLASHES)
             ->header('Content-Type', 'application/activity+json');
@@ -456,14 +385,12 @@ class MastodonActivityPubController extends Controller
     {
         $post = $this->postRepository->getById($id);
 
-        $note = Type::create('Note', [
-            'id' => route('ap.post-object', ['id' => $id]),
-            'published' => $post->publishedAt,
-            'attributedTo' => route('ap.actor', ['username' => $post->user->username]),
-            'content' => $post->getBody() ?? '',
-            'to' => ['https://www.w3.org/ns/activitystreams#Public'],
-        ]);
-        $note->set('@context', 'https://www.w3.org/ns/activitystreams');
+        $note = new NoteHydrator()->hydrate(
+            post: $post,
+            actorUrl: route('ap.actor', ['username' => $post->user->username]),
+            followersUrl: route('ap.followers', ['username' => $post->user->username]),
+            context: true
+        );
 
         return response()->json(data: $note->toArray(), options: JSON_UNESCAPED_SLASHES)->header('Content-Type', 'application/activity+json');
     }
@@ -477,25 +404,10 @@ class MastodonActivityPubController extends Controller
         return $this->postData($request, $id);
     }
 
-    private function buildAcceptActivity(UserDto $user, string $acceptId, array $originalActivity): array
-    {
-        // Strip @context from the nested activity — it belongs only at the top level
-        $object = $originalActivity;
-        unset($object['@context']);
-
-        return [
-            '@context' => 'https://www.w3.org/ns/activitystreams',
-            'id' => $acceptId,
-            'type' => 'Accept',
-            'actor' => route('ap.actor', ['username' => $user->username]),
-            'object' => $object,
-        ];
-    }
-
     private function sendAccept(UserDto $user, array $followActivity, string $inboxUrl): void
     {
         $acceptId = route('ap.actor', ['username' => $user->username]).'#accepts/'.uniqid();
-        $accept = $this->buildAcceptActivity($user, $acceptId, $followActivity);
+        $accept = new AcceptHydrator()->hydrate($acceptId, $user, $followActivity)->toArray();
 
         $this->activityPubService->deliverActivity($user, $followActivity['actor'], $inboxUrl, $accept);
     }
@@ -503,7 +415,7 @@ class MastodonActivityPubController extends Controller
     private function sendAcceptToInbox(UserDto $user, array $activity, string $inboxUrl): void
     {
         $acceptId = route('ap.actor', ['username' => $user->username]).'#accepts/'.uniqid();
-        $accept = $this->buildAcceptActivity($user, $acceptId, $activity);
+        $accept = new AcceptHydrator()->hydrate($acceptId, $user, $activity)->toArray();
 
         $this->activityPubService->deliverActivity($user, $activity['actor'], $inboxUrl, $accept);
     }
@@ -517,12 +429,10 @@ class MastodonActivityPubController extends Controller
 
         $count = ActivityPubFollower::where('followed_user_id', $user->id)->count();
 
-        $collection = [
-            '@context' => 'https://www.w3.org/ns/activitystreams',
-            'id' => route('ap.followers', ['username' => $user->username]),
-            'type' => 'OrderedCollection',
-            'totalItems' => $count,
-        ];
+        $collection = new OrderedCollectionHydrator()->hydrate(
+            id: route('ap.followers', ['username' => $user->username]),
+            totalItems: $count,
+        )->toArray();
 
         return response()->json(data: $collection, options: JSON_UNESCAPED_SLASHES)
             ->header('Content-Type', 'application/activity+json');
@@ -535,12 +445,10 @@ class MastodonActivityPubController extends Controller
             return response()->json(['error' => 'User not found'], 404);
         }
 
-        $collection = [
-            '@context' => 'https://www.w3.org/ns/activitystreams',
-            'id' => route('ap.following', ['username' => $user->username]),
-            'type' => 'OrderedCollection',
-            'totalItems' => 0,
-        ];
+        $collection = new OrderedCollectionHydrator()->hydrate(
+            id: route('ap.following', ['username' => $user->username]),
+            totalItems: 0
+        )->toArray();
 
         return response()->json(data: $collection, options: JSON_UNESCAPED_SLASHES)
             ->header('Content-Type', 'application/activity+json');

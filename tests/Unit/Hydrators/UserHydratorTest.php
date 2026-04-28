@@ -41,6 +41,7 @@ class UserHydratorTest extends TestCase
                 'created_at' => new Carbon('2023-01-01'),
                 'is_followed' => true,
                 'is_follow_requested' => false,
+                'public_key' => 'foobar',
                 default => null,
             };
         });
@@ -80,6 +81,7 @@ class UserHydratorTest extends TestCase
                 'created_at' => new Carbon('2023-01-01'),
                 'is_followed' => true,
                 'is_follow_requested' => false,
+                'public_key' => 'foobar',
                 default => null,
             };
         });
