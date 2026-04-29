@@ -103,8 +103,18 @@ class BasePost
             })->toArray() ?? [];
     }
 
-    public function getBody(): ?string
+    public function getHtmlBody(): ?string
     {
         return $this->body;
+    }
+
+    public function getSummary(): ?string
+    {
+        return empty($this->post->body) ? null : $this->formattedBody();
+    }
+
+    protected function formattedBody(): string
+    {
+        return $this->body ? sprintf('"%s" ', $this->body) : '';
     }
 }

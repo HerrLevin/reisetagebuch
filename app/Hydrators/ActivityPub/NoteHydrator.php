@@ -13,7 +13,7 @@ class NoteHydrator
         $note->id = route('ap.post-object', ['id' => $post->id]);
         $note->published = $post->publishedAt;
         $note->attributedTo = $actorUrl;
-        $note->content = $post->getBody() ?? '';
+        $note->content = $post->getHtmlBody() ?? '';
         $note->to = ['https://www.w3.org/ns/activitystreams#Public'];
         $note->cc = [$followersUrl];
 
