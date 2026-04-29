@@ -342,8 +342,8 @@ class MastodonActivityPubController extends Controller
                         iconUrl: $actorProfile['iconUrl'] ?? null,
                         profileUrl: $actorProfile['url'] ?? null,
                         postId: $postId,
-                        postBody: $postDto->body ? strip_tags(substr($postDto->body, 0, 50)) : null,
-                        postSummary: $postDto->getBody(),
+                        postBody: $postDto->body ? substr($postDto->body, 0, 50) : null,
+                        postSummary: $postDto->getSummary(),
                     )
                 );
             } catch (\Exception $e) {
