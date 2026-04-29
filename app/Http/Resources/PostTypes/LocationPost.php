@@ -46,14 +46,37 @@ class LocationPost extends BasePost
         $this->location = new LocationDto($post->locationPost->location);
         $this->travelReason = TravelReason::tryFrom($post->metaInfos->where('key', MetaInfoKey::TRAVEL_REASON)->first()?->value);
         $this->visitedAt = $post->locationPost->visited_at?->toIso8601String();
+        $this->updatedAt = $this->getUpdatedAt($post)?->toIso8601String();
     }
 
-    public function getBody(): ?string
+    private function getUpdatedAt(Post $post)
     {
-        $parentBody = parent::getBody();
+        if ($post->locationPost->updated_at === null) {
+            return $post->updated_at;
+        }
+
+        if ($post->locationPost->updated_at->gte($post->updated_at)) {
+            return $post->locationPost->updated_at;
+        }
+
+        return $post->updated_at;
+    }
+
+    public function getHtmlBody(): ?string
+    {
+        $parentBody = parent::getHtmlBody();
         $name = $this->location->name;
         $body = "<p>📍<strong>$name</strong></p>";
 
         return $parentBody ? nl2br(e($parentBody)).$body : $body;
+    }
+
+    public function getSummary(): ?string
+    {
+        return sprintf(
+            '%s@ %s',
+            $this->formattedBody(),
+            $this->location->name
+        );
     }
 }
