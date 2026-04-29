@@ -100,15 +100,29 @@ class TransportPost extends BasePost
         $this->travelReason = TravelReason::tryFrom($post->metaInfos->where('key', MetaInfoKey::TRAVEL_REASON)->first()?->value);
         $this->distance = $post->transportPost->distance;
         $this->duration = $post->transportPost->duration;
+        $this->updatedAt = $this->getUpdatedAt($post)?->toIso8601String();
 
         if ($withGeometry && $post->transportPost->user_geometry !== null) {
             $this->userGeometry = (new GeojsonGenerator)->generate($post->transportPost->user_geometry);
         }
     }
 
-    public function getBody(): ?string
+    private function getUpdatedAt(Post $post)
     {
-        $parentBody = parent::getBody();
+        if ($post->transportPost->updated_at === null) {
+            return $post->updated_at;
+        }
+
+        if ($post->transportPost->updated_at->gte($post->updated_at)) {
+            return $post->transportPost->updated_at;
+        }
+
+        return $post->updated_at;
+    }
+
+    public function getHtmlBody(): ?string
+    {
+        $parentBody = parent::getHtmlBody();
         $emoji = $this->trip->mode?->getEmoji();
         $line = $this->trip->lineName;
         $origin = $this->originStop->name;
@@ -118,5 +132,16 @@ class TransportPost extends BasePost
         $body = "<p>$emoji<strong>$line</strong> · $origin → $destination<br>🕐 $duration min · $distance km</p>";
 
         return $parentBody ? nl2br(e($parentBody)).$body : $body;
+    }
+
+    public function getSummary(): ?string
+    {
+        return sprintf(
+            '%s@ %s, %s ➜ %s',
+            $this->formattedBody(),
+            $this->trip->displayName ?? $this->trip->tripShortName ?? $this->trip->lineName ?? $this->trip->routeLongName,
+            $this->originStop->name,
+            $this->destinationStop->name
+        );
     }
 }
