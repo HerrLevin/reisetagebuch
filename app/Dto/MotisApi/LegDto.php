@@ -13,7 +13,7 @@ use OpenApi\Attributes as OA;
     description: 'Data Transfer Object for a Leg of a Trip in the Motis API',
     required: ['mode', 'from', 'to', 'duration', 'startTime', 'endTime', 'scheduledStartTime',
         'scheduledEndTime', 'realTime', 'headSign', 'agencyName', 'agencyId', 'tripId', 'routeShortName',
-        'routeLongName', 'tripShortName', 'displayName', 'routeColor', 'routeTextColor', 'source', 'intermediateStops'],
+        'routeLongName', 'tripShortName', 'displayName', 'routeColor', 'routeTextColor', 'source', 'intermediateStops', 'continuesAs'],
     type: 'object'
 )]
 class LegDto
@@ -185,6 +185,14 @@ class LegDto
      */
     public array $intermediateStops;
 
+    #[OA\Property(
+        property: 'continuesAs',
+        description: 'The trip id of the next leg if this leg continues as another leg without a transfer, if available',
+        type: 'string',
+        nullable: true
+    )]
+    public ?string $continuesAs = null;
+
     public function setRouteColor(?string $routeColor): LegDto
     {
         $this->routeColor = $routeColor;
@@ -328,6 +336,13 @@ class LegDto
     public function setDisplayName(?string $displayName): LegDto
     {
         $this->displayName = $displayName;
+
+        return $this;
+    }
+
+    public function setContinuesAs(?string $continuesAs): LegDto
+    {
+        $this->continuesAs = $continuesAs;
 
         return $this;
     }

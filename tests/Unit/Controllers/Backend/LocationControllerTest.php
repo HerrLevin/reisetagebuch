@@ -229,7 +229,7 @@ class LocationControllerTest extends TestCase
             ->with($tripId)
             ->willReturn($trip);
 
-        $result = $this->controller->stopovers($tripId, $startId, $startTime);
+        $result = $this->controller->stopovers($tripId);
         $this->assertEquals($trip, $result);
 
         Queue::assertPushed(RerouteStops::class);

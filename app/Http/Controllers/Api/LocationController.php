@@ -287,8 +287,6 @@ class LocationController extends Controller
     {
         $trip = $this->locationController->stopovers(
             tripId: $request->tripId,
-            startId: $request->startId,
-            startTime: $request->startTime
         );
 
         return new StopoversResponseDto(

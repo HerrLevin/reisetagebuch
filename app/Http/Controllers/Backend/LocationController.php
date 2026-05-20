@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backend;
 use App\Dto\DeparturesDto;
 use App\Dto\LocationHistoryDto;
 use App\Dto\MotisApi\GeocodeResponseEntry;
+use App\Dto\MotisApi\LegDto;
 use App\Dto\MotisApi\LocationType;
 use App\Dto\MotisApi\StopDto;
 use App\Dto\MotisApi\StopPlaceDto;
@@ -22,6 +23,7 @@ use App\Jobs\PrefetchJob;
 use App\Jobs\RerouteStops;
 use App\Models\RequestLocation;
 use App\Models\TimestampedUserWaypoint;
+use App\Models\TransportTrip;
 use App\Models\TransportTripStop;
 use App\Repositories\LocationRepository;
 use App\Repositories\TransportTripRepository;
@@ -370,12 +372,12 @@ class LocationController extends Controller
         }
     }
 
-    public function stopovers(string $tripId, string $startId, string $startTime): ?TripDto
+    public function stopovers(string $tripId): ?TripDto
     {
         $trip = $this->transportTripRepository->getTripByIdentifier(
             $tripId,
             null,
-            ['stops', 'stops.location.identifiers']
+            ['stops', 'stops.location.identifiers', 'continuesAs']
         );
 
         $hydrator = new DbTripHydrator;
@@ -384,24 +386,58 @@ class LocationController extends Controller
         }
 
         $dto = $this->transitousRequestService->getStopTimes($tripId);
+        if (! $dto) {
+            return null;
+        }
 
-        // create a database trip
+        $nextTrip = null;
+        foreach (array_reverse($dto->legs) as $leg) {
+            [$nextTrip, $stopModels] = $this->createTrip($leg, $nextTrip);
+
+            RerouteStops::dispatch($dto, $stopModels);
+        }
+
+        // return a trip dto with the stopovers
+        return $hydrator->hydrateTrip($nextTrip);
+    }
+
+    /**
+     * @return array{0: TransportTrip, 1: TransportTripStop[]}
+     */
+    private function createTrip(LegDto $legDto, ?TransportTrip $previousTrip): array
+    {
         $trip = $this->transportTripRepository->getOrCreateTrip(
-            $dto->legs[0]->mode,
-            $tripId,
+            $legDto->mode,
+            $legDto->tripId,
             'transitous',
-            $dto->legs[0]->routeShortName,
-            $dto->legs[0]->routeLongName,
-            $dto->legs[0]->tripShortName,
-            $dto->legs[0]->displayName,
-            $dto->legs[0]->routeColor,
-            $dto->legs[0]->routeTextColor
+            $legDto->routeShortName,
+            $legDto->routeLongName,
+            $legDto->tripShortName,
+            $legDto->displayName,
+            $legDto->routeColor,
+            $legDto->routeTextColor,
+            null,
+            $previousTrip?->id ?? null,
         );
 
-        $realtime = $dto->legs[0]->realTime;
+        [$stops, $stopModels] = $this->createStopovers($legDto, $trip);
 
-        // create stopovers
-        $stopovers = [$dto->legs[0]->from, ...$dto->legs[0]->intermediateStops, $dto->legs[0]->to];
+        $legDto->setFrom($stops[0]);
+        $legDto->setTo($stops[count($stops) - 1]);
+        $legDto->setIntermediateStops(
+            array_slice($stops, 1, count($stops) - 2)
+        );
+
+        return [$trip, $stopModels];
+    }
+
+    /**
+     * @return array{0: StopPlaceDto[], 1: TransportTripStop[]}
+     */
+    private function createStopovers(LegDto $legDto, TransportTrip $trip): array
+    {
+        $realTime = $legDto->realTime;
+        $stopovers = [$legDto->from, ...$legDto->intermediateStops, $legDto->to];
         /** @var StopPlaceDto[] $stops */
         $stops = [];
         /** @var TransportTripStop[] $stopModels */
@@ -424,8 +460,8 @@ class LocationController extends Controller
                 $order,
                 $stopover->scheduledArrival,
                 $stopover->scheduledDeparture,
-                $realtime ? $stopover->scheduledArrival?->diffInSeconds($stopover->arrival) : null,
-                $realtime ? $stopover->scheduledDeparture?->diffInSeconds($stopover->departure) : null,
+                $realTime ? $stopover->scheduledArrival?->diffInSeconds($stopover->arrival) : null,
+                $realTime ? $stopover->scheduledDeparture?->diffInSeconds($stopover->departure) : null,
                 $stopover->cancelled ?? false,
                 null // todo: get route segment between stops
             );
@@ -435,15 +471,6 @@ class LocationController extends Controller
             $order++;
         }
 
-        $dto->legs[0]->setFrom($stops[0]);
-        $dto->legs[0]->setTo($stops[count($stops) - 1]);
-        $dto->legs[0]->setIntermediateStops(
-            array_slice($stops, 1, count($stops) - 2)
-        );
-
-        RerouteStops::dispatch($dto, $stopModels);
-
-        // return a trip dto with the stopovers
-        return $dto;
+        return [$stops, $stopModels];
     }
 }

@@ -3352,7 +3352,8 @@
                     "routeColor",
                     "routeTextColor",
                     "source",
-                    "intermediateStops"
+                    "intermediateStops",
+                    "continuesAs"
                 ],
                 "properties": {
                     "mode": {
@@ -3453,6 +3454,11 @@
                         "items": {
                             "$ref": "#/components/schemas/StopPlaceDto"
                         }
+                    },
+                    "continuesAs": {
+                        "description": "The trip id of the next leg if this leg continues as another leg without a transfer, if available",
+                        "type": "string",
+                        "nullable": true
                     }
                 },
                 "type": "object"

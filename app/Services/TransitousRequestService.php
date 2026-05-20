@@ -140,7 +140,14 @@ class TransitousRequestService
 
     public function getStopTimes(string $tripId): ?TripDto
     {
-        $response = Http::withUserAgent($this->versionService->getUserAgent())->get($this->apiUrl.'/v5/trip?tripId='.$tripId);
+        $response = Http::withUserAgent($this->versionService->getUserAgent())
+            ->get(
+                $this->apiUrl.'/v5/trip',
+                [
+                    'tripId' => $tripId,
+                    'joinInterlinedLegs' => true,
+                ]
+            );
 
         if (! $response->ok()) {
             Log::error('Unknown response (getStopTimes)', [
