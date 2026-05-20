@@ -185,6 +185,8 @@ class LegDto
      */
     public array $intermediateStops;
 
+    public ?string $continuesAs = null;
+
     public function setRouteColor(?string $routeColor): LegDto
     {
         $this->routeColor = $routeColor;
@@ -328,6 +330,13 @@ class LegDto
     public function setDisplayName(?string $displayName): LegDto
     {
         $this->displayName = $displayName;
+
+        return $this;
+    }
+
+    public function setContinuesAs(?string $continuesAs): LegDto
+    {
+        $this->continuesAs = $continuesAs;
 
         return $this;
     }

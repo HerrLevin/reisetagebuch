@@ -332,15 +332,19 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property string|null $header
+ * @property string|null $avatar_mime_type
+ * @property string|null $header_mime_type
  * @property-read \App\Models\User $user
  * @method static \Database\Factories\ProfileFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile whereAvatar($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile whereAvatarMimeType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile whereBio($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile whereHeader($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile whereHeaderMimeType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Profile whereUserId($value)
@@ -509,6 +513,8 @@ namespace App\Models{
  * @property string|null $route_color
  * @property string|null $route_text_color
  * @property \Illuminate\Support\Carbon|null $last_refreshed_at
+ * @property string|null $continues_as_trip_id
+ * @property-read TransportTrip|null $continuesAs
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\TransportTripStop> $stops
  * @property-read int|null $stops_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\TransportPost> $transportPosts
@@ -518,6 +524,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereContinuesAsTripId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereDisplayName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereForeignTripId($value)
@@ -585,6 +592,8 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property bool $is_admin
+ * @property string $public_key
+ * @property string $private_key
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Passport\Client> $clients
  * @property-read int|null $clients_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\FollowRequest> $followRequests
@@ -633,6 +642,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereIsAdmin($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User wherePassword($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User wherePrivateKey($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User wherePublicKey($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUsername($value)
