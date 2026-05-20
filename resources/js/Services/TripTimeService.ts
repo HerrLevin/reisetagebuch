@@ -1,6 +1,7 @@
 import { DateTime, DateTimeMaybeValid } from 'luxon';
 import { StopDto, TransportPost } from '../../types/Api.gen';
 
+// delay in minutes
 export function calculateDelay(
     plannedTime: DateTimeMaybeValid | null,
     manualTime: string | null,
@@ -35,6 +36,32 @@ export function getArrivalDelay(post: TransportPost): number | null {
         post?.manualArrivalTime,
         post?.destinationStop.arrivalDelay,
     );
+}
+
+export function getRealDepartureTime(stop: StopDto): DateTimeMaybeValid | null {
+    const scheduledTime = getDepartureTime(stop);
+    const delay = calculateDelay(scheduledTime, null, stop.departureDelay);
+
+    const realTime = scheduledTime?.plus({ minutes: delay ?? 0 });
+
+    if (realTime?.isValid) {
+        return realTime;
+    }
+
+    return null;
+}
+
+export function getRealArrivalTime(stop: StopDto): DateTimeMaybeValid | null {
+    const scheduledTime = getArrivalTime(stop);
+    const delay = calculateDelay(scheduledTime, null, stop.arrivalDelay);
+
+    const realTime = scheduledTime?.plus({ minutes: delay ?? 0 });
+
+    if (realTime?.isValid) {
+        return realTime;
+    }
+
+    return null;
 }
 
 export function getArrivalTime(stop: StopDto): DateTimeMaybeValid | null {

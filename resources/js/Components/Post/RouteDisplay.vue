@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Delay from '@/Components/Post/Partials/Delay.vue';
 import router from '@/router';
-import { getColor, getEmoji } from '@/Services/DepartureTypeService';
+import { getEmoji, getRouteBadgeStyle } from '@/Services/DepartureTypeService';
 import {
     getPostLineName,
     getPostTripNumber,
@@ -10,10 +10,15 @@ import {
     formatArrivalTime,
     formatDepartureTime,
 } from '@/Services/TimeFormattingService';
-import { getArrivalDelay, getDepartureDelay } from '@/Services/TripTimeService';
+import {
+    getArrivalDelay,
+    getDepartureDelay,
+    getRealArrivalTime,
+    getRealDepartureTime,
+} from '@/Services/TripTimeService';
 import { DateTime } from 'luxon';
 import { computed, PropType, ref, watch } from 'vue';
-import { LocationDto, TransportPost, TripDto } from '../../../types/Api.gen';
+import { StopDto, TransportPost } from '../../../types/Api.gen';
 
 const props = defineProps({
     post: {
@@ -56,29 +61,17 @@ function getFormattedArrivalTime(): string | null {
     );
 }
 
-function getRouteTextColor(trip: TripDto) {
-    if (trip.routeTextColor && trip.routeTextColor.length > 2) {
-        return '#' + trip.routeTextColor;
-    }
-
-    return '#FFFFFF';
-}
-
-function getRouteColor(trip: TripDto) {
-    if (trip.routeColor && trip.routeColor.length > 2) {
-        return '#' + trip.routeColor;
-    }
-
-    return getColor(trip.mode);
-}
-
-function selectStation(location: LocationDto) {
+function selectStation(stop: StopDto, arrival: boolean) {
+    const location = stop.location;
     const identifier = location.identifiers.find((id) => id.origin === 'motis');
+    const when =
+        (arrival ? getRealArrivalTime(stop) : getRealDepartureTime(stop)) ??
+        DateTime.now();
     const params = {
         latitude: String(location.latitude),
         longitude: String(location.longitude),
         identifier: identifier?.identifier || '',
-        when: DateTime.now().toISO()!,
+        when: when.toISO()!,
     };
     router.push({
         path: `/posts/transport/departures`,
@@ -93,9 +86,7 @@ function selectStation(location: LocationDto) {
             <div class="text-left">
                 <div
                     class="mb-2 line-clamp-2 cursor-pointer leading-none font-semibold overflow-ellipsis"
-                    @click.prevent="
-                        selectStation(localPost.originStop.location)
-                    "
+                    @click.prevent="selectStation(localPost.originStop, false)"
                 >
                     {{ localPost.originStop.location.name }}
                 </div>
@@ -104,7 +95,7 @@ function selectStation(location: LocationDto) {
                 <div
                     class="mb-2 line-clamp-2 cursor-pointer leading-none font-semibold overflow-ellipsis"
                     @click.prevent="
-                        selectStation(localPost.destinationStop.location)
+                        selectStation(localPost.destinationStop, true)
                     "
                 >
                     {{ localPost.destinationStop.location.name }}
@@ -122,7 +113,7 @@ function selectStation(location: LocationDto) {
                 <div
                     v-show="localPost.trip.lineName"
                     class="badge min-w-[3em] px-[0.5] text-sm font-medium"
-                    :style="`background-color: ${getRouteColor(localPost.trip)}; color: ${getRouteTextColor(localPost.trip)}`"
+                    :style="getRouteBadgeStyle(localPost.trip)"
                 >
                     {{ getPostLineName(localPost) }}
                 </div>
