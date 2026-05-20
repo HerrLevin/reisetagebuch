@@ -4,12 +4,7 @@ import Loading from '@/Components/Loading.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import StopoversListEntry from '@/Pages/NewPostDialog/Partials/StopoversListEntry.vue';
 import router from '@/router';
-import {
-    getEmoji,
-    getRouteBadgeStyle,
-    getRouteColor,
-    getRouteTextColor,
-} from '@/Services/DepartureTypeService';
+import { getEmoji, getRouteBadgeStyle } from '@/Services/DepartureTypeService';
 import { normalizeQueryParam } from '@/Services/QueryParamService';
 import { DateTime } from 'luxon';
 import { onMounted, ref } from 'vue';
