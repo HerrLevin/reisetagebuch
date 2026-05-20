@@ -11,7 +11,10 @@ use App\Http\Controllers\Backend\MapController;
 use App\Hydrators\TripDtoHydrator;
 use App\Jobs\PrefetchJob;
 use App\Jobs\RerouteStops;
+use App\Models\Location;
 use App\Models\RequestLocation;
+use App\Models\TransportTrip;
+use App\Models\TransportTripStop;
 use App\Repositories\LocationRepository;
 use App\Repositories\TransportTripRepository;
 use App\Services\OverpassLocationRequestService;
@@ -212,25 +215,108 @@ class LocationControllerTest extends TestCase
             RerouteStops::class,
         ]);
         $tripId = 'tripId';
-        $startId = 'startId';
-        $startTime = now();
+        $departureTime = now();
+        $arrivalTime = now()->addMinutes(30);
+
         $leg = new LegDto()
             ->setMode('bus')
+            ->setTripId($tripId)
             ->setRouteShortName('Route 42')
-            ->setFrom($this->createStopPlaceDto())
+            ->setFrom($this->createStopPlaceDto('fromStopId', 'From Stop', 48.0, 2.0, $arrivalTime, $departureTime))
             ->setIntermediateStops([])
             ->setRealTime(false)
-            ->setTo($this->createStopPlaceDto());
+            ->setTo($this->createStopPlaceDto('toStopId', 'To Stop', 49.0, 3.0, $arrivalTime, $departureTime));
 
-        $trip = new TripDto()->setLegs([$leg]);
+        $apiTrip = new TripDto()->setLegs([$leg]);
 
+        // Build model instances for the DB creation flow
+        $fromLocation = new Location;
+        $fromLocation->forceFill(['id' => 'loc-from', 'name' => 'From Stop']);
+        $fromLocation->latitude = 48.0;
+        $fromLocation->longitude = 2.0;
+
+        $toLocation = new Location;
+        $toLocation->forceFill(['id' => 'loc-to', 'name' => 'To Stop']);
+        $toLocation->latitude = 49.0;
+        $toLocation->longitude = 3.0;
+
+        $fromStop = new TransportTripStop;
+        $fromStop->forceFill([
+            'id' => 'stop-from',
+            'cancelled' => false,
+            'arrival_time' => $arrivalTime,
+            'departure_time' => $departureTime,
+            'arrival_delay' => null,
+            'departure_delay' => null,
+        ]);
+
+        $toStop = new TransportTripStop;
+        $toStop->forceFill([
+            'id' => 'stop-to',
+            'cancelled' => false,
+            'arrival_time' => $arrivalTime,
+            'departure_time' => $departureTime,
+            'arrival_delay' => null,
+            'departure_delay' => null,
+        ]);
+
+        $transportTrip = new TransportTrip;
+        $transportTrip->forceFill([
+            'mode' => 'bus',
+            'foreign_trip_id' => $tripId,
+            'provider' => 'transitous',
+            'line_name' => 'Route 42',
+            'route_long_name' => null,
+            'trip_short_name' => null,
+            'display_name' => null,
+            'route_color' => null,
+            'route_text_color' => null,
+        ]);
+        $transportTrip->setRelation('continuesAs', null);
+
+        // Trip not found in DB
+        $this->transportTripRepository->expects($this->once())
+            ->method('getTripByIdentifier')
+            ->willReturn(null);
+
+        // Fetch from API
         $this->transitousRequestService->expects($this->once())
             ->method('getStopTimes')
             ->with($tripId)
-            ->willReturn($trip);
+            ->willReturn($apiTrip);
+
+        // Create trip in DB
+        $this->transportTripRepository->expects($this->once())
+            ->method('getOrCreateTrip')
+            ->willReturn($transportTrip);
+
+        // Create locations for each stop
+        $this->repository->expects($this->exactly(2))
+            ->method('getOrCreateLocationByIdentifier')
+            ->willReturnOnConsecutiveCalls($fromLocation, $toLocation);
+
+        // Add stops to trip
+        $this->transportTripRepository->expects($this->exactly(2))
+            ->method('addStopToTrip')
+            ->willReturnOnConsecutiveCalls($fromStop, $toStop);
+
+        // TripDtoHydrator used in createStopovers
+        $this->tripDtoHydrator->expects($this->exactly(2))
+            ->method('hydrateStopPlace')
+            ->willReturnOnConsecutiveCalls(
+                $this->createStopPlaceDto('fromStopId', 'From Stop', 48.0, 2.0, $arrivalTime, $departureTime),
+                $this->createStopPlaceDto('toStopId', 'To Stop', 49.0, 3.0, $arrivalTime, $departureTime),
+            );
 
         $result = $this->controller->stopovers($tripId);
-        $this->assertEquals($trip, $result);
+
+        $this->assertInstanceOf(TripDto::class, $result);
+        $this->assertCount(1, $result->legs);
+        $this->assertEquals('bus', $result->legs[0]->mode);
+        $this->assertEquals($tripId, $result->legs[0]->tripId);
+        $this->assertEquals('Route 42', $result->legs[0]->routeShortName);
+        $this->assertNotNull($result->legs[0]->from);
+        $this->assertNotNull($result->legs[0]->to);
 
         Queue::assertPushed(RerouteStops::class);
     }
