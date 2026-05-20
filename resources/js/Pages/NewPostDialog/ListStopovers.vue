@@ -4,7 +4,12 @@ import Loading from '@/Components/Loading.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import StopoversListEntry from '@/Pages/NewPostDialog/Partials/StopoversListEntry.vue';
 import router from '@/router';
-import { getEmoji } from '@/Services/DepartureTypeService';
+import {
+    getEmoji,
+    getRouteBadgeStyle,
+    getRouteColor,
+    getRouteTextColor,
+} from '@/Services/DepartureTypeService';
 import { normalizeQueryParam } from '@/Services/QueryParamService';
 import { DateTime } from 'luxon';
 import { onMounted, ref } from 'vue';
@@ -15,6 +20,7 @@ import {
     StopPlaceDto,
     TransportPostExitUpdateRequest,
 } from '../../../types/Api.gen';
+import { getTripLineName } from '@/Services/LineNameFormattingService';
 
 const { t } = useI18n();
 const vueRouter = useRouter();
@@ -43,6 +49,7 @@ function updateUrlParams() {
 const trip = ref<MotisTripDto | null>(null);
 const stopovers = ref<StopPlaceDto[]>([]);
 const loading = ref(true);
+const continuesAs = ref<MotisTripDto | null>(null);
 
 async function loadStopovers() {
     loading.value = true;
@@ -79,6 +86,24 @@ async function loadStopovers() {
         console.error('Error loading stopovers:', error);
     } finally {
         loading.value = false;
+
+        if (trip.value?.legs[0]?.continuesAs) {
+            await loadContinuesAs(trip.value.legs[0].continuesAs);
+        }
+    }
+}
+
+async function loadContinuesAs(continuesAsId: string) {
+    try {
+        const response = await api.locations.stopovers({
+            tripId: continuesAsId,
+            startId: startId.value,
+            startTime: startTime.value,
+        });
+
+        continuesAs.value = response.data.trip;
+    } catch (error) {
+        console.error('Error loading continuesAs trip:', error);
     }
 }
 
@@ -161,6 +186,20 @@ function getTitle() {
                     :selected="stopId == stopover.tripStopId"
                     @click="submit(stopover)"
                 />
+
+                <li v-if="continuesAs" ref="row" class="list-row text-center">
+                    <div class="list-col-grow">
+                        {{ t('new_post.continues_as') }}
+                        <div
+                            v-show="getTripLineName(continuesAs)"
+                            class="badge min-w-[3em] px-[0.5] text-sm font-medium"
+                            :style="getRouteBadgeStyle(continuesAs.legs[0])"
+                        >
+                            {{ getTripLineName(continuesAs) }}
+                        </div>
+                        {{ continuesAs.legs[0].headSign }}
+                    </div>
+                </li>
             </ul>
         </div>
     </AuthenticatedLayout>

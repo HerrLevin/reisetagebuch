@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import Delay from '@/Components/Post/Partials/Delay.vue';
 import router from '@/router';
-import { getColor, getEmoji } from '@/Services/DepartureTypeService';
+import {
+    getColor,
+    getEmoji,
+    getRouteBadgeStyle,
+    getRouteColor,
+    getRouteTextColor,
+} from '@/Services/DepartureTypeService';
 import {
     getPostLineName,
     getPostTripNumber,
@@ -56,22 +62,6 @@ function getFormattedArrivalTime(): string | null {
     );
 }
 
-function getRouteTextColor(trip: TripDto) {
-    if (trip.routeTextColor && trip.routeTextColor.length > 2) {
-        return '#' + trip.routeTextColor;
-    }
-
-    return '#FFFFFF';
-}
-
-function getRouteColor(trip: TripDto) {
-    if (trip.routeColor && trip.routeColor.length > 2) {
-        return '#' + trip.routeColor;
-    }
-
-    return getColor(trip.mode);
-}
-
 function selectStation(location: LocationDto) {
     const identifier = location.identifiers.find((id) => id.origin === 'motis');
     const params = {
@@ -122,7 +112,7 @@ function selectStation(location: LocationDto) {
                 <div
                     v-show="localPost.trip.lineName"
                     class="badge min-w-[3em] px-[0.5] text-sm font-medium"
-                    :style="`background-color: ${getRouteColor(localPost.trip)}; color: ${getRouteTextColor(localPost.trip)}`"
+                    :style="getRouteBadgeStyle(localPost.trip)"
                 >
                     {{ getPostLineName(localPost) }}
                 </div>
