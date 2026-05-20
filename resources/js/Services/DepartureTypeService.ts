@@ -1,5 +1,11 @@
 import i18n from '@/i18n';
-import { TransportMode, TransportPost } from '../../types/Api.gen';
+import { contrastingForeground } from '@/Services/ColorHelper';
+import {
+    LegDto,
+    TransportMode,
+    TransportPost,
+    TripDto,
+} from '../../types/Api.gen';
 
 const { t } = i18n.global;
 
@@ -75,6 +81,32 @@ export function getColorForPost(post: TransportPost): string {
         return `#${post.trip.routeColor}`;
     }
     return getColor(post.trip.mode);
+}
+
+export function getRouteBadgeStyle(trip: TripDto | LegDto) {
+    const background = getRouteColor(trip);
+    const foreground = contrastingForeground(
+        background,
+        getRouteTextColor(trip),
+    );
+
+    return `background-color: ${background}; color: ${foreground}`;
+}
+
+export function getRouteTextColor(trip: TripDto | LegDto) {
+    if (trip.routeTextColor && trip.routeTextColor.length > 2) {
+        return '#' + trip.routeTextColor;
+    }
+
+    return '#FFFFFF';
+}
+
+export function getRouteColor(trip: TripDto | LegDto) {
+    if (trip.routeColor && trip.routeColor.length > 2) {
+        return '#' + trip.routeColor;
+    }
+
+    return getColor(trip.mode);
 }
 
 export function getColor(mode: TransportMode): string {

@@ -144,7 +144,8 @@
             "set_datetime": "Set Time"
         },
         "departures_at_stop": "Departures at {location} from {time}",
-        "no_departures": "No departures found for this location, time and selected transport types."
+        "no_departures": "No departures found for this location, time and selected transport types.",
+        "continues_as": "Continues as:"
     },
     "edit_transport_times": {
         "title": "Edit Transport Times",

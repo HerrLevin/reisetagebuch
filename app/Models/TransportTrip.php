@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class TransportTrip extends Model
 {
@@ -24,6 +25,7 @@ class TransportTrip extends Model
         'route_text_color',
         'last_refreshed_at',
         'user_id',
+        'continues_as_trip_id',
     ];
 
     protected $casts = [
@@ -52,5 +54,10 @@ class TransportTrip extends Model
     public function transportPosts(): HasMany
     {
         return $this->hasMany(TransportPost::class, 'transport_trip_id', 'id');
+    }
+
+    public function continuesAs(): HasOne
+    {
+        return $this->hasOne(TransportTrip::class, 'id', 'continues_as_trip_id');
     }
 }
