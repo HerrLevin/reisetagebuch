@@ -100,7 +100,8 @@ class TransportTripRepository
         ?string $displayName = null,
         ?string $routeColor = null,
         ?string $routeTextColor = null,
-        ?User $user = null
+        ?User $user = null,
+        ?string $nextTripId = null,
     ): TransportTrip {
         $trip = $this->getTripByIdentifier($foreignId, $provider);
 
@@ -120,9 +121,10 @@ class TransportTripRepository
         $trip->route_color = $routeColor;
         $trip->route_text_color = $routeTextColor;
         $trip->last_refreshed_at = now();
+        $trip->continues_as_trip_id = $nextTripId;
         $trip->save();
 
-        return $trip;
+        return $trip->load('continuesAs');
     }
 
     public function addStopToTrip(
