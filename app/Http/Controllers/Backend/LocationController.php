@@ -391,14 +391,17 @@ class LocationController extends Controller
         }
 
         $nextTrip = null;
+        $lastStopModels = [];
         foreach (array_reverse($dto->legs) as $leg) {
-            [$nextTrip, $stopModels] = $this->createTrip($leg, $nextTrip);
+            [$nextTrip, $lastStopModels] = $this->createTrip($leg, $nextTrip);
 
-            RerouteStops::dispatch($dto, $stopModels);
+            RerouteStops::dispatch($dto, $lastStopModels);
         }
 
-        // return a trip dto with the stopovers
-        return $hydrator->hydrateTrip($nextTrip);
+        // pass stops directly to avoid reloading from DB — location relation
+        // is already set on each stop by createStopovers, and continuesAs is
+        // loaded by getOrCreateTrip
+        return $hydrator->hydrateTrip($nextTrip, collect($lastStopModels));
     }
 
     /**
@@ -466,6 +469,7 @@ class LocationController extends Controller
                 null // todo: get route segment between stops
             );
 
+            $stop->setRelation('location', $location);
             $stopModels[] = $stop;
             $stops[] = $this->tripDtoHydrator->hydrateStopPlace($stop, $location);
             $order++;
