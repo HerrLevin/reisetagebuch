@@ -142,7 +142,8 @@
             "set_datetime": "Zeit setzen"
         },
         "departures_at_stop": "Abfahrten von {location} ab {time} ",
-        "no_departures": "Keine Abfahrten für diesen Ort, Zeitpunkt und die ausgewählten Transportarten gefunden."
+        "no_departures": "Keine Abfahrten für diesen Ort, Zeitpunkt und die ausgewählten Transportarten gefunden.",
+        "continues_as": "Fährt weiter als:"
     },
     "edit_transport_times": {
         "title": "Beförderungszeiten bearbeiten",
