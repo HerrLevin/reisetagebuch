@@ -339,6 +339,8 @@ export interface LegDto {
   source: string;
   /** List of intermediate stops for the leg, if available */
   intermediateStops: StopPlaceDto[];
+  /** The trip id of the next leg if this leg continues as another leg without a transfer, if available */
+  continuesAs: string | null;
 }
 
 /** Data Transfer Object for a Stop */
@@ -812,14 +814,16 @@ export interface StoreTripRequest {
    */
   arrivalTime: string;
   /** An array of stops for the trip. */
-  stops?: {
-    /** The identifier of the stop. */
-    identifier?: string;
-    /** The type of identifier used for the stop (id or identifier). */
-    identifierType?: string | null;
-    /** The order of the stop in the trip sequence. */
-    order?: number;
-  }[];
+  stops?:
+    | {
+        /** The identifier of the stop. */
+        identifier?: string;
+        /** The type of identifier used for the stop (id or identifier). */
+        identifierType?: string | null;
+        /** The order of the stop in the trip sequence. */
+        order?: number;
+      }[]
+    | null;
 }
 
 export type TransportPostRequest = BasePostRequest & {
