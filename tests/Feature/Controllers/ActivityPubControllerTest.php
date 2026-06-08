@@ -3,11 +3,11 @@
 namespace Tests\Feature\Controllers\ActivityPub;
 
 use App\Http\Middleware\VerifyHttpSignature;
+use App\Models\ActivityPubActor;
 use App\Models\ActivityPubFollower;
 use App\Models\ActivityPubLike;
 use App\Models\Post;
 use App\Models\User;
-use App\Services\ActivityPubService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -486,8 +486,6 @@ class ActivityPubControllerTest extends TestCase
             ActivityPubFollower::factory()->create([
                 'follower_actor_id' => "https://remote.example/users/{$name}",
                 'followed_user_id' => $user->id,
-                'follower_inbox_url' => "https://remote.example/users/{$name}/inbox",
-                'follower_shared_inbox_url' => 'https://remote.example/inbox',
             ]);
         }
 
@@ -722,11 +720,15 @@ class ActivityPubControllerTest extends TestCase
         [, $remotePubKey] = $this->generateKeyPair();
         $remoteActorId = 'https://remote.example/users/bob';
 
+        $actor = ActivityPubActor::create([
+            'actor_uri' => $remoteActorId,
+            'inbox_url' => 'https://remote.example/inbox',
+            'shared_inbox_url' => null,
+        ]);
         ActivityPubFollower::factory()->create([
             'follower_actor_id' => $remoteActorId,
             'followed_user_id' => $user->id,
-            'follower_inbox_url' => 'https://remote.example/inbox',
-            'follower_shared_inbox_url' => null,
+            'activity_pub_actor_id' => $actor->id,
         ]);
 
         $this->setupRemoteActor($remoteActorId, $remotePubKey);

@@ -44,7 +44,7 @@ class PushPostToMastodon implements ShouldQueue
 
         $followersCollectionUrl = route('ap.followers', ['username' => $postDto->user->username]);
 
-        $followers = ActivityPubFollower::whereFollowedUserId($postDto->user->id)->get();
+        $followers = ActivityPubFollower::whereFollowedUserId($postDto->user->id)->with('actor')->get();
 
         if ($followers->isEmpty()) {
             Log::info('No followers to send activity to for user: '.$postDto->user->username);
