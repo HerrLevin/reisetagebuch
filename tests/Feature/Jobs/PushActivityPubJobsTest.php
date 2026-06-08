@@ -6,6 +6,7 @@ use App\Enums\Visibility;
 use App\Jobs\PushDeleteToMastodon;
 use App\Jobs\PushPostToMastodon;
 use App\Jobs\PushUpdateToMastodon;
+use App\Models\ActivityPubActor;
 use App\Models\ActivityPubFollower;
 use App\Models\Post;
 use App\Models\User;
@@ -39,11 +40,16 @@ class PushActivityPubJobsTest extends TestCase
 
     private function createFollower(User $user, string $actorId, string $inboxUrl, ?string $sharedInboxUrl = null): ActivityPubFollower
     {
+        $actor = ActivityPubActor::create([
+            'actor_uri' => $actorId,
+            'inbox_url' => $inboxUrl,
+            'shared_inbox_url' => $sharedInboxUrl,
+        ]);
+
         return ActivityPubFollower::create([
             'follower_actor_id' => $actorId,
             'followed_user_id' => $user->id,
-            'follower_inbox_url' => $inboxUrl,
-            'follower_shared_inbox_url' => $sharedInboxUrl,
+            'activity_pub_actor_id' => $actor->id,
         ]);
     }
 
