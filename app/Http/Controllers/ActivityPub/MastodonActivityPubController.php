@@ -14,6 +14,7 @@ use App\Hydrators\ActivityPub\OrderedCollectionHydrator;
 use App\Hydrators\ActivityPub\OrderedCollectionPageHydrator;
 use App\Hydrators\ActivityPub\PersonHydrator;
 use App\Hydrators\PostHydrator;
+use App\Models\ActivityPubActor;
 use App\Models\ActivityPubFollower;
 use App\Models\ActivityPubLike;
 use App\Models\User;
@@ -27,6 +28,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class MastodonActivityPubController extends Controller
 {
@@ -178,6 +180,12 @@ class MastodonActivityPubController extends Controller
         if ($type === 'Undo' && isset($activity['object']['type']) && $activity['object']['type'] === 'Like') {
             return $this->handleUndoLike($activity, $user);
         }
+        if ($type === 'Update') {
+            return $this->handleUpdate($activity);
+        }
+        if ($type === 'Delete') {
+            return $this->handleDelete($activity);
+        }
 
         // For other activities, just accept
         return response()->json('', 202);
@@ -194,7 +202,7 @@ class MastodonActivityPubController extends Controller
             return response()->json(['error' => 'Invalid follow object'], 400);
         }
 
-        $actorProfile = $this->activityPubService->getActorProfile($followerActorId);
+        $actor = $this->activityPubService->resolveActor($followerActorId);
 
         $follow = ActivityPubFollower::updateOrCreate(
             [
@@ -202,8 +210,7 @@ class MastodonActivityPubController extends Controller
                 'followed_user_id' => $user->id,
             ],
             [
-                'follower_shared_inbox_url' => $actorProfile['sharedInbox'] ?? null,
-                'follower_inbox_url' => $actorProfile['inbox'] ?? null,
+                'activity_pub_actor_id' => $actor?->id,
             ]
         );
 
@@ -212,10 +219,10 @@ class MastodonActivityPubController extends Controller
                 $user,
                 new ActivityPubUserFollowedNotification(
                     followerActorId: $followerActorId,
-                    followerPreferredUsername: $actorProfile['preferredUsername'] ?? $followerActorId,
-                    followerDisplayName: $actorProfile['name'] ?? null,
-                    followerIconUrl: $actorProfile['iconUrl'] ?? null,
-                    followerProfileUrl: $actorProfile['url'] ?? null,
+                    followerPreferredUsername: $actor?->preferred_username ?? $followerActorId,
+                    followerDisplayName: $actor?->display_name,
+                    followerIconUrl: $actor?->local_icon_url,
+                    followerProfileUrl: $actor?->profile_url,
                 )
             );
         }
@@ -249,7 +256,7 @@ class MastodonActivityPubController extends Controller
             return response()->json(['error' => 'Invalid follow object'], 400);
         }
 
-        $follower = ActivityPubFollower::where([
+        $follower = ActivityPubFollower::with('actor')->where([
             'follower_actor_id' => $followerActorId,
             'followed_user_id' => $user->id,
         ])->first();
@@ -329,7 +336,7 @@ class MastodonActivityPubController extends Controller
 
         if ($like->wasRecentlyCreated) {
             try {
-                $actorProfile = $this->activityPubService->getActorProfile($actorId);
+                $actor = $this->activityPubService->resolveActor($actorId);
                 $postHydrator = new PostHydrator;
                 $postDto = $postHydrator->modelToDto($post);
 
@@ -337,10 +344,10 @@ class MastodonActivityPubController extends Controller
                     $user,
                     new ActivityPubPostLikedNotification(
                         actorId: $actorId,
-                        preferredUsername: $actorProfile['preferredUsername'] ?? $actorId,
-                        displayName: $actorProfile['name'] ?? null,
-                        iconUrl: $actorProfile['iconUrl'] ?? null,
-                        profileUrl: $actorProfile['url'] ?? null,
+                        preferredUsername: $actor?->preferred_username ?? $actorId,
+                        displayName: $actor?->display_name,
+                        iconUrl: $actor?->local_icon_url,
+                        profileUrl: $actor?->profile_url,
                         postId: $postId,
                         postBody: $postDto->body ? substr($postDto->body, 0, 50) : null,
                         postSummary: $postDto->getSummary(),
@@ -377,6 +384,60 @@ class MastodonActivityPubController extends Controller
             'actor_id' => $actorId,
             'post_id' => $postId,
         ])->delete();
+
+        return response()->json('', 202);
+    }
+
+    private function handleUpdate(array $activity): JsonResponse
+    {
+        $actorUri = $activity['actor'] ?? null;
+        $object = $activity['object'] ?? null;
+
+        if (! $actorUri || ! is_array($object)) {
+            return response()->json('', 202);
+        }
+
+        $objectType = $object['type'] ?? null;
+        $objectId = $object['id'] ?? null;
+        $personTypes = ['Person', 'Service', 'Organization', 'Application', 'Group'];
+
+        if (! in_array($objectType, $personTypes) || $objectId !== $actorUri) {
+            return response()->json('', 202);
+        }
+
+        // Only process updates for actors we already know about
+        if (! ActivityPubActor::where('actor_uri', $actorUri)->exists()) {
+            return response()->json('', 202);
+        }
+
+        $this->activityPubService->resolveActor($actorUri);
+
+        return response()->json('', 202);
+    }
+
+    private function handleDelete(array $activity): JsonResponse
+    {
+        $actorUri = $activity['actor'] ?? null;
+        $object = $activity['object'] ?? null;
+
+        // Account deletion: object is the actor URI itself (string) or object.id === actor
+        $objectId = is_string($object) ? $object : ($object['id'] ?? null);
+
+        if (! $actorUri || $objectId !== $actorUri) {
+            return response()->json('', 202);
+        }
+
+        $actor = ActivityPubActor::where('actor_uri', $actorUri)->first();
+        if ($actor) {
+            if ($actor->local_icon_path) {
+                Storage::disk('public')->delete($actor->local_icon_path);
+            }
+            $actor->delete();
+        }
+
+        // Clean up related records
+        ActivityPubFollower::where('follower_actor_id', $actorUri)->delete();
+        ActivityPubLike::where('actor_id', $actorUri)->delete();
 
         return response()->json('', 202);
     }

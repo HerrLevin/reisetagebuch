@@ -14,22 +14,64 @@
 namespace App\Models{
 /**
  * @property string $id
+ * @property string $actor_uri
+ * @property string|null $preferred_username
+ * @property string|null $display_name
+ * @property string|null $profile_url
+ * @property string|null $inbox_url
+ * @property string|null $shared_inbox_url
+ * @property string|null $remote_icon_url
+ * @property string|null $local_icon_path
+ * @property string|null $icon_mime_type
+ * @property string|null $icon_etag
+ * @property \Illuminate\Support\Carbon|null $icon_fetched_at
+ * @property \Illuminate\Support\Carbon|null $profile_fetched_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read string|null $local_icon_url
+ * @method static \Database\Factories\ActivityPubActorFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubActor newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubActor newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubActor query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubActor whereActorUri($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubActor whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubActor whereDisplayName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubActor whereIconEtag($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubActor whereIconFetchedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubActor whereIconMimeType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubActor whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubActor whereInboxUrl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubActor whereLocalIconPath($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubActor wherePreferredUsername($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubActor whereProfileFetchedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubActor whereProfileUrl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubActor whereRemoteIconUrl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubActor whereSharedInboxUrl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubActor whereUpdatedAt($value)
+ */
+	class ActivityPubActor extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property string $id
  * @property string $follower_actor_id
  * @property string $followed_user_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $follower_inbox_url
- * @property string|null $follower_shared_inbox_url
+ * @property string|null $activity_pub_actor_id
+ * @property-read \App\Models\ActivityPubActor|null $actor
+ * @property-read mixed $follower_inbox_url
+ * @property-read mixed $follower_shared_inbox_url
  * @property-read \App\Models\User $user
  * @method static \Database\Factories\ActivityPubFollowerFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollower newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollower newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollower query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollower whereActivityPubActorId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollower whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollower whereFollowedUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollower whereFollowerActorId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollower whereFollowerInboxUrl($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollower whereFollowerSharedInboxUrl($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollower whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollower whereUpdatedAt($value)
  */

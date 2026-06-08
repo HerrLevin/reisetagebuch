@@ -3,9 +3,12 @@
 namespace App\Services;
 
 use App\Http\Resources\UserDto;
+use App\Jobs\FetchRemoteActorAvatar;
+use App\Models\ActivityPubActor;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use JetBrains\PhpStorm\ArrayShape;
 
 class ActivityPubService
@@ -62,6 +65,44 @@ class ActivityPubService
         }
 
         return null;
+    }
+
+    public function resolveActor(string $actorUri): ?ActivityPubActor
+    {
+        $profile = $this->getActorProfile($actorUri);
+        if ($profile === null) {
+            return null;
+        }
+
+        $actor = ActivityPubActor::updateOrCreate(
+            ['actor_uri' => $actorUri],
+            [
+                'preferred_username' => $profile['preferredUsername'],
+                'display_name' => $profile['name'],
+                'profile_url' => $profile['url'],
+                'inbox_url' => $profile['inbox'],
+                'shared_inbox_url' => $profile['sharedInbox'],
+                'remote_icon_url' => $profile['iconUrl'],
+                'profile_fetched_at' => now(),
+            ]
+        );
+
+        $remoteIconUrl = $profile['iconUrl'];
+
+        if ($remoteIconUrl === null && $actor->local_icon_path) {
+            // Remote actor removed their avatar — delete local copy
+            Storage::disk('public')->delete($actor->local_icon_path);
+            $actor->update([
+                'local_icon_path' => null,
+                'icon_mime_type' => null,
+                'icon_etag' => null,
+                'icon_fetched_at' => null,
+            ]);
+        } elseif ($remoteIconUrl !== null && ($actor->wasRecentlyCreated || $actor->local_icon_path === null || $actor->wasChanged('remote_icon_url'))) {
+            FetchRemoteActorAvatar::dispatch($actor->id);
+        }
+
+        return $actor;
     }
 
     public function deliverActivity(UserDto $user, string $followerActorId, ?string $inbox, array $activity): void

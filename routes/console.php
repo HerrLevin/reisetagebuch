@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 use Laravel\Passport\Console\KeysCommand;
 
 Artisan::command('inspire', function () {
@@ -11,3 +12,5 @@ Artisan::command('inspire', function () {
 Artisan::addCommands([
     KeysCommand::class,
 ]);
+
+Schedule::command('ap:refresh-remote-actors')->daily();

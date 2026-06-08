@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\ActivityPubActor;
 use App\Models\ActivityPubFollower;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -15,11 +16,16 @@ class ActivityPubFollowerFactory extends Factory
 
     public function definition(): array
     {
+        $actorId = 'https://remote.example/users/'.$this->faker->unique()->userName();
+
         return [
-            'follower_actor_id' => 'https://remote.example/users/'.$this->faker->unique()->userName(),
+            'follower_actor_id' => $actorId,
             'followed_user_id' => User::factory(),
-            'follower_inbox_url' => 'https://remote.example/inbox',
-            'follower_shared_inbox_url' => 'https://remote.example/shared-inbox',
+            'activity_pub_actor_id' => ActivityPubActor::factory()->state([
+                'actor_uri' => $actorId,
+                'inbox_url' => 'https://remote.example/inbox',
+                'shared_inbox_url' => 'https://remote.example/shared-inbox',
+            ]),
         ];
     }
 }

@@ -36,7 +36,7 @@ class PushDeleteToMastodon implements ShouldQueue
         }
 
         $userDto = app(UserHydrator::class)->modelToDto($user);
-        $followers = ActivityPubFollower::whereFollowedUserId($this->userId)->get();
+        $followers = ActivityPubFollower::whereFollowedUserId($this->userId)->with('actor')->get();
 
         if ($followers->isEmpty()) {
             return;
