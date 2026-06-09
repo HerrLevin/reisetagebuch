@@ -34,9 +34,11 @@ class Note extends BaseObject
 
     public function setContext(array|string|null $context = []): void
     {
-        $this->context = [
-            'https://gotosocial.org/ns',
-            'https://www.w3.org/ns/activitystreams',
-        ];
+        parent::setContext(
+            [
+                'https://gotosocial.org/ns',
+                'https://www.w3.org/ns/activitystreams',
+            ]
+        );
     }
 }

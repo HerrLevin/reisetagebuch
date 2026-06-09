@@ -4,18 +4,18 @@ namespace App\Traits;
 
 trait ActivityPubContextable
 {
-    protected array|string|null $context = null;
+    private array|string|null $__context = null;
 
-    public function setContext(array|string|null $context = 'https://www.w3.org/ns/activitystreams'): void
+    public function setContext(array|string|null $__context = 'https://www.w3.org/ns/activitystreams'): void
     {
-        $this->context = $context;
+        $this->__context = $__context;
     }
 
     protected function prependRaw(): array
     {
-        if ($this->context) {
+        if ($this->__context) {
             return [
-                '@context' => $this->context,
+                '@context' => $this->__context,
             ];
         }
 
