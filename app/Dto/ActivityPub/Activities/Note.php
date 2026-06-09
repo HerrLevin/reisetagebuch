@@ -20,8 +20,23 @@ class Note extends BaseObject
 
     public string $updated;
 
+    public array $interactionPolicy = [
+        'canReply' => [
+            'automaticApproval' => [],
+            'manualApproval' => [],
+        ],
+    ];
+
     public function __construct()
     {
         $this->type = 'Note';
+    }
+
+    public function setContext(array|string|null $context = []): void
+    {
+        $this->context = [
+            'https://gotosocial.org/ns',
+            'https://www.w3.org/ns/activitystreams',
+        ];
     }
 }
