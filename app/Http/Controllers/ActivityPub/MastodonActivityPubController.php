@@ -168,6 +168,8 @@ class MastodonActivityPubController extends Controller
     {
         $type = $activity['type'] ?? null;
 
+        Log::info('processing activity', ['type' => $type]);
+
         if ($type === 'Follow') {
             return $this->handleFollow($activity, $user);
         }
@@ -407,10 +409,13 @@ class MastodonActivityPubController extends Controller
 
         // Only process updates for actors we already know about
         if (! ActivityPubActor::where('actor_uri', $actorUri)->exists()) {
+            Log::info('Received update for unknown actor, ignoring', ['actorUri' => $actorUri]);
+
             return response()->json('', 202);
         }
 
         $this->activityPubService->resolveActor($actorUri);
+        Log::info('Processed update activity for actor', ['actorUri' => $actorUri]);
 
         return response()->json('', 202);
     }
