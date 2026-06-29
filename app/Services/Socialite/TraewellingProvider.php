@@ -2,6 +2,9 @@
 
 namespace App\Services\Socialite;
 
+use App\Services\VersionService;
+use GuzzleHttp\Client;
+use Illuminate\Http\Request;
 use Laravel\Socialite\Two\AbstractProvider;
 use Laravel\Socialite\Two\ProviderInterface;
 use Laravel\Socialite\Two\User;
@@ -11,6 +14,27 @@ class TraewellingProvider extends AbstractProvider implements ProviderInterface
     protected $scopes = ['write-statuses', 'read-statuses'];
 
     protected $scopeSeparator = ' ';
+
+    private VersionService $versionService;
+
+    public function __construct(Request $request, $clientId, $clientSecret, $redirectUrl, $guzzle = [], ?VersionService $versionService = null)
+    {
+        parent::__construct($request, $clientId, $clientSecret, $redirectUrl, $guzzle);
+        $this->versionService = $versionService ?? app(VersionService::class);
+    }
+
+    protected function getHttpClient(): Client
+    {
+        if (is_null($this->httpClient)) {
+            $this->httpClient = new Client(array_merge_recursive($this->guzzle, [
+                'headers' => [
+                    'User-Agent' => $this->versionService->getUserAgent(),
+                ],
+            ]));
+        }
+
+        return $this->httpClient;
+    }
 
     /**
      * {@inheritdoc}

@@ -16,11 +16,14 @@ class TraewellingRequestService
 {
     private ?Client $client;
 
+    private VersionService $versionService;
+
     private string $accessToken;
 
-    public function __construct(?Client $client = null)
+    public function __construct(?Client $client = null, ?VersionService $versionService = null)
     {
         $this->client = $client;
+        $this->versionService = $versionService ?? app(VersionService::class);
     }
 
     private function getClient(): Client
@@ -35,6 +38,7 @@ class TraewellingRequestService
             'headers' => [
                 'Authorization' => 'Bearer '.$this->accessToken,
                 'Accept' => 'application/json',
+                'User-Agent' => $this->versionService->getUserAgent(),
             ],
         ]);
     }
