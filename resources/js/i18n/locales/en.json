@@ -17,7 +17,8 @@
         },
         "crosspost_failed": {
             "lead": "Failed to post your post to Träwelling",
-            "info": "Error details: {error}"
+            "info": "Error details: {error}",
+            "retry": "Retry"
         },
         "follower": {
             "lead": "{user} started following you"

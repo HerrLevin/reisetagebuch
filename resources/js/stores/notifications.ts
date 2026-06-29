@@ -64,6 +64,16 @@ export const useNotificationStore = defineStore('notifications', () => {
         }
     };
 
+    const removeNotification = (id: string) => {
+        const index = notifications.value.findIndex((n) => n.id === id);
+        if (index !== -1) {
+            if (!notifications.value[index].readAt) {
+                unreadCount.value = Math.max(0, unreadCount.value - 1);
+            }
+            notifications.value.splice(index, 1);
+        }
+    };
+
     return {
         notifications,
         unreadCount,
@@ -72,5 +82,6 @@ export const useNotificationStore = defineStore('notifications', () => {
         fetchUnreadCount,
         markAsRead,
         markAllAsRead,
+        removeNotification,
     };
 });
