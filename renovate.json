@@ -1,6 +1,10 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "extends": ["config:recommended", "gitmoji", ":rebaseStalePrs"],
+    "osvVulnerabilityAlerts": true,
+    "vulnerabilityAlerts": {
+        "automerge": true
+    },
     "packageRules": [
         {
             "matchUpdateTypes": ["minor", "patch"],
