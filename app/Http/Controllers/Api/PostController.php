@@ -610,4 +610,37 @@ class PostController extends Controller
     {
         return $this->postController->deleteTransportTrack($postId, $this->auth->user());
     }
+
+    /**
+     * @throws AuthorizationException
+     */
+    #[OA\Post(
+        path: '/posts/{id}/traewelling/retry',
+        operationId: 'retryTraewellingCrosspost',
+        description: 'Retry a failed Traewelling crosspost. Dispatches an edit job if a Traewelling ID already exists, otherwise dispatches a new check-in job. Deletes the failure notification.',
+        summary: 'Retry Traewelling crosspost',
+        security: [['passport' => []]],
+        tags: ['Posts'],
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                description: 'Post id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'string', format: 'uuid')
+            ),
+        ],
+        responses: [
+            new OA\Response(response: 204, description: 'No Content'),
+            new OA\Response(response: 403, description: 'Forbidden'),
+            new OA\Response(response: 404, description: 'Resource Not Found'),
+            new OA\Response(response: 422, description: 'Not a transport post'),
+        ]
+    )]
+    public function retryTraewellingCrosspost(string $postId): Response
+    {
+        $this->postController->retryTraewellingCrosspost($postId, $this->auth->user());
+
+        return response()->noContent();
+    }
 }

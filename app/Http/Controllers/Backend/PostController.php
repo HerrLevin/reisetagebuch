@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Backend;
 
 use App\Dto\PostPaginationDto;
+use App\Enums\PostMetaInfo\MetaInfoKey;
 use App\Enums\PostMetaInfo\TravelReason;
 use App\Enums\PostMetaInfo\TravelRole;
 use App\Enums\Visibility;
@@ -28,9 +29,11 @@ use App\Jobs\TraewellingChangeExitJob;
 use App\Jobs\TraewellingCrossCheckInJob;
 use App\Jobs\TraewellingDeletePostJob;
 use App\Jobs\TraewellingEditPostJob;
+use App\Models\Post;
 use App\Models\TransportTripStop;
 use App\Models\User;
 use App\Repositories\LocationRepository;
+use App\Repositories\NotificationRepository;
 use App\Repositories\PostRepository;
 use App\Repositories\TransportTripRepository;
 use App\Repositories\UserStatisticsRepository;
@@ -55,18 +58,22 @@ class PostController extends Controller
 
     private CalculateTransportStatsController $calculateTransportStatsController;
 
+    private NotificationRepository $notificationRepository;
+
     public function __construct(
         PostRepository $postRepository,
         LocationRepository $locationRepository,
         TransportTripRepository $transportTripRepository,
         UserStatisticsRepository $statisticsRepository,
-        CalculateTransportStatsController $calculateTransportStatsController
+        CalculateTransportStatsController $calculateTransportStatsController,
+        NotificationRepository $notificationRepository
     ) {
         $this->locationRepository = $locationRepository;
         $this->postRepository = $postRepository;
         $this->transportTripRepository = $transportTripRepository;
         $this->statisticsRepository = $statisticsRepository;
         $this->calculateTransportStatsController = $calculateTransportStatsController;
+        $this->notificationRepository = $notificationRepository;
     }
 
     public function storeLocation(LocationBasePostRequest $request): BasePost|LocationPost|TransportPost
@@ -405,5 +412,34 @@ class PostController extends Controller
         $this->calculateTransportStatsController->calculateStatsForPost($post->id);
 
         return $this->postRepository->getById($postId, $user);
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function retryTraewellingCrosspost(string $postId, User $user): void
+    {
+        $post = Post::with(['metaInfos', 'transportPost'])->findOrFail($postId);
+
+        if ($post->user_id !== $user->id) {
+            throw new AuthorizationException('You do not have permission to retry this crosspost.');
+        }
+
+        if (! $post->transportPost) {
+            abort(422, 'Not a transport post');
+        }
+
+        $traewellingId = $post->metaInfos->where('key', MetaInfoKey::TRAEWELLING_TRIP_ID)->first()?->value;
+        $postResource = $this->postRepository->getById($postId, $user);
+
+        if ($traewellingId) {
+            TraewellingEditPostJob::dispatch($postResource);
+        } else {
+            TraewellingCrossCheckInJob::withChain([
+                new TraewellingEditPostJob($postResource),
+            ])->dispatch($postId);
+        }
+
+        $this->notificationRepository->deleteTraewellingCrosspostFailedNotification($user, $postId);
     }
 }

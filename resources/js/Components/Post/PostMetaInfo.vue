@@ -69,7 +69,16 @@ const getMetaInfoDisplayValue = (
                     <span class="text-base-content/70 font-medium">
                         {{ entry.label }}
                     </span>
-                    <span class="text-base-content">
+                    <a
+                        v-if="entry.key == 'rtb:traewelling_trip_id'"
+                        :href="`https://traewelling.de/status/${entry.value}`"
+                        target="_blank"
+                        class="link"
+                        rel="noopener noreferrer"
+                    >
+                        {{ entry.displayValue }}
+                    </a>
+                    <span v-else class="text-base-content">
                         {{ entry.displayValue }}
                     </span>
                 </div>

@@ -125,6 +125,10 @@ Route::middleware('auth:api')->group(function () {
                 Route::post('/track', [PostController::class, 'uploadTransportTrack'])->name('posts.upload.transport-track');
                 Route::delete('/track', [PostController::class, 'deleteTransportTrack'])->name('posts.delete.transport-track');
             });
+
+            Route::prefix('traewelling')->group(function () {
+                Route::post('/retry', [PostController::class, 'retryTraewellingCrosspost'])->name('posts.traewelling.retry');
+            });
         });
 
         Route::post('/transport', [PostController::class, 'storeTransport'])->name('posts.create.transport-post.store');

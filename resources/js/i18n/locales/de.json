@@ -17,7 +17,8 @@
         },
         "crosspost_failed": {
             "lead": "Fehler beim Teilen deines Beitrags auf Träwelling",
-            "info": "Fehlermeldung: {error}"
+            "info": "Fehlermeldung: {error}",
+            "retry": "Erneut versuchen"
         },
         "follower": {
             "lead": "{user} folgt dir jetzt"

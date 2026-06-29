@@ -80,4 +80,12 @@ class NotificationRepository
             ->whereLike('data', '%"reference_id":"'.$referenceId.'"%')
             ->delete();
     }
+
+    public function deleteTraewellingCrosspostFailedNotification(User $user, string $postId): void
+    {
+        $user->notifications()
+            ->where('type', DatabaseNotificationType::TraewellingCrosspostFailed->value)
+            ->whereJsonContains('data', ['post_id' => $postId])
+            ->delete();
+    }
 }
