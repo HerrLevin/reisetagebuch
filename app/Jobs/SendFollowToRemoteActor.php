@@ -7,6 +7,7 @@ namespace App\Jobs;
 use App\Hydrators\ActivityPub\FollowHydrator;
 use App\Repositories\ActivityPubRemoteFollowRepository;
 use App\Repositories\UserRepository;
+use App\Repositories\UserStatisticsRepository;
 use App\Services\ActivityPubService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -30,6 +31,7 @@ class SendFollowToRemoteActor implements ShouldQueue
         UserRepository $userRepository,
         ActivityPubRemoteFollowRepository $remoteFollowRepository,
         FollowHydrator $hydrator,
+        UserStatisticsRepository $userStatisticsRepository,
     ): void {
         $remoteFollow = $remoteFollowRepository->findByUserAndActor($this->userId, $this->remoteActorId);
 
@@ -54,5 +56,6 @@ class SendFollowToRemoteActor implements ShouldQueue
         $inbox = $remoteFollow->remote_actor_shared_inbox_url ?? $remoteFollow->remote_actor_inbox_url;
 
         $activityPub->deliverActivity($userDto, $this->remoteActorId, $inbox, $followActivity);
+        $userStatisticsRepository->incrementFollowingCount($this->userId);
     }
 }

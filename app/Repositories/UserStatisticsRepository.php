@@ -91,6 +91,30 @@ class UserStatisticsRepository
         $user->statistics()->increment('travelled_duration', $newDuration);
     }
 
+    public function incrementFollowersCount(string $userId): void
+    {
+        $user = User::find($userId);
+        $user?->statistics()->increment('followers_count');
+    }
+
+    public function decrementFollowersCount(string $userId): void
+    {
+        $user = User::find($userId);
+        $user?->statistics()->decrement('followers_count');
+    }
+
+    public function incrementFollowingCount(string $userId): void
+    {
+        $user = User::find($userId);
+        $user?->statistics()->increment('following_count');
+    }
+
+    public function decrementFollowingCount(string $userId): void
+    {
+        $user = User::find($userId);
+        $user?->statistics()->decrement('following_count');
+    }
+
     public function setData(
         string $userId,
         int $postsCount,
