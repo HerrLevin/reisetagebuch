@@ -78,8 +78,15 @@ class BasePost
     /** @var array<string, string|string[]> */
     public array $metaInfos = [];
 
-    public function __construct(Post $post, UserDto $userDto)
+    #[OA\Property('sourceUrl', description: 'Original URL for posts from the fediverse', type: 'string', nullable: true)]
+    public ?string $sourceUrl = null;
+
+    public function __construct(?Post $post = null, ?UserDto $userDto = null)
     {
+        if ($post === null) {
+            return;
+        }
+
         $likes = $post->likes_count ?? 0;
         $apLikes = $post->activity_pub_likes_count ?? 0;
 

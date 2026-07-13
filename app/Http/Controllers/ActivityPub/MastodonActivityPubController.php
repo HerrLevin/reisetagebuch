@@ -21,12 +21,14 @@ use App\Models\ActivityPubLike;
 use App\Models\User;
 use App\Notifications\ActivityPubPostLikedNotification;
 use App\Notifications\ActivityPubUserFollowedNotification;
+use App\Repositories\ActivityPubPostRepository;
 use App\Repositories\ActivityPubRemoteFollowRepository;
 use App\Repositories\NotificationRepository;
 use App\Repositories\PostRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\UserStatisticsRepository;
 use App\Services\ActivityPubService;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -42,6 +44,7 @@ class MastodonActivityPubController extends Controller
         private readonly NotificationRepository $notificationRepository,
         private readonly ActivityPubRemoteFollowRepository $remoteFollowRepository,
         private readonly UserStatisticsRepository $userStatisticsRepository,
+        private readonly ActivityPubPostRepository $activityPubPostRepository,
     ) {}
 
     private function checkHeader(Request $request): bool
@@ -130,6 +133,16 @@ class MastodonActivityPubController extends Controller
         }
 
         $activity = $request->json()->all();
+        $type = $activity['type'] ?? null;
+
+        // Global activities: Create(Note) and Delete(Note) have no specific local user target
+        if ($type === 'Create') {
+            return $this->processGlobalActivity($activity);
+        }
+
+        if ($type === 'Delete' && ! $this->isActorDelete($activity)) {
+            return $this->processGlobalActivity($activity);
+        }
 
         // Determine the target user from the activity
         $targetActorId = null;
@@ -156,6 +169,97 @@ class MastodonActivityPubController extends Controller
                 Log::warning('Shared inbox: user not found', ['targetActorId' => $targetActorId]);
             }
         }
+
+        return response()->json('', 202);
+    }
+
+    private function isActorDelete(array $activity): bool
+    {
+        $actorUri = $activity['actor'] ?? null;
+        $object = $activity['object'] ?? null;
+        $objectId = is_string($object) ? $object : ($object['id'] ?? null);
+
+        return $objectId !== null && $objectId === $actorUri;
+    }
+
+    private function processGlobalActivity(array $activity): JsonResponse
+    {
+        $type = $activity['type'] ?? null;
+        $activityId = $activity['id'] ?? null;
+        $actorId = $activity['actor'] ?? null;
+
+        if ($activityId && $actorId) {
+            $inserted = ActivityPubInboxItem::insertOrIgnore([
+                'activity_id' => $activityId,
+                'actor_id' => $actorId,
+                'activity_type' => $type,
+            ]);
+
+            if (! $inserted) {
+                return response()->json('', 202);
+            }
+        }
+
+        if ($type === 'Create') {
+            return $this->handleCreate($activity);
+        }
+
+        if ($type === 'Delete') {
+            return $this->handleNoteDelete($activity);
+        }
+
+        return response()->json('', 202);
+    }
+
+    private function handleCreate(array $activity): JsonResponse
+    {
+        $actorId = $activity['actor'] ?? null;
+        $object = $activity['object'] ?? null;
+
+        if (! $actorId || ! is_array($object) || ($object['type'] ?? null) !== 'Note') {
+            return response()->json('', 202);
+        }
+
+        $noteId = $object['id'] ?? null;
+        $content = $object['content'] ?? null;
+        $objectUrl = $object['url'] ?? null;
+        $published = $object['published'] ?? null;
+
+        if (! $noteId) {
+            return response()->json('', 202);
+        }
+
+        // Only store if we know the actor (i.e. someone follows them)
+        $actor = ActivityPubActor::where('actor_uri', $actorId)->first();
+        if (! $actor) {
+            Log::info('Create(Note): unknown actor, ignoring', ['actorId' => $actorId]);
+
+            return response()->json('', 202);
+        }
+
+        $this->activityPubPostRepository->findOrCreateByActivityId(
+            activityPubActorId: $actor->id,
+            activityId: $noteId,
+            url: is_string($objectUrl) ? $objectUrl : null,
+            content: $content,
+            publishedAt: $published ? Carbon::parse($published) : Carbon::now(),
+        );
+
+        Log::info('Stored AP post', ['noteId' => $noteId, 'actor' => $actorId]);
+
+        return response()->json('', 202);
+    }
+
+    private function handleNoteDelete(array $activity): JsonResponse
+    {
+        $object = $activity['object'] ?? null;
+        $noteId = is_string($object) ? $object : ($object['id'] ?? null);
+
+        if (! $noteId) {
+            return response()->json('', 202);
+        }
+
+        $this->activityPubPostRepository->deleteByActivityId($noteId);
 
         return response()->json('', 202);
     }
