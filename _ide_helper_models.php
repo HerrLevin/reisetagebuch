@@ -124,6 +124,35 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property string $id
+ * @property string $local_user_id
+ * @property string $remote_actor_id
+ * @property string $remote_actor_inbox_url
+ * @property string|null $remote_actor_shared_inbox_url
+ * @property string $follow_activity_id
+ * @property string $state
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\ActivityPubActor|null $actor
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubRemoteFollow newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubRemoteFollow newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubRemoteFollow query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubRemoteFollow whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubRemoteFollow whereFollowActivityId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubRemoteFollow whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubRemoteFollow whereLocalUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubRemoteFollow whereRemoteActorId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubRemoteFollow whereRemoteActorInboxUrl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubRemoteFollow whereRemoteActorSharedInboxUrl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubRemoteFollow whereState($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubRemoteFollow whereUpdatedAt($value)
+ */
+	class ActivityPubRemoteFollow extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property string $id
  * @property string $origin_user_id
  * @property string $target_user_id
  * @property \Illuminate\Support\Carbon|null $created_at

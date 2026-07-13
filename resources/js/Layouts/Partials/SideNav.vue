@@ -2,6 +2,7 @@
 import { useUserStore } from '@/stores/user';
 import {
     Filter,
+    Globe,
     Handshake,
     History,
     LogOut,
@@ -62,6 +63,12 @@ const links = [
         link: { name: 'location-history.index' },
         label: 'app.location_history',
         icon: History,
+        condition: !!user.user,
+    },
+    {
+        link: { name: 'fediverse.index' },
+        label: 'fediverse.title',
+        icon: Globe,
         condition: !!user.user,
     },
     {
