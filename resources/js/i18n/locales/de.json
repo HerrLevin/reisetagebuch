@@ -478,6 +478,20 @@
         "AREAL_LIFT": "Luftlift",
         "METRO": "Metro"
     },
+    "fediverse": {
+        "title": "Fediverse",
+        "find_title": "Jemanden im Fediverse finden",
+        "handle_placeholder": "{'@'}nutzer{'@'}instanz.social",
+        "find": "Suchen",
+        "follow": "Folgen",
+        "unfollow": "Entfolgen",
+        "pending": "Ausstehend",
+        "rejected": "Abgelehnt",
+        "following_title": "Personen, denen du folgst",
+        "no_following": "Du folgst noch niemandem im Fediverse.",
+        "not_found": "Nutzer nicht gefunden. Überprüfe den Handle und versuche es erneut.",
+        "resolve_error": "Handle konnte nicht aufgelöst werden. Die Instanz ist möglicherweise nicht erreichbar."
+    },
     "transport_group": {
         "long_distance": "Fernverkehr",
         "regional": "Regional",

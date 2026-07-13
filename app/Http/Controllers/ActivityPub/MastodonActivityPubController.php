@@ -22,6 +22,7 @@ use App\Models\Follow;
 use App\Models\User;
 use App\Notifications\ActivityPubPostLikedNotification;
 use App\Notifications\ActivityPubUserFollowedNotification;
+use App\Repositories\ActivityPubRemoteFollowRepository;
 use App\Repositories\NotificationRepository;
 use App\Repositories\PostRepository;
 use App\Repositories\UserRepository;
@@ -39,6 +40,7 @@ class MastodonActivityPubController extends Controller
         private readonly UserRepository $userRepository,
         private readonly PostRepository $postRepository,
         private readonly NotificationRepository $notificationRepository,
+        private readonly ActivityPubRemoteFollowRepository $remoteFollowRepository,
     ) {}
 
     private function checkHeader(Request $request): bool
@@ -173,7 +175,7 @@ class MastodonActivityPubController extends Controller
         $actorId = $activity['actor'] ?? null;
 
         if ($activityId && $actorId) {
-            $inserted = ActivityPubInboxItem::fillAndInsertOrIgnore([
+            $inserted = ActivityPubInboxItem::insertOrIgnore([
                 'activity_id' => $activityId,
                 'actor_id' => $actorId,
                 'activity_type' => $type,
@@ -206,8 +208,38 @@ class MastodonActivityPubController extends Controller
         if ($type === 'Delete') {
             return $this->handleDelete($activity);
         }
+        if ($type === 'Accept') {
+            return $this->handleAccept($activity, $user);
+        }
+        if ($type === 'Reject') {
+            return $this->handleReject($activity, $user);
+        }
 
         // For other activities, just accept
+        return response()->json('', 202);
+    }
+
+    private function handleAccept(array $activity, UserDto $user): JsonResponse
+    {
+        $object = $activity['object'] ?? null;
+        $followActivityId = is_string($object) ? $object : ($object['id'] ?? null);
+
+        if ($followActivityId) {
+            $this->remoteFollowRepository->updateStateByFollowActivityId($user->id, $followActivityId, 'accepted');
+        }
+
+        return response()->json('', 202);
+    }
+
+    private function handleReject(array $activity, UserDto $user): JsonResponse
+    {
+        $object = $activity['object'] ?? null;
+        $followActivityId = is_string($object) ? $object : ($object['id'] ?? null);
+
+        if ($followActivityId) {
+            $this->remoteFollowRepository->updateStateByFollowActivityId($user->id, $followActivityId, 'rejected');
+        }
+
         return response()->json('', 202);
     }
 

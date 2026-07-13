@@ -480,6 +480,20 @@
         "AREAL_LIFT": "Areal Lift",
         "METRO": "Metro"
     },
+    "fediverse": {
+        "title": "Fediverse",
+        "find_title": "Find someone on the Fediverse",
+        "handle_placeholder": "{'@'}user{'@'}instance.social",
+        "find": "Find",
+        "follow": "Follow",
+        "unfollow": "Unfollow",
+        "pending": "Pending",
+        "rejected": "Rejected",
+        "following_title": "People you follow",
+        "no_following": "You're not following anyone in the Fediverse yet.",
+        "not_found": "Actor not found. Check the handle and try again.",
+        "resolve_error": "Failed to resolve this handle. The instance may be unavailable."
+    },
     "transport_group": {
         "long_distance": "Long Distance",
         "regional": "Regional",

@@ -9,6 +9,7 @@ import VerifyEmail from '@/Pages/Auth/VerifyEmail.vue';
 import EditPost from '@/Pages/EditPost.vue';
 import Forbidden from '@/Pages/Errors/Forbidden.vue';
 import NotFound from '@/Pages/Errors/NotFound.vue';
+import FediverseIndex from '@/Pages/Fediverse/Index.vue';
 import Home from '@/Pages/Home.vue';
 import Imprint from '@/Pages/Imprint.vue';
 import Invites from '@/Pages/Invites.vue';
@@ -185,6 +186,12 @@ const routes: RouteRecordRaw[] = [
         path: '/trips/create',
         name: 'trips.create',
         component: CreateTrip,
+        meta: { auth: true },
+    },
+    {
+        path: '/fediverse',
+        name: 'fediverse.index',
+        component: FediverseIndex,
         meta: { auth: true },
     },
     {

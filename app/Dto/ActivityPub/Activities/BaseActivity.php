@@ -18,5 +18,5 @@ class BaseActivity
 
     public string $published;
 
-    public BaseObject|array $object;
+    public BaseObject|array|string $object;
 }
