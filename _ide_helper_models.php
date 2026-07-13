@@ -80,6 +80,27 @@ namespace App\Models{
 
 namespace App\Models{
 /**
+ * @property int $id
+ * @property string $activity_id
+ * @property string $actor_id
+ * @property string|null $activity_type
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubInboxItem newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubInboxItem newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubInboxItem query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubInboxItem whereActivityId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubInboxItem whereActivityType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubInboxItem whereActorId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubInboxItem whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubInboxItem whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubInboxItem whereUpdatedAt($value)
+ */
+	class ActivityPubInboxItem extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
  * @property string $id
  * @property string $actor_id
  * @property string $post_id
