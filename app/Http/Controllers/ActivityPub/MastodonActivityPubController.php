@@ -18,6 +18,7 @@ use App\Models\ActivityPubActor;
 use App\Models\ActivityPubFollower;
 use App\Models\ActivityPubInboxItem;
 use App\Models\ActivityPubLike;
+use App\Models\Follow;
 use App\Models\User;
 use App\Notifications\ActivityPubPostLikedNotification;
 use App\Notifications\ActivityPubUserFollowedNotification;
@@ -511,6 +512,7 @@ class MastodonActivityPubController extends Controller
         }
 
         $count = ActivityPubFollower::where('followed_user_id', $user->id)->count();
+        $count += Follow::where('target_user_id', $user->id)->count();
 
         $collection = new OrderedCollectionHydrator()->hydrate(
             id: route('ap.followers', ['username' => $user->username]),
@@ -528,9 +530,12 @@ class MastodonActivityPubController extends Controller
             return response()->json(['error' => 'User not found'], 404);
         }
 
+        $count = ActivityPubFollower::where('follower_actor_id', $user->id)->count();
+        $count += Follow::where('origin_user_id', $user->id)->count();
+
         $collection = new OrderedCollectionHydrator()->hydrate(
             id: route('ap.following', ['username' => $user->username]),
-            totalItems: 0
+            totalItems: $count,
         )->toArray();
 
         return response()->json(data: $collection, options: JSON_UNESCAPED_SLASHES)
