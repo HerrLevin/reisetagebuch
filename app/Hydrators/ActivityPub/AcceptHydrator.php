@@ -15,6 +15,7 @@ class AcceptHydrator
         $accept->id = $acceptId;
         $accept->actor = route('ap.actor', ['username' => $user->username]);
         $accept->object = $object;
+        $accept->setContext();
 
         return $accept;
     }
