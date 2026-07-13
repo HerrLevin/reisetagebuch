@@ -72,7 +72,17 @@ const relativeCreatedAt = computed(() => {
     </div>
     <div>
         <div class="mb-1 text-xs">
+            <a
+                v-if="localPost.user.profileUrl"
+                :href="localPost.user.profileUrl"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="opacity-60"
+            >
+                {{ localPost.user.name }}
+            </a>
             <RouterLink
+                v-else
                 :to="`/profile/${localPost.user.username}`"
                 class="opacity-60"
             >
@@ -130,8 +140,15 @@ const relativeCreatedAt = computed(() => {
                 }}
             </span>
         </div>
+        <!-- Fediverse posts have HTML content -->
+        <!-- eslint-disable-next-line vue/no-v-html -->
+        <div
+            v-if="localPost.sourceUrl && localPost.body"
+            class="ap-post-content list-col-wrap my-2 ps-3 text-xs"
+            v-html="localPost.body"
+        />
         <p
-            v-if="localPost.body"
+            v-else-if="localPost.body"
             class="list-col-wrap my-2 ps-3 text-xs whitespace-pre-wrap"
         >
             {{ localPost.body }}
@@ -157,5 +174,16 @@ const relativeCreatedAt = computed(() => {
 .iconSize {
     width: 1em;
     height: 1em;
+}
+
+.ap-post-content :deep(a) {
+    color: var(--color-primary);
+    text-decoration: underline;
+}
+.ap-post-content :deep(p) {
+    margin-bottom: 0.5rem;
+}
+.ap-post-content :deep(p:last-child) {
+    margin-bottom: 0;
 }
 </style>

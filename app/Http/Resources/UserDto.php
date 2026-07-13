@@ -61,4 +61,7 @@ class UserDto
 
     #[OA\Property('createdAt', description: 'Account creation timestamp', type: 'string', format: 'date-time')]
     public string $createdAt;
+
+    #[OA\Property('profileUrl', description: 'External profile URL for federated actors; null for local users', type: 'string', format: 'uri', nullable: true)]
+    public ?string $profileUrl = null;
 }

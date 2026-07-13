@@ -6,6 +6,7 @@ import { ref } from 'vue';
 const props = defineProps<{
     postId: string;
     initialLiked: boolean;
+    isApPost?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -23,10 +24,14 @@ const toggleLike = async () => {
 
     let request;
 
-    if (willBeLiked) {
-        request = api.posts.likePost(props.postId);
+    if (props.isApPost) {
+        request = willBeLiked
+            ? api.activitypub.likeApPost(props.postId)
+            : api.activitypub.unlikeApPost(props.postId);
     } else {
-        request = api.posts.unlikePost(props.postId);
+        request = willBeLiked
+            ? api.posts.likePost(props.postId)
+            : api.posts.unlikePost(props.postId);
     }
 
     request

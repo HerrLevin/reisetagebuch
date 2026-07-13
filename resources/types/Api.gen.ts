@@ -1134,6 +1134,8 @@ export interface BasePost {
   likedByUser: boolean;
   /** Additional meta information associated with the post */
   metaInfos: Record<string, string | string[]>;
+  /** Original URL for posts from the fediverse */
+  sourceUrl?: string | null;
 }
 
 /** Location Post Resource */
@@ -1256,10 +1258,20 @@ export interface UserDto {
    */
   avatar: string | null;
   /**
+   * MimeType of the user header image
+   * @format uri
+   */
+  avatarMimeType?: string | null;
+  /**
    * URL of the user header image
    * @format uri
    */
   header: string | null;
+  /**
+   * MimeType of the user header image
+   * @format uri
+   */
+  headerMimeType?: string | null;
   /** Biography of the user */
   bio: string | null;
   /**
@@ -1282,6 +1294,11 @@ export interface UserDto {
    * @format date-time
    */
   createdAt: string;
+  /**
+   * External profile URL for federated actors; null for local users
+   * @format uri
+   */
+  profileUrl?: string | null;
 }
 
 /** User Statistics Data Object */
@@ -1726,6 +1743,41 @@ export class Api<
         body: data,
         secure: true,
         type: ContentType.Json,
+        ...params,
+      }),
+  };
+  activitypub = {
+    /**
+     * No description
+     *
+     * @tags ActivityPub
+     * @name LikeApPost
+     * @summary Like an ActivityPub post
+     * @request POST:/activitypub/posts/{postId}/likes
+     * @secure
+     */
+    likeApPost: (postId: string, params: RequestParams = {}) =>
+      this.request<void, void>({
+        path: `/activitypub/posts/${postId}/likes`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags ActivityPub
+     * @name UnlikeApPost
+     * @summary Unlike an ActivityPub post
+     * @request DELETE:/activitypub/posts/{postId}/likes
+     * @secure
+     */
+    unlikeApPost: (postId: string, params: RequestParams = {}) =>
+      this.request<void, void>({
+        path: `/activitypub/posts/${postId}/likes`,
+        method: "DELETE",
+        secure: true,
         ...params,
       }),
   };

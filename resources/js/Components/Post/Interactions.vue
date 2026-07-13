@@ -2,8 +2,12 @@
 import ContextMenu from '@/Components/Post/ContextMenu.vue';
 import LikeButton from '@/Components/Post/LikeButton.vue';
 import LikesIndicator from '@/Components/Post/LikesIndicator.vue';
+import { ExternalLink } from 'lucide-vue-next';
 import { PropType, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { BasePost, LocationPost, TransportPost } from '../../../types/Api.gen';
+
+const { t } = useI18n();
 
 const props = defineProps({
     post: {
@@ -37,11 +41,25 @@ const handleLikeToggled = (liked: boolean, count: number) => {
             <LikeButton
                 :post-id="post.id"
                 :initial-liked="post.likedByUser"
+                :is-ap-post="!!post.sourceUrl"
                 @like-toggled="handleLikeToggled"
             />
         </div>
 
+        <a
+            v-if="post.sourceUrl"
+            :href="post.sourceUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn btn-sm btn-circle btn-ghost"
+            :title="t('fediverse.view_original')"
+            @click.stop
+        >
+            <ExternalLink class="size-4" />
+        </a>
+
         <ContextMenu
+            v-if="!post.sourceUrl"
             :post
             @delete:post="emit('delete:post', $event)"
             @update:post="emit('update:post', $event)"
