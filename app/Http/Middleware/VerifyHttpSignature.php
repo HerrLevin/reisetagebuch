@@ -3,6 +3,8 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use DateTime;
+use DateTimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -33,6 +35,37 @@ class VerifyHttpSignature
             return response()->json(['error' => 'Invalid Signature header'], 401);
         }
 
+        // Reject requests outside a 5-minute window to prevent replay attacks.
+        // The date must also be part of the signed headers — otherwise validating
+        // it provides no protection (an attacker could just update the field).
+        $signedHeaders = explode(' ', $params['headers']);
+        $dateHeader = $request->header('Date');
+        if (! $dateHeader) {
+            Log::warning('VerifyHttpSignature: missing Date header', ['keyId' => $params['keyId']]);
+
+            return response()->json(['error' => 'Missing Date header'], 401);
+        }
+        if (! in_array('date', $signedHeaders, true)) {
+            Log::warning('VerifyHttpSignature: date not included in signed headers', ['keyId' => $params['keyId']]);
+
+            return response()->json(['error' => 'Date header must be signed'], 401);
+        }
+        try {
+            $requestTime = new DateTime($dateHeader);
+            $skew = abs(new DateTime('now', new DateTimeZone('UTC'))->getTimestamp() - $requestTime->getTimestamp());
+            if ($skew > 300) {
+                Log::warning('VerifyHttpSignature: request timestamp outside allowed window', [
+                    'keyId' => $params['keyId'],
+                    'date' => $dateHeader,
+                    'skew_seconds' => $skew,
+                ]);
+
+                return response()->json(['error' => 'Request timestamp too old or too far in the future'], 401);
+            }
+        } catch (\Exception) {
+            return response()->json(['error' => 'Invalid Date header'], 401);
+        }
+
         // Verify Digest header matches body
         $digestHeader = $request->header('Digest');
         if ($digestHeader) {
@@ -57,7 +90,6 @@ class VerifyHttpSignature
         }
 
         // Build the signing string
-        $signedHeaders = explode(' ', $params['headers']);
         $signingStringParts = [];
         foreach ($signedHeaders as $header) {
             if ($header === '(request-target)') {
