@@ -16,6 +16,7 @@ use App\Hydrators\ActivityPub\PersonHydrator;
 use App\Hydrators\PostHydrator;
 use App\Models\ActivityPubActor;
 use App\Models\ActivityPubFollower;
+use App\Models\ActivityPubInboxItem;
 use App\Models\ActivityPubLike;
 use App\Models\User;
 use App\Notifications\ActivityPubPostLikedNotification;
@@ -167,6 +168,22 @@ class MastodonActivityPubController extends Controller
     private function processActivity(array $activity, UserDto $user): JsonResponse
     {
         $type = $activity['type'] ?? null;
+        $activityId = $activity['id'] ?? null;
+        $actorId = $activity['actor'] ?? null;
+
+        if ($activityId && $actorId) {
+            $inserted = ActivityPubInboxItem::fillAndInsertOrIgnore([
+                'activity_id' => $activityId,
+                'actor_id' => $actorId,
+                'activity_type' => $type,
+            ]);
+
+            if (! $inserted) {
+                Log::info('ActivityPub: duplicate activity ignored', ['activityId' => $activityId, 'actorId' => $actorId]);
+
+                return response()->json('', 202);
+            }
+        }
 
         Log::info('processing activity', ['type' => $type]);
 
