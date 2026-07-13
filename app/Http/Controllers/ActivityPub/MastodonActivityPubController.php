@@ -247,7 +247,7 @@ class MastodonActivityPubController extends Controller
             );
         }
 
-        $inboxUrl = $follow->follower_shared_inbox_url ?? $follow->follower_inbox_url;
+        $inboxUrl = $actor?->shared_inbox_url ?? $actor?->inbox_url;
         if ($inboxUrl) {
             try {
                 $this->sendAccept($user, $activity, $inboxUrl);
