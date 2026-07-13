@@ -492,7 +492,9 @@
         "following_title": "People you follow",
         "no_following": "You're not following anyone in the Fediverse yet.",
         "not_found": "Actor not found. Check the handle and try again.",
-        "resolve_error": "Failed to resolve this handle. The instance may be unavailable."
+        "resolve_error": "Failed to resolve this handle. The instance may be unavailable.",
+        "from_fediverse": "Fediverse",
+        "view_original": "View original post"
     },
     "transport_group": {
         "long_distance": "Long Distance",

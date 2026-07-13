@@ -124,6 +124,59 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property string $id
+ * @property string $activity_pub_actor_id
+ * @property string $activity_id
+ * @property string|null $url
+ * @property string|null $content
+ * @property \Illuminate\Support\Carbon $published_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\ActivityPubActor $actor
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ActivityPubPostLike> $likes
+ * @property-read int|null $likes_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ActivityPubPostLike> $userLikes
+ * @property-read int|null $user_likes_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPost newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPost newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPost query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPost whereActivityId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPost whereActivityPubActorId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPost whereContent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPost whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPost whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPost wherePublishedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPost whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPost whereUrl($value)
+ */
+	class ActivityPubPost extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property string $id
+ * @property string $user_id
+ * @property string $activity_pub_post_id
+ * @property string|null $activity_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\ActivityPubPost $post
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPostLike newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPostLike newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPostLike query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPostLike whereActivityId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPostLike whereActivityPubPostId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPostLike whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPostLike whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPostLike whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPostLike whereUserId($value)
+ */
+	class ActivityPubPostLike extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property string $id
  * @property string $local_user_id
  * @property string $remote_actor_id
  * @property string $remote_actor_inbox_url

@@ -20,6 +20,7 @@ use App\Http\Resources\PostTypes\BasePost;
 use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 
@@ -63,9 +64,9 @@ class PostController extends Controller
             new OA\Response(response: 404, description: 'Resource Not Found'),
         ]
     )]
-    public function timeline(): PostPaginationDto
+    public function timeline(Request $request): PostPaginationDto
     {
-        return $this->postController->timeline($this->auth->user());
+        return $this->postController->timeline($this->auth->user(), $request->query('cursor'));
     }
 
     #[OA\Get(

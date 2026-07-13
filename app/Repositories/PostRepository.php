@@ -36,11 +36,18 @@ class PostRepository
 
     private PostMetaInfoRepository $postMetaInfoRepository;
 
-    public function __construct(?PostHydrator $postHydrator = null, ?HashTagRepository $hashTagRepository = null, ?PostMetaInfoRepository $postMetaInfoRepository = null)
-    {
+    private ActivityPubPostRepository $activityPubPostRepository;
+
+    public function __construct(
+        ?PostHydrator $postHydrator = null,
+        ?HashTagRepository $hashTagRepository = null,
+        ?PostMetaInfoRepository $postMetaInfoRepository = null,
+        ?ActivityPubPostRepository $activityPubPostRepository = null,
+    ) {
         $this->postHydrator = $postHydrator ?? new PostHydrator;
         $this->hashTagRepository = $hashTagRepository ?? new HashTagRepository;
         $this->postMetaInfoRepository = $postMetaInfoRepository ?? new PostMetaInfoRepository;
+        $this->activityPubPostRepository = $activityPubPostRepository ?? new ActivityPubPostRepository;
     }
 
     public function storeLocation(
@@ -299,26 +306,56 @@ class PostRepository
             ->where('user_id', '=', $user->id);
     }
 
-    public function getTimelineForUser(User $user): PostPaginationDto
+    public function getTimelineForUser(User $user, ?string $cursor = null): PostPaginationDto
     {
-        $posts = $this->timelineQueryForUser($user)
+        $before = $this->decodeCursor($cursor);
+        $limit = 25;
+
+        $localPosts = $this->timelineQueryForUser($user)
             ->orWhere(function ($query) use ($user) {
                 $query->whereIn('user_id', $user->followings()->pluck('target_user_id'))
                     ->whereIn('visibility', [Visibility::PUBLIC->value, Visibility::ONLY_AUTHENTICATED->value]);
             })
+            ->where('published_at', '<', $before)
             ->orderByDesc('published_at')
-            ->cursorPaginate(50);
+            ->limit($limit)
+            ->get()
+            ->map(fn (Post $post) => $this->postHydrator->modelToDto($post));
 
-        $mapped = $posts->map(function (Post $post) {
-            return $this->postHydrator->modelToDto($post);
-        });
+        $apPosts = $this->activityPubPostRepository->getForFollowedActors($user->id, $before, $limit);
+
+        /** @var Collection<int, BasePost|LocationPost|TransportPost> $merged */
+        $merged = $localPosts->concat($apPosts)
+            ->sortByDesc(fn ($post) => $post->publishedAt)
+            ->values()
+            ->take($limit);
+
+        $nextCursor = $merged->count() === $limit
+            ? base64_encode($merged->last()->publishedAt)
+            : null;
 
         return new PostPaginationDto(
-            perPage: $posts->perPage(),
-            nextCursor: $posts->nextCursor()?->encode(),
-            previousCursor: $posts->previousCursor()?->encode(),
-            items: $mapped,
+            perPage: $limit,
+            nextCursor: $nextCursor,
+            previousCursor: null,
+            items: $merged,
         );
+    }
+
+    private function decodeCursor(?string $cursor): Carbon
+    {
+        if ($cursor === null) {
+            return Carbon::now()->addSecond();
+        }
+
+        $decoded = base64_decode($cursor);
+        // Handle legacy Eloquent cursor format (JSON with published_at key)
+        $json = json_decode($decoded, true);
+        if (isset($json['published_at'])) {
+            return Carbon::parse($json['published_at']);
+        }
+
+        return Carbon::parse($decoded);
     }
 
     public function getGlobalTimeline(?User $user = null): PostPaginationDto

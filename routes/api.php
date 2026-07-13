@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AccountController;
 use App\Http\Controllers\Api\ActivityPubFederationController;
+use App\Http\Controllers\Api\ActivityPubPostInteractionController;
 use App\Http\Controllers\Api\AppConfigurationController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CypressController;
@@ -177,6 +178,11 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/following', [ActivityPubFederationController::class, 'following'])->name('ap.federation.following');
         Route::post('/follow', [ActivityPubFederationController::class, 'follow'])->name('ap.federation.follow');
         Route::delete('/follow', [ActivityPubFederationController::class, 'unfollow'])->name('ap.federation.unfollow');
+
+        Route::prefix('posts/{postId}')->group(function () {
+            Route::post('/likes', [ActivityPubPostInteractionController::class, 'like'])->name('ap.posts.like');
+            Route::delete('/likes', [ActivityPubPostInteractionController::class, 'unlike'])->name('ap.posts.unlike');
+        });
     });
 
     Route::prefix('account')->group(function () {

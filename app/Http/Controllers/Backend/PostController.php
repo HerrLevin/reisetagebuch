@@ -176,9 +176,9 @@ class PostController extends Controller
         return $post;
     }
 
-    public function timeline(User $user): PostPaginationDto
+    public function timeline(User $user, ?string $cursor = null): PostPaginationDto
     {
-        return $this->postRepository->getTimelineForUser($user);
+        return $this->postRepository->getTimelineForUser($user, $cursor);
     }
 
     public function globalTimeline(?User $user = null): PostPaginationDto

@@ -150,6 +150,70 @@
                 ]
             }
         },
+        "/activitypub/posts/{postId}/likes": {
+            "post": {
+                "tags": [
+                    "ActivityPub"
+                ],
+                "summary": "Like an ActivityPub post",
+                "operationId": "likeApPost",
+                "parameters": [
+                    {
+                        "name": "postId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Like toggled"
+                    },
+                    "404": {
+                        "description": "Post not found"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "ActivityPub"
+                ],
+                "summary": "Unlike an ActivityPub post",
+                "operationId": "unlikeApPost",
+                "parameters": [
+                    {
+                        "name": "postId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Like removed"
+                    },
+                    "404": {
+                        "description": "Post not found"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
         "/app/configuration": {
             "get": {
                 "tags": [
@@ -2585,6 +2649,47 @@
                 ]
             }
         },
+        "/posts/{id}/traewelling/retry": {
+            "post": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Retry Traewelling crosspost",
+                "description": "Retry a failed Traewelling crosspost. Dispatches an edit job if a Traewelling ID already exists, otherwise dispatches a new check-in job. Deletes the failure notification.",
+                "operationId": "retryTraewellingCrosspost",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Post id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "422": {
+                        "description": "Not a transport post"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
         "/socialite/traewelling/connect": {
             "get": {
                 "tags": [
@@ -4893,6 +4998,11 @@
                                 }
                             ]
                         }
+                    },
+                    "sourceUrl": {
+                        "description": "Original URL for posts from the fediverse",
+                        "type": "string",
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -5167,8 +5277,20 @@
                         "format": "uri",
                         "nullable": true
                     },
+                    "avatarMimeType": {
+                        "description": "MimeType of the user header image",
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
+                    },
                     "header": {
                         "description": "URL of the user header image",
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
+                    },
+                    "headerMimeType": {
+                        "description": "MimeType of the user header image",
                         "type": "string",
                         "format": "uri",
                         "nullable": true
@@ -5207,6 +5329,12 @@
                         "description": "Account creation timestamp",
                         "type": "string",
                         "format": "date-time"
+                    },
+                    "profileUrl": {
+                        "description": "External profile URL for federated actors; null for local users",
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -5299,6 +5427,10 @@
         {
             "name": "Account",
             "description": "Account"
+        },
+        {
+            "name": "ActivityPub",
+            "description": "ActivityPub"
         },
         {
             "name": "App Configuration",

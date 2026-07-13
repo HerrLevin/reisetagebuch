@@ -490,7 +490,9 @@
         "following_title": "Personen, denen du folgst",
         "no_following": "Du folgst noch niemandem im Fediverse.",
         "not_found": "Nutzer nicht gefunden. Überprüfe den Handle und versuche es erneut.",
-        "resolve_error": "Handle konnte nicht aufgelöst werden. Die Instanz ist möglicherweise nicht erreichbar."
+        "resolve_error": "Handle konnte nicht aufgelöst werden. Die Instanz ist möglicherweise nicht erreichbar.",
+        "from_fediverse": "Fediverse",
+        "view_original": "Originalbeitrag ansehen"
     },
     "transport_group": {
         "long_distance": "Fernverkehr",
