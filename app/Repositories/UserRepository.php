@@ -92,8 +92,8 @@ class UserRepository
         }
 
         return [
-            'followers' => $user->followers()->count(),
-            'followings' => $user->followings()->count(),
+            'followers' => $user->followers()->count() + $user->activityPubFollowers()->count(),
+            'followings' => $user->followings()->count() + $user->remoteFollows()->count(),
         ];
     }
 }

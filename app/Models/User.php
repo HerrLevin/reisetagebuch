@@ -181,4 +181,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(ActivityPubFollower::class, 'followed_user_id');
     }
+
+    public function remoteFollows(): HasMany
+    {
+        return $this->hasMany(ActivityPubRemoteFollow::class, 'local_user_id');
+    }
 }

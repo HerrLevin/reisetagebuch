@@ -6,6 +6,7 @@ namespace App\Jobs;
 
 use App\Hydrators\ActivityPub\UndoFollowHydrator;
 use App\Repositories\UserRepository;
+use App\Repositories\UserStatisticsRepository;
 use App\Services\ActivityPubService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -30,6 +31,7 @@ class SendUndoFollowToRemoteActor implements ShouldQueue
         ActivityPubService $activityPub,
         UserRepository $userRepository,
         UndoFollowHydrator $hydrator,
+        UserStatisticsRepository $userStatisticsRepository,
     ): void {
         $userDto = $userRepository->getUserById($this->userId);
         $actorUrl = route('ap.actor', ['username' => $userDto->username]);
@@ -42,5 +44,6 @@ class SendUndoFollowToRemoteActor implements ShouldQueue
         )->toArray();
 
         $activityPub->deliverActivity($userDto, $this->remoteActorId, $this->inboxUrl, $undoActivity);
+        $userStatisticsRepository->decrementFollowingCount($this->userId);
     }
 }
