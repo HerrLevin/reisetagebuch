@@ -811,6 +811,8 @@ namespace App\Models{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PrivacyPolicyAcceptance> $privacyPolicyAcceptances
  * @property-read int|null $privacy_policy_acceptances_count
  * @property-read \App\Models\Profile|null $profile
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ActivityPubRemoteFollow> $remoteFollows
+ * @property-read int|null $remote_follows_count
  * @property-read \App\Models\UserSettings|null $settings
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SocialAccount> $socialAccounts
  * @property-read int|null $social_accounts_count

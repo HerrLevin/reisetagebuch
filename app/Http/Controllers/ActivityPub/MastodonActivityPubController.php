@@ -18,7 +18,6 @@ use App\Models\ActivityPubActor;
 use App\Models\ActivityPubFollower;
 use App\Models\ActivityPubInboxItem;
 use App\Models\ActivityPubLike;
-use App\Models\Follow;
 use App\Models\User;
 use App\Notifications\ActivityPubPostLikedNotification;
 use App\Notifications\ActivityPubUserFollowedNotification;
@@ -26,6 +25,7 @@ use App\Repositories\ActivityPubRemoteFollowRepository;
 use App\Repositories\NotificationRepository;
 use App\Repositories\PostRepository;
 use App\Repositories\UserRepository;
+use App\Repositories\UserStatisticsRepository;
 use App\Services\ActivityPubService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -41,6 +41,7 @@ class MastodonActivityPubController extends Controller
         private readonly PostRepository $postRepository,
         private readonly NotificationRepository $notificationRepository,
         private readonly ActivityPubRemoteFollowRepository $remoteFollowRepository,
+        private readonly UserStatisticsRepository $userStatisticsRepository,
     ) {}
 
     private function checkHeader(Request $request): bool
@@ -267,6 +268,7 @@ class MastodonActivityPubController extends Controller
         );
 
         if ($follow->wasRecentlyCreated) {
+            $this->userStatisticsRepository->incrementFollowersCount($user->id);
             $this->notificationRepository->notifyUser(
                 $user,
                 new ActivityPubUserFollowedNotification(
@@ -320,6 +322,7 @@ class MastodonActivityPubController extends Controller
 
         $inboxUrl = $follower->follower_shared_inbox_url ?? $follower->follower_inbox_url;
         $follower->delete();
+        $this->userStatisticsRepository->decrementFollowersCount($user->id);
 
         if ($inboxUrl) {
             try {
@@ -538,17 +541,14 @@ class MastodonActivityPubController extends Controller
 
     public function followers(string $username): JsonResponse
     {
-        $user = User::where('username', $username)->first();
+        $user = User::with('statistics')->where('username', $username)->first();
         if (! $user) {
             return response()->json(['error' => 'User not found'], 404);
         }
 
-        $count = ActivityPubFollower::where('followed_user_id', $user->id)->count();
-        $count += Follow::where('target_user_id', $user->id)->count();
-
         $collection = new OrderedCollectionHydrator()->hydrate(
             id: route('ap.followers', ['username' => $user->username]),
-            totalItems: $count,
+            totalItems: $user->statistics?->followers_count ?? 0,
         )->toArray();
 
         return response()->json(data: $collection, options: JSON_UNESCAPED_SLASHES)
@@ -557,17 +557,14 @@ class MastodonActivityPubController extends Controller
 
     public function following(string $username): JsonResponse
     {
-        $user = User::where('username', $username)->first();
+        $user = User::with('statistics')->where('username', $username)->first();
         if (! $user) {
             return response()->json(['error' => 'User not found'], 404);
         }
 
-        $count = ActivityPubFollower::where('follower_actor_id', $user->id)->count();
-        $count += Follow::where('origin_user_id', $user->id)->count();
-
         $collection = new OrderedCollectionHydrator()->hydrate(
             id: route('ap.following', ['username' => $user->username]),
-            totalItems: $count,
+            totalItems: $user->statistics?->following_count ?? 0,
         )->toArray();
 
         return response()->json(data: $collection, options: JSON_UNESCAPED_SLASHES)
