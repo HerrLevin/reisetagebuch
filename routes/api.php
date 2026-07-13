@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AccountController;
+use App\Http\Controllers\Api\ActivityPubFederationController;
 use App\Http\Controllers\Api\AppConfigurationController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CypressController;
@@ -182,7 +183,14 @@ Route::middleware('auth:api')->group(function () {
             Route::delete('/{inviteCode}', [InviteController::class, 'destroy'])->name('api.invites.destroy');
         });
 
-        Route::prefix('account')->group(function () {
+        Route::prefix('activitypub')->group(function () {
+        Route::get('/resolve', [ActivityPubFederationController::class, 'resolve'])->name('ap.federation.resolve');
+        Route::get('/following', [ActivityPubFederationController::class, 'following'])->name('ap.federation.following');
+        Route::post('/follow', [ActivityPubFederationController::class, 'follow'])->name('ap.federation.follow');
+        Route::delete('/follow', [ActivityPubFederationController::class, 'unfollow'])->name('ap.federation.unfollow');
+    });
+
+    Route::prefix('account')->group(function () {
             Route::patch('/settings', [UserSettingsController::class, 'update'])->name('account.settings.update');
             Route::patch('/profile', [UserController::class, 'update'])->name('profile.update');
             Route::post('/profile/avatar', [UserController::class, 'updateAvatar'])->name('profile.update.avatar'); // needs to be post b/c of file upload

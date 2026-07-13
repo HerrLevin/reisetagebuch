@@ -6,6 +6,7 @@ use App\Http\Resources\UserDto;
 use App\Jobs\FetchRemoteActorAvatar;
 use App\Models\ActivityPubActor;
 use App\Models\User;
+use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -32,6 +33,7 @@ class ActivityPubService
         'sharedInbox' => 'string|null',
         'preferredUsername' => 'string|null',
         'name' => 'string|null',
+        'summary' => 'string|null',
         'iconUrl' => 'string|null',
         'url' => 'string|null',
     ])]
@@ -54,17 +56,68 @@ class ActivityPubService
                         'sharedInbox' => $sharedInbox,
                         'preferredUsername' => $actor['preferredUsername'] ?? null,
                         'name' => $actor['name'] ?? null,
+                        'summary' => $actor['summary'] ?? null,
                         'iconUrl' => $actor['icon']['url'] ?? null,
                         'url' => $actor['url'] ?? null,
                     ];
                 }
             }
             Log::warning('No inbox found for actor: '.$actorId, ['actor' => $actor, 'response' => $response->body()]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error fetching actor: '.$actorId.' Error: '.$e->getMessage());
         }
 
         return null;
+    }
+
+    public function resolveActorByHandle(string $handle): ?array
+    {
+        $handle = ltrim($handle, '@');
+
+        if (substr_count($handle, '@') !== 1) {
+            return null;
+        }
+
+        [$username, $domain] = explode('@', $handle, 2);
+        $resource = urlencode("acct:{$username}@{$domain}");
+        $webfingerUrl = "https://{$domain}/.well-known/webfinger?resource={$resource}";
+
+        try {
+            $response = Http::withHeaders([
+                'Accept' => 'application/jrd+json, application/json',
+            ])->timeout(10)->get($webfingerUrl);
+
+            if (! $response->successful()) {
+                Log::warning('WebFinger lookup failed', ['handle' => $handle, 'status' => $response->status()]);
+
+                return null;
+            }
+
+            $actorUrl = null;
+            foreach ($response->json('links', []) as $link) {
+                if (($link['rel'] ?? '') === 'self') {
+                    $actorUrl = $link['href'];
+                    break;
+                }
+            }
+
+            if (! $actorUrl) {
+                Log::warning('WebFinger: no self link found', ['handle' => $handle]);
+
+                return null;
+            }
+
+            $profile = $this->getActorProfile($actorUrl);
+            if ($profile === null) {
+                return null;
+            }
+
+            return array_merge($profile, ['actorId' => $actorUrl]);
+        } catch (Exception $e) {
+            Log::error('WebFinger lookup error', ['handle' => $handle, 'error' => $e->getMessage()]);
+
+            return null;
+        }
     }
 
     public function resolveActor(string $actorUri): ?ActivityPubActor
