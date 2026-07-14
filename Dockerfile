@@ -19,7 +19,6 @@ RUN apk add --no-cache \
     bash \
     icu-dev \
     libpq-dev \
-    libxml2-dev \
     libzip-dev \
     nginx \
     nodejs \
@@ -33,7 +32,6 @@ RUN apk add --no-cache \
 # Install required PHP extensions
 RUN docker-php-ext-install \
         bcmath \
-        dom \
         intl \
         pdo_mysql \
         pdo_pgsql \
