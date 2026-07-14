@@ -35,6 +35,7 @@ use App\Jobs\TraewellingEditPostJob;
 use App\Models\Post;
 use App\Models\TransportTripStop;
 use App\Models\User;
+use App\Repositories\ActivityPubPostRepository;
 use App\Repositories\LocationRepository;
 use App\Repositories\NotificationRepository;
 use App\Repositories\PostRepository;
@@ -46,6 +47,7 @@ use Carbon\Carbon;
 use Clickbar\Magellan\Data\Geometries\LineString;
 use Clickbar\Magellan\IO\Parser\Geojson\GeojsonParser;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\UploadedFile;
 use Throwable;
 
@@ -63,13 +65,16 @@ class PostController extends Controller
 
     private NotificationRepository $notificationRepository;
 
+    private ActivityPubPostRepository $activityPubPostRepository;
+
     public function __construct(
         PostRepository $postRepository,
         LocationRepository $locationRepository,
         TransportTripRepository $transportTripRepository,
         UserStatisticsRepository $statisticsRepository,
         CalculateTransportStatsController $calculateTransportStatsController,
-        NotificationRepository $notificationRepository
+        NotificationRepository $notificationRepository,
+        ActivityPubPostRepository $activityPubPostRepository,
     ) {
         $this->locationRepository = $locationRepository;
         $this->postRepository = $postRepository;
@@ -77,6 +82,7 @@ class PostController extends Controller
         $this->statisticsRepository = $statisticsRepository;
         $this->calculateTransportStatsController = $calculateTransportStatsController;
         $this->notificationRepository = $notificationRepository;
+        $this->activityPubPostRepository = $activityPubPostRepository;
     }
 
     private function dispatchPost(BasePost|LocationPost|TransportPost $post): void
@@ -196,7 +202,14 @@ class PostController extends Controller
      */
     public function show(string $postId, ?User $visitingUser = null): BasePost|LocationPost|TransportPost
     {
-        return $this->postRepository->getById($postId, $visitingUser);
+        try {
+            return $this->postRepository->getById($postId, $visitingUser);
+        } catch (ModelNotFoundException) {
+            $apPost = $this->activityPubPostRepository->findByIdForUser($postId, $visitingUser?->id);
+            abort_if($apPost === null, 404);
+
+            return $apPost;
+        }
     }
 
     /**
