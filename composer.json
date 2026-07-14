@@ -12,6 +12,7 @@
     ],
     "require": {
         "php": "^8.4",
+        "ext-dom": "*",
         "ext-openssl": "*",
         "ext-pdo": "*",
         "ext-simplexml": "*",
