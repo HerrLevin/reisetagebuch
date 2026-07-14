@@ -27,6 +27,7 @@ use App\Repositories\NotificationRepository;
 use App\Repositories\PostRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\UserStatisticsRepository;
+use App\Services\ActivityPubContentSanitizer;
 use App\Services\ActivityPubService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -45,6 +46,7 @@ class MastodonActivityPubController extends Controller
         private readonly ActivityPubRemoteFollowRepository $remoteFollowRepository,
         private readonly UserStatisticsRepository $userStatisticsRepository,
         private readonly ActivityPubPostRepository $activityPubPostRepository,
+        private readonly ActivityPubContentSanitizer $contentSanitizer,
     ) {}
 
     private function checkHeader(Request $request): bool
@@ -241,7 +243,7 @@ class MastodonActivityPubController extends Controller
             activityPubActorId: $actor->id,
             activityId: $noteId,
             url: is_string($objectUrl) ? $objectUrl : null,
-            content: $content,
+            content: is_string($content) ? $this->contentSanitizer->sanitize($content) : null,
             publishedAt: $published ? Carbon::parse($published) : Carbon::now(),
         );
 
