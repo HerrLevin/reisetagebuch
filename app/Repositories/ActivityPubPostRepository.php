@@ -47,6 +47,21 @@ class ActivityPubPostRepository
         return ActivityPubPost::with('actor')->find($id);
     }
 
+    public function findByIdForUser(string $id, ?string $userId): ?BasePost
+    {
+        $query = ActivityPubPost::with('actor')->withCount('likes');
+
+        if ($userId) {
+            $query->withExists(['userLikes as liked_by_user' => function ($q) use ($userId) {
+                $q->where('user_id', $userId);
+            }]);
+        }
+
+        $post = $query->find($id);
+
+        return $post ? $this->hydrator->modelToDto($post) : null;
+    }
+
     /**
      * @return Collection<int, BasePost>
      */

@@ -61,7 +61,7 @@ loadPosts();
         <li v-for="post in posts" :key="post.id">
             <div
                 class="list-row hover-list-entry cursor-pointer"
-                @click="!post.sourceUrl && redirectToPost(post.id)"
+                @click="redirectToPost(post.id)"
             >
                 <Post :post="post" @delete:post="removePost(post.id)"></Post>
             </div>
