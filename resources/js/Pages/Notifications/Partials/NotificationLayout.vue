@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+    isActivityPubMentionNotification,
     isActivityPubPostLikedNotification,
     isActivityPubUserFollowedNotification,
     isPostLikedNotification,
@@ -9,6 +10,7 @@ import {
 import { computed, PropType } from 'vue';
 import { RouterLink } from 'vue-router';
 import {
+    ActivityPubMentionData,
     ActivityPubPostLikedData,
     ActivityPubUserFollowedData,
     NotificationWrapper,
@@ -69,6 +71,15 @@ const getNotificationLink = (
             };
         }
         return '#';
+    }
+    if (isActivityPubMentionNotification(notification)) {
+        const data = notification.data as ActivityPubMentionData;
+        return {
+            name: 'posts.show',
+            params: {
+                postId: data.postId,
+            },
+        };
     }
     return '#';
 };

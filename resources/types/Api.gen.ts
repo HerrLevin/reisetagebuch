@@ -80,6 +80,7 @@ export enum NotificationType {
   UserRequestedFollowNotification = "UserRequestedFollowNotification",
   ActivityPubUserFollowedNotification = "ActivityPubUserFollowedNotification",
   ActivityPubPostLikedNotification = "ActivityPubPostLikedNotification",
+  ActivityPubMentionNotification = "ActivityPubMentionNotification",
 }
 
 export enum MotisLocationType {
@@ -483,6 +484,23 @@ export interface ActivityPubPostLikedData {
   postSummary?: string | null;
 }
 
+/** Data for an ActivityPub mention notification */
+export interface ActivityPubMentionData {
+  /** @format uri */
+  actorId: string;
+  /** @example "johndoe" */
+  preferredUsername: string;
+  /** @example "John Doe" */
+  displayName?: string | null;
+  /** @format uri */
+  iconUrl?: string | null;
+  /** @format uri */
+  profileUrl?: string | null;
+  /** @format uuid */
+  postId: string;
+  postBody?: string | null;
+}
+
 /** Data for an ActivityPub user followed notification */
 export interface ActivityPubUserFollowedData {
   /**
@@ -542,6 +560,7 @@ export interface NotificationWrapper {
     | UserFollowedData
     | ActivityPubUserFollowedData
     | ActivityPubPostLikedData
+    | ActivityPubMentionData
     | null;
 }
 

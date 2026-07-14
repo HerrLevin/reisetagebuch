@@ -33,6 +33,9 @@
         },
         "ap_liked": {
             "lead": "{user} liked your post from the fediverse"
+        },
+        "ap_mention": {
+            "lead": "{user} mentioned you in a post"
         }
     },
     "trip_details": {

@@ -19,6 +19,7 @@ use App\Models\ActivityPubFollower;
 use App\Models\ActivityPubInboxItem;
 use App\Models\ActivityPubLike;
 use App\Models\User;
+use App\Notifications\ActivityPubMentionNotification;
 use App\Notifications\ActivityPubPostLikedNotification;
 use App\Notifications\ActivityPubUserFollowedNotification;
 use App\Repositories\ActivityPubPostRepository;
@@ -30,6 +31,7 @@ use App\Repositories\UserStatisticsRepository;
 use App\Services\ActivityPubContentSanitizer;
 use App\Services\ActivityPubService;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -167,7 +169,7 @@ class MastodonActivityPubController extends Controller
                 $user = $this->userRepository->getUserByUsername($username);
 
                 return $this->processActivity($activity, $user);
-            } catch (\Exception) {
+            } catch (Exception) {
                 Log::warning('Shared inbox: user not found', ['targetActorId' => $targetActorId]);
             }
         }
@@ -239,7 +241,7 @@ class MastodonActivityPubController extends Controller
             return response()->json('', 202);
         }
 
-        $this->activityPubPostRepository->findOrCreateByActivityId(
+        $post = $this->activityPubPostRepository->findOrCreateByActivityId(
             activityPubActorId: $actor->id,
             activityId: $noteId,
             url: is_string($objectUrl) ? $objectUrl : null,
@@ -249,7 +251,54 @@ class MastodonActivityPubController extends Controller
 
         Log::info('Stored AP post', ['noteId' => $noteId, 'actor' => $actorId]);
 
+        if ($post->wasRecentlyCreated) {
+            $this->notifyMentionedUsers($object, $actor, $post->id);
+        }
+
         return response()->json('', 202);
+    }
+
+    private function notifyMentionedUsers(array $object, ActivityPubActor $actor, string $postId): void
+    {
+        $tags = $object['tag'] ?? [];
+        if (! is_array($tags)) {
+            return;
+        }
+
+        $actorPrefix = str_replace('PLACEHOLDER', '', route('ap.actor', ['username' => 'PLACEHOLDER']));
+        $postBody = isset($object['content']) && is_string($object['content'])
+            ? substr(strip_tags($object['content']), 0, 100)
+            : null;
+
+        foreach ($tags as $tag) {
+            if (! is_array($tag) || ($tag['type'] ?? null) !== 'Mention') {
+                continue;
+            }
+
+            $href = $tag['href'] ?? null;
+            if (! is_string($href) || ! str_starts_with($href, $actorPrefix)) {
+                continue;
+            }
+
+            $username = substr($href, strlen($actorPrefix));
+            try {
+                $mentionedUser = $this->userRepository->getUserByUsername($username);
+                $this->notificationRepository->notifyUser(
+                    $mentionedUser,
+                    new ActivityPubMentionNotification(
+                        actorId: $actor->actor_uri,
+                        preferredUsername: $actor->preferred_username ?? $actor->actor_uri,
+                        displayName: $actor->display_name,
+                        iconUrl: $actor->local_icon_url,
+                        profileUrl: $actor->profile_url,
+                        postId: $postId,
+                        postBody: $postBody,
+                    )
+                );
+            } catch (Exception) {
+                // Mentioned user not found locally — ignore
+            }
+        }
     }
 
     private function handleNoteDelete(array $activity): JsonResponse
@@ -391,7 +440,7 @@ class MastodonActivityPubController extends Controller
         if ($inboxUrl) {
             try {
                 $this->sendAccept($user, $activity, $inboxUrl);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::error('Failed to send Accept for follow', [
                     'follower' => $followerActorId,
                     'error' => $e->getMessage(),
@@ -433,7 +482,7 @@ class MastodonActivityPubController extends Controller
         if ($inboxUrl) {
             try {
                 $this->sendAcceptToInbox($user, $activity, $inboxUrl);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::error('Failed to send Accept for undo follow', [
                     'follower' => $followerActorId,
                     'error' => $e->getMessage(),
@@ -514,7 +563,7 @@ class MastodonActivityPubController extends Controller
                         postSummary: $postDto->getSummary(),
                     )
                 );
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::error('Failed to send notification for AP like', [
                     'actor' => $actorId,
                     'postId' => $postId,
