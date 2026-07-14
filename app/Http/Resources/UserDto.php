@@ -29,8 +29,14 @@ class UserDto
     #[OA\Property('avatar', description: 'URL of the user avatar image', type: 'string', format: 'uri', nullable: true)]
     public ?string $avatar = null;
 
+    #[OA\Property('avatarMimeType', description: 'MimeType of the user header image', type: 'string', format: 'uri', nullable: true)]
+    public ?string $avatarMimeType = null;
+
     #[OA\Property('header', description: 'URL of the user header image', type: 'string', format: 'uri', nullable: true)]
     public ?string $header = null;
+
+    #[OA\Property('headerMimeType', description: 'MimeType of the user header image', type: 'string', format: 'uri', nullable: true)]
+    public ?string $headerMimeType = null;
 
     #[OA\Property('bio', description: 'Biography of the user', type: 'string', nullable: true)]
     public ?string $bio = null;
@@ -50,6 +56,12 @@ class UserDto
     #[OA\Property(ref: '#/components/schemas/UserStatisticsDto')]
     public UserStatisticsDto $statistics;
 
+    #[OA\Property('publicKeyPem', description: 'Public Key PEM', type: 'string')]
+    public string $publicKeyPem;
+
     #[OA\Property('createdAt', description: 'Account creation timestamp', type: 'string', format: 'date-time')]
     public string $createdAt;
+
+    #[OA\Property('profileUrl', description: 'External profile URL for federated actors; null for local users', type: 'string', format: 'uri', nullable: true)]
+    public ?string $profileUrl = null;
 }

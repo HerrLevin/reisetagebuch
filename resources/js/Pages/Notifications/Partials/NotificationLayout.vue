@@ -1,26 +1,34 @@
 <script setup lang="ts">
 import {
+    isActivityPubMentionNotification,
+    isActivityPubPostLikedNotification,
+    isActivityPubUserFollowedNotification,
     isPostLikedNotification,
     isTraewellingCrosspostFailedNotification,
     isUserFollowedNotification,
 } from '@/types/notifications';
-import { PropType } from 'vue';
+import { computed, PropType } from 'vue';
 import { RouterLink } from 'vue-router';
 import {
+    ActivityPubMentionData,
+    ActivityPubPostLikedData,
+    ActivityPubUserFollowedData,
     NotificationWrapper,
     PostLikedData,
     TraewellingCrosspostFailedData,
     UserFollowedData,
 } from '../../../../types/Api.gen';
 
-defineProps({
+const props = defineProps({
     notification: {
         type: Object as PropType<NotificationWrapper>,
         required: true,
     },
 });
 
-const getNotificationLink = (notification: NotificationWrapper) => {
+const getNotificationLink = (
+    notification: NotificationWrapper,
+): string | { name: string; params: Record<string, string> } => {
     if (isPostLikedNotification(notification)) {
         const data = notification.data as PostLikedData;
         return {
@@ -48,15 +56,61 @@ const getNotificationLink = (notification: NotificationWrapper) => {
             },
         };
     }
+    if (isActivityPubUserFollowedNotification(notification)) {
+        const data = notification.data as ActivityPubUserFollowedData;
+        return data.followerProfileUrl ?? '#';
+    }
+    if (isActivityPubPostLikedNotification(notification)) {
+        const data = notification.data as ActivityPubPostLikedData;
+        if (data.postId) {
+            return {
+                name: 'posts.show',
+                params: {
+                    postId: data.postId,
+                },
+            };
+        }
+        return '#';
+    }
+    if (isActivityPubMentionNotification(notification)) {
+        const data = notification.data as ActivityPubMentionData;
+        return {
+            name: 'posts.show',
+            params: {
+                postId: data.postId,
+            },
+        };
+    }
     return '#';
 };
+
+const link = computed(() => getNotificationLink(props.notification));
+const isExternalLink = computed(
+    () => typeof link.value === 'string' && link.value !== '#',
+);
 </script>
 <template>
+    <a
+        v-if="isExternalLink"
+        :href="link as string"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        <li
+            :class="{
+                'bg-base-200': !notification.readAt,
+            }"
+            class="list-row hover-list-entry cursor-pointer"
+        >
+            <slot></slot>
+        </li>
+    </a>
     <RouterLink
+        v-else
         v-slot="{ navigate }"
         class="list-row hover-list-entry cursor-pointer"
         custom
-        :to="getNotificationLink(notification)"
+        :to="link"
     >
         <li
             :class="{

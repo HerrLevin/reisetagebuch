@@ -67,4 +67,9 @@ class Post extends Model
     {
         return $this->hasMany(Like::class);
     }
+
+    public function activityPubLikes(): HasMany
+    {
+        return $this->hasMany(ActivityPubLike::class);
+    }
 }

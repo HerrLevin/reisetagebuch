@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import ActivityPubMentionNotification from '@/Pages/Notifications/Partials/ActivityPubMentionNotification.vue';
+import ActivityPubPostLikedNotification from '@/Pages/Notifications/Partials/ActivityPubPostLikedNotification.vue';
+import ActivityPubUserFollowedNotification from '@/Pages/Notifications/Partials/ActivityPubUserFollowedNotification.vue';
 import PostLikedNotification from '@/Pages/Notifications/Partials/PostLikedNotification.vue';
 import TraewellingCrosspostFailedNotification from '@/Pages/Notifications/Partials/TraewellingCrosspostFailedNotification.vue';
 import UserFollowedNotification from '@/Pages/Notifications/Partials/UserFollowedNotification.vue';
@@ -8,6 +11,9 @@ import UserRequestedFollowNotification from '@/Pages/Notifications/Partials/User
 import { useNotificationStore } from '@/stores/notifications';
 import {
     getTypedNotificationData,
+    isActivityPubMentionNotification,
+    isActivityPubPostLikedNotification,
+    isActivityPubUserFollowedNotification,
     isPostLikedNotification,
     isTraewellingCrosspostFailedNotification,
     isUserFollowedNotification,
@@ -38,6 +44,15 @@ const getNotificationComponent = (notification: NotificationWrapper) => {
     }
     if (isUserRequestedFollowNotification(notification)) {
         return UserRequestedFollowNotification;
+    }
+    if (isActivityPubUserFollowedNotification(notification)) {
+        return ActivityPubUserFollowedNotification;
+    }
+    if (isActivityPubPostLikedNotification(notification)) {
+        return ActivityPubPostLikedNotification;
+    }
+    if (isActivityPubMentionNotification(notification)) {
+        return ActivityPubMentionNotification;
     }
     return null;
 };

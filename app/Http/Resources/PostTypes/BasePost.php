@@ -78,8 +78,18 @@ class BasePost
     /** @var array<string, string|string[]> */
     public array $metaInfos = [];
 
-    public function __construct(Post $post, UserDto $userDto)
+    #[OA\Property('sourceUrl', description: 'Original URL for posts from the fediverse', type: 'string', nullable: true)]
+    public ?string $sourceUrl = null;
+
+    public function __construct(?Post $post = null, ?UserDto $userDto = null)
     {
+        if ($post === null) {
+            return;
+        }
+
+        $likes = $post->likes_count ?? 0;
+        $apLikes = $post->activity_pub_likes_count ?? 0;
+
         $this->id = $post->id;
         $this->body = $post->body;
         $this->user = $userDto;
@@ -88,7 +98,7 @@ class BasePost
         $this->createdAt = $post->created_at->toIso8601String();
         $this->updatedAt = $post->updated_at->toIso8601String();
         $this->hashTags = $post->hashTags?->map(fn ($hashTag) => $hashTag->value)->toArray() ?? [];
-        $this->likesCount = $post->likes_count ?? 0;
+        $this->likesCount = $likes + $apLikes;
         $this->likedByUser = $post->liked_by_user ?? false;
         $this->metaInfos = $post->metaInfos?->groupBy(fn ($metaInfo) => $metaInfo->key->value)
             ->map(function ($group) {
@@ -98,5 +108,20 @@ class BasePost
 
                 return $group->first()->value;
             })->toArray() ?? [];
+    }
+
+    public function getHtmlBody(): ?string
+    {
+        return $this->body;
+    }
+
+    public function getSummary(): ?string
+    {
+        return empty($this->post->body) ? null : $this->formattedBody();
+    }
+
+    protected function formattedBody(): string
+    {
+        return $this->body ? sprintf('"%s" ', $this->body) : '';
     }
 }

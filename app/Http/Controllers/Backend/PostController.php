@@ -25,6 +25,9 @@ use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
 use App\Jobs\CalculateStatsForTransportPost;
 use App\Jobs\PrefetchJob;
+use App\Jobs\PushDeleteToMastodon;
+use App\Jobs\PushPostToMastodon;
+use App\Jobs\PushUpdateToMastodon;
 use App\Jobs\TraewellingChangeExitJob;
 use App\Jobs\TraewellingCrossCheckInJob;
 use App\Jobs\TraewellingDeletePostJob;
@@ -32,6 +35,7 @@ use App\Jobs\TraewellingEditPostJob;
 use App\Models\Post;
 use App\Models\TransportTripStop;
 use App\Models\User;
+use App\Repositories\ActivityPubPostRepository;
 use App\Repositories\LocationRepository;
 use App\Repositories\NotificationRepository;
 use App\Repositories\PostRepository;
@@ -43,6 +47,7 @@ use Carbon\Carbon;
 use Clickbar\Magellan\Data\Geometries\LineString;
 use Clickbar\Magellan\IO\Parser\Geojson\GeojsonParser;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\UploadedFile;
 use Throwable;
 
@@ -60,13 +65,16 @@ class PostController extends Controller
 
     private NotificationRepository $notificationRepository;
 
+    private ActivityPubPostRepository $activityPubPostRepository;
+
     public function __construct(
         PostRepository $postRepository,
         LocationRepository $locationRepository,
         TransportTripRepository $transportTripRepository,
         UserStatisticsRepository $statisticsRepository,
         CalculateTransportStatsController $calculateTransportStatsController,
-        NotificationRepository $notificationRepository
+        NotificationRepository $notificationRepository,
+        ActivityPubPostRepository $activityPubPostRepository,
     ) {
         $this->locationRepository = $locationRepository;
         $this->postRepository = $postRepository;
@@ -74,6 +82,17 @@ class PostController extends Controller
         $this->statisticsRepository = $statisticsRepository;
         $this->calculateTransportStatsController = $calculateTransportStatsController;
         $this->notificationRepository = $notificationRepository;
+        $this->activityPubPostRepository = $activityPubPostRepository;
+    }
+
+    private function dispatchPost(BasePost|LocationPost|TransportPost $post): void
+    {
+        PushPostToMastodon::dispatch($post->id);
+    }
+
+    private function dispatchUpdate(BasePost|LocationPost|TransportPost $post): void
+    {
+        PushUpdateToMastodon::dispatch($post->id);
     }
 
     public function storeLocation(LocationBasePostRequest $request): BasePost|LocationPost|TransportPost
@@ -81,7 +100,7 @@ class PostController extends Controller
         $location = $this->locationRepository->getLocationById($request->input('location'));
         $this->statisticsRepository->storeLocationPostCreation($request->user()->id);
 
-        return $this->postRepository->storeLocation(
+        $post = $this->postRepository->storeLocation(
             $request->user(),
             $location,
             Visibility::from($request->input('visibility')),
@@ -90,18 +109,24 @@ class PostController extends Controller
             TravelReason::from($request->input('travelReason')),
             $request->input('visitedAt') ? Carbon::parse($request->input('visitedAt')) : null,
         );
+        $this->dispatchPost($post);
+
+        return $post;
     }
 
     public function storeText(BasePostRequest $request): BasePost
     {
         $this->statisticsRepository->storeTextPostCreation($request->user()->id);
 
-        return $this->postRepository->storeText(
+        $post = $this->postRepository->storeText(
             $request->user(),
             Visibility::from($request->input('visibility')),
             $request->input('body'),
             $request->input('tags', [])
         );
+        $this->dispatchPost($post);
+
+        return $post;
     }
 
     public function storeMotisTransport(TransportBasePostCreateRequest $request): BasePost|LocationPost|TransportPost
@@ -152,13 +177,14 @@ class PostController extends Controller
         TraewellingCrossCheckInJob::dispatch($post->id);
         $this->calculateTransportStatsController->calculateStatsForPost($post->id);
         PrefetchJob::dispatch($stopStopover->location->location);
+        $this->dispatchPost($post);
 
         return $post;
     }
 
-    public function timeline(User $user): PostPaginationDto
+    public function timeline(User $user, ?string $cursor = null): PostPaginationDto
     {
-        return $this->postRepository->getTimelineForUser($user);
+        return $this->postRepository->getTimelineForUser($user, $cursor);
     }
 
     public function globalTimeline(?User $user = null): PostPaginationDto
@@ -176,7 +202,14 @@ class PostController extends Controller
      */
     public function show(string $postId, ?User $visitingUser = null): BasePost|LocationPost|TransportPost
     {
-        return $this->postRepository->getById($postId, $visitingUser);
+        try {
+            return $this->postRepository->getById($postId, $visitingUser);
+        } catch (ModelNotFoundException) {
+            $apPost = $this->activityPubPostRepository->findByIdForUser($postId, $visitingUser?->id);
+            abort_if($apPost === null, 404);
+
+            return $apPost;
+        }
     }
 
     /**
@@ -216,6 +249,8 @@ class PostController extends Controller
             );
         }
 
+        $this->dispatchUpdate($post);
+
         return $post;
     }
 
@@ -228,6 +263,8 @@ class PostController extends Controller
         if ($user->cannot('delete', $post)) {
             throw new AuthorizationException('You do not have permission to delete this post.');
         }
+
+        PushDeleteToMastodon::dispatch($postId, $user->id, $user->username);
 
         if ($post instanceof TransportPost) {
             TraewellingDeletePostJob::dispatch($post);
@@ -272,6 +309,7 @@ class PostController extends Controller
         $this->calculateTransportStatsController->calculateStatsForPost($post->id);
 
         TraewellingEditPostJob::dispatch($post);
+        $this->dispatchUpdate($post);
 
         return $post;
     }
@@ -305,6 +343,7 @@ class PostController extends Controller
         }
 
         TraewellingChangeExitJob::dispatch($post);
+        $this->dispatchUpdate($post);
         $this->calculateTransportStatsController->calculateStatsForPost($post->id);
 
         return $post;
@@ -377,6 +416,7 @@ class PostController extends Controller
         $internalPost = $this->postRepository->internalGetById($postId);
         $this->postRepository->updateTransportGeometry($internalPost->transportPost, $geometry);
         $this->calculateTransportStatsController->calculateStatsForPost($post->id);
+        $this->dispatchUpdate($post);
 
         return $this->postRepository->getById($postId, $user);
     }
@@ -410,6 +450,7 @@ class PostController extends Controller
         $this->postRepository->updateTransportGeometry($internalPost->transportPost, null);
 
         $this->calculateTransportStatsController->calculateStatsForPost($post->id);
+        $this->dispatchUpdate($post);
 
         return $this->postRepository->getById($postId, $user);
     }

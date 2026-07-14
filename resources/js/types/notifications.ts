@@ -1,4 +1,7 @@
 import {
+    ActivityPubMentionData,
+    ActivityPubPostLikedData,
+    ActivityPubUserFollowedData,
     NotificationType,
     NotificationWrapper,
     PostLikedData,
@@ -51,9 +54,50 @@ export const isTraewellingCrosspostFailedNotification = (
     );
 };
 
+export const isActivityPubUserFollowedNotification = (
+    notification: NotificationWrapper,
+) => {
+    const data = notification.data;
+    return (
+        notification.data !== null &&
+        notification.type ===
+            NotificationType.ActivityPubUserFollowedNotification &&
+        (data as ActivityPubUserFollowedData).followerActorId !== undefined
+    );
+};
+
+export const isActivityPubPostLikedNotification = (
+    notification: NotificationWrapper,
+) => {
+    const data = notification.data;
+    return (
+        notification.data !== null &&
+        notification.type ===
+            NotificationType.ActivityPubPostLikedNotification &&
+        (data as ActivityPubPostLikedData).actorId !== undefined
+    );
+};
+
+export const isActivityPubMentionNotification = (
+    notification: NotificationWrapper,
+) => {
+    const data = notification.data;
+    return (
+        notification.data !== null &&
+        notification.type === NotificationType.ActivityPubMentionNotification &&
+        (data as ActivityPubMentionData).postId !== undefined
+    );
+};
+
 export const getTypedNotificationData = (
     notification: NotificationWrapper,
-): PostLikedData | UserFollowedData | null => {
+):
+    | PostLikedData
+    | UserFollowedData
+    | ActivityPubUserFollowedData
+    | ActivityPubPostLikedData
+    | ActivityPubMentionData
+    | null => {
     if (isPostLikedNotification(notification)) {
         return notification.data;
     }
@@ -64,6 +108,15 @@ export const getTypedNotificationData = (
         return notification.data;
     }
     if (isUserRequestedFollowNotification(notification)) {
+        return notification.data;
+    }
+    if (isActivityPubUserFollowedNotification(notification)) {
+        return notification.data;
+    }
+    if (isActivityPubPostLikedNotification(notification)) {
+        return notification.data;
+    }
+    if (isActivityPubMentionNotification(notification)) {
         return notification.data;
     }
     return null;

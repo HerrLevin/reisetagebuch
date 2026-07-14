@@ -32,12 +32,12 @@ class UserRepository
         return $this->userHydrator->modelToDto($user);
     }
 
-    public function updateAvatar(User $user, ?string $avatarPath): UserDto
+    public function updateAvatar(User $user, ?string $avatarPath, ?string $avatarMimeType): UserDto
     {
         if (! $user->profile) {
-            $user->profile()->create(['avatar' => $avatarPath]);
+            $user->profile()->create(['avatar' => $avatarPath, 'avatar_mime_type' => $avatarMimeType]);
         } else {
-            $user->profile()->update(['avatar' => $avatarPath]);
+            $user->profile()->update(['avatar' => $avatarPath, 'avatar_mime_type' => $avatarMimeType]);
         }
 
         $user->load('profile');
@@ -45,12 +45,12 @@ class UserRepository
         return $this->userHydrator->modelToDto($user);
     }
 
-    public function updateHeader(User $user, ?string $headerPath): UserDto
+    public function updateHeader(User $user, ?string $headerPath, ?string $headerMimeType): UserDto
     {
         if (! $user->profile) {
-            $user->profile()->create(['header' => $headerPath]);
+            $user->profile()->create(['header' => $headerPath, 'header_mime_type' => $headerMimeType]);
         } else {
-            $user->profile()->update(['header' => $headerPath]);
+            $user->profile()->update(['header' => $headerPath, 'header_mime_type' => $headerMimeType]);
         }
 
         $user->load('profile');
@@ -92,8 +92,8 @@ class UserRepository
         }
 
         return [
-            'followers' => $user->followers()->count(),
-            'followings' => $user->followings()->count(),
+            'followers' => $user->followers()->count() + $user->activityPubFollowers()->count(),
+            'followings' => $user->followings()->count() + $user->remoteFollows()->count(),
         ];
     }
 }

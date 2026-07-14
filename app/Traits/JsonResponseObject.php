@@ -13,6 +13,9 @@ trait JsonResponseObject
     {
         $array = [];
         foreach (get_object_vars($this) as $key => $value) {
+            if (str_starts_with($key, '__')) {
+                continue;
+            }
             if (is_object($value) && method_exists($value, 'toArray')) {
                 $array[$key] = $value->toArray();
             } elseif (is_array($value)) {
@@ -20,6 +23,10 @@ trait JsonResponseObject
             } else {
                 $array[$key] = $value;
             }
+        }
+
+        if (method_exists($this, 'prependRaw')) {
+            return array_merge($this->prependRaw(), $array);
         }
 
         return $array;

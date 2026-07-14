@@ -35,7 +35,7 @@ class UserController extends Controller
         $avatarPath = $user->profile?->avatar;
         $avatarPath = $this->fileRepository->uploadAndReplaceFile('avatars', $upload, $avatarPath);
 
-        return $this->userRepository->updateAvatar($user, $avatarPath);
+        return $this->userRepository->updateAvatar($user, $avatarPath, $upload->getMimeType());
     }
 
     public function deleteAvatar(User $user): UserDto
@@ -44,7 +44,7 @@ class UserController extends Controller
             $this->fileRepository->deleteFile($user->profile->avatar);
         }
 
-        return $this->userRepository->updateAvatar($user, null);
+        return $this->userRepository->updateAvatar($user, null, null);
     }
 
     public function updateHeader(ImageUploadRequest $request, User $user): UserDto
@@ -53,7 +53,7 @@ class UserController extends Controller
         $headerPath = $user->profile?->header;
         $headerPath = $this->fileRepository->uploadAndReplaceFile('headers', $upload, $headerPath);
 
-        return $this->userRepository->updateHeader($user, $headerPath);
+        return $this->userRepository->updateHeader($user, $headerPath, $upload->getMimeType());
     }
 
     public function deleteHeader(User $user): UserDto
@@ -62,7 +62,7 @@ class UserController extends Controller
             $this->fileRepository->deleteFile($user->profile->header);
         }
 
-        return $this->userRepository->updateHeader($user, null);
+        return $this->userRepository->updateHeader($user, null, null);
     }
 
     public function update(UpdateProfileRequest $request, User $user): UserDto

@@ -9,6 +9,7 @@ import VerifyEmail from '@/Pages/Auth/VerifyEmail.vue';
 import EditPost from '@/Pages/EditPost.vue';
 import Forbidden from '@/Pages/Errors/Forbidden.vue';
 import NotFound from '@/Pages/Errors/NotFound.vue';
+import FediverseIndex from '@/Pages/Fediverse/Index.vue';
 import Home from '@/Pages/Home.vue';
 import Imprint from '@/Pages/Imprint.vue';
 import Invites from '@/Pages/Invites.vue';
@@ -188,6 +189,12 @@ const routes: RouteRecordRaw[] = [
         meta: { auth: true },
     },
     {
+        path: '/fediverse',
+        name: 'fediverse.index',
+        component: FediverseIndex,
+        meta: { auth: true },
+    },
+    {
         path: '/invites',
         name: 'invites.index',
         component: Invites,
@@ -200,10 +207,19 @@ const routes: RouteRecordRaw[] = [
         meta: { auth: true },
     },
     {
-        path: '/profile/:username',
+        path: '/@:username',
         name: 'profile.show',
         component: ProfileShow,
         props: true,
+    },
+    {
+        path: '/profile/:username',
+        redirect: (to) => {
+            return {
+                name: 'profile.show',
+                params: { username: to.params.username },
+            };
+        },
     },
     {
         path: '/profile/:username/map',

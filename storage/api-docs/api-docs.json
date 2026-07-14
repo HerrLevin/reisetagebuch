@@ -150,6 +150,70 @@
                 ]
             }
         },
+        "/activitypub/posts/{postId}/likes": {
+            "post": {
+                "tags": [
+                    "ActivityPub"
+                ],
+                "summary": "Like an ActivityPub post",
+                "operationId": "likeApPost",
+                "parameters": [
+                    {
+                        "name": "postId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Like toggled"
+                    },
+                    "404": {
+                        "description": "Post not found"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "ActivityPub"
+                ],
+                "summary": "Unlike an ActivityPub post",
+                "operationId": "unlikeApPost",
+                "parameters": [
+                    {
+                        "name": "postId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Like removed"
+                    },
+                    "404": {
+                        "description": "Post not found"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
         "/app/configuration": {
             "get": {
                 "tags": [
@@ -2585,6 +2649,47 @@
                 ]
             }
         },
+        "/posts/{id}/traewelling/retry": {
+            "post": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Retry Traewelling crosspost",
+                "description": "Retry a failed Traewelling crosspost. Dispatches an edit job if a Traewelling ID already exists, otherwise dispatches a new check-in job. Deletes the failure notification.",
+                "operationId": "retryTraewellingCrosspost",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Post id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "422": {
+                        "description": "Not a transport post"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
         "/socialite/traewelling/connect": {
             "get": {
                 "tags": [
@@ -3684,6 +3789,98 @@
                 },
                 "type": "object"
             },
+            "ActivityPubPostLikedData": {
+                "description": "Data for an ActivityPub post liked notification",
+                "required": [
+                    "actorId",
+                    "preferredUsername",
+                    "postId"
+                ],
+                "properties": {
+                    "actorId": {
+                        "description": "ActivityPub actor ID (URI) of the remote user who liked the post",
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    "preferredUsername": {
+                        "description": "Preferred username of the remote user",
+                        "type": "string",
+                        "example": "johndoe"
+                    },
+                    "displayName": {
+                        "description": "Display name of the remote user",
+                        "type": "string",
+                        "example": "John Doe",
+                        "nullable": true
+                    },
+                    "iconUrl": {
+                        "description": "Avatar URL of the remote user",
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
+                    },
+                    "profileUrl": {
+                        "description": "Profile URL of the remote user",
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
+                    },
+                    "postId": {
+                        "description": "ID of the liked post",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "postBody": {
+                        "description": "Body content of the liked post",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "postSummary": {
+                        "description": "Summary of the liked post",
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "ActivityPubUserFollowedData": {
+                "description": "Data for an ActivityPub user followed notification",
+                "required": [
+                    "followerActorId",
+                    "followerPreferredUsername"
+                ],
+                "properties": {
+                    "followerActorId": {
+                        "description": "ActivityPub actor ID (URI) of the remote follower",
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    "followerPreferredUsername": {
+                        "description": "Preferred username of the remote follower",
+                        "type": "string",
+                        "example": "johndoe"
+                    },
+                    "followerDisplayName": {
+                        "description": "Display name of the remote follower",
+                        "type": "string",
+                        "example": "John Doe",
+                        "nullable": true
+                    },
+                    "followerIconUrl": {
+                        "description": "Avatar URL of the remote follower",
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
+                    },
+                    "followerProfileUrl": {
+                        "description": "Profile URL of the remote follower",
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
             "NotificationWrapper": {
                 "description": "A wrapper for notification data",
                 "required": [
@@ -3729,6 +3926,12 @@
                             },
                             {
                                 "$ref": "#/components/schemas/UserFollowedData"
+                            },
+                            {
+                                "$ref": "#/components/schemas/ActivityPubUserFollowedData"
+                            },
+                            {
+                                "$ref": "#/components/schemas/ActivityPubPostLikedData"
                             }
                         ]
                     }
@@ -4068,7 +4271,9 @@
                     "PostLikedNotification",
                     "UserFollowedNotification",
                     "TraewellingCrosspostFailedNotification",
-                    "UserRequestedFollowNotification"
+                    "UserRequestedFollowNotification",
+                    "ActivityPubUserFollowedNotification",
+                    "ActivityPubPostLikedNotification"
                 ]
             },
             "Feature": {
@@ -4793,6 +4998,11 @@
                                 }
                             ]
                         }
+                    },
+                    "sourceUrl": {
+                        "description": "Original URL for posts from the fediverse",
+                        "type": "string",
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -5067,8 +5277,20 @@
                         "format": "uri",
                         "nullable": true
                     },
+                    "avatarMimeType": {
+                        "description": "MimeType of the user header image",
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
+                    },
                     "header": {
                         "description": "URL of the user header image",
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
+                    },
+                    "headerMimeType": {
+                        "description": "MimeType of the user header image",
                         "type": "string",
                         "format": "uri",
                         "nullable": true
@@ -5099,10 +5321,20 @@
                     "statistics": {
                         "$ref": "#/components/schemas/UserStatisticsDto"
                     },
+                    "publicKeyPem": {
+                        "description": "Public Key PEM",
+                        "type": "string"
+                    },
                     "createdAt": {
                         "description": "Account creation timestamp",
                         "type": "string",
                         "format": "date-time"
+                    },
+                    "profileUrl": {
+                        "description": "External profile URL for federated actors; null for local users",
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -5195,6 +5427,10 @@
         {
             "name": "Account",
             "description": "Account"
+        },
+        {
+            "name": "ActivityPub",
+            "description": "ActivityPub"
         },
         {
             "name": "App Configuration",

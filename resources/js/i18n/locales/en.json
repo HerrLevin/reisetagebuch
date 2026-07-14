@@ -27,6 +27,15 @@
             "lead": "{user} requested to follow you",
             "accept": "Accept",
             "decline": "Decline"
+        },
+        "ap_follower": {
+            "lead": "{user} started following you from the fediverse"
+        },
+        "ap_liked": {
+            "lead": "{user} liked your post from the fediverse"
+        },
+        "ap_mention": {
+            "lead": "{user} mentioned you in a post"
         }
     },
     "trip_details": {
@@ -473,6 +482,22 @@
         "OTHER": "Other",
         "AREAL_LIFT": "Areal Lift",
         "METRO": "Metro"
+    },
+    "fediverse": {
+        "title": "Fediverse",
+        "find_title": "Find someone on the Fediverse",
+        "handle_placeholder": "{'@'}user{'@'}instance.social",
+        "find": "Find",
+        "follow": "Follow",
+        "unfollow": "Unfollow",
+        "pending": "Pending",
+        "rejected": "Rejected",
+        "following_title": "People you follow",
+        "no_following": "You're not following anyone in the Fediverse yet.",
+        "not_found": "Actor not found. Check the handle and try again.",
+        "resolve_error": "Failed to resolve this handle. The instance may be unavailable.",
+        "from_fediverse": "Fediverse",
+        "view_original": "View original post"
     },
     "transport_group": {
         "long_distance": "Long Distance",

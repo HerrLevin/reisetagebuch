@@ -26,7 +26,9 @@ class UserHydrator
         $dto->name = $user->name;
         $dto->username = $user->username;
         $dto->avatar = $user->profile?->avatar ? $this->urlGenerator->to('/files/'.$user->profile?->avatar) : null;
+        $dto->avatarMimeType = $user->profile?->avatar_mime_type;
         $dto->header = $user->profile?->header ? $this->urlGenerator->to('/files/'.$user->profile?->header) : null;
+        $dto->headerMimeType = $user->profile?->header_mime_type;
         $dto->bio = $user->profile?->bio;
         $dto->website = $user->profile?->website;
         $dto->isFollowed = $user->is_followed;
@@ -34,6 +36,7 @@ class UserHydrator
         $dto->requiresFollowRequest = $user->settings?->requires_follow_request ?? false;
         $dto->statistics = $this->statisticsToDto($user->statistics);
         $dto->createdAt = $user->created_at->toIso8601String();
+        $dto->publicKeyPem = $user->public_key;
 
         return $dto;
     }

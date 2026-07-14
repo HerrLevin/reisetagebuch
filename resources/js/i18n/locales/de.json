@@ -27,6 +27,15 @@
             "lead": "{user} möchte dir folgen",
             "accept": "Anfrage akzeptieren",
             "decline": "Anfrage ablehnen"
+        },
+        "ap_follower": {
+            "lead": "{user} folgt dir jetzt aus dem Fediverse"
+        },
+        "ap_liked": {
+            "lead": "{user} hat deinen Post aus dem Fediverse geliked"
+        },
+        "ap_mention": {
+            "lead": "{user} hat dich in einem Post erwähnt"
         }
     },
     "trip_details": {
@@ -471,6 +480,22 @@
         "OTHER": "Andere",
         "AREAL_LIFT": "Luftlift",
         "METRO": "Metro"
+    },
+    "fediverse": {
+        "title": "Fediverse",
+        "find_title": "Jemanden im Fediverse finden",
+        "handle_placeholder": "{'@'}nutzer{'@'}instanz.social",
+        "find": "Suchen",
+        "follow": "Folgen",
+        "unfollow": "Entfolgen",
+        "pending": "Ausstehend",
+        "rejected": "Abgelehnt",
+        "following_title": "Personen, denen du folgst",
+        "no_following": "Du folgst noch niemandem im Fediverse.",
+        "not_found": "Nutzer nicht gefunden. Überprüfe den Handle und versuche es erneut.",
+        "resolve_error": "Handle konnte nicht aufgelöst werden. Die Instanz ist möglicherweise nicht erreichbar.",
+        "from_fediverse": "Fediverse",
+        "view_original": "Originalbeitrag ansehen"
     },
     "transport_group": {
         "long_distance": "Fernverkehr",

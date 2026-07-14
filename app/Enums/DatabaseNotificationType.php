@@ -2,10 +2,16 @@
 
 namespace App\Enums;
 
+use App\Hydrators\Notifications\ActivityPubMentionHydrator;
+use App\Hydrators\Notifications\ActivityPubPostLikedHydrator;
+use App\Hydrators\Notifications\ActivityPubUserFollowedHydrator;
 use App\Hydrators\Notifications\PostLikedDataHydrator;
 use App\Hydrators\Notifications\TraewellingCrosspostFailedHydrator;
 use App\Hydrators\Notifications\UserFollowedHydrator;
 use App\Hydrators\Notifications\UserRequestedFollowHydrator;
+use App\Notifications\ActivityPubMentionNotification;
+use App\Notifications\ActivityPubPostLikedNotification;
+use App\Notifications\ActivityPubUserFollowedNotification;
 use App\Notifications\PostLiked;
 use App\Notifications\TraewellingCrosspostFailedNotification;
 use App\Notifications\UserFollowedNotification;
@@ -24,6 +30,9 @@ enum DatabaseNotificationType: string
     case UserFollowed = 'UserFollowedNotification';
     case TraewellingCrosspostFailed = 'TraewellingCrosspostFailedNotification';
     case UserRequestedFollow = 'UserRequestedFollowNotification';
+    case ActivityPubUserFollowed = 'ActivityPubUserFollowedNotification';
+    case ActivityPubPostLiked = 'ActivityPubPostLikedNotification';
+    case ActivityPubMention = 'ActivityPubMentionNotification';
 
     public function getClassName(): string
     {
@@ -32,6 +41,9 @@ enum DatabaseNotificationType: string
             self::UserFollowed => UserFollowedNotification::class,
             self::TraewellingCrosspostFailed => TraewellingCrosspostFailedNotification::class,
             self::UserRequestedFollow => UserRequestedFollowNotification::class,
+            self::ActivityPubUserFollowed => ActivityPubUserFollowedNotification::class,
+            self::ActivityPubPostLiked => ActivityPubPostLikedNotification::class,
+            self::ActivityPubMention => ActivityPubMentionNotification::class,
         };
     }
 
@@ -42,6 +54,9 @@ enum DatabaseNotificationType: string
             self::UserFollowed => UserFollowedHydrator::class,
             self::TraewellingCrosspostFailed => TraewellingCrosspostFailedHydrator::class,
             self::UserRequestedFollow => UserRequestedFollowHydrator::class,
+            self::ActivityPubUserFollowed => ActivityPubUserFollowedHydrator::class,
+            self::ActivityPubPostLiked => ActivityPubPostLikedHydrator::class,
+            self::ActivityPubMention => ActivityPubMentionHydrator::class,
         };
     }
 }
