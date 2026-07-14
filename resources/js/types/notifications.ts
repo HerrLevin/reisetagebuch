@@ -1,4 +1,5 @@
 import {
+    ActivityPubMentionData,
     ActivityPubPostLikedData,
     ActivityPubUserFollowedData,
     NotificationType,
@@ -77,6 +78,17 @@ export const isActivityPubPostLikedNotification = (
     );
 };
 
+export const isActivityPubMentionNotification = (
+    notification: NotificationWrapper,
+) => {
+    const data = notification.data;
+    return (
+        notification.data !== null &&
+        notification.type === NotificationType.ActivityPubMentionNotification &&
+        (data as ActivityPubMentionData).postId !== undefined
+    );
+};
+
 export const getTypedNotificationData = (
     notification: NotificationWrapper,
 ):
@@ -84,6 +96,7 @@ export const getTypedNotificationData = (
     | UserFollowedData
     | ActivityPubUserFollowedData
     | ActivityPubPostLikedData
+    | ActivityPubMentionData
     | null => {
     if (isPostLikedNotification(notification)) {
         return notification.data;
@@ -101,6 +114,9 @@ export const getTypedNotificationData = (
         return notification.data;
     }
     if (isActivityPubPostLikedNotification(notification)) {
+        return notification.data;
+    }
+    if (isActivityPubMentionNotification(notification)) {
         return notification.data;
     }
     return null;
