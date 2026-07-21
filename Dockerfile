@@ -20,6 +20,7 @@ RUN apk add --no-cache \
     icu-dev \
     libpq-dev \
     libzip-dev \
+    logrotate \
     nginx \
     nodejs \
     npm \
@@ -77,6 +78,7 @@ ENV SERVER_NAME={HOSTNAME}
 COPY docker/php/php-fpm.conf /usr/local/etc/php-fpm.conf
 COPY docker/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY docker/supervisor/supervisord.conf /etc/supervisord.conf
+COPY docker/logrotate/supervisord /etc/logrotate.d/supervisord
 COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
