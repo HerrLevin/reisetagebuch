@@ -1,0 +1,9 @@
+/var/www/html/storage/logs/supervisord.log {
+    daily
+    rotate 7
+    missingok
+    notifempty
+    compress
+    delaycompress
+    copytruncate
+}
