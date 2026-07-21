@@ -60,6 +60,7 @@
         "vue-router": "^5.0.3"
     },
     "overrides": {
-        "serialize-javascript": ">=7.0.3"
+        "serialize-javascript": ">=7.0.3",
+        "shell-quote": ">=1.9.0"
     }
 }
