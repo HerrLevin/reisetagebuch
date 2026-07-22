@@ -52,7 +52,7 @@
         "luxon": "^3.6.1",
         "maplibre-gl": "^5.4.0",
         "markdown-it": "^14.1.1",
-        "pinia": "^3.0.4",
+        "pinia": "^4.0.0",
         "pinia-plugin-persistedstate": "^4.7.1",
         "vite-plugin-pwa": "^1.0.0",
         "vue-debounce": "^5.0.1",
