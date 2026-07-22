@@ -131,7 +131,7 @@ class TransportPost extends BasePost
         $distance = round($this->distance / 1000, 1);
         $body = "<p>$emoji<strong>$line</strong> · $origin → $destination<br>🕐 $duration min · $distance km</p>";
 
-        return $parentBody ? nl2br(e($parentBody)."\n\n").$body : $body;
+        return $parentBody ? nl2br($parentBody."\n\n").$body : $body;
     }
 
     public function getSummary(): ?string
