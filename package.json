@@ -52,12 +52,12 @@
         "luxon": "^3.6.1",
         "maplibre-gl": "^5.4.0",
         "markdown-it": "^14.1.1",
-        "pinia": "^3.0.4",
+        "pinia": "^4.0.2",
         "pinia-plugin-persistedstate": "^4.7.1",
         "vite-plugin-pwa": "^1.0.0",
         "vue-debounce": "^5.0.1",
         "vue-i18n": "^11.1.12",
-        "vue-router": "^5.0.3"
+        "vue-router": "^5.2.0"
     },
     "overrides": {
         "serialize-javascript": ">=7.0.3",
