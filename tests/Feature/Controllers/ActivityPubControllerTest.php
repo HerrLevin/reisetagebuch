@@ -83,12 +83,16 @@ class ActivityPubControllerTest extends TestCase
         $date = now()->format('D, d M Y H:i:s \G\M\T');
         $digest = 'SHA-256='.base64_encode(hash('sha256', $body, true));
 
+        // content-type wird bewusst nicht mitsigniert: Laravels postJson() erzwingt
+        // immer "Content-Type: application/json" auf dem tatsächlichen Request,
+        // unabhängig vom hier gesetzten Header — genau wie die echte Federation-
+        // Implementierung (ActivityPubService::createSignature()) signiert dieser
+        // Helper daher nur (request-target) host date digest.
         $signingString = implode("\n", [
             "(request-target): post {$path}",
             "host: {$host}",
             "date: {$date}",
             "digest: {$digest}",
-            'content-type: application/activity+json',
         ]);
 
         $privateKey = openssl_pkey_get_private($privateKeyPem);
@@ -98,7 +102,7 @@ class ActivityPubControllerTest extends TestCase
         $signatureHeader = implode(',', [
             "keyId=\"{$keyId}\"",
             'algorithm="rsa-sha256"',
-            'headers="(request-target) host date digest content-type"',
+            'headers="(request-target) host date digest"',
             "signature=\"{$signatureB64}\"",
         ]);
 
@@ -106,7 +110,6 @@ class ActivityPubControllerTest extends TestCase
             'Date' => $date,
             'Digest' => $digest,
             'Signature' => $signatureHeader,
-            'Content-Type' => 'application/activity+json',
             'Host' => $host,
         ];
     }
@@ -157,7 +160,9 @@ class ActivityPubControllerTest extends TestCase
     ) {
         $host = parse_url(config('app.url'), PHP_URL_HOST) ?? 'localhost';
         $path = parse_url($url, PHP_URL_PATH);
-        $body = json_encode($activity, JSON_UNESCAPED_SLASHES);
+        // Muss exakt dem entsprechen, was postJson() tatsächlich sendet
+        // (json_encode() ohne JSON_UNESCAPED_SLASHES), sonst stimmt der Digest nicht.
+        $body = json_encode($activity);
         $keyId = "{$actorId}#main-key";
         $headers = $this->buildSignedHeaders($privateKeyPem, $keyId, $path, $body, $host);
 
@@ -165,13 +170,92 @@ class ActivityPubControllerTest extends TestCase
     }
 
     /**
-     * POST auf einen Inbox-Endpunkt, bei dem die VerifyHttpSignature-Middleware
-     * deaktiviert ist (für reine Controller-Logik-Tests).
+     * Wie signedPost(), erlaubt aber explizite Kontrolle darüber, welche Header
+     * signiert werden und ob der Digest-Header überhaupt gesendet wird — für
+     * Tests der Digest-Pflicht (Fix 2).
+     *
+     * @param  string[]  $signedHeaderNames
+     */
+    private function signedPostCustomHeaders(
+        string $url,
+        array $activity,
+        string $actorId,
+        string $privateKeyPem,
+        array $signedHeaderNames,
+        bool $includeDigestHeader,
+    ): TestResponse {
+        $host = parse_url(config('app.url'), PHP_URL_HOST) ?? 'localhost';
+        $path = parse_url($url, PHP_URL_PATH);
+        $body = json_encode($activity);
+        $date = now()->format('D, d M Y H:i:s \G\M\T');
+        $digest = 'SHA-256='.base64_encode(hash('sha256', $body, true));
+
+        $availableParts = [
+            '(request-target)' => "(request-target): post {$path}",
+            'host' => "host: {$host}",
+            'date' => "date: {$date}",
+            'digest' => "digest: {$digest}",
+            'content-type' => 'content-type: application/activity+json',
+        ];
+        $signingString = implode("\n", array_map(fn ($name) => $availableParts[$name], $signedHeaderNames));
+
+        $privateKey = openssl_pkey_get_private($privateKeyPem);
+        openssl_sign($signingString, $signature, $privateKey, OPENSSL_ALGO_SHA256);
+        $signatureB64 = base64_encode($signature);
+
+        $signatureHeader = implode(',', [
+            'keyId="'.$actorId.'#main-key"',
+            'algorithm="rsa-sha256"',
+            'headers="'.implode(' ', $signedHeaderNames).'"',
+            "signature=\"{$signatureB64}\"",
+        ]);
+
+        $headers = [
+            'Date' => $date,
+            'Signature' => $signatureHeader,
+            'Content-Type' => 'application/activity+json',
+            'Host' => $host,
+        ];
+        if ($includeDigestHeader) {
+            $headers['Digest'] = $digest;
+        }
+
+        return $this->withHeaders($headers)->postJson($url, $activity);
+    }
+
+    /**
+     * Ersetzt die VerifyHttpSignature-Middleware durch eine Fake-Variante, die
+     * den signierenden Actor als bereits verifiziert markiert (ohne echte
+     * Signaturprüfung), damit reine Controller-Logik-Tests unabhängig von der
+     * HTTP-Signature-Verifikation bleiben (die separat getestet wird).
+     */
+    private function withVerifiedActor(?string $actorId): static
+    {
+        $this->app->bind(VerifyHttpSignature::class, fn () => new class($actorId)
+        {
+            public function __construct(private readonly ?string $actorId) {}
+
+            public function handle($request, \Closure $next)
+            {
+                if ($this->actorId !== null) {
+                    $request->attributes->set('ap_verified_actor', $this->actorId);
+                }
+
+                return $next($request);
+            }
+        });
+
+        return $this;
+    }
+
+    /**
+     * POST auf einen Inbox-Endpunkt, bei dem die HTTP-Signature-Verifikation
+     * durch eine Fake-Middleware ersetzt wird (für reine Controller-Logik-Tests).
      */
     private function inboxPost(string $url, array $activity): TestResponse
     {
         return $this
-            ->withoutMiddleware(VerifyHttpSignature::class)
+            ->withVerifiedActor($activity['actor'] ?? null)
             ->withHeaders(['Content-Type' => 'application/activity+json'])
             ->postJson($url, $activity);
     }
@@ -626,6 +710,104 @@ class ActivityPubControllerTest extends TestCase
         $response->assertStatus(401);
     }
 
+    public function test_inbox_rejects_body_when_digest_header_missing(): void
+    {
+        $this->createUserWithKeys(['username' => 'alice']);
+        [$remotePrivKey, $remotePubKey] = $this->generateKeyPair();
+        $remoteActorId = 'https://remote.example/users/bob';
+
+        $this->setupRemoteActor($remoteActorId, $remotePubKey);
+
+        $activity = [
+            'type' => 'Follow',
+            'actor' => $remoteActorId,
+            'object' => route('ap.actor', ['username' => 'alice']),
+        ];
+
+        $response = $this->signedPostCustomHeaders(
+            '/ap/users/alice/inbox',
+            $activity,
+            $remoteActorId,
+            $remotePrivKey,
+            signedHeaderNames: ['(request-target)', 'host', 'date'],
+            includeDigestHeader: false,
+        );
+
+        $response->assertStatus(401);
+    }
+
+    public function test_inbox_rejects_body_when_digest_not_included_in_signed_headers(): void
+    {
+        $this->createUserWithKeys(['username' => 'alice']);
+        [$remotePrivKey, $remotePubKey] = $this->generateKeyPair();
+        $remoteActorId = 'https://remote.example/users/bob';
+
+        $this->setupRemoteActor($remoteActorId, $remotePubKey);
+
+        $activity = [
+            'type' => 'Follow',
+            'actor' => $remoteActorId,
+            'object' => route('ap.actor', ['username' => 'alice']),
+        ];
+
+        // Digest-Header wird gesendet, ist aber nicht Teil der signierten Header
+        // → die Signatur deckt den Body nicht ab.
+        $response = $this->signedPostCustomHeaders(
+            '/ap/users/alice/inbox',
+            $activity,
+            $remoteActorId,
+            $remotePrivKey,
+            signedHeaderNames: ['(request-target)', 'host', 'date'],
+            includeDigestHeader: true,
+        );
+
+        $response->assertStatus(401);
+    }
+
+    public function test_inbox_rejects_activity_actor_that_does_not_match_signer(): void
+    {
+        $this->createUserWithKeys(['username' => 'alice']);
+        [$bobPrivKey, $bobPubKey] = $this->generateKeyPair();
+        $bobActorId = 'https://remote.example/users/bob';
+
+        $this->setupRemoteActor($bobActorId, $bobPubKey);
+
+        $activity = [
+            '@context' => 'https://www.w3.org/ns/activitystreams',
+            'id' => 'https://remote.example/activities/forged-1',
+            'type' => 'Follow',
+            'actor' => 'https://remote.example/users/carol', // fälschlich als Carol ausgegeben
+            'object' => route('ap.actor', ['username' => 'alice']),
+        ];
+
+        // Signiert mit Bobs Schlüssel, behauptet aber Carol zu sein.
+        $response = $this->signedPost('/ap/users/alice/inbox', $activity, $bobActorId, $bobPrivKey);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_inbox_rejects_undo_follow_when_inner_actor_does_not_match_outer(): void
+    {
+        $this->createUserWithKeys(['username' => 'alice']);
+        $remoteActorId = 'https://remote.example/users/bob';
+
+        $activity = [
+            '@context' => 'https://www.w3.org/ns/activitystreams',
+            'id' => 'https://remote.example/activities/forged-undo',
+            'type' => 'Undo',
+            'actor' => $remoteActorId,
+            'object' => [
+                'type' => 'Follow',
+                'actor' => 'https://remote.example/users/carol', // gefälschter innerer Actor
+                'object' => route('ap.actor', ['username' => 'alice']),
+            ],
+        ];
+
+        $response = $this->inboxPost('/ap/users/alice/inbox', $activity);
+
+        $response->assertStatus(403);
+    }
+
     // ──────────────────────────────────────────────────────────────────────────
     // POST /ap/users/{username}/inbox  –  Controller-Logik (Middleware bypassed)
     //
@@ -927,7 +1109,7 @@ class ActivityPubControllerTest extends TestCase
         ];
 
         $response = $this
-            ->withoutMiddleware(VerifyHttpSignature::class)
+            ->withVerifiedActor($activity['actor'] ?? null)
             ->withHeaders(['Content-Type' => 'application/activity+json'])
             ->postJson('/ap/inbox', $activity);
 
@@ -950,7 +1132,7 @@ class ActivityPubControllerTest extends TestCase
         ];
 
         $response = $this
-            ->withoutMiddleware(VerifyHttpSignature::class)
+            ->withVerifiedActor($activity['actor'] ?? null)
             ->withHeaders(['Content-Type' => 'application/activity+json'])
             ->postJson('/ap/inbox', $activity);
 
@@ -969,7 +1151,7 @@ class ActivityPubControllerTest extends TestCase
         ];
 
         $response = $this
-            ->withoutMiddleware(VerifyHttpSignature::class)
+            ->withVerifiedActor($activity['actor'] ?? null)
             ->withHeaders(['Content-Type' => 'application/activity+json'])
             ->postJson('/ap/inbox', $activity);
 

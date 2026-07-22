@@ -28,6 +28,8 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'private_key',
+        'public_key',
     ];
 
     protected $casts = [
@@ -48,6 +50,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_admin' => 'boolean',
+            'private_key' => 'encrypted',
         ];
     }
 

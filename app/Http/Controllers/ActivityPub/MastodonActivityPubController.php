@@ -127,7 +127,7 @@ class MastodonActivityPubController extends Controller
         $user = $this->userRepository->getUserByUsername($username);
         $activity = $request->json()->all();
 
-        return $this->processActivity($activity, $user);
+        return $this->processActivity($activity, $user, $request);
     }
 
     public function sharedInbox(Request $request): JsonResponse
@@ -141,11 +141,11 @@ class MastodonActivityPubController extends Controller
 
         // Global activities: Create(Note) and Delete(Note) have no specific local user target
         if ($type === 'Create') {
-            return $this->processGlobalActivity($activity);
+            return $this->processGlobalActivity($activity, $request);
         }
 
         if ($type === 'Delete' && ! $this->isActorDelete($activity)) {
-            return $this->processGlobalActivity($activity);
+            return $this->processGlobalActivity($activity, $request);
         }
 
         // Determine the target user from the activity
@@ -168,7 +168,7 @@ class MastodonActivityPubController extends Controller
             try {
                 $user = $this->userRepository->getUserByUsername($username);
 
-                return $this->processActivity($activity, $user);
+                return $this->processActivity($activity, $user, $request);
             } catch (Exception) {
                 Log::warning('Shared inbox: user not found', ['targetActorId' => $targetActorId]);
             }
@@ -186,11 +186,18 @@ class MastodonActivityPubController extends Controller
         return $objectId !== null && $objectId === $actorUri;
     }
 
-    private function processGlobalActivity(array $activity): JsonResponse
+    private function processGlobalActivity(array $activity, Request $request): JsonResponse
     {
         $type = $activity['type'] ?? null;
         $activityId = $activity['id'] ?? null;
         $actorId = $activity['actor'] ?? null;
+
+        $verifiedActor = $request->attributes->get('ap_verified_actor');
+        if (! $actorId || $actorId !== $verifiedActor) {
+            Log::warning('ActivityPub: actor does not match signer', ['claimed' => $actorId, 'verified' => $verifiedActor]);
+
+            return response()->json(['error' => 'Actor does not match signature'], 403);
+        }
 
         if ($activityId && $actorId) {
             $inserted = ActivityPubInboxItem::insertOrIgnore([
@@ -324,11 +331,18 @@ class MastodonActivityPubController extends Controller
             || str_contains($contentType, 'application/json');
     }
 
-    private function processActivity(array $activity, UserDto $user): JsonResponse
+    private function processActivity(array $activity, UserDto $user, Request $request): JsonResponse
     {
         $type = $activity['type'] ?? null;
         $activityId = $activity['id'] ?? null;
         $actorId = $activity['actor'] ?? null;
+
+        $verifiedActor = $request->attributes->get('ap_verified_actor');
+        if (! $actorId || $actorId !== $verifiedActor) {
+            Log::warning('ActivityPub: actor does not match signer', ['claimed' => $actorId, 'verified' => $verifiedActor]);
+
+            return response()->json(['error' => 'Actor does not match signature'], 403);
+        }
 
         if ($activityId && $actorId) {
             $inserted = ActivityPubInboxItem::insertOrIgnore([
@@ -459,6 +473,15 @@ class MastodonActivityPubController extends Controller
         $followerActorId = $object['actor'];
         $followedActorId = $object['object'];
 
+        if ($followerActorId !== $activity['actor']) {
+            Log::warning('ActivityPub: Undo(Follow) inner actor does not match outer actor', [
+                'inner' => $followerActorId,
+                'outer' => $activity['actor'],
+            ]);
+
+            return response()->json(['error' => 'Actor does not match signature'], 403);
+        }
+
         if ($followedActorId !== route('ap.actor', ['username' => $user->username])) {
             Log::info('invalid follow object', [$user->username, $followedActorId]);
 
@@ -580,6 +603,15 @@ class MastodonActivityPubController extends Controller
         $object = $activity['object'] ?? [];
         $actorId = $object['actor'] ?? $activity['actor'] ?? null;
         $objectUrl = $object['object'] ?? null;
+
+        if (isset($object['actor']) && $object['actor'] !== $activity['actor']) {
+            Log::warning('ActivityPub: Undo(Like) inner actor does not match outer actor', [
+                'inner' => $object['actor'],
+                'outer' => $activity['actor'],
+            ]);
+
+            return response()->json(['error' => 'Actor does not match signature'], 403);
+        }
 
         if (! $actorId || ! is_string($objectUrl)) {
             return response()->json('', 202);

@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\ActivityPubActor;
+use App\Services\ActivityPubUrlGuard;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Http;
@@ -28,7 +29,7 @@ class FetchRemoteActorAvatar implements ShouldQueue
         private readonly string $actorId
     ) {}
 
-    public function handle(): void
+    public function handle(ActivityPubUrlGuard $urlGuard): void
     {
         $actor = ActivityPubActor::find($this->actorId);
         if (! $actor || ! $actor->remote_icon_url) {
@@ -41,7 +42,10 @@ class FetchRemoteActorAvatar implements ShouldQueue
         }
 
         try {
+            $urlGuard->assertSafe($actor->remote_icon_url);
+
             $response = Http::withHeaders($headers)
+                ->withOptions(['allow_redirects' => false])
                 ->timeout(15)
                 ->get($actor->remote_icon_url);
         } catch (\Exception $e) {

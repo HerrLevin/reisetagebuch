@@ -14,6 +14,10 @@ use JetBrains\PhpStorm\ArrayShape;
 
 class ActivityPubService
 {
+    public function __construct(
+        private readonly ActivityPubUrlGuard $urlGuard,
+    ) {}
+
     #[ArrayShape(['inbox' => 'string|null', 'sharedInbox' => 'string|null'])]
     public function getInbox(string $followerActorId): ?array
     {
@@ -41,9 +45,11 @@ class ActivityPubService
     {
         $actor = null;
         try {
+            $this->urlGuard->assertSafe($actorId);
+
             $response = Http::withHeaders([
                 'Accept' => 'application/activity+json',
-            ])->get($actorId);
+            ])->withOptions(['allow_redirects' => false])->timeout(10)->get($actorId);
 
             if ($response->successful()) {
                 $actor = $response->json();
@@ -83,9 +89,11 @@ class ActivityPubService
         $webfingerUrl = "https://{$domain}/.well-known/webfinger?resource={$resource}";
 
         try {
+            $this->urlGuard->assertSafe($webfingerUrl);
+
             $response = Http::withHeaders([
                 'Accept' => 'application/jrd+json, application/json',
-            ])->timeout(10)->get($webfingerUrl);
+            ])->withOptions(['allow_redirects' => false])->timeout(10)->get($webfingerUrl);
 
             if (! $response->successful()) {
                 Log::warning('WebFinger lookup failed', ['handle' => $handle, 'status' => $response->status()]);
@@ -106,6 +114,8 @@ class ActivityPubService
 
                 return null;
             }
+
+            $this->urlGuard->assertSafe($actorUrl);
 
             $profile = $this->getActorProfile($actorUrl);
             if ($profile === null) {

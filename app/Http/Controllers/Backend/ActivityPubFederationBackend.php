@@ -9,6 +9,7 @@ use App\Jobs\SendFollowToRemoteActor;
 use App\Jobs\SendUndoFollowToRemoteActor;
 use App\Repositories\ActivityPubRemoteFollowRepository;
 use App\Repositories\UserRepository;
+use App\Services\ActivityPubContentSanitizer;
 use App\Services\ActivityPubService;
 use Illuminate\Support\Str;
 
@@ -18,6 +19,7 @@ class ActivityPubFederationBackend extends Controller
         private readonly ActivityPubService $activityPubService,
         private readonly ActivityPubRemoteFollowRepository $remoteFollowRepository,
         private readonly UserRepository $userRepository,
+        private readonly ActivityPubContentSanitizer $contentSanitizer,
     ) {}
 
     public function resolveHandle(string $userId, string $handle): ?array
@@ -34,7 +36,7 @@ class ActivityPubFederationBackend extends Controller
             'actor_id' => $actorId,
             'display_name' => $profile['name'],
             'preferred_username' => $profile['preferredUsername'],
-            'summary' => $profile['summary'],
+            'summary' => $this->contentSanitizer->sanitize($profile['summary']),
             'icon_url' => $profile['iconUrl'],
             'profile_url' => $profile['url'],
             'follow_state' => $followState,

@@ -38,9 +38,7 @@ function fetchPost() {
         .showPost(props.postId)
         .then((response) => {
             post.value = response.data as
-                | BasePost
-                | TransportPost
-                | LocationPost;
+                BasePost | TransportPost | LocationPost;
             prefillForm();
         })
         .catch(() => {
