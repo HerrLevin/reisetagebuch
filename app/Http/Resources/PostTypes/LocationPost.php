@@ -68,7 +68,7 @@ class LocationPost extends BasePost
         $name = $this->location->name;
         $body = "<p>📍<strong>$name</strong></p>";
 
-        return $parentBody ? nl2br(e($parentBody)."\n\n").$body : $body;
+        return $parentBody ? nl2br($parentBody."\n\n").$body : $body;
     }
 
     public function getSummary(): ?string

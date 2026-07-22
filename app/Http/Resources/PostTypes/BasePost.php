@@ -112,7 +112,7 @@ class BasePost
 
     public function getHtmlBody(): ?string
     {
-        return $this->body;
+        return $this->body !== null ? e($this->body) : null;
     }
 
     public function getSummary(): ?string

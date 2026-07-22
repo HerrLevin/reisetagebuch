@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\ActivityPubUrlGuard;
 use Closure;
 use DateTime;
 use DateTimeZone;
@@ -13,6 +14,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class VerifyHttpSignature
 {
+    public function __construct(
+        private readonly ActivityPubUrlGuard $urlGuard,
+    ) {}
+
     public function handle(Request $request, Closure $next): Response
     {
         $signatureHeader = $request->header('Signature');
@@ -66,9 +71,21 @@ class VerifyHttpSignature
             return response()->json(['error' => 'Invalid Date header'], 401);
         }
 
-        // Verify Digest header matches body
+        // Verify Digest header matches body. Mandatory whenever there's a body, and it
+        // must be part of the signed headers — otherwise the signature covers the
+        // transport but not the payload, letting an attacker tamper with the body.
         $digestHeader = $request->header('Digest');
-        if ($digestHeader) {
+        if ($request->getContent() !== '') {
+            if (! $digestHeader) {
+                Log::warning('VerifyHttpSignature: missing Digest header on request with body', ['keyId' => $params['keyId']]);
+
+                return response()->json(['error' => 'Missing Digest header'], 401);
+            }
+            if (! in_array('digest', $signedHeaders, true)) {
+                Log::warning('VerifyHttpSignature: digest not included in signed headers', ['keyId' => $params['keyId']]);
+
+                return response()->json(['error' => 'Digest header must be signed'], 401);
+            }
             $expectedDigest = 'SHA-256='.base64_encode(hash('sha256', $request->getContent(), true));
             if (! hash_equals($expectedDigest, $digestHeader)) {
                 Log::warning('VerifyHttpSignature: digest mismatch', [
@@ -136,6 +153,8 @@ class VerifyHttpSignature
             return response()->json(['error' => 'Invalid signature'], 401);
         }
 
+        $request->attributes->set('ap_verified_actor', strtok($params['keyId'], '#'));
+
         return $next($request);
     }
 
@@ -164,9 +183,11 @@ class VerifyHttpSignature
         }
 
         try {
+            $this->urlGuard->assertSafe($actorUrl);
+
             $response = Http::withHeaders([
                 'Accept' => 'application/activity+json',
-            ])->timeout(10)->get($actorUrl);
+            ])->withOptions(['allow_redirects' => false])->timeout(10)->get($actorUrl);
 
             if ($response->successful()) {
                 $actor = $response->json();
