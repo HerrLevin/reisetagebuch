@@ -1,0 +1,17 @@
+{
+	skip_install_trust
+	frankenphp {
+		num_threads 5
+	}
+}
+
+{$SERVER_NAME:localhost}:80 {
+	root /var/www/html/public
+	encode zstd br gzip
+
+	request_body {
+		max_size 11MB
+	}
+
+	php_server
+}
