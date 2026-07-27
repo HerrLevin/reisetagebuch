@@ -6,6 +6,7 @@ on:
       - "v*"
     branches:
       - main
+      - franken-php
   workflow_run:
     workflows: ["linter", "run-tests"]
     types:
@@ -30,7 +31,7 @@ jobs:
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@v6
 
       - name: Docker meta
         id: meta
@@ -53,19 +54,30 @@ jobs:
       - name: Determine app version
         id: app_version
         run: |
+          # If this is a semver tag (v...), use the metadata action's version and tags
           if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
             echo "version=${{ steps.meta.outputs.version }}" >> "$GITHUB_OUTPUT"
-          else
+            echo "tags=${{ steps.meta.outputs.tags }}" >> "$GITHUB_OUTPUT"
+          # If this is the special franken-php branch, force the docker tag to 'franken-php'
+          elif [[ "${{ github.ref }}" == refs/heads/franken-php ]]; then
+            # Use fully qualified repository name so Docker pushes to the correct repo
             echo "version=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+            echo "tags=herrlevin/reisetagebuch:franken-php" >> "$GITHUB_OUTPUT"
+          else
+            # Default: use commit SHA as version and propagate metadata tags
+            echo "version=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+            echo "tags=${{ steps.meta.outputs.tags }}" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v7
         with:
-          context: ./
+          context: ./.
           file: Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags || 'latest' }}
+          # Prefer tags computed by the previous step (which may force 'franken-php'),
+          # fall back to metadata tags or 'latest'
+          tags: ${{ steps.app_version.outputs.tags || steps.meta.outputs.tags || 'latest' }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             APP_VERSION=${{ steps.app_version.outputs.version }}
