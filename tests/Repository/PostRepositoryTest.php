@@ -167,6 +167,32 @@ class PostRepositoryTest extends TestCase
         $this->assertNotContains($privateFollowedPost->id, $ids);
     }
 
+    public function test_timeline_shows_own_future_posts_but_not_followed_users_future_posts()
+    {
+        $owner = User::factory()->create();
+        $followedUser = User::factory()->create();
+        $repo = new PostRepository;
+
+        $owner->followings()->create(['target_user_id' => $followedUser->id]);
+
+        $ownFuturePost = Post::factory()->create([
+            'user_id' => $owner->id,
+            'visibility' => Visibility::PUBLIC->value,
+            'published_at' => now()->addHour(),
+        ]);
+        $followedFuturePost = Post::factory()->create([
+            'user_id' => $followedUser->id,
+            'visibility' => Visibility::PUBLIC->value,
+            'published_at' => now()->addHour(),
+        ]);
+
+        $result = $repo->getTimelineForUser($owner);
+        $ids = collect($result->items)->pluck('id')->all();
+
+        $this->assertContains($ownFuturePost->id, $ids);
+        $this->assertNotContains($followedFuturePost->id, $ids);
+    }
+
     public function test_unauthenticated_user_cannot_access_only_authenticated_post()
     {
         $owner = User::factory()->create();
