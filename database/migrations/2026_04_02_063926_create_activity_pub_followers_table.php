@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\ActivityPubActor;
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -13,9 +14,11 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('follower_actor_id'); // Actor ID of the follower (can be remote)
             $table->foreignIdFor(User::class, 'followed_user_id')->constrained();
+            $table->foreignIdFor(ActivityPubActor::class)->nullable()->constrained()->nullOnDelete();
             $table->unique(['follower_actor_id', 'followed_user_id']); // Prevent duplicate follows
             $table->timestamps();
             $table->index(['followed_user_id']);
+            $table->index(['activity_pub_actor_id']);
         });
     }
 

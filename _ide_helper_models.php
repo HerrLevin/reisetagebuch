@@ -57,9 +57,9 @@ namespace App\Models{
  * @property string $id
  * @property string $follower_actor_id
  * @property string $followed_user_id
+ * @property string|null $activity_pub_actor_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $activity_pub_actor_id
  * @property-read \App\Models\ActivityPubActor|null $actor
  * @property-read mixed $follower_inbox_url
  * @property-read mixed $follower_shared_inbox_url
@@ -829,9 +829,9 @@ namespace App\Models{
  * @property string|null $remember_token
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property bool $is_admin
  * @property string $public_key
  * @property string $private_key
+ * @property bool $is_admin
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ActivityPubFollower> $activityPubFollowers
  * @property-read int|null $activity_pub_followers_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Passport\Client> $clients

@@ -23,6 +23,11 @@ return new class extends Migration
                 $user->save();
             }
         });
+
+        Schema::table('users', function (Blueprint $table) {
+            $table->text('public_key')->nullable(false)->change();
+            $table->text('private_key')->nullable(false)->change();
+        });
     }
 
     public function down(): void
