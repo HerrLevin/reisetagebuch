@@ -311,17 +311,29 @@ class PostRepository
         $before = $this->decodeCursor($cursor);
         $limit = 25;
 
-        $localPosts = $this->basePostQuery()
-            ->withExists(['likes as liked_by_user' => function ($query) use ($user) {
+        // Only other people's posts are withheld until their publish time has passed; the user's
+        // own posts always show on their own timeline, so the first page has no upper time bound.
+        $ownBefore = $cursor === null ? Carbon::create(9999, 12, 31, 23, 59, 59) : $before;
+
+        $withLikedByUser = function ($query) use ($user) {
+            $query->withExists(['likes as liked_by_user' => function ($query) use ($user) {
                 $query->where('user_id', $user->id);
-            }])
-            ->where(function ($query) use ($user) {
-                $query->where('user_id', '=', $user->id)
-                    ->orWhere(function ($query) use ($user) {
-                        $query->whereIn('user_id', $user->followings()->pluck('target_user_id'))
-                            ->whereIn('visibility', [Visibility::PUBLIC->value, Visibility::ONLY_AUTHENTICATED->value]);
-                    });
-            })
+            }]);
+        };
+
+        $ownPosts = $this->basePostQuery()
+            ->tap($withLikedByUser)
+            ->where('user_id', '=', $user->id)
+            ->where('published_at', '<', $ownBefore)
+            ->orderByDesc('published_at')
+            ->limit($limit)
+            ->get()
+            ->map(fn (Post $post) => $this->postHydrator->modelToDto($post));
+
+        $followingPosts = $this->basePostQuery()
+            ->tap($withLikedByUser)
+            ->whereIn('user_id', $user->followings()->pluck('target_user_id'))
+            ->whereIn('visibility', [Visibility::PUBLIC->value, Visibility::ONLY_AUTHENTICATED->value])
             ->where('published_at', '<', $before)
             ->orderByDesc('published_at')
             ->limit($limit)
@@ -331,7 +343,7 @@ class PostRepository
         $apPosts = $this->activityPubPostRepository->getForFollowedActors($user->id, $before, $limit);
 
         /** @var Collection<int, BasePost|LocationPost|TransportPost> $merged */
-        $merged = $localPosts->concat($apPosts)
+        $merged = $ownPosts->concat($followingPosts)->concat($apPosts)
             ->sortByDesc(fn ($post) => $post->publishedAt)
             ->values()
             ->take($limit);
