@@ -18,12 +18,14 @@ class FetchRemoteActorAvatar implements ShouldQueue
 
     public array $backoff = [30, 120, 600];
 
-    private const ALLOWED_MIME_TYPES = [
+    private const array ALLOWED_MIME_TYPES = [
         'image/jpeg' => 'jpg',
         'image/png' => 'png',
         'image/gif' => 'gif',
         'image/webp' => 'webp',
     ];
+
+    private const int MAX_DIMENSION = 4000;
 
     public function __construct(
         private readonly string $actorId
@@ -72,14 +74,44 @@ class FetchRemoteActorAvatar implements ShouldQueue
             throw new \RuntimeException('Failed to fetch avatar: HTTP '.$response->status());
         }
 
-        $contentType = $response->header('Content-Type');
-        $mimeType = strtok($contentType, ';');
-        $extension = self::ALLOWED_MIME_TYPES[$mimeType] ?? null;
+        $body = $response->body();
+        $imageInfo = @getimagesizefromstring($body);
+        $mimeType = $imageInfo['mime'] ?? null;
+        $extension = $mimeType ? (self::ALLOWED_MIME_TYPES[$mimeType] ?? null) : null;
 
         if (! $extension) {
-            Log::warning('FetchRemoteActorAvatar: Unsupported MIME type', [
+            Log::warning('FetchRemoteActorAvatar: Response body is not a valid supported image', [
                 'actorId' => $this->actorId,
-                'mimeType' => $contentType,
+                'url' => $actor->remote_icon_url,
+                'contentType' => $response->header('Content-Type'),
+                'detectedMimeType' => $mimeType,
+            ]);
+
+            return;
+        }
+
+        if ($imageInfo[0] > self::MAX_DIMENSION || $imageInfo[1] > self::MAX_DIMENSION) {
+            Log::warning('FetchRemoteActorAvatar: Image dimensions exceed the allowed maximum', [
+                'actorId' => $this->actorId,
+                'url' => $actor->remote_icon_url,
+                'width' => $imageInfo[0],
+                'height' => $imageInfo[1],
+            ]);
+
+            return;
+        }
+
+        // Fully decode and re-encode the image ourselves rather than persisting the
+        // remote bytes verbatim. This strips any payload smuggled past the header
+        // (polyglot files, malicious metadata) since the output only ever contains
+        // pixel data that GD itself produced.
+        $reencoded = $this->reencode($body, $mimeType);
+
+        if ($reencoded === null) {
+            Log::warning('FetchRemoteActorAvatar: Image could not be decoded', [
+                'actorId' => $this->actorId,
+                'url' => $actor->remote_icon_url,
+                'mimeType' => $mimeType,
             ]);
 
             return;
@@ -93,7 +125,7 @@ class FetchRemoteActorAvatar implements ShouldQueue
         }
 
         $filename = 'ap-avatars/'.$actor->id.'.'.$extension;
-        $disk->put($filename, $response->body());
+        $disk->put($filename, $reencoded);
 
         $actor->update([
             'local_icon_path' => $filename,
@@ -101,5 +133,31 @@ class FetchRemoteActorAvatar implements ShouldQueue
             'icon_etag' => $response->header('ETag'),
             'icon_fetched_at' => now(),
         ]);
+    }
+
+    private function reencode(string $body, string $mimeType): ?string
+    {
+        $image = @imagecreatefromstring($body);
+
+        if ($image === false) {
+            return null;
+        }
+
+        imagealphablending($image, false);
+        imagesavealpha($image, true);
+
+        ob_start();
+        $encoded = match ($mimeType) {
+            'image/jpeg' => imagejpeg($image, quality: 85),
+            'image/png' => imagepng($image),
+            'image/gif' => imagegif($image),
+            'image/webp' => imagewebp($image),
+            default => false,
+        };
+        $data = ob_get_clean();
+
+        imagedestroy($image);
+
+        return $encoded ? $data : null;
     }
 }
