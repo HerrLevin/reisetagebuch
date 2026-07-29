@@ -311,10 +311,16 @@ class PostRepository
         $before = $this->decodeCursor($cursor);
         $limit = 25;
 
-        $localPosts = $this->timelineQueryForUser($user)
-            ->orWhere(function ($query) use ($user) {
-                $query->whereIn('user_id', $user->followings()->pluck('target_user_id'))
-                    ->whereIn('visibility', [Visibility::PUBLIC->value, Visibility::ONLY_AUTHENTICATED->value]);
+        $localPosts = $this->basePostQuery()
+            ->withExists(['likes as liked_by_user' => function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            }])
+            ->where(function ($query) use ($user) {
+                $query->where('user_id', '=', $user->id)
+                    ->orWhere(function ($query) use ($user) {
+                        $query->whereIn('user_id', $user->followings()->pluck('target_user_id'))
+                            ->whereIn('visibility', [Visibility::PUBLIC->value, Visibility::ONLY_AUTHENTICATED->value]);
+                    });
             })
             ->where('published_at', '<', $before)
             ->orderByDesc('published_at')

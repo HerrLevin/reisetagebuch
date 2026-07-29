@@ -180,6 +180,11 @@ class ActivityPubService
             return;
         }
 
+        // Inbox URLs originate from the remote actor's own profile JSON, so they
+        // must be re-validated here even though the actor URI was already checked
+        // when the profile was fetched/stored.
+        $this->urlGuard->assertSafe($inbox);
+
         // Prepare the request
         $body = json_encode($activity, JSON_UNESCAPED_SLASHES);
         $date = now()->toRfc7231String();

@@ -11,6 +11,7 @@ use App\Models\ActivityPubFollower;
 use App\Models\Post;
 use App\Models\User;
 use App\Services\ActivityPubService;
+use App\Services\ActivityPubUrlGuard;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
@@ -57,6 +58,20 @@ class PushActivityPubJobsTest extends TestCase
     private function fakeSuccessfulInbox(): void
     {
         Http::fake(['*' => Http::response('', 202)]);
+    }
+
+    /**
+     * The HTTP-integration tests below use non-resolvable `*.example` inbox
+     * hosts (RFC 2606). ActivityPubUrlGuard performs a real DNS lookup, which
+     * Http::fake() doesn't intercept, so it must be stubbed out here — SSRF
+     * behavior itself is covered by ActivityPubUrlGuardTest.
+     */
+    private function bypassUrlGuard(): void
+    {
+        $this->app->bind(ActivityPubUrlGuard::class, fn () => new class extends ActivityPubUrlGuard
+        {
+            public function assertSafe(string $url): void {}
+        });
     }
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -446,6 +461,7 @@ class PushActivityPubJobsTest extends TestCase
 
     public function test_deliver_activity_sends_signed_post_request_to_inbox(): void
     {
+        $this->bypassUrlGuard();
         $user = $this->createUserWithKeys(['username' => 'alice']);
         $post = Post::factory()->create(['user_id' => $user->id, 'visibility' => Visibility::PUBLIC]);
 
@@ -466,6 +482,7 @@ class PushActivityPubJobsTest extends TestCase
 
     public function test_deliver_activity_sends_create_activity_body_to_inbox(): void
     {
+        $this->bypassUrlGuard();
         $user = $this->createUserWithKeys(['username' => 'alice']);
         $post = Post::factory()->create([
             'user_id' => $user->id,
@@ -490,6 +507,7 @@ class PushActivityPubJobsTest extends TestCase
 
     public function test_deliver_activity_sends_delete_activity_body_to_inbox(): void
     {
+        $this->bypassUrlGuard();
         $user = $this->createUserWithKeys(['username' => 'alice']);
         $postId = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee';
 
@@ -511,6 +529,7 @@ class PushActivityPubJobsTest extends TestCase
 
     public function test_deliver_activity_throws_on_server_error(): void
     {
+        $this->bypassUrlGuard();
         $user = $this->createUserWithKeys(['username' => 'alice']);
         $post = Post::factory()->create(['user_id' => $user->id, 'visibility' => Visibility::PUBLIC]);
 
@@ -525,6 +544,7 @@ class PushActivityPubJobsTest extends TestCase
 
     public function test_deliver_activity_signature_header_contains_key_id_for_actor(): void
     {
+        $this->bypassUrlGuard();
         $user = $this->createUserWithKeys(['username' => 'alice']);
         $post = Post::factory()->create(['user_id' => $user->id, 'visibility' => Visibility::PUBLIC]);
 
@@ -785,6 +805,7 @@ class PushActivityPubJobsTest extends TestCase
 
     public function test_deliver_activity_sends_update_activity_body_to_inbox(): void
     {
+        $this->bypassUrlGuard();
         $user = $this->createUserWithKeys(['username' => 'alice']);
         $post = Post::factory()->create([
             'user_id' => $user->id,
