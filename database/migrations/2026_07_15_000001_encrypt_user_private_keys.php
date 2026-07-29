@@ -11,6 +11,17 @@ return new class extends Migration
     {
         DB::table('users')->whereNotNull('private_key')->orderBy('id')->chunkById(100, function ($users) {
             foreach ($users as $user) {
+                try {
+                    // Already encrypted (e.g. written by the `encrypted` model cast
+                    // when this migration runs together with the one that creates
+                    // the column) — skip to avoid double-encrypting it.
+                    Crypt::decryptString($user->private_key);
+
+                    continue;
+                } catch (DecryptException) {
+                    // Plaintext — needs encrypting.
+                }
+
                 DB::table('users')->where('id', $user->id)->update([
                     'private_key' => Crypt::encryptString($user->private_key),
                 ]);

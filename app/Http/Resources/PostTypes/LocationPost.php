@@ -65,7 +65,7 @@ class LocationPost extends BasePost
     public function getHtmlBody(): ?string
     {
         $parentBody = parent::getHtmlBody();
-        $name = $this->location->name;
+        $name = e($this->location->name);
         $body = "<p>📍<strong>$name</strong></p>";
 
         return $parentBody ? nl2br($parentBody."\n\n").$body : $body;
