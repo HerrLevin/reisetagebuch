@@ -17,8 +17,12 @@ ARG NGINX_LIB_DIR="/var/lib/nginx"
 # Install required system dependencies
 RUN apk add --no-cache \
     bash \
+    freetype-dev \
     icu-dev \
+    libjpeg-turbo-dev \
+    libpng-dev \
     libpq-dev \
+    libwebp-dev \
     libzip-dev \
     logrotate \
     nginx \
@@ -31,8 +35,10 @@ RUN apk add --no-cache \
     zlib-dev
 
 # Install required PHP extensions
-RUN docker-php-ext-install \
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
+    && docker-php-ext-install \
         bcmath \
+        gd \
         intl \
         pdo_mysql \
         pdo_pgsql \
