@@ -158,11 +158,6 @@ export interface AuthenticatedUserDto {
    * @example false
    */
   isAdmin: boolean;
-  /**
-   * Indicates whether the user has accepted the privacy policy currently in effect (true when no policy has been published)
-   * @example true
-   */
-  hasAcceptedCurrentPrivacyPolicy: boolean;
 }
 
 /** Data Transfer Object for Departures at a Stop */
@@ -451,6 +446,42 @@ export interface MotisTripDto {
   legs: LegDto[];
 }
 
+/** Data for an ActivityPub mention notification */
+export interface ActivityPubMentionData {
+  /**
+   * ActivityPub actor ID (URI) of the remote user who mentioned the local user
+   * @format uri
+   */
+  actorId: string;
+  /**
+   * Preferred username of the remote user
+   * @example "johndoe"
+   */
+  preferredUsername: string;
+  /**
+   * Display name of the remote user
+   * @example "John Doe"
+   */
+  displayName?: string | null;
+  /**
+   * Avatar URL of the remote user
+   * @format uri
+   */
+  iconUrl?: string | null;
+  /**
+   * Profile URL of the remote user
+   * @format uri
+   */
+  profileUrl?: string | null;
+  /**
+   * Local ID of the AP post containing the mention
+   * @format uuid
+   */
+  postId: string;
+  /** Truncated body of the post containing the mention */
+  postBody?: string | null;
+}
+
 /** Data for an ActivityPub post liked notification */
 export interface ActivityPubPostLikedData {
   /**
@@ -487,23 +518,6 @@ export interface ActivityPubPostLikedData {
   postBody?: string | null;
   /** Summary of the liked post */
   postSummary?: string | null;
-}
-
-/** Data for an ActivityPub mention notification */
-export interface ActivityPubMentionData {
-  /** @format uri */
-  actorId: string;
-  /** @example "johndoe" */
-  preferredUsername: string;
-  /** @example "John Doe" */
-  displayName?: string | null;
-  /** @format uri */
-  iconUrl?: string | null;
-  /** @format uri */
-  profileUrl?: string | null;
-  /** @format uuid */
-  postId: string;
-  postBody?: string | null;
 }
 
 /** Data for an ActivityPub user followed notification */
@@ -565,7 +579,6 @@ export interface NotificationWrapper {
     | UserFollowedData
     | ActivityPubUserFollowedData
     | ActivityPubPostLikedData
-    | ActivityPubMentionData
     | null;
 }
 
@@ -683,28 +696,41 @@ export type PostPaginationDto = PaginationDto & {
   items: (LocationPost | BasePost | TransportPost)[];
 };
 
-/**
- * Privacy Policy DTO
- * Data Transfer Object representing a versioned privacy policy
- */
-export interface PrivacyPolicyDto {
+export interface RemoteActorProfileDto {
+  /** The remote actor's ActivityPub id */
+  actorId: string;
+  /** The remote actor's display name */
+  displayName: string | null;
+  /** The remote actor's preferred username */
+  preferredUsername: string | null;
+  /** The remote actor's sanitized profile summary */
+  summary: string | null;
+  /** The remote actor's avatar URL */
+  iconUrl: string | null;
+  /** The remote actor's public profile URL */
+  profileUrl: string | null;
+  /** The current follow state for this actor, if any */
+  followState: string | null;
+}
+
+export interface RemoteFollowDto {
+  /** The remote actor's ActivityPub id */
+  actorId: string;
+  /** The state of the follow request */
+  state: string;
   /**
-   * The unique identifier of this privacy policy version
-   * @format uuid
-   */
-  id: string;
-  /** The privacy policy content, rendered as free-form text */
-  content: string;
-  /**
-   * The point in time from which this version is (or will be) in effect
+   * When the follow request was created
    * @format date-time
    */
-  validFrom: string;
-  /**
-   * When the requesting user accepted this version, if authenticated and accepted
-   * @format date-time
-   */
-  acceptedAt?: string | null;
+  createdAt: string | null;
+  /** The remote actor's display name */
+  displayName: string | null;
+  /** The remote actor's preferred username */
+  preferredUsername: string | null;
+  /** The remote actor's avatar URL */
+  iconUrl: string | null;
+  /** The remote actor's public profile URL */
+  profileUrl: string | null;
 }
 
 /** Data Transfer Object for Request Location */
@@ -832,17 +858,6 @@ export type LocationPostRequest = BasePostRequest & {
   /** @format date-time */
   visitedAt: string | null;
 };
-
-/** Request to publish a new privacy policy version */
-export interface PrivacyPolicyStoreRequest {
-  /** The privacy policy content */
-  content: string;
-  /**
-   * The point in time from which this version takes effect. Must not be in the past.
-   * @format date-time
-   */
-  validFrom: string;
-}
 
 /**
  * Profile Update Request
@@ -1853,83 +1868,6 @@ export class Api<
         body: data,
         secure: true,
         type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags App
-     * @name GetPrivacyPolicy
-     * @summary Get the privacy policy currently in effect
-     * @request GET:/app/privacy-policy
-     * @secure
-     */
-    getPrivacyPolicy: (params: RequestParams = {}) =>
-      this.request<PrivacyPolicyDto, void>({
-        path: `/app/privacy-policy`,
-        method: "GET",
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Publish a new privacy policy version. Requires admin privileges.
-     *
-     * @tags App
-     * @name CreatePrivacyPolicy
-     * @summary Publish a new privacy policy version
-     * @request POST:/app/privacy-policy
-     * @secure
-     */
-    createPrivacyPolicy: (
-      data: PrivacyPolicyStoreRequest,
-      params: RequestParams = {},
-    ) =>
-      this.request<PrivacyPolicyDto, void>({
-        path: `/app/privacy-policy`,
-        method: "POST",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags App
-     * @name GetUpcomingPrivacyPolicy
-     * @summary Get the next privacy policy version, if one has been published for the future
-     * @request GET:/app/privacy-policy/upcoming
-     * @secure
-     */
-    getUpcomingPrivacyPolicy: (params: RequestParams = {}) =>
-      this.request<PrivacyPolicyDto, void>({
-        path: `/app/privacy-policy/upcoming`,
-        method: "GET",
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Accept the current or upcoming privacy policy version on behalf of the authenticated user
-     *
-     * @tags App
-     * @name AcceptPrivacyPolicy
-     * @summary Accept a privacy policy version
-     * @request POST:/app/privacy-policy/{privacyPolicy}/accept
-     * @secure
-     */
-    acceptPrivacyPolicy: (privacyPolicy: string, params: RequestParams = {}) =>
-      this.request<PrivacyPolicyDto, void>({
-        path: `/app/privacy-policy/${privacyPolicy}/accept`,
-        method: "POST",
-        secure: true,
         format: "json",
         ...params,
       }),

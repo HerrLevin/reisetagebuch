@@ -5,36 +5,17 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Search, Users } from 'lucide-vue-next';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { RemoteActorProfileDto, RemoteFollowDto } from '../../../types/Api.gen';
 
 const { t } = useI18n();
 useTitle(t('fediverse.title'));
 
-interface RemoteActor {
-    actor_id: string;
-    display_name: string | null;
-    preferred_username: string | null;
-    summary: string | null;
-    icon_url: string | null;
-    profile_url: string | null;
-    follow_state: 'pending' | 'accepted' | 'rejected' | null;
-}
-
-interface RemoteFollow {
-    actor_id: string;
-    state: string;
-    created_at: string;
-    display_name: string | null;
-    preferred_username: string | null;
-    icon_url: string | null;
-    profile_url: string | null;
-}
-
 const handle = ref('');
-const resolvedActor = ref<RemoteActor | null>(null);
+const resolvedActor = ref<RemoteActorProfileDto | null>(null);
 const resolveError = ref<string | null>(null);
 const resolving = ref(false);
 const following = ref(false);
-const remoteFollows = ref<RemoteFollow[]>([]);
+const remoteFollows = ref<RemoteFollowDto[]>([]);
 const loadingFollows = ref(true);
 
 function instanceOf(actorId: string): string {
@@ -72,9 +53,9 @@ async function follow() {
 
     try {
         await api.instance.post('/activitypub/follow', {
-            actor_id: resolvedActor.value.actor_id,
+            actor_id: resolvedActor.value.actorId,
         });
-        resolvedActor.value.follow_state = 'pending';
+        resolvedActor.value.followState = 'pending';
         await loadFollowing();
     } finally {
         following.value = false;
@@ -86,10 +67,10 @@ async function unfollow(actorId: string) {
         data: { actor_id: actorId },
     });
     remoteFollows.value = remoteFollows.value.filter(
-        (f) => f.actor_id !== actorId,
+        (f) => f.actorId !== actorId,
     );
-    if (resolvedActor.value?.actor_id === actorId) {
-        resolvedActor.value.follow_state = null;
+    if (resolvedActor.value?.actorId === actorId) {
+        resolvedActor.value.followState = null;
     }
 }
 
@@ -149,8 +130,8 @@ loadFollowing();
                         class="bg-base-100 rounded-box flex items-start gap-4 p-4"
                     >
                         <img
-                            v-if="resolvedActor.icon_url"
-                            :src="resolvedActor.icon_url"
+                            v-if="resolvedActor.iconUrl"
+                            :src="resolvedActor.iconUrl"
                             class="size-14 shrink-0 rounded-full object-cover"
                             alt=""
                         />
@@ -162,13 +143,13 @@ loadFollowing();
                         <div class="min-w-0 flex-1">
                             <div class="truncate font-semibold">
                                 {{
-                                    resolvedActor.display_name ||
-                                    resolvedActor.preferred_username
+                                    resolvedActor.displayName ||
+                                    resolvedActor.preferredUsername
                                 }}
                             </div>
                             <div class="text-base-content/60 truncate text-sm">
-                                @{{ resolvedActor.preferred_username }}@{{
-                                    instanceOf(resolvedActor.actor_id)
+                                @{{ resolvedActor.preferredUsername }}@{{
+                                    instanceOf(resolvedActor.actorId)
                                 }}
                             </div>
                             <div
@@ -179,7 +160,7 @@ loadFollowing();
                         </div>
 
                         <button
-                            v-if="!resolvedActor.follow_state"
+                            v-if="!resolvedActor.followState"
                             class="btn btn-primary btn-sm shrink-0"
                             :disabled="following"
                             @click="follow"
@@ -187,25 +168,21 @@ loadFollowing();
                             {{ t('fediverse.follow') }}
                         </button>
                         <button
-                            v-else-if="resolvedActor.follow_state === 'pending'"
+                            v-else-if="resolvedActor.followState === 'pending'"
                             class="btn btn-sm shrink-0"
                             disabled
                         >
                             {{ t('fediverse.pending') }}
                         </button>
                         <button
-                            v-else-if="
-                                resolvedActor.follow_state === 'accepted'
-                            "
+                            v-else-if="resolvedActor.followState === 'accepted'"
                             class="btn btn-sm shrink-0"
-                            @click="unfollow(resolvedActor.actor_id)"
+                            @click="unfollow(resolvedActor.actorId)"
                         >
                             {{ t('fediverse.unfollow') }}
                         </button>
                         <span
-                            v-else-if="
-                                resolvedActor.follow_state === 'rejected'
-                            "
+                            v-else-if="resolvedActor.followState === 'rejected'"
                             class="badge badge-error badge-sm shrink-0"
                         >
                             {{ t('fediverse.rejected') }}
@@ -235,12 +212,12 @@ loadFollowing();
                 <div v-else class="space-y-2">
                     <div
                         v-for="follow in remoteFollows"
-                        :key="follow.actor_id"
+                        :key="follow.actorId"
                         class="bg-base-200 rounded-box flex items-center gap-3 p-3"
                     >
                         <img
-                            v-if="follow.icon_url"
-                            :src="follow.icon_url"
+                            v-if="follow.iconUrl"
+                            :src="follow.iconUrl"
                             class="size-10 shrink-0 rounded-full object-cover"
                             alt=""
                         />
@@ -252,13 +229,13 @@ loadFollowing();
                         <div class="min-w-0 flex-1">
                             <div class="truncate font-medium">
                                 {{
-                                    follow.display_name ||
-                                    follow.preferred_username
+                                    follow.displayName ||
+                                    follow.preferredUsername
                                 }}
                             </div>
                             <div class="text-base-content/60 truncate text-xs">
-                                @{{ follow.preferred_username }}@{{
-                                    instanceOf(follow.actor_id)
+                                @{{ follow.preferredUsername }}@{{
+                                    instanceOf(follow.actorId)
                                 }}
                             </div>
                         </div>
@@ -278,7 +255,7 @@ loadFollowing();
 
                         <button
                             class="btn btn-ghost btn-sm shrink-0"
-                            @click="unfollow(follow.actor_id)"
+                            @click="unfollow(follow.actorId)"
                         >
                             {{ t('fediverse.unfollow') }}
                         </button>

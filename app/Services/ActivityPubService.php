@@ -41,7 +41,7 @@ class ActivityPubService
         'iconUrl' => 'string|null',
         'url' => 'string|null',
     ])]
-    public function getActorProfile(string $actorId): ?array
+    private function getActorProfile(string $actorId): ?array
     {
         $actor = null;
         try {

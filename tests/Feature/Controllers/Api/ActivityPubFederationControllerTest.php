@@ -106,9 +106,9 @@ class ActivityPubFederationControllerTest extends TestCase
         $response = $this->getJson('/api/activitypub/resolve?handle=bob@remote.example');
 
         $response->assertOk()->assertJson([
-            'actor_id' => $actorId,
-            'display_name' => 'Remote User',
-            'preferred_username' => 'bob',
+            'actorId' => $actorId,
+            'displayName' => 'Remote User',
+            'preferredUsername' => 'bob',
             'summary' => 'Hello world',
         ]);
     }
@@ -283,6 +283,6 @@ class ActivityPubFederationControllerTest extends TestCase
         $response = $this->getJson('/api/activitypub/following');
 
         $response->assertOk()->assertJsonCount(1);
-        $this->assertSame($actor->actor_uri, $response->json('0.actor_id'));
+        $this->assertSame($actor->actor_uri, $response->json('0.actorId'));
     }
 }

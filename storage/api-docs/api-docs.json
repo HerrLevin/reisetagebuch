@@ -150,6 +150,70 @@
                 ]
             }
         },
+        "/activitypub/posts/{postId}/likes": {
+            "post": {
+                "tags": [
+                    "ActivityPub"
+                ],
+                "summary": "Like an ActivityPub post",
+                "operationId": "likeApPost",
+                "parameters": [
+                    {
+                        "name": "postId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Like toggled"
+                    },
+                    "404": {
+                        "description": "Post not found"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "ActivityPub"
+                ],
+                "summary": "Unlike an ActivityPub post",
+                "operationId": "unlikeApPost",
+                "parameters": [
+                    {
+                        "name": "postId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Like removed"
+                    },
+                    "404": {
+                        "description": "Post not found"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
         "/app/configuration": {
             "get": {
                 "tags": [
@@ -2626,137 +2690,6 @@
                 ]
             }
         },
-        "/app/privacy-policy": {
-            "get": {
-                "tags": [
-                    "App"
-                ],
-                "summary": "Get the privacy policy currently in effect",
-                "operationId": "getPrivacyPolicy",
-                "responses": {
-                    "200": {
-                        "description": "Successful response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/PrivacyPolicyDto"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "No privacy policy has been published yet"
-                    }
-                }
-            },
-            "post": {
-                "tags": [
-                    "App"
-                ],
-                "summary": "Publish a new privacy policy version",
-                "description": "Publish a new privacy policy version. Requires admin privileges.",
-                "operationId": "createPrivacyPolicy",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/PrivacyPolicyStoreRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Successful response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/PrivacyPolicyDto"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    }
-                },
-                "security": [
-                    {
-                        "passport": []
-                    }
-                ]
-            }
-        },
-        "/app/privacy-policy/upcoming": {
-            "get": {
-                "tags": [
-                    "App"
-                ],
-                "summary": "Get the next privacy policy version, if one has been published for the future",
-                "operationId": "getUpcomingPrivacyPolicy",
-                "responses": {
-                    "200": {
-                        "description": "Successful response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/PrivacyPolicyDto"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "No upcoming privacy policy has been published"
-                    }
-                }
-            }
-        },
-        "/app/privacy-policy/{privacyPolicy}/accept": {
-            "post": {
-                "tags": [
-                    "App"
-                ],
-                "summary": "Accept a privacy policy version",
-                "description": "Accept the current or upcoming privacy policy version on behalf of the authenticated user",
-                "operationId": "acceptPrivacyPolicy",
-                "parameters": [
-                    {
-                        "name": "privacyPolicy",
-                        "in": "path",
-                        "description": "The ID of the privacy policy version to accept",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/PrivacyPolicyDto"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized"
-                    },
-                    "422": {
-                        "description": "The given privacy policy version is neither current nor upcoming"
-                    }
-                },
-                "security": [
-                    {
-                        "passport": []
-                    }
-                ]
-            }
-        },
         "/socialite/traewelling/connect": {
             "get": {
                 "tags": [
@@ -3135,8 +3068,7 @@
                     "traewellingConnected",
                     "settings",
                     "avatar",
-                    "isAdmin",
-                    "hasAcceptedCurrentPrivacyPolicy"
+                    "isAdmin"
                 ],
                 "properties": {
                     "id": {
@@ -3189,11 +3121,6 @@
                         "description": "Indicates whether the user has administrative privileges on this instance",
                         "type": "boolean",
                         "example": false
-                    },
-                    "hasAcceptedCurrentPrivacyPolicy": {
-                        "description": "Indicates whether the user has accepted the privacy policy currently in effect (true when no policy has been published)",
-                        "type": "boolean",
-                        "example": true
                     }
                 },
                 "type": "object"
@@ -3862,6 +3789,55 @@
                 },
                 "type": "object"
             },
+            "ActivityPubMentionData": {
+                "description": "Data for an ActivityPub mention notification",
+                "required": [
+                    "actorId",
+                    "preferredUsername",
+                    "postId"
+                ],
+                "properties": {
+                    "actorId": {
+                        "description": "ActivityPub actor ID (URI) of the remote user who mentioned the local user",
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    "preferredUsername": {
+                        "description": "Preferred username of the remote user",
+                        "type": "string",
+                        "example": "johndoe"
+                    },
+                    "displayName": {
+                        "description": "Display name of the remote user",
+                        "type": "string",
+                        "example": "John Doe",
+                        "nullable": true
+                    },
+                    "iconUrl": {
+                        "description": "Avatar URL of the remote user",
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
+                    },
+                    "profileUrl": {
+                        "description": "Profile URL of the remote user",
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
+                    },
+                    "postId": {
+                        "description": "Local ID of the AP post containing the mention",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "postBody": {
+                        "description": "Truncated body of the post containing the mention",
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
             "ActivityPubPostLikedData": {
                 "description": "Data for an ActivityPub post liked notification",
                 "required": [
@@ -4205,33 +4181,97 @@
                     }
                 ]
             },
-            "PrivacyPolicyDto": {
-                "title": "Privacy Policy DTO",
-                "description": "Data Transfer Object representing a versioned privacy policy",
+            "RemoteActorProfileDto": {
                 "required": [
-                    "id",
-                    "content",
-                    "validFrom"
+                    "actorId",
+                    "displayName",
+                    "preferredUsername",
+                    "summary",
+                    "iconUrl",
+                    "profileUrl",
+                    "followState"
                 ],
                 "properties": {
-                    "id": {
-                        "description": "The unique identifier of this privacy policy version",
-                        "type": "string",
-                        "format": "uuid"
-                    },
-                    "content": {
-                        "description": "The privacy policy content, rendered as free-form text",
+                    "actorId": {
+                        "description": "The remote actor's ActivityPub id",
                         "type": "string"
                     },
-                    "validFrom": {
-                        "description": "The point in time from which this version is (or will be) in effect",
+                    "displayName": {
+                        "description": "The remote actor's display name",
                         "type": "string",
-                        "format": "date-time"
+                        "nullable": true
                     },
-                    "acceptedAt": {
-                        "description": "When the requesting user accepted this version, if authenticated and accepted",
+                    "preferredUsername": {
+                        "description": "The remote actor's preferred username",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "summary": {
+                        "description": "The remote actor's sanitized profile summary",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "iconUrl": {
+                        "description": "The remote actor's avatar URL",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "profileUrl": {
+                        "description": "The remote actor's public profile URL",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "followState": {
+                        "description": "The current follow state for this actor, if any",
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "RemoteFollowDto": {
+                "required": [
+                    "actorId",
+                    "state",
+                    "createdAt",
+                    "displayName",
+                    "preferredUsername",
+                    "iconUrl",
+                    "profileUrl"
+                ],
+                "properties": {
+                    "actorId": {
+                        "description": "The remote actor's ActivityPub id",
+                        "type": "string"
+                    },
+                    "state": {
+                        "description": "The state of the follow request",
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "description": "When the follow request was created",
                         "type": "string",
                         "format": "date-time",
+                        "nullable": true
+                    },
+                    "displayName": {
+                        "description": "The remote actor's display name",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "preferredUsername": {
+                        "description": "The remote actor's preferred username",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "iconUrl": {
+                        "description": "The remote actor's avatar URL",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "profileUrl": {
+                        "description": "The remote actor's public profile URL",
+                        "type": "string",
                         "nullable": true
                     }
                 },
@@ -4378,7 +4418,8 @@
                     "TraewellingCrosspostFailedNotification",
                     "UserRequestedFollowNotification",
                     "ActivityPubUserFollowedNotification",
-                    "ActivityPubPostLikedNotification"
+                    "ActivityPubPostLikedNotification",
+                    "ActivityPubMentionNotification"
                 ]
             },
             "Feature": {
@@ -4540,25 +4581,6 @@
                         "type": "object"
                     }
                 ]
-            },
-            "PrivacyPolicyStoreRequest": {
-                "description": "Request to publish a new privacy policy version",
-                "required": [
-                    "content",
-                    "validFrom"
-                ],
-                "properties": {
-                    "content": {
-                        "description": "The privacy policy content",
-                        "type": "string"
-                    },
-                    "validFrom": {
-                        "description": "The point in time from which this version takes effect. Must not be in the past.",
-                        "type": "string",
-                        "format": "date-time"
-                    }
-                },
-                "type": "object"
             },
             "ProfileUpdateRequest": {
                 "title": "Profile Update Request",
@@ -5122,6 +5144,11 @@
                                 }
                             ]
                         }
+                    },
+                    "sourceUrl": {
+                        "description": "Original URL for posts from the fediverse",
+                        "type": "string",
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -5396,8 +5423,20 @@
                         "format": "uri",
                         "nullable": true
                     },
+                    "avatarMimeType": {
+                        "description": "MimeType of the user header image",
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
+                    },
                     "header": {
                         "description": "URL of the user header image",
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
+                    },
+                    "headerMimeType": {
+                        "description": "MimeType of the user header image",
                         "type": "string",
                         "format": "uri",
                         "nullable": true
@@ -5436,6 +5475,12 @@
                         "description": "Account creation timestamp",
                         "type": "string",
                         "format": "date-time"
+                    },
+                    "profileUrl": {
+                        "description": "External profile URL for federated actors; null for local users",
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -5528,6 +5573,10 @@
         {
             "name": "Account",
             "description": "Account"
+        },
+        {
+            "name": "ActivityPub",
+            "description": "ActivityPub"
         },
         {
             "name": "App Configuration",
