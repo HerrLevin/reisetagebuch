@@ -33,7 +33,7 @@ class RequestLogger
                 'body' => $this->safeRequestBody($request),
             ];
 
-            Log::info('Incoming request', $data);
+            Log::debug('Incoming request', $data);
         } catch (\Throwable $e) {
             // Don't break the request on logging failures
             Log::warning('RequestLogger failed: '.$e->getMessage());

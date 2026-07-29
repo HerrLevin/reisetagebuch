@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Backend;
 
+use App\Dto\LikeDto;
 use App\Http\Controllers\Controller;
 use App\Jobs\SendApPostLikeActivity;
 use App\Jobs\SendApPostUndoLikeActivity;
@@ -18,7 +19,7 @@ class ActivityPubPostInteractionBackend extends Controller
         private readonly UserRepository $userRepository,
     ) {}
 
-    public function like(string $userId, string $postId): array
+    public function like(string $userId, string $postId): LikeDto
     {
         $post = $this->apPostRepository->findById($postId);
         if (! $post) {
@@ -26,10 +27,7 @@ class ActivityPubPostInteractionBackend extends Controller
         }
 
         if ($this->apPostRepository->isLikedByUser($userId, $postId)) {
-            return [
-                'likedByUser' => true,
-                'likeCount' => $this->apPostRepository->getLikeCount($postId),
-            ];
+            return new LikeDto(true, $this->apPostRepository->getLikeCount($postId));
         }
 
         $userDto = $this->userRepository->getUserById($userId);
@@ -40,13 +38,10 @@ class ActivityPubPostInteractionBackend extends Controller
 
         SendApPostLikeActivity::dispatch($userId, $postId, $likeActivityId);
 
-        return [
-            'likedByUser' => true,
-            'likeCount' => $this->apPostRepository->getLikeCount($postId),
-        ];
+        return new LikeDto(true, $this->apPostRepository->getLikeCount($postId));
     }
 
-    public function unlike(string $userId, string $postId): array
+    public function unlike(string $userId, string $postId): LikeDto
     {
         $post = $this->apPostRepository->findById($postId);
         if (! $post) {
@@ -61,9 +56,6 @@ class ActivityPubPostInteractionBackend extends Controller
             SendApPostUndoLikeActivity::dispatch($userId, $postId, $likeActivityId);
         }
 
-        return [
-            'likedByUser' => false,
-            'likeCount' => $this->apPostRepository->getLikeCount($postId),
-        ];
+        return new LikeDto(false, $this->apPostRepository->getLikeCount($postId));
     }
 }

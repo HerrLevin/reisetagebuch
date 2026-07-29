@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Backend;
 
+use App\Dto\RemoteActorProfileDto;
+use App\Dto\RemoteFollowDto;
 use App\Http\Controllers\Controller;
 use App\Jobs\SendFollowToRemoteActor;
 use App\Jobs\SendUndoFollowToRemoteActor;
@@ -22,7 +24,7 @@ class ActivityPubFederationBackend extends Controller
         private readonly ActivityPubContentSanitizer $contentSanitizer,
     ) {}
 
-    public function resolveHandle(string $userId, string $handle): ?array
+    public function resolveHandle(string $userId, string $handle): ?RemoteActorProfileDto
     {
         $profile = $this->activityPubService->resolveActorByHandle($handle);
         if ($profile === null) {
@@ -32,29 +34,32 @@ class ActivityPubFederationBackend extends Controller
         $actorId = $profile['actorId'];
         $followState = $this->remoteFollowRepository->findByUserAndActor($userId, $actorId)?->state;
 
-        return [
-            'actor_id' => $actorId,
-            'display_name' => $profile['name'],
-            'preferred_username' => $profile['preferredUsername'],
-            'summary' => $this->contentSanitizer->sanitize($profile['summary']),
-            'icon_url' => $profile['iconUrl'],
-            'profile_url' => $profile['url'],
-            'follow_state' => $followState,
-        ];
+        return new RemoteActorProfileDto(
+            actorId: $actorId,
+            displayName: $profile['name'],
+            preferredUsername: $profile['preferredUsername'],
+            summary: $this->contentSanitizer->sanitize($profile['summary']),
+            iconUrl: $profile['iconUrl'],
+            profileUrl: $profile['url'],
+            followState: $followState,
+        );
     }
 
+    /**
+     * @return RemoteFollowDto[]
+     */
     public function listFollowing(string $userId): array
     {
         return $this->remoteFollowRepository->listForUser($userId)
-            ->map(fn ($follow) => [
-                'actor_id' => $follow->remote_actor_id,
-                'state' => $follow->state,
-                'created_at' => $follow->created_at,
-                'display_name' => $follow->actor?->display_name,
-                'preferred_username' => $follow->actor?->preferred_username,
-                'icon_url' => $follow->actor?->local_icon_url,
-                'profile_url' => $follow->actor?->profile_url,
-            ])
+            ->map(fn ($follow) => new RemoteFollowDto(
+                actorId: $follow->remote_actor_id,
+                state: $follow->state,
+                createdAt: $follow->created_at,
+                displayName: $follow->actor?->display_name,
+                preferredUsername: $follow->actor?->preferred_username,
+                iconUrl: $follow->actor?->local_icon_url,
+                profileUrl: $follow->actor?->profile_url,
+            ))
             ->values()
             ->all();
     }
