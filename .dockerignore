@@ -1,0 +1,12 @@
+.git
+.github
+.idea
+.claude
+.DS_Store
+.env
+.env.*
+!.env.example
+!.env.prod.example
+node_modules
+vendor
+bootstrap/cache/*.php
