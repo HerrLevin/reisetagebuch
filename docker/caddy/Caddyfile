@@ -5,7 +5,7 @@
 	}
 }
 
-{$SERVER_NAME:localhost}:80 {
+:80 {
 	root /var/www/html/public
 	encode zstd br gzip
 
