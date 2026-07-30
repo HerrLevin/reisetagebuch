@@ -317,7 +317,12 @@ class MastodonActivityPubController extends Controller
             return response()->json('', 202);
         }
 
+        $post = $this->activityPubPostRepository->findByActivityId($noteId);
         $this->activityPubPostRepository->deleteByActivityId($noteId);
+
+        if ($post) {
+            $this->notificationRepository->deleteActivityPubMentionNotifications($post->id);
+        }
 
         return response()->json('', 202);
     }
@@ -626,6 +631,8 @@ class MastodonActivityPubController extends Controller
             'actor_id' => $actorId,
             'post_id' => $postId,
         ])->delete();
+
+        $this->notificationRepository->deleteActivityPubPostLikedNotification($user->id, $actorId, $postId);
 
         return response()->json('', 202);
     }

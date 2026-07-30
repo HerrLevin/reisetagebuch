@@ -8,7 +8,6 @@ use App\Http\Resources\StopDto;
 use App\Http\Resources\TripDto;
 use App\Http\Resources\UserDto;
 use App\Models\Post;
-use Carbon\Carbon;
 use Clickbar\Magellan\IO\Generator\Geojson\GeojsonGenerator;
 use OpenApi\Attributes as OA;
 

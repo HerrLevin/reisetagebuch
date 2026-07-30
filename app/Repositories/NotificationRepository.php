@@ -88,4 +88,23 @@ class NotificationRepository
             ->whereJsonContains('data', ['post_id' => $postId])
             ->delete();
     }
+
+    public function deleteActivityPubMentionNotifications(string $postId): void
+    {
+        DatabaseNotification::where('type', DatabaseNotificationType::ActivityPubMention)
+            ->whereJsonContains('data', ['post_id' => $postId])
+            ->delete();
+    }
+
+    public function deleteActivityPubPostLikedNotification(User|string $user, string $actorId, string $postId): void
+    {
+        $userId = $user instanceof User ? $user->id : $user;
+
+        DatabaseNotification::where('notifiable_id', $userId)
+            ->where('notifiable_type', User::class)
+            ->where('type', DatabaseNotificationType::ActivityPubPostLiked)
+            ->whereJsonContains('data', ['actor_id' => $actorId])
+            ->whereJsonContains('data', ['post_id' => $postId])
+            ->delete();
+    }
 }
