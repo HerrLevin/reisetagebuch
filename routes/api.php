@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\LocationController as ApiLocationController;
 use App\Http\Controllers\Api\MapController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PostController;
+use App\Http\Controllers\Api\PrivacyPolicyController;
 use App\Http\Controllers\Api\TraewellingOAuthController;
 use App\Http\Controllers\Api\TripController;
 use App\Http\Controllers\Api\UserController;
@@ -64,21 +65,15 @@ Route::prefix('app')->group(function () {
 
     Route::get('imprint', [ImprintController::class, 'show'])
         ->name('imprint.show');
+
+    Route::get('privacy-policy', [PrivacyPolicyController::class, 'show'])
+        ->name('privacy-policy.show');
+    Route::get('privacy-policy/upcoming', [PrivacyPolicyController::class, 'upcoming'])
+        ->name('privacy-policy.upcoming');
 });
 
 Route::middleware('auth:api')->group(function () {
-    Route::prefix('socialite')->group(function () {
-        Route::get('/traewelling/connect', [TraewellingOAuthController::class, 'redirectToProvider'])->name('traewelling.connect');
-        Route::get('/traewelling/callback', [TraewellingOAuthController::class, 'handleProviderCallback'])->name('traewelling.callback');
-    });
-
-    Route::prefix('app')->group(function () {
-        Route::patch('imprint', [ImprintController::class, 'update'])
-            ->middleware('admin')
-            ->name('imprint.update');
-    });
-
-    // Auth routes (authenticated)
+    // Auth routes (authenticated) - always accessible, even without accepting the current privacy policy
     Route::prefix('auth')->group(function () {
         Route::get('/user', [AuthController::class, 'user'])->name('auth.user');
         Route::post('/logout', [AuthController::class, 'logout']);
@@ -87,103 +82,129 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/email/resend', [AuthController::class, 'resendVerificationEmail']);
     });
 
-    Route::get('/timeline', [PostController::class, 'timeline'])
-        ->name('posts.timeline');
-
-    Route::get('/timeline/global', [PostController::class, 'globalTimeline'])
-        ->name('posts.timeline.global');
-
-    Route::post('/trips', [TripController::class, 'store'])
-        ->name('trips.store');
-
-    Route::get('/geocode', [ApiLocationController::class, 'geocode'])
-        ->name('posts.create.geocode');
-    Route::get('/location/prefetch', [ApiLocationController::class, 'prefetch'])
-        ->name('posts.create.prefetch');
-    Route::get('/location/request-location', [ApiLocationController::class, 'getRecentRequestLocation'])
-        ->name('api.request-location.get');
-
-    Route::prefix('posts')->group(function () {
-        Route::get('/', [PostController::class, 'index'])->name('api.posts.filter');
-        Route::post('/text', [PostController::class, 'storeText'])->name('posts.create.text-post.store');
-        Route::post('/location', [PostController::class, 'storeLocation'])->name('posts.create.post.store');
-        Route::post('/mass-edit', [PostController::class, 'massEdit'])->name('api.posts.mass-edit');
-
-        Route::prefix('{postId}')->group(function () {
-            Route::post('/likes', [LikeController::class, 'store'])
-                ->name('posts.like');
-            Route::delete('/likes', [LikeController::class, 'destroy'])
-                ->name('posts.unlike');
-
-            Route::patch('/', [PostController::class, 'update'])->name('posts.update');
-            Route::delete('/', [PostController::class, 'destroy'])
-                ->name('api.posts.destroy');
-
-            Route::prefix('transport')->group(function () {
-                Route::put('/exit', [PostController::class, 'updateTransportPostExit'])->name('posts.update.transport-post');
-                Route::put('/times', [PostController::class, 'updateTimesTransport'])->name('posts.update.transport-times');
-                Route::post('/track', [PostController::class, 'uploadTransportTrack'])->name('posts.upload.transport-track');
-                Route::delete('/track', [PostController::class, 'deleteTransportTrack'])->name('posts.delete.transport-track');
-            });
-
-            Route::prefix('traewelling')->group(function () {
-                Route::post('/retry', [PostController::class, 'retryTraewellingCrosspost'])->name('posts.traewelling.retry');
-            });
-        });
-
-        Route::post('/transport', [PostController::class, 'storeTransport'])->name('posts.create.transport-post.store');
+    Route::prefix('app')->group(function () {
+        Route::post('privacy-policy', [PrivacyPolicyController::class, 'store'])
+            ->middleware('admin')
+            ->name('privacy-policy.store');
+        Route::post('privacy-policy/{privacyPolicy}/accept', [PrivacyPolicyController::class, 'accept'])
+            ->name('privacy-policy.accept');
     });
 
-    Route::prefix('map')->group(function () {
-        Route::get('/linestring', [MapController::class, 'getLineStringBetween'])
-            ->name('posts.get.linestring');
-        Route::get('/stopovers', [MapController::class, 'getStopsBetween'])
-            ->name('posts.get.stopovers');
-    });
-
-    Route::prefix('notifications')->group(function () {
-        Route::get('/list', [NotificationController::class, 'index'])
-            ->name('notifications.index');
-        Route::get('/unread-count', [NotificationController::class, 'unreadCount'])
-            ->name('notifications.unread-count');
-        Route::post('/{id}/read', [NotificationController::class, 'markAsRead'])
-            ->name('notifications.read');
-        Route::post('/read-all', [NotificationController::class, 'markAllAsRead'])
-            ->name('notifications.read-all');
-    });
-
-    Route::prefix('locations')->group(function () {
-        Route::get('/nearby', [ApiLocationController::class, 'search'])
-            ->name('api.location.search');
-        Route::get('/history', [ApiLocationController::class, 'index'])
-            ->name('api.location.history');
-        Route::post('/history', [ApiLocationController::class, 'createHistoryLocation'])
-            ->name('api.location.history.create');
-        Route::get('/departures', [ApiLocationController::class, 'departures'])
-            ->name('api.location.departures');
-        Route::get('/stopovers', [ApiLocationController::class, 'stopovers'])
-            ->name('api.location.stopovers');
-    });
-
-    Route::prefix('invites')->group(function () {
-        Route::get('/', [InviteController::class, 'index'])->name('api.invites.index');
-        Route::post('/', [InviteController::class, 'store'])->name('api.invites.store');
-        Route::delete('/{inviteCode}', [InviteController::class, 'destroy'])->name('api.invites.destroy');
-    });
-
+    // Account viewing/deletion - always accessible, even without accepting the current privacy policy
     Route::prefix('account')->group(function () {
         Route::get('/', [AccountController::class, 'show'])->name('account.show');
-        Route::patch('/settings', [UserSettingsController::class, 'update'])->name('account.settings.update');
-        Route::patch('/profile', [UserController::class, 'update'])->name('profile.update');
-        Route::post('/profile/avatar', [UserController::class, 'updateAvatar'])->name('profile.update.avatar'); // needs to be post b/c of file upload
-        Route::delete('/profile/avatar', [UserController::class, 'deleteAvatar'])->name('profile.delete.avatar');
-        Route::post('/profile/header', [UserController::class, 'updateHeader'])->name('profile.update.header'); // needs to be post b/c of file upload
-        Route::delete('/profile/header', [UserController::class, 'deleteHeader'])->name('profile.delete.header');
-        Route::patch('/', [AccountController::class, 'update'])->name('account.update');
         Route::delete('/', [AccountController::class, 'destroy'])->name('account.destroy');
+    });
 
-        Route::prefix('socialite')->group(callback: function () {
-            Route::delete('/traewelling', [AccountController::class, 'disconnectTraewelling'])->name('traewelling.disconnect');
+    // Everything below requires the currently effective privacy policy to be accepted
+    Route::middleware('privacy-policy')->group(function () {
+        Route::prefix('socialite')->group(function () {
+            Route::get('/traewelling/connect', [TraewellingOAuthController::class, 'redirectToProvider'])->name('traewelling.connect');
+            Route::get('/traewelling/callback', [TraewellingOAuthController::class, 'handleProviderCallback'])->name('traewelling.callback');
+        });
+
+        Route::prefix('app')->group(function () {
+            Route::patch('imprint', [ImprintController::class, 'update'])
+                ->middleware('admin')
+                ->name('imprint.update');
+        });
+
+        Route::get('/timeline', [PostController::class, 'timeline'])
+            ->name('posts.timeline');
+
+        Route::get('/timeline/global', [PostController::class, 'globalTimeline'])
+            ->name('posts.timeline.global');
+
+        Route::post('/trips', [TripController::class, 'store'])
+            ->name('trips.store');
+
+        Route::get('/geocode', [ApiLocationController::class, 'geocode'])
+            ->name('posts.create.geocode');
+        Route::get('/location/prefetch', [ApiLocationController::class, 'prefetch'])
+            ->name('posts.create.prefetch');
+        Route::get('/location/request-location', [ApiLocationController::class, 'getRecentRequestLocation'])
+            ->name('api.request-location.get');
+
+        Route::prefix('posts')->group(function () {
+            Route::get('/', [PostController::class, 'index'])->name('api.posts.filter');
+            Route::post('/text', [PostController::class, 'storeText'])->name('posts.create.text-post.store');
+            Route::post('/location', [PostController::class, 'storeLocation'])->name('posts.create.post.store');
+            Route::post('/mass-edit', [PostController::class, 'massEdit'])->name('api.posts.mass-edit');
+
+            Route::prefix('{postId}')->group(function () {
+                Route::post('/likes', [LikeController::class, 'store'])
+                    ->name('posts.like');
+                Route::delete('/likes', [LikeController::class, 'destroy'])
+                    ->name('posts.unlike');
+
+                Route::patch('/', [PostController::class, 'update'])->name('posts.update');
+                Route::delete('/', [PostController::class, 'destroy'])
+                    ->name('api.posts.destroy');
+
+                Route::prefix('transport')->group(function () {
+                    Route::put('/exit', [PostController::class, 'updateTransportPostExit'])->name('posts.update.transport-post');
+                    Route::put('/times', [PostController::class, 'updateTimesTransport'])->name('posts.update.transport-times');
+                    Route::post('/track', [PostController::class, 'uploadTransportTrack'])->name('posts.upload.transport-track');
+                    Route::delete('/track', [PostController::class, 'deleteTransportTrack'])->name('posts.delete.transport-track');
+                });
+
+                Route::prefix('traewelling')->group(function () {
+                    Route::post('/retry', [PostController::class, 'retryTraewellingCrosspost'])->name('posts.traewelling.retry');
+                });
+            });
+
+            Route::post('/transport', [PostController::class, 'storeTransport'])->name('posts.create.transport-post.store');
+        });
+
+        Route::prefix('map')->group(function () {
+            Route::get('/linestring', [MapController::class, 'getLineStringBetween'])
+                ->name('posts.get.linestring');
+            Route::get('/stopovers', [MapController::class, 'getStopsBetween'])
+                ->name('posts.get.stopovers');
+        });
+
+        Route::prefix('notifications')->group(function () {
+            Route::get('/list', [NotificationController::class, 'index'])
+                ->name('notifications.index');
+            Route::get('/unread-count', [NotificationController::class, 'unreadCount'])
+                ->name('notifications.unread-count');
+            Route::post('/{id}/read', [NotificationController::class, 'markAsRead'])
+                ->name('notifications.read');
+            Route::post('/read-all', [NotificationController::class, 'markAllAsRead'])
+                ->name('notifications.read-all');
+        });
+
+        Route::prefix('locations')->group(function () {
+            Route::get('/nearby', [ApiLocationController::class, 'search'])
+                ->name('api.location.search');
+            Route::get('/history', [ApiLocationController::class, 'index'])
+                ->name('api.location.history');
+            Route::post('/history', [ApiLocationController::class, 'createHistoryLocation'])
+                ->name('api.location.history.create');
+            Route::get('/departures', [ApiLocationController::class, 'departures'])
+                ->name('api.location.departures');
+            Route::get('/stopovers', [ApiLocationController::class, 'stopovers'])
+                ->name('api.location.stopovers');
+        });
+
+        Route::prefix('invites')->group(function () {
+            Route::get('/', [InviteController::class, 'index'])->name('api.invites.index');
+            Route::post('/', [InviteController::class, 'store'])->name('api.invites.store');
+            Route::delete('/{inviteCode}', [InviteController::class, 'destroy'])->name('api.invites.destroy');
+        });
+
+        Route::prefix('account')->group(function () {
+            Route::patch('/settings', [UserSettingsController::class, 'update'])->name('account.settings.update');
+            Route::patch('/profile', [UserController::class, 'update'])->name('profile.update');
+            Route::post('/profile/avatar', [UserController::class, 'updateAvatar'])->name('profile.update.avatar'); // needs to be post b/c of file upload
+            Route::delete('/profile/avatar', [UserController::class, 'deleteAvatar'])->name('profile.delete.avatar');
+            Route::post('/profile/header', [UserController::class, 'updateHeader'])->name('profile.update.header'); // needs to be post b/c of file upload
+            Route::delete('/profile/header', [UserController::class, 'deleteHeader'])->name('profile.delete.header');
+            Route::patch('/', [AccountController::class, 'update'])->name('account.update');
+
+            Route::prefix('socialite')->group(callback: function () {
+                Route::delete('/traewelling', [AccountController::class, 'disconnectTraewelling'])->name('traewelling.disconnect');
+            });
         });
     });
 });

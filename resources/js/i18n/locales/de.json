@@ -68,6 +68,15 @@
         "imprint": {
             "title": "Impressum",
             "empty": "Es ist noch kein Impressum hinterlegt."
+        },
+        "privacyPolicy": {
+            "title": "Datenschutzerklärung",
+            "empty": "Es ist noch keine Datenschutzerklärung hinterlegt.",
+            "upcomingTitle": "Kommende Datenschutzerklärung",
+            "upcomingDescription": "Diese Version tritt am {date} in Kraft.",
+            "accept": "Akzeptieren",
+            "accepted": "Akzeptiert",
+            "acceptRequiredNotice": "Bitte akzeptiere die aktuelle Datenschutzerklärung, um die App weiter zu nutzen."
         }
     },
     "auth": {
@@ -278,6 +287,17 @@
             "title": "Impressum",
             "description": "Konfiguriere das Impressum, das in der Fußzeile angezeigt wird.",
             "content": "Inhalt"
+        },
+        "privacyPolicy": {
+            "title": "Datenschutzerklärung",
+            "description": "Veröffentliche eine neue Version der Datenschutzerklärung. Bestehende Versionen können nicht bearbeitet werden.",
+            "content": "Inhalt",
+            "validFrom": "Gültig ab",
+            "currentVersion": "Aktuelle Version gültig seit {date}",
+            "upcomingVersion": "Kommende Version gültig ab {date}",
+            "noCurrentVersion": "Es wurde noch keine Datenschutzerklärung veröffentlicht.",
+            "noUpcomingVersion": "Keine kommende Version geplant.",
+            "error": "Die Datenschutzerklärung konnte nicht veröffentlicht werden. Bitte versuche es erneut."
         }
     },
     "errors": {

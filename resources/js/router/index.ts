@@ -25,6 +25,7 @@ import NotificationsIndex from '@/Pages/Notifications/Index.vue';
 import PostsFilter from '@/Pages/Posts/Filter.vue';
 import Likes from '@/Pages/Posts/Likes.vue';
 import SinglePost from '@/Pages/Posts/SinglePost.vue';
+import PrivacyPolicy from '@/Pages/PrivacyPolicy.vue';
 import ProfileShow from '@/Pages/Profile/Show.vue';
 import ProfileShowMap from '@/Pages/Profile/ShowMap.vue';
 import EditSettings from '@/Pages/Settings/Edit.vue';
@@ -220,6 +221,11 @@ const routes: RouteRecordRaw[] = [
         path: '/imprint',
         name: 'imprint',
         component: Imprint,
+    },
+    {
+        path: '/privacy-policy',
+        name: 'privacy-policy',
+        component: PrivacyPolicy,
     },
     { path: '/:pathMatch(.*)*', name: 'not-found', component: NotFound },
     {

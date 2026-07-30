@@ -41,14 +41,30 @@ api.instance.interceptors.response.use(
         }
 
         if (error.response?.status === 403) {
-            router
-                .push({
-                    name: 'forbidden',
-                })
-                .then((r) => r);
+            if (error.response?.data?.code === 'privacyPolicyRequired') {
+                if (router.currentRoute.value.name !== 'privacy-policy') {
+                    router
+                        .push({
+                            name: 'privacy-policy',
+                            query: {
+                                redirect: router.currentRoute.value.fullPath,
+                            },
+                        })
+                        .then((r) => r);
+                }
+            } else {
+                router
+                    .push({
+                        name: 'forbidden',
+                    })
+                    .then((r) => r);
+            }
         }
 
-        if (error.response?.status === 404) {
+        if (
+            error.response?.status === 404 &&
+            !error.config?.url?.includes('/app/privacy-policy')
+        ) {
             router
                 .push({
                     name: 'not-found',

@@ -56,9 +56,12 @@ const versionLink = computed(() => {
         <nav></nav>
         <nav>
             <h6 class="footer-title">{{ $t('footer.legal.title') }}</h6>
-            <a class="link link-hover">{{
-                $t('footer.legal.privacy_policy')
-            }}</a>
+            <router-link
+                :to="{ name: 'privacy-policy' }"
+                class="link link-hover"
+            >
+                {{ $t('footer.legal.privacy_policy') }}
+            </router-link>
             <router-link :to="{ name: 'imprint' }" class="link link-hover">
                 {{ $t('footer.legal.imprint') }}
             </router-link>
