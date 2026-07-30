@@ -3,6 +3,7 @@
     "name": "herrlevin/reisetagebuch",
     "type": "project",
     "description": "A self-hosted travel diary application built with Laravel and Vue.js.",
+    "license": "Unlicense",
     "keywords": [
         "laravel",
         "vue",
