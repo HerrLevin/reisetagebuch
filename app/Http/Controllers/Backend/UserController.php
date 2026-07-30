@@ -29,6 +29,14 @@ class UserController extends Controller
         return $this->userRepository->getUserByUsername($username);
     }
 
+    /**
+     * @return UserDto[]
+     */
+    public function search(string $query): array
+    {
+        return $this->userRepository->searchUsers($query);
+    }
+
     public function updateAvatar(ImageUploadRequest $request, User $user): UserDto
     {
         $upload = $request->file('image');

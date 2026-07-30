@@ -2,11 +2,11 @@
 import { useUserStore } from '@/stores/user';
 import {
     Filter,
-    Globe,
     Handshake,
     History,
     LogOut,
     Route,
+    Search,
     Settings,
     User,
 } from 'lucide-vue-next';
@@ -66,9 +66,9 @@ const links = [
         condition: !!user.user,
     },
     {
-        link: { name: 'fediverse.index' },
-        label: 'fediverse.title',
-        icon: Globe,
+        link: { name: 'search.index' },
+        label: 'search.title',
+        icon: Search,
         condition: !!user.user,
     },
     {

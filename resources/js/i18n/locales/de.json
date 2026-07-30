@@ -238,7 +238,10 @@
             "followings": "Following | Followings",
             "locations": "Ort | Orte",
             "trips": "Trip | Trips",
-            "posts": "Beitrag | Beiträge"
+            "posts": "Beitrag | Beiträge",
+            "followers_modal_title": "Follower",
+            "following_modal_title": "Following",
+            "no_results": "Hier gibt es noch nichts zu sehen."
         }
     },
     "settings": {
@@ -502,20 +505,21 @@
         "METRO": "Metro"
     },
     "fediverse": {
-        "title": "Fediverse",
-        "find_title": "Jemanden im Fediverse finden",
-        "handle_placeholder": "{'@'}nutzer{'@'}instanz.social",
         "find": "Suchen",
         "follow": "Folgen",
         "unfollow": "Entfolgen",
         "pending": "Ausstehend",
         "rejected": "Abgelehnt",
-        "following_title": "Personen, denen du folgst",
-        "no_following": "Du folgst noch niemandem im Fediverse.",
         "not_found": "Nutzer nicht gefunden. Überprüfe den Handle und versuche es erneut.",
         "resolve_error": "Handle konnte nicht aufgelöst werden. Die Instanz ist möglicherweise nicht erreichbar.",
         "from_fediverse": "Fediverse",
         "view_original": "Originalbeitrag ansehen"
+    },
+    "search": {
+        "title": "Suche",
+        "placeholder": "Nach Personen suchen...",
+        "no_results": "Keine Personen gefunden.",
+        "fediverse_section_title": "Jemanden im Fediverse finden"
     },
     "transport_group": {
         "long_distance": "Fernverkehr",

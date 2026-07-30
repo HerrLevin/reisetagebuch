@@ -150,6 +150,76 @@
                 ]
             }
         },
+        "/users/{userId}/activitypub/followers": {
+            "get": {
+                "tags": [
+                    "Follows"
+                ],
+                "summary": "Get remote followers",
+                "description": "Return the remote (ActivityPub) actors that follow a user",
+                "operationId": "getUserActivityPubFollowers",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/RemoteFollowerDto"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{userId}/activitypub/following": {
+            "get": {
+                "tags": [
+                    "Follows"
+                ],
+                "summary": "Get remote following",
+                "description": "Return the remote (ActivityPub) actors a user follows",
+                "operationId": "getUserActivityPubFollowing",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/RemoteFollowDto"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/activitypub/posts/{postId}/likes": {
             "post": {
                 "tags": [
@@ -2973,6 +3043,41 @@
                 }
             }
         },
+        "/users/search": {
+            "get": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Search users",
+                "description": "Search local users by username or display name (case-insensitive, partial match, public endpoint)",
+                "operationId": "searchUsers",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/UserDto"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/profile/{username}": {
             "get": {
                 "tags": [
@@ -4446,6 +4551,49 @@
                 },
                 "type": "object"
             },
+            "RemoteFollowerDto": {
+                "required": [
+                    "actorId",
+                    "createdAt",
+                    "displayName",
+                    "preferredUsername",
+                    "iconUrl",
+                    "profileUrl"
+                ],
+                "properties": {
+                    "actorId": {
+                        "description": "The remote actor's ActivityPub id",
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "description": "When the follow was received",
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "displayName": {
+                        "description": "The remote actor's display name",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "preferredUsername": {
+                        "description": "The remote actor's preferred username",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "iconUrl": {
+                        "description": "The remote actor's avatar URL",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "profileUrl": {
+                        "description": "The remote actor's public profile URL",
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
             "RequestLocationDto": {
                 "description": "Data Transfer Object for Request Location",
                 "required": [
@@ -5763,6 +5911,10 @@
             "description": "Account"
         },
         {
+            "name": "Follows",
+            "description": "Follows"
+        },
+        {
             "name": "ActivityPub",
             "description": "ActivityPub"
         },
@@ -5773,10 +5925,6 @@
         {
             "name": "Authentication",
             "description": "Authentication"
-        },
-        {
-            "name": "Follows",
-            "description": "Follows"
         },
         {
             "name": "App",
