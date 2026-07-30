@@ -42,6 +42,11 @@ class ActivityPubPostRepository
         ActivityPubPost::where('activity_id', $activityId)->delete();
     }
 
+    public function findByActivityId(string $activityId): ?ActivityPubPost
+    {
+        return ActivityPubPost::where('activity_id', $activityId)->first();
+    }
+
     public function findById(string $id): ?ActivityPubPost
     {
         return ActivityPubPost::with('actor')->find($id);

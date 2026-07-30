@@ -1042,6 +1042,48 @@ class ActivityPubControllerTest extends TestCase
         ]);
     }
 
+    public function test_inbox_undo_like_removes_like_notification(): void
+    {
+        $user = $this->createUserWithKeys(['username' => 'alice']);
+        $post = Post::factory()->create(['user_id' => $user->id]);
+        $remoteActorId = 'https://remote.example/users/bob';
+        [, $remotePubKey] = $this->generateKeyPair();
+        $this->setupRemoteActor($remoteActorId, $remotePubKey);
+
+        $likeActivity = [
+            '@context' => 'https://www.w3.org/ns/activitystreams',
+            'id' => 'https://remote.example/activities/like-1',
+            'type' => 'Like',
+            'actor' => $remoteActorId,
+            'object' => route('ap.post', ['id' => $post->id]),
+        ];
+
+        $this->inboxPost('/ap/users/alice/inbox', $likeActivity);
+
+        $this->assertDatabaseCount('notifications', 1);
+
+        $undoActivity = [
+            '@context' => 'https://www.w3.org/ns/activitystreams',
+            'id' => 'https://remote.example/activities/undo-like-1',
+            'type' => 'Undo',
+            'actor' => $remoteActorId,
+            'object' => [
+                'type' => 'Like',
+                'actor' => $remoteActorId,
+                'object' => route('ap.post', ['id' => $post->id]),
+            ],
+        ];
+
+        $response = $this->inboxPost('/ap/users/alice/inbox', $undoActivity);
+
+        $response->assertStatus(202);
+        $this->assertDatabaseMissing('activity_pub_likes', [
+            'actor_id' => $remoteActorId,
+            'post_id' => $post->id,
+        ]);
+        $this->assertDatabaseCount('notifications', 0);
+    }
+
     public function test_inbox_unknown_activity_type_returns_202(): void
     {
         $this->createUserWithKeys(['username' => 'alice']);
@@ -1158,5 +1200,47 @@ class ActivityPubControllerTest extends TestCase
             ->postJson('/ap/inbox', $activity);
 
         $response->assertStatus(202);
+    }
+
+    public function test_shared_inbox_delete_note_removes_mention_notification(): void
+    {
+        $this->createUserWithKeys(['username' => 'alice']);
+        $remoteActorId = 'https://remote.example/users/bob';
+        ActivityPubActor::factory()->create(['actor_uri' => $remoteActorId]);
+
+        $noteId = 'https://remote.example/notes/1';
+        $createActivity = [
+            '@context' => 'https://www.w3.org/ns/activitystreams',
+            'id' => 'https://remote.example/activities/create-1',
+            'type' => 'Create',
+            'actor' => $remoteActorId,
+            'object' => [
+                'id' => $noteId,
+                'type' => 'Note',
+                'content' => 'Hello @alice',
+                'tag' => [
+                    ['type' => 'Mention', 'href' => route('ap.actor', ['username' => 'alice'])],
+                ],
+            ],
+        ];
+
+        $this->inboxPost('/ap/inbox', $createActivity);
+
+        $this->assertDatabaseHas('activity_pub_posts', ['activity_id' => $noteId]);
+        $this->assertDatabaseCount('notifications', 1);
+
+        $deleteActivity = [
+            '@context' => 'https://www.w3.org/ns/activitystreams',
+            'id' => 'https://remote.example/activities/delete-1',
+            'type' => 'Delete',
+            'actor' => $remoteActorId,
+            'object' => $noteId,
+        ];
+
+        $response = $this->inboxPost('/ap/inbox', $deleteActivity);
+
+        $response->assertStatus(202);
+        $this->assertDatabaseMissing('activity_pub_posts', ['activity_id' => $noteId]);
+        $this->assertDatabaseCount('notifications', 0);
     }
 }
