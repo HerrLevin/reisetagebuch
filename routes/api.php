@@ -185,18 +185,18 @@ Route::middleware('auth:api')->group(function () {
         });
 
         Route::prefix('activitypub')->group(function () {
-        Route::get('/resolve', [ActivityPubFederationController::class, 'resolve'])->name('ap.federation.resolve');
-        Route::get('/following', [ActivityPubFederationController::class, 'following'])->name('ap.federation.following');
-        Route::post('/follow', [ActivityPubFederationController::class, 'follow'])->name('ap.federation.follow');
-        Route::delete('/follow', [ActivityPubFederationController::class, 'unfollow'])->name('ap.federation.unfollow');
+            Route::get('/resolve', [ActivityPubFederationController::class, 'resolve'])->name('ap.federation.resolve');
+            Route::get('/following', [ActivityPubFederationController::class, 'following'])->name('ap.federation.following');
+            Route::post('/follow', [ActivityPubFederationController::class, 'follow'])->name('ap.federation.follow');
+            Route::delete('/follow', [ActivityPubFederationController::class, 'unfollow'])->name('ap.federation.unfollow');
 
-        Route::prefix('posts/{postId}')->group(function () {
-            Route::post('/likes', [ActivityPubPostInteractionController::class, 'like'])->name('ap.posts.like');
-            Route::delete('/likes', [ActivityPubPostInteractionController::class, 'unlike'])->name('ap.posts.unlike');
+            Route::prefix('posts/{postId}')->group(function () {
+                Route::post('/likes', [ActivityPubPostInteractionController::class, 'like'])->name('ap.posts.like');
+                Route::delete('/likes', [ActivityPubPostInteractionController::class, 'unlike'])->name('ap.posts.unlike');
+            });
         });
-    });
 
-    Route::prefix('account')->group(function () {
+        Route::prefix('account')->group(function () {
             Route::patch('/settings', [UserSettingsController::class, 'update'])->name('account.settings.update');
             Route::patch('/profile', [UserController::class, 'update'])->name('profile.update');
             Route::post('/profile/avatar', [UserController::class, 'updateAvatar'])->name('profile.update.avatar'); // needs to be post b/c of file upload

@@ -37,7 +37,7 @@ async function resolveActor() {
             params: { handle: handle.value.trim() },
         });
         resolvedActor.value = response.data;
-    } catch (e: any) {
+    } catch (e) {
         resolveError.value =
             e.response?.status === 404
                 ? t('fediverse.not_found')
@@ -152,11 +152,13 @@ loadFollowing();
                                     instanceOf(resolvedActor.actorId)
                                 }}
                             </div>
+                            <!-- eslint-disable vue/no-v-html -->
                             <div
                                 v-if="resolvedActor.summary"
                                 class="mt-1 line-clamp-3 text-sm [&_a]:underline"
                                 v-html="resolvedActor.summary"
                             />
+                            <!-- eslint-enable vue/no-v-html -->
                         </div>
 
                         <button
@@ -211,13 +213,13 @@ loadFollowing();
 
                 <div v-else class="space-y-2">
                     <div
-                        v-for="follow in remoteFollows"
-                        :key="follow.actorId"
+                        v-for="remoteFollow in remoteFollows"
+                        :key="remoteFollow.actorId"
                         class="bg-base-200 rounded-box flex items-center gap-3 p-3"
                     >
                         <img
-                            v-if="follow.iconUrl"
-                            :src="follow.iconUrl"
+                            v-if="remoteFollow.iconUrl"
+                            :src="remoteFollow.iconUrl"
                             class="size-10 shrink-0 rounded-full object-cover"
                             alt=""
                         />
@@ -229,25 +231,25 @@ loadFollowing();
                         <div class="min-w-0 flex-1">
                             <div class="truncate font-medium">
                                 {{
-                                    follow.displayName ||
-                                    follow.preferredUsername
+                                    remoteFollow.displayName ||
+                                    remoteFollow.preferredUsername
                                 }}
                             </div>
                             <div class="text-base-content/60 truncate text-xs">
-                                @{{ follow.preferredUsername }}@{{
-                                    instanceOf(follow.actorId)
+                                @{{ remoteFollow.preferredUsername }}@{{
+                                    instanceOf(remoteFollow.actorId)
                                 }}
                             </div>
                         </div>
 
                         <span
-                            v-if="follow.state === 'pending'"
+                            v-if="remoteFollow.state === 'pending'"
                             class="badge badge-warning badge-sm shrink-0"
                         >
                             {{ t('fediverse.pending') }}
                         </span>
                         <span
-                            v-else-if="follow.state === 'rejected'"
+                            v-else-if="remoteFollow.state === 'rejected'"
                             class="badge badge-error badge-sm shrink-0"
                         >
                             {{ t('fediverse.rejected') }}
@@ -255,7 +257,7 @@ loadFollowing();
 
                         <button
                             class="btn btn-ghost btn-sm shrink-0"
-                            @click="unfollow(follow.actorId)"
+                            @click="unfollow(remoteFollow.actorId)"
                         >
                             {{ t('fediverse.unfollow') }}
                         </button>
