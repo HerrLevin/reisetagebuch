@@ -131,36 +131,9 @@ class TransportPost extends BasePost
         $duration = round($this->duration / 60);
         $distance = round($this->distance / 1000, 1);
 
-        $departureTimeString = $this->originStop->departureTime ?? $this->originStop->arrivalTime;
-        $arrivalTimeString = $this->destinationStop->arrivalTime ?? $this->destinationStop->departureTime;
-        $departureTime = $departureTimeString !== null ? Carbon::parse($departureTimeString) : null;
-        $arrivalTime = $arrivalTimeString !== null ? Carbon::parse($arrivalTimeString) : null;
-
-        $departureDelay = $this->manualDepartureTime !== null && $departureTime !== null
-            ? (int) round($departureTime->diffInMinutes(Carbon::parse($this->manualDepartureTime)))
-            : $this->originStop->departureDelay;
-        $arrivalDelay = $this->manualArrivalTime !== null && $arrivalTime !== null
-            ? (int) round($arrivalTime->diffInMinutes(Carbon::parse($this->manualArrivalTime)))
-            : $this->destinationStop->arrivalDelay;
-
-        $departureDelay = $departureDelay !== null && $departureDelay > 0 ? '+'.$departureDelay : $departureDelay;
-        $arrivalDelay = $arrivalDelay !== null && $arrivalDelay > 0 ? '+'.$arrivalDelay : $arrivalDelay;
-
-        $departure = $departureTime !== null ? e($departureTime->format('H:i')) : null;
-        $arrival = $arrivalTime !== null ? e($arrivalTime->format('H:i')) : null;
-        $departure = $departure !== null && $departureDelay !== null && $departureDelay !== 0 ? $departure." ($departureDelay min)" : $departure;
-        $arrival = $arrival !== null && $arrivalDelay !== null && $arrivalDelay !== 0 ? $arrival." ($arrivalDelay min)" : $arrival;
-
         $body = "$emoji <strong>$line</strong><br>".
             "🛤️ $origin → $destination<br>".
-            "⏱️ $duration min • 📏 $distance km<br>";
-
-        if ($departure !== null) {
-            $body .= "<br>▶️ $departure";
-        }
-        if ($arrival !== null) {
-            $body .= "<br>⏹️ $arrival";
-        }
+            "⏱️ $duration min • 📏 $distance km";
 
         return $parentBody ? nl2br($parentBody."\n\n").$body : $body;
     }
