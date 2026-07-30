@@ -2,7 +2,7 @@
 FROM composer:latest AS builder
 WORKDIR /app
 COPY . .
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install --no-dev --optimize-autoloader --ignore-platform-req=ext-gd
 
 # Stage 2: Build PHP application
 FROM php:8.5-fpm-alpine
