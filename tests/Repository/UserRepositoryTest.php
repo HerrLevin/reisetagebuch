@@ -78,6 +78,63 @@ class UserRepositoryTest extends TestCase
         $this->assertNull($updatedUser->headerMimeType);
     }
 
+    public function test_search_users_matches_username(): void
+    {
+        $user = User::factory()->create(['username' => 'traveldiaryfan']);
+        User::factory()->create(['username' => 'someoneelse']);
+
+        $repository = new UserRepository;
+        $results = $repository->searchUsers('traveldiary');
+
+        $this->assertCount(1, $results);
+        $this->assertSame($user->id, $results[0]->id);
+    }
+
+    public function test_search_users_matches_name(): void
+    {
+        $user = User::factory()->create(['name' => 'Ada Lovelace']);
+        User::factory()->create(['name' => 'Someone Else']);
+
+        $repository = new UserRepository;
+        $results = $repository->searchUsers('Lovelace');
+
+        $this->assertCount(1, $results);
+        $this->assertSame($user->id, $results[0]->id);
+    }
+
+    public function test_search_users_is_case_insensitive(): void
+    {
+        $user = User::factory()->create(['username' => 'CaseSensitiveUser']);
+
+        $repository = new UserRepository;
+        $results = $repository->searchUsers('casesensitive');
+
+        $this->assertCount(1, $results);
+        $this->assertSame($user->id, $results[0]->id);
+    }
+
+    public function test_search_users_respects_limit(): void
+    {
+        for ($i = 0; $i < 5; $i++) {
+            User::factory()->create(['username' => 'searchlimit'.$i]);
+        }
+
+        $repository = new UserRepository;
+        $results = $repository->searchUsers('searchlimit', limit: 2);
+
+        $this->assertCount(2, $results);
+    }
+
+    public function test_search_users_returns_empty_array_for_no_matches(): void
+    {
+        User::factory()->create(['username' => 'someone']);
+
+        $repository = new UserRepository;
+        $results = $repository->searchUsers('nonexistentquery');
+
+        $this->assertSame([], $results);
+    }
+
     public function test_create_profile_if_not_exists()
     {
         $user = User::factory()->create();

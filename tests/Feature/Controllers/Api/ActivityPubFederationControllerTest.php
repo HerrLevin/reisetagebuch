@@ -5,6 +5,7 @@ namespace Tests\Feature\Controllers\Api;
 use App\Jobs\SendFollowToRemoteActor;
 use App\Jobs\SendUndoFollowToRemoteActor;
 use App\Models\ActivityPubActor;
+use App\Models\ActivityPubFollower;
 use App\Models\ActivityPubRemoteFollow;
 use App\Models\User;
 use App\Services\ActivityPubUrlGuard;
@@ -284,5 +285,105 @@ class ActivityPubFederationControllerTest extends TestCase
 
         $response->assertOk()->assertJsonCount(1);
         $this->assertSame($actor->actor_uri, $response->json('0.actorId'));
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    // GET /api/users/{userId}/activitypub/followers
+    // ──────────────────────────────────────────────────────────────────────────
+
+    public function test_get_user_activitypub_followers_is_public(): void
+    {
+        $user = User::factory()->create();
+
+        $this->getJson("/api/users/{$user->id}/activitypub/followers")->assertOk();
+    }
+
+    public function test_get_user_activitypub_followers_returns_remote_followers_for_given_user(): void
+    {
+        $user = User::factory()->create();
+        $actor = ActivityPubActor::factory()->create();
+        $follower = ActivityPubFollower::factory()->create([
+            'followed_user_id' => $user->id,
+            'follower_actor_id' => $actor->actor_uri,
+            'activity_pub_actor_id' => $actor->id,
+        ]);
+
+        $response = $this->getJson("/api/users/{$user->id}/activitypub/followers");
+
+        $response->assertOk()->assertJsonCount(1);
+        $this->assertSame($follower->follower_actor_id, $response->json('0.actorId'));
+        $this->assertSame($actor->display_name, $response->json('0.displayName'));
+        $this->assertSame($actor->preferred_username, $response->json('0.preferredUsername'));
+    }
+
+    public function test_get_user_activitypub_followers_scopes_by_user_id(): void
+    {
+        $user = User::factory()->create();
+        $otherUser = User::factory()->create();
+
+        ActivityPubFollower::factory()->create(['followed_user_id' => $otherUser->id]);
+
+        $response = $this->getJson("/api/users/{$user->id}/activitypub/followers");
+
+        $response->assertOk()->assertJsonCount(0);
+    }
+
+    public function test_get_user_activitypub_followers_returns_empty_array_when_none(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->getJson("/api/users/{$user->id}/activitypub/followers");
+
+        $response->assertOk()->assertExactJson([]);
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    // GET /api/users/{userId}/activitypub/following
+    // ──────────────────────────────────────────────────────────────────────────
+
+    public function test_get_user_activitypub_following_is_public(): void
+    {
+        $user = User::factory()->create();
+
+        $this->getJson("/api/users/{$user->id}/activitypub/following")->assertOk();
+    }
+
+    public function test_get_user_activitypub_following_returns_remote_follows_for_given_user(): void
+    {
+        $user = User::factory()->create();
+        $actor = ActivityPubActor::factory()->create();
+        ActivityPubRemoteFollow::create([
+            'local_user_id' => $user->id,
+            'remote_actor_id' => $actor->actor_uri,
+            'remote_actor_inbox_url' => $actor->inbox_url,
+            'remote_actor_shared_inbox_url' => $actor->shared_inbox_url,
+            'follow_activity_id' => 'https://example.test/follows/mine',
+            'state' => 'accepted',
+        ]);
+
+        $response = $this->getJson("/api/users/{$user->id}/activitypub/following");
+
+        $response->assertOk()->assertJsonCount(1);
+        $this->assertSame($actor->actor_uri, $response->json('0.actorId'));
+    }
+
+    public function test_get_user_activitypub_following_scopes_by_user_id(): void
+    {
+        $user = User::factory()->create();
+        $otherUser = User::factory()->create();
+
+        $actor = ActivityPubActor::factory()->create();
+        ActivityPubRemoteFollow::create([
+            'local_user_id' => $otherUser->id,
+            'remote_actor_id' => $actor->actor_uri,
+            'remote_actor_inbox_url' => $actor->inbox_url,
+            'remote_actor_shared_inbox_url' => $actor->shared_inbox_url,
+            'follow_activity_id' => 'https://example.test/follows/other',
+            'state' => 'accepted',
+        ]);
+
+        $response = $this->getJson("/api/users/{$user->id}/activitypub/following");
+
+        $response->assertOk()->assertJsonCount(0);
     }
 }

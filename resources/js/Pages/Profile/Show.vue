@@ -4,7 +4,7 @@ import Post from '@/Components/Post/Post.vue';
 import PostSkeleton from '@/Components/Post/PostSkeleton.vue';
 import { useTitle } from '@/composables/useTitle';
 import ProfileWrapper from '@/Pages/Profile/ProfileWrapper.vue';
-import { onMounted, ref, watchEffect } from 'vue';
+import { ref, watch, watchEffect } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { RouterLink } from 'vue-router';
 import {
@@ -32,6 +32,9 @@ watchEffect(() => {
 
 function loadProfileData() {
     userLoading.value = true;
+    user.value = null;
+    posts.value = [];
+    nextCursor.value = null;
     try {
         api.profile.getProfile(props.username).then((response) => {
             user.value = response.data;
@@ -79,9 +82,7 @@ function deletePost(postId: string): void {
     }
 }
 
-onMounted(() => {
-    loadProfileData();
-});
+watch(() => props.username, loadProfileData, { immediate: true });
 </script>
 
 <template>

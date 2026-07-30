@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import DurationStats from '@/Pages/Profile/Partials/DurationStats.vue';
+import FollowListModal from '@/Pages/Profile/Partials/FollowListModal.vue';
 import {
     formatFullNumber,
     formatShortenedNumber,
 } from '@/Services/NumberFormattingService';
-import { PropType } from 'vue';
+import { PropType, useTemplateRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { UserDto } from '../../../../types/Api.gen';
 
@@ -16,13 +17,21 @@ defineProps({
         default: () => ({}),
     },
 });
+
+const followListModal = useTemplateRef('followListModal');
+
+function openFollowList(mode: 'followers' | 'following') {
+    followListModal.value?.open(mode);
+}
 </script>
 
 <template>
     <div class="flex flex-wrap gap-x-3">
-        <a
+        <button
+            type="button"
             class="link link-hover tooltip flex cursor-pointer"
             :data-tip="formatFullNumber(user.statistics.followersCount, locale)"
+            @click="openFollowList('followers')"
         >
             <b>{{
                 formatShortenedNumber(user.statistics.followersCount, locale)
@@ -33,10 +42,12 @@ defineProps({
                     t('profile.stats.followers', user.statistics.followersCount)
                 }}
             </span>
-        </a>
-        <a
+        </button>
+        <button
+            type="button"
             class="link link-hover tooltip flex cursor-pointer"
             :data-tip="formatFullNumber(user.statistics.followingCount, locale)"
+            @click="openFollowList('following')"
         >
             <b>{{
                 formatShortenedNumber(user.statistics.followingCount, locale)
@@ -50,7 +61,7 @@ defineProps({
                     )
                 }}
             </span>
-        </a>
+        </button>
         <a
             class="link link-hover tooltip flex cursor-pointer"
             :data-tip="
@@ -127,4 +138,5 @@ defineProps({
         </span>
         <DurationStats :duration="user.statistics.travelledDuration" />
     </div>
+    <FollowListModal ref="followListModal" :user-id="user.id" />
 </template>

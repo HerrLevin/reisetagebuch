@@ -9,6 +9,7 @@ use App\Models\Location;
 use App\Models\User;
 use Clickbar\Magellan\Data\Geometries\GeometryCollection;
 use Clickbar\Magellan\IO\Generator\Geojson\GeojsonGenerator;
+use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
 
 class UserController extends Controller
@@ -41,6 +42,28 @@ class UserController extends Controller
         $locations = GeometryCollection::make($locations->pluck('location')->toArray());
 
         return new GeojsonGenerator()->generateGeometryCollection($locations); // todo: document response format
+    }
+
+    #[OA\Get(
+        path: '/users/search',
+        operationId: 'searchUsers',
+        description: 'Search local users by username or display name (case-insensitive, partial match, public endpoint)',
+        summary: 'Search users',
+        tags: ['Profile'],
+        parameters: [new OA\Parameter(name: 'q', in: 'query', required: true, schema: new OA\Schema(type: 'string'))],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: Controller::OA_DESC_SUCCESS,
+                content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: UserDto::class))
+            ),
+        ]
+    )]
+    public function search(Request $request): array
+    {
+        $query = trim((string) $request->string('q'));
+
+        return $query === '' ? [] : $this->userController->search($query);
     }
 
     #[OA\Get(

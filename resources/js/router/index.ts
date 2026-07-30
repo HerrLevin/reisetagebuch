@@ -9,7 +9,6 @@ import VerifyEmail from '@/Pages/Auth/VerifyEmail.vue';
 import EditPost from '@/Pages/EditPost.vue';
 import Forbidden from '@/Pages/Errors/Forbidden.vue';
 import NotFound from '@/Pages/Errors/NotFound.vue';
-import FediverseIndex from '@/Pages/Fediverse/Index.vue';
 import Home from '@/Pages/Home.vue';
 import Imprint from '@/Pages/Imprint.vue';
 import Invites from '@/Pages/Invites.vue';
@@ -29,6 +28,7 @@ import SinglePost from '@/Pages/Posts/SinglePost.vue';
 import PrivacyPolicy from '@/Pages/PrivacyPolicy.vue';
 import ProfileShow from '@/Pages/Profile/Show.vue';
 import ProfileShowMap from '@/Pages/Profile/ShowMap.vue';
+import SearchIndex from '@/Pages/Search/Index.vue';
 import EditSettings from '@/Pages/Settings/Edit.vue';
 import CreateTrip from '@/Pages/Trips/Create.vue';
 
@@ -190,9 +190,9 @@ const routes: RouteRecordRaw[] = [
         meta: { auth: true },
     },
     {
-        path: '/fediverse',
-        name: 'fediverse.index',
-        component: FediverseIndex,
+        path: '/search',
+        name: 'search.index',
+        component: SearchIndex,
         meta: { auth: true },
     },
     {

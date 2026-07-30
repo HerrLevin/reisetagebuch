@@ -3,7 +3,7 @@ import { api } from '@/api';
 import LocationsMap from '@/Components/Maps/LocationsMap.vue';
 import { useTitle } from '@/composables/useTitle';
 import ProfileWrapper from '@/Pages/Profile/ProfileWrapper.vue';
-import { PropType, ref, watchEffect } from 'vue';
+import { PropType, ref, watch, watchEffect } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { UserDto } from '../../../types/Api.gen';
 
@@ -26,6 +26,7 @@ watchEffect(() => {
 
 const loadProfileData = async () => {
     loading.value = true;
+    user.value = null;
     try {
         api.profile.getProfile(props.username).then((response) => {
             user.value = response.data;
@@ -38,7 +39,7 @@ const loadProfileData = async () => {
     }
 };
 
-loadProfileData();
+watch(() => props.username, loadProfileData, { immediate: true });
 </script>
 
 <template>

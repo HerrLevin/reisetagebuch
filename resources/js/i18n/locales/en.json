@@ -240,7 +240,10 @@
             "followings": "Following | Followings",
             "locations": "Location | Locations",
             "trips": "Trip | Trips",
-            "posts": "Post | Posts"
+            "posts": "Post | Posts",
+            "followers_modal_title": "Followers",
+            "following_modal_title": "Following",
+            "no_results": "Nothing to show here yet."
         }
     },
     "settings": {
@@ -504,20 +507,21 @@
         "METRO": "Metro"
     },
     "fediverse": {
-        "title": "Fediverse",
-        "find_title": "Find someone on the Fediverse",
-        "handle_placeholder": "{'@'}user{'@'}instance.social",
         "find": "Find",
         "follow": "Follow",
         "unfollow": "Unfollow",
         "pending": "Pending",
         "rejected": "Rejected",
-        "following_title": "People you follow",
-        "no_following": "You're not following anyone in the Fediverse yet.",
         "not_found": "Actor not found. Check the handle and try again.",
         "resolve_error": "Failed to resolve this handle. The instance may be unavailable.",
         "from_fediverse": "Fediverse",
         "view_original": "View original post"
+    },
+    "search": {
+        "title": "Search",
+        "placeholder": "Search for people...",
+        "no_results": "No people found.",
+        "fediverse_section_title": "Find someone on the Fediverse"
     },
     "transport_group": {
         "long_distance": "Long Distance",

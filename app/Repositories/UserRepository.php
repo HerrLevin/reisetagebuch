@@ -80,6 +80,25 @@ class UserRepository
         return $this->userHydrator->modelToDto($user);
     }
 
+    /**
+     * @return UserDto[]
+     */
+    public function searchUsers(string $query, int $limit = 20): array
+    {
+        $needle = '%'.mb_strtolower($query).'%';
+
+        $users = User::with('profile')
+            ->where(function ($q) use ($needle) {
+                $q->whereRaw('LOWER(username) LIKE ?', [$needle])
+                    ->orWhereRaw('LOWER(name) LIKE ?', [$needle]);
+            })
+            ->orderBy('username')
+            ->limit($limit)
+            ->get();
+
+        return $users->map(fn (User $user) => $this->userHydrator->modelToDto($user))->all();
+    }
+
     #[ArrayShape(['followers' => 'int', 'followings' => 'int'])]
     public function getFollowCountsForUser(string $userId): array
     {

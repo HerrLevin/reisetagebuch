@@ -6,9 +6,11 @@ namespace App\Http\Controllers\Backend;
 
 use App\Dto\RemoteActorProfileDto;
 use App\Dto\RemoteFollowDto;
+use App\Dto\RemoteFollowerDto;
 use App\Http\Controllers\Controller;
 use App\Jobs\SendFollowToRemoteActor;
 use App\Jobs\SendUndoFollowToRemoteActor;
+use App\Repositories\ActivityPubFollowerRepository;
 use App\Repositories\ActivityPubRemoteFollowRepository;
 use App\Repositories\UserRepository;
 use App\Services\ActivityPubContentSanitizer;
@@ -20,6 +22,7 @@ class ActivityPubFederationBackend extends Controller
     public function __construct(
         private readonly ActivityPubService $activityPubService,
         private readonly ActivityPubRemoteFollowRepository $remoteFollowRepository,
+        private readonly ActivityPubFollowerRepository $followerRepository,
         private readonly UserRepository $userRepository,
         private readonly ActivityPubContentSanitizer $contentSanitizer,
     ) {}
@@ -59,6 +62,24 @@ class ActivityPubFederationBackend extends Controller
                 preferredUsername: $follow->actor?->preferred_username,
                 iconUrl: $follow->actor?->local_icon_url,
                 profileUrl: $follow->actor?->profile_url,
+            ))
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return RemoteFollowerDto[]
+     */
+    public function listFollowers(string $userId): array
+    {
+        return $this->followerRepository->listForUser($userId)
+            ->map(fn ($follower) => new RemoteFollowerDto(
+                actorId: $follower->follower_actor_id,
+                createdAt: $follower->created_at,
+                displayName: $follower->actor?->display_name,
+                preferredUsername: $follower->actor?->preferred_username,
+                iconUrl: $follower->actor?->local_icon_url,
+                profileUrl: $follower->actor?->profile_url,
             ))
             ->values()
             ->all();

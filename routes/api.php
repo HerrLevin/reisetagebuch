@@ -33,6 +33,8 @@ Route::prefix('auth')->group(function () {
 Route::get('profile/{username}', [UserController::class, 'show']);
 
 Route::prefix('users')->group(function () {
+    Route::get('search', [UserController::class, 'search'])->name('users.search');
+
     Route::prefix('{userId}')->group(function () {
         Route::get('map-data', [UserController::class, 'mapData'])->name('profile.mapdata');
         Route::get('posts', [PostController::class, 'postsForUser'])->name('profile.posts');
@@ -50,6 +52,10 @@ Route::prefix('users')->group(function () {
             Route::post('/{targetId}', [FollowController::class, 'createFollowRequest'])->name('profile.followrequest');
             Route::put('/{targetId}', [FollowController::class, 'approveFollowRequest'])->name('profile.followrequest.update');
             Route::delete('/{targetId}', [FollowController::class, 'deleteFollowRequest'])->name('profile.unfollowrequest');
+        });
+        Route::prefix('activitypub')->group(function () {
+            Route::get('followers', [ActivityPubFederationController::class, 'followersForUser'])->name('profile.activitypub.followers');
+            Route::get('following', [ActivityPubFederationController::class, 'followingForUser'])->name('profile.activitypub.following');
         });
     });
 });

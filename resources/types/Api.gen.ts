@@ -762,6 +762,24 @@ export interface RemoteFollowDto {
   profileUrl: string | null;
 }
 
+export interface RemoteFollowerDto {
+  /** The remote actor's ActivityPub id */
+  actorId: string;
+  /**
+   * When the follow was received
+   * @format date-time
+   */
+  createdAt: string | null;
+  /** The remote actor's display name */
+  displayName: string | null;
+  /** The remote actor's preferred username */
+  preferredUsername: string | null;
+  /** The remote actor's avatar URL */
+  iconUrl: string | null;
+  /** The remote actor's public profile URL */
+  profileUrl: string | null;
+}
+
 /** Data Transfer Object for Request Location */
 export interface RequestLocationDto {
   /** Number of locations fetched */
@@ -1820,6 +1838,252 @@ export class Api<
         ...params,
       }),
   };
+  users = {
+    /**
+     * @description Return the remote (ActivityPub) actors that follow a user
+     *
+     * @tags Follows
+     * @name GetUserActivityPubFollowers
+     * @summary Get remote followers
+     * @request GET:/users/{userId}/activitypub/followers
+     * @secure
+     */
+    getUserActivityPubFollowers: (userId: string, params: RequestParams = {}) =>
+      this.request<RemoteFollowerDto[], any>({
+        path: `/users/${userId}/activitypub/followers`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Return the remote (ActivityPub) actors a user follows
+     *
+     * @tags Follows
+     * @name GetUserActivityPubFollowing
+     * @summary Get remote following
+     * @request GET:/users/{userId}/activitypub/following
+     * @secure
+     */
+    getUserActivityPubFollowing: (userId: string, params: RequestParams = {}) =>
+      this.request<RemoteFollowDto[], any>({
+        path: `/users/${userId}/activitypub/following`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Return the users, that follow a user
+     *
+     * @tags Follows
+     * @name GetFollowers
+     * @summary Get followers data
+     * @request GET:/users/{userId}/followers
+     * @secure
+     */
+    getFollowers: (userId: string, params: RequestParams = {}) =>
+      this.request<UserDto[], any>({
+        path: `/users/${userId}/followers`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Return the users, that a user follows
+     *
+     * @tags Follows
+     * @name GetFollowings
+     * @summary Get followings data
+     * @request GET:/users/{userId}/followings
+     * @secure
+     */
+    getFollowings: (userId: string, params: RequestParams = {}) =>
+      this.request<UserDto[], any>({
+        path: `/users/${userId}/followings`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Create a follow relationship between two users
+     *
+     * @tags Follows
+     * @name CreateFollow
+     * @summary Create follow relationship
+     * @request POST:/users/{userId}/followers/{targetId}
+     * @secure
+     */
+    createFollow: (
+      userId: string,
+      targetId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, void>({
+        path: `/users/${userId}/followers/${targetId}`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Delete a follow relationship between two users
+     *
+     * @tags Follows
+     * @name DeleteFollow
+     * @summary Delete follow relationship
+     * @request DELETE:/users/{userId}/followers/{targetId}
+     * @secure
+     */
+    deleteFollow: (
+      userId: string,
+      targetId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, void>({
+        path: `/users/${userId}/followers/${targetId}`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Approve a follow request between two users
+     *
+     * @tags Follows
+     * @name ApproveFollowRequest
+     * @summary Approve follow request
+     * @request PUT:/users/{userId}/follow-requests/{targetId}
+     * @secure
+     */
+    approveFollowRequest: (
+      userId: string,
+      targetId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, void>({
+        path: `/users/${userId}/follow-requests/${targetId}`,
+        method: "PUT",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Create a follow request between two users
+     *
+     * @tags Follows
+     * @name CreateFollowRequest
+     * @summary Create follow request
+     * @request POST:/users/{userId}/follow-requests/{targetId}
+     * @secure
+     */
+    createFollowRequest: (
+      userId: string,
+      targetId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, void>({
+        path: `/users/${userId}/follow-requests/${targetId}`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Delete a follow request between two users
+     *
+     * @tags Follows
+     * @name DeleteFollowRequest
+     * @summary Delete follow relationship
+     * @request DELETE:/users/{userId}/follow-requests/{targetId}
+     * @secure
+     */
+    deleteFollowRequest: (
+      userId: string,
+      targetId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, void>({
+        path: `/users/${userId}/follow-requests/${targetId}`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Returns paginated posts for a specific user
+     *
+     * @tags Posts
+     * @name PostsForUser
+     * @summary Get posts for a specific user
+     * @request GET:/users/{userId}/posts
+     * @secure
+     */
+    postsForUser: (
+      userId: string,
+      query?: {
+        /** Pagination cursor */
+        cursor?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<PostPaginationDto, void>({
+        path: `/users/${userId}/posts`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Return GeoJSON map data for a user
+     *
+     * @tags Profile
+     * @name GetProfileMapData
+     * @summary Profile map data
+     * @request GET:/users/{userId}/map-data
+     * @secure
+     */
+    getProfileMapData: (userId: string, params: RequestParams = {}) =>
+      this.request<object, any>({
+        path: `/users/${userId}/map-data`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Search local users by username or display name (case-insensitive, partial match, public endpoint)
+     *
+     * @tags Profile
+     * @name SearchUsers
+     * @summary Search users
+     * @request GET:/users/search
+     * @secure
+     */
+    searchUsers: (
+      query: {
+        q: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<UserDto[], any>({
+        path: `/users/search`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
   activitypub = {
     /**
      * No description
@@ -2267,192 +2531,6 @@ export class Api<
         any
       >({
         path: `/auth/invite/${code}`,
-        method: "GET",
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-  };
-  users = {
-    /**
-     * @description Return the users, that follow a user
-     *
-     * @tags Follows
-     * @name GetFollowers
-     * @summary Get followers data
-     * @request GET:/users/{userId}/followers
-     * @secure
-     */
-    getFollowers: (userId: string, params: RequestParams = {}) =>
-      this.request<UserDto[], any>({
-        path: `/users/${userId}/followers`,
-        method: "GET",
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Return the users, that a user follows
-     *
-     * @tags Follows
-     * @name GetFollowings
-     * @summary Get followings data
-     * @request GET:/users/{userId}/followings
-     * @secure
-     */
-    getFollowings: (userId: string, params: RequestParams = {}) =>
-      this.request<UserDto[], any>({
-        path: `/users/${userId}/followings`,
-        method: "GET",
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Create a follow relationship between two users
-     *
-     * @tags Follows
-     * @name CreateFollow
-     * @summary Create follow relationship
-     * @request POST:/users/{userId}/followers/{targetId}
-     * @secure
-     */
-    createFollow: (
-      userId: string,
-      targetId: string,
-      params: RequestParams = {},
-    ) =>
-      this.request<void, void>({
-        path: `/users/${userId}/followers/${targetId}`,
-        method: "POST",
-        secure: true,
-        ...params,
-      }),
-
-    /**
-     * @description Delete a follow relationship between two users
-     *
-     * @tags Follows
-     * @name DeleteFollow
-     * @summary Delete follow relationship
-     * @request DELETE:/users/{userId}/followers/{targetId}
-     * @secure
-     */
-    deleteFollow: (
-      userId: string,
-      targetId: string,
-      params: RequestParams = {},
-    ) =>
-      this.request<void, void>({
-        path: `/users/${userId}/followers/${targetId}`,
-        method: "DELETE",
-        secure: true,
-        ...params,
-      }),
-
-    /**
-     * @description Approve a follow request between two users
-     *
-     * @tags Follows
-     * @name ApproveFollowRequest
-     * @summary Approve follow request
-     * @request PUT:/users/{userId}/follow-requests/{targetId}
-     * @secure
-     */
-    approveFollowRequest: (
-      userId: string,
-      targetId: string,
-      params: RequestParams = {},
-    ) =>
-      this.request<void, void>({
-        path: `/users/${userId}/follow-requests/${targetId}`,
-        method: "PUT",
-        secure: true,
-        ...params,
-      }),
-
-    /**
-     * @description Create a follow request between two users
-     *
-     * @tags Follows
-     * @name CreateFollowRequest
-     * @summary Create follow request
-     * @request POST:/users/{userId}/follow-requests/{targetId}
-     * @secure
-     */
-    createFollowRequest: (
-      userId: string,
-      targetId: string,
-      params: RequestParams = {},
-    ) =>
-      this.request<void, void>({
-        path: `/users/${userId}/follow-requests/${targetId}`,
-        method: "POST",
-        secure: true,
-        ...params,
-      }),
-
-    /**
-     * @description Delete a follow request between two users
-     *
-     * @tags Follows
-     * @name DeleteFollowRequest
-     * @summary Delete follow relationship
-     * @request DELETE:/users/{userId}/follow-requests/{targetId}
-     * @secure
-     */
-    deleteFollowRequest: (
-      userId: string,
-      targetId: string,
-      params: RequestParams = {},
-    ) =>
-      this.request<void, void>({
-        path: `/users/${userId}/follow-requests/${targetId}`,
-        method: "DELETE",
-        secure: true,
-        ...params,
-      }),
-
-    /**
-     * @description Returns paginated posts for a specific user
-     *
-     * @tags Posts
-     * @name PostsForUser
-     * @summary Get posts for a specific user
-     * @request GET:/users/{userId}/posts
-     * @secure
-     */
-    postsForUser: (
-      userId: string,
-      query?: {
-        /** Pagination cursor */
-        cursor?: string;
-      },
-      params: RequestParams = {},
-    ) =>
-      this.request<PostPaginationDto, void>({
-        path: `/users/${userId}/posts`,
-        method: "GET",
-        query: query,
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Return GeoJSON map data for a user
-     *
-     * @tags Profile
-     * @name GetProfileMapData
-     * @summary Profile map data
-     * @request GET:/users/{userId}/map-data
-     * @secure
-     */
-    getProfileMapData: (userId: string, params: RequestParams = {}) =>
-      this.request<object, any>({
-        path: `/users/${userId}/map-data`,
         method: "GET",
         secure: true,
         format: "json",
