@@ -2690,6 +2690,137 @@
                 ]
             }
         },
+        "/app/privacy-policy": {
+            "get": {
+                "tags": [
+                    "App"
+                ],
+                "summary": "Get the privacy policy currently in effect",
+                "operationId": "getPrivacyPolicy",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PrivacyPolicyDto"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No privacy policy has been published yet"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "App"
+                ],
+                "summary": "Publish a new privacy policy version",
+                "description": "Publish a new privacy policy version. Requires admin privileges.",
+                "operationId": "createPrivacyPolicy",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PrivacyPolicyStoreRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PrivacyPolicyDto"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/app/privacy-policy/upcoming": {
+            "get": {
+                "tags": [
+                    "App"
+                ],
+                "summary": "Get the next privacy policy version, if one has been published for the future",
+                "operationId": "getUpcomingPrivacyPolicy",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PrivacyPolicyDto"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No upcoming privacy policy has been published"
+                    }
+                }
+            }
+        },
+        "/app/privacy-policy/{privacyPolicy}/accept": {
+            "post": {
+                "tags": [
+                    "App"
+                ],
+                "summary": "Accept a privacy policy version",
+                "description": "Accept the current or upcoming privacy policy version on behalf of the authenticated user",
+                "operationId": "acceptPrivacyPolicy",
+                "parameters": [
+                    {
+                        "name": "privacyPolicy",
+                        "in": "path",
+                        "description": "The ID of the privacy policy version to accept",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PrivacyPolicyDto"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "422": {
+                        "description": "The given privacy policy version is neither current nor upcoming"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
         "/socialite/traewelling/connect": {
             "get": {
                 "tags": [
@@ -3068,7 +3199,8 @@
                     "traewellingConnected",
                     "settings",
                     "avatar",
-                    "isAdmin"
+                    "isAdmin",
+                    "hasAcceptedCurrentPrivacyPolicy"
                 ],
                 "properties": {
                     "id": {
@@ -3121,6 +3253,11 @@
                         "description": "Indicates whether the user has administrative privileges on this instance",
                         "type": "boolean",
                         "example": false
+                    },
+                    "hasAcceptedCurrentPrivacyPolicy": {
+                        "description": "Indicates whether the user has accepted the privacy policy currently in effect (true when no policy has been published)",
+                        "type": "boolean",
+                        "example": true
                     }
                 },
                 "type": "object"
@@ -4181,6 +4318,38 @@
                     }
                 ]
             },
+            "PrivacyPolicyDto": {
+                "title": "Privacy Policy DTO",
+                "description": "Data Transfer Object representing a versioned privacy policy",
+                "required": [
+                    "id",
+                    "content",
+                    "validFrom"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "The unique identifier of this privacy policy version",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "content": {
+                        "description": "The privacy policy content, rendered as free-form text",
+                        "type": "string"
+                    },
+                    "validFrom": {
+                        "description": "The point in time from which this version is (or will be) in effect",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "acceptedAt": {
+                        "description": "When the requesting user accepted this version, if authenticated and accepted",
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
             "RemoteActorProfileDto": {
                 "required": [
                     "actorId",
@@ -4581,6 +4750,25 @@
                         "type": "object"
                     }
                 ]
+            },
+            "PrivacyPolicyStoreRequest": {
+                "description": "Request to publish a new privacy policy version",
+                "required": [
+                    "content",
+                    "validFrom"
+                ],
+                "properties": {
+                    "content": {
+                        "description": "The privacy policy content",
+                        "type": "string"
+                    },
+                    "validFrom": {
+                        "description": "The point in time from which this version takes effect. Must not be in the past.",
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
             },
             "ProfileUpdateRequest": {
                 "title": "Profile Update Request",
