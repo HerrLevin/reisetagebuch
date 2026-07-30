@@ -573,6 +573,8 @@ class ActivityPubControllerTest extends TestCase
             ]);
         }
 
+        $user->statistics()->update(['followers_count' => 3]);
+
         $response = $this->getJson('/ap/users/alice/followers');
 
         $this->assertSame(3, $response->json('totalItems'));
