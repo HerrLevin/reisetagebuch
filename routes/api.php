@@ -82,13 +82,8 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/email/resend', [AuthController::class, 'resendVerificationEmail']);
     });
 
-    Route::prefix('app')->group(function () {
-        Route::post('privacy-policy', [PrivacyPolicyController::class, 'store'])
-            ->middleware('admin')
-            ->name('privacy-policy.store');
-        Route::post('privacy-policy/{privacyPolicy}/accept', [PrivacyPolicyController::class, 'accept'])
-            ->name('privacy-policy.accept');
-    });
+    Route::post('app/privacy-policy/{privacyPolicy}/accept', [PrivacyPolicyController::class, 'accept'])
+        ->name('privacy-policy.accept');
 
     // Account viewing/deletion - always accessible, even without accepting the current privacy policy
     Route::prefix('account')->group(function () {
@@ -101,12 +96,6 @@ Route::middleware('auth:api')->group(function () {
         Route::prefix('socialite')->group(function () {
             Route::get('/traewelling/connect', [TraewellingOAuthController::class, 'redirectToProvider'])->name('traewelling.connect');
             Route::get('/traewelling/callback', [TraewellingOAuthController::class, 'handleProviderCallback'])->name('traewelling.callback');
-        });
-
-        Route::prefix('app')->group(function () {
-            Route::patch('imprint', [ImprintController::class, 'update'])
-                ->middleware('admin')
-                ->name('imprint.update');
         });
 
         Route::get('/timeline', [PostController::class, 'timeline'])
