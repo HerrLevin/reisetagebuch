@@ -42,7 +42,7 @@ class StopDto
         format: 'date-time',
         nullable: true
     )]
-    public ?string $arrivalTime;
+    public ?string $arrivalTime = null;
 
     #[OA\Property(
         property: 'departureTime',
@@ -51,7 +51,7 @@ class StopDto
         format: 'date-time',
         nullable: true
     )]
-    public ?string $departureTime;
+    public ?string $departureTime = null;
 
     #[OA\Property(
         property: 'arrivalDelay',
