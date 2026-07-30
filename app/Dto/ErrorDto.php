@@ -12,5 +12,6 @@ class ErrorDto
         public string $message,
         public ?array $errors = null,
         public ?string $code = null,
+        public ?array $debug = null,
     ) {}
 }
