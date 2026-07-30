@@ -1,6 +1,7 @@
 <?php
 
 use App\Console\Commands\FetchAirports;
+use App\Exceptions\ApiExceptionRenderer;
 use App\Http\Middleware\ApiMiddleware;
 use App\Http\Middleware\EnsurePrivacyPolicyAccepted;
 use App\Http\Middleware\EnsureUserIsAdmin;
@@ -10,6 +11,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
 use Laravel\Passport\Http\Middleware\CreateFreshApiToken;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -39,7 +41,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->redirectGuestsTo('/login');
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        $exceptions->render(function (Throwable $e, Request $request) {
+            return (new ApiExceptionRenderer)->render($e, $request);
+        });
     })
     ->withSchedule(function (Schedule $schedule) {
         $schedule->command(FetchAirports::class)->daily()->runInBackground();
