@@ -9,12 +9,17 @@ use App\Dto\UserSettingsDto;
 use App\Http\Controllers\Controller;
 use App\Models\Invite;
 use App\Models\User;
+use App\Repositories\PrivacyPolicyRepository;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Laravel\Passport\Guards\TokenGuard;
 
 class AuthBackend extends Controller
 {
+    public function __construct(
+        private readonly PrivacyPolicyRepository $privacyPolicyRepository
+    ) {}
+
     public function getAuthenticatedUser(StatefulGuard|TokenGuard|User $guardOrUser)
     {
         $user = $guardOrUser instanceof User ? $guardOrUser : $guardOrUser->user();
@@ -30,7 +35,15 @@ class AuthBackend extends Controller
             canInviteUsers: config('app.invite.enabled') && $user->can('create', Invite::class),
             traewellingConnected: (bool) $user->traewellingAccount,
             isAdmin: $user->isAdmin(),
+            hasAcceptedCurrentPrivacyPolicy: $this->hasAcceptedCurrentPrivacyPolicy($user),
         );
+    }
+
+    private function hasAcceptedCurrentPrivacyPolicy(User $user): bool
+    {
+        $current = $this->privacyPolicyRepository->currentModel();
+
+        return ! $current || $this->privacyPolicyRepository->hasAccepted($user, $current);
     }
 
     private function getSettings(User $user): UserSettingsDto

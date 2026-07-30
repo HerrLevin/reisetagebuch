@@ -2,6 +2,7 @@
 
 use App\Console\Commands\FetchAirports;
 use App\Http\Middleware\ApiMiddleware;
+use App\Http\Middleware\EnsurePrivacyPolicyAccepted;
 use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Jobs\DeleteOldNearbyRequests;
 use App\Jobs\DispatchRefreshJobForActiveTrips;
@@ -30,6 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->alias([
             'admin' => EnsureUserIsAdmin::class,
+            'privacy-policy' => EnsurePrivacyPolicyAccepted::class,
         ]);
         $middleware->redirectGuestsTo('/login');
     })

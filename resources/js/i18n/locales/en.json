@@ -70,6 +70,15 @@
         "imprint": {
             "title": "Imprint",
             "empty": "No imprint configured yet."
+        },
+        "privacyPolicy": {
+            "title": "Privacy Policy",
+            "empty": "No privacy policy configured yet.",
+            "upcomingTitle": "Upcoming Privacy Policy",
+            "upcomingDescription": "This version will take effect on {date}.",
+            "accept": "Accept",
+            "accepted": "Accepted",
+            "acceptRequiredNotice": "Please review and accept the current privacy policy to continue using the app."
         }
     },
     "auth": {
@@ -280,6 +289,17 @@
             "title": "Imprint",
             "description": "Configure the imprint shown in the footer.",
             "content": "Content"
+        },
+        "privacyPolicy": {
+            "title": "Privacy Policy",
+            "description": "Publish a new privacy policy version. Existing versions can never be edited.",
+            "content": "Content",
+            "validFrom": "Valid From",
+            "currentVersion": "Current version valid since {date}",
+            "upcomingVersion": "Upcoming version valid from {date}",
+            "noCurrentVersion": "No privacy policy has been published yet.",
+            "noUpcomingVersion": "No upcoming version scheduled.",
+            "error": "Failed to publish the privacy policy. Please try again."
         }
     },
     "errors": {

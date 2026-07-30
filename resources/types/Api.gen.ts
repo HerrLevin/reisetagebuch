@@ -155,6 +155,11 @@ export interface AuthenticatedUserDto {
    * @example false
    */
   isAdmin: boolean;
+  /**
+   * Indicates whether the user has accepted the privacy policy currently in effect (true when no policy has been published)
+   * @example true
+   */
+  hasAcceptedCurrentPrivacyPolicy: boolean;
 }
 
 /** Data Transfer Object for Departures at a Stop */
@@ -585,6 +590,30 @@ export type PostPaginationDto = PaginationDto & {
   items: (LocationPost | BasePost | TransportPost)[];
 };
 
+/**
+ * Privacy Policy DTO
+ * Data Transfer Object representing a versioned privacy policy
+ */
+export interface PrivacyPolicyDto {
+  /**
+   * The unique identifier of this privacy policy version
+   * @format uuid
+   */
+  id: string;
+  /** The privacy policy content, rendered as free-form text */
+  content: string;
+  /**
+   * The point in time from which this version is (or will be) in effect
+   * @format date-time
+   */
+  validFrom: string;
+  /**
+   * When the requesting user accepted this version, if authenticated and accepted
+   * @format date-time
+   */
+  acceptedAt?: string | null;
+}
+
 /** Data Transfer Object for Request Location */
 export interface RequestLocationDto {
   /** Number of locations fetched */
@@ -710,6 +739,17 @@ export type LocationPostRequest = BasePostRequest & {
   /** @format date-time */
   visitedAt: string | null;
 };
+
+/** Request to publish a new privacy policy version */
+export interface PrivacyPolicyStoreRequest {
+  /** The privacy policy content */
+  content: string;
+  /**
+   * The point in time from which this version takes effect. Must not be in the past.
+   * @format date-time
+   */
+  validFrom: string;
+}
 
 /**
  * Profile Update Request
@@ -1669,6 +1709,83 @@ export class Api<
         format: "json",
         ...params,
       }),
+
+    /**
+     * No description
+     *
+     * @tags App
+     * @name GetPrivacyPolicy
+     * @summary Get the privacy policy currently in effect
+     * @request GET:/app/privacy-policy
+     * @secure
+     */
+    getPrivacyPolicy: (params: RequestParams = {}) =>
+      this.request<PrivacyPolicyDto, void>({
+        path: `/app/privacy-policy`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Publish a new privacy policy version. Requires admin privileges.
+     *
+     * @tags App
+     * @name CreatePrivacyPolicy
+     * @summary Publish a new privacy policy version
+     * @request POST:/app/privacy-policy
+     * @secure
+     */
+    createPrivacyPolicy: (
+      data: PrivacyPolicyStoreRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<PrivacyPolicyDto, void>({
+        path: `/app/privacy-policy`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags App
+     * @name GetUpcomingPrivacyPolicy
+     * @summary Get the next privacy policy version, if one has been published for the future
+     * @request GET:/app/privacy-policy/upcoming
+     * @secure
+     */
+    getUpcomingPrivacyPolicy: (params: RequestParams = {}) =>
+      this.request<PrivacyPolicyDto, void>({
+        path: `/app/privacy-policy/upcoming`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Accept the current or upcoming privacy policy version on behalf of the authenticated user
+     *
+     * @tags App
+     * @name AcceptPrivacyPolicy
+     * @summary Accept a privacy policy version
+     * @request POST:/app/privacy-policy/{privacyPolicy}/accept
+     * @secure
+     */
+    acceptPrivacyPolicy: (privacyPolicy: string, params: RequestParams = {}) =>
+      this.request<PrivacyPolicyDto, void>({
+        path: `/app/privacy-policy/${privacyPolicy}/accept`,
+        method: "POST",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
   };
   auth = {
     /**
@@ -2523,6 +2640,23 @@ export class Api<
         method: "DELETE",
         secure: true,
         format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Retry a failed Traewelling crosspost. Dispatches an edit job if a Traewelling ID already exists, otherwise dispatches a new check-in job. Deletes the failure notification.
+     *
+     * @tags Posts
+     * @name RetryTraewellingCrosspost
+     * @summary Retry Traewelling crosspost
+     * @request POST:/posts/{id}/traewelling/retry
+     * @secure
+     */
+    retryTraewellingCrosspost: (id: string, params: RequestParams = {}) =>
+      this.request<void, void>({
+        path: `/posts/${id}/traewelling/retry`,
+        method: "POST",
+        secure: true,
         ...params,
       }),
   };

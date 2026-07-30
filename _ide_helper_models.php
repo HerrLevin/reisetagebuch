@@ -325,6 +325,50 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property string $id
+ * @property string $content
+ * @property \Illuminate\Support\Carbon $valid_from
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PrivacyPolicyAcceptance> $acceptances
+ * @property-read int|null $acceptances_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PrivacyPolicy newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PrivacyPolicy newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PrivacyPolicy query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PrivacyPolicy whereContent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PrivacyPolicy whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PrivacyPolicy whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PrivacyPolicy whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PrivacyPolicy whereValidFrom($value)
+ */
+	class PrivacyPolicy extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property string $id
+ * @property string $user_id
+ * @property string $privacy_policy_id
+ * @property \Illuminate\Support\Carbon $accepted_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\PrivacyPolicy $privacyPolicy
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PrivacyPolicyAcceptance newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PrivacyPolicyAcceptance newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PrivacyPolicyAcceptance query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PrivacyPolicyAcceptance whereAcceptedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PrivacyPolicyAcceptance whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PrivacyPolicyAcceptance whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PrivacyPolicyAcceptance wherePrivacyPolicyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PrivacyPolicyAcceptance whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PrivacyPolicyAcceptance whereUserId($value)
+ */
+	class PrivacyPolicyAcceptance extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property string $id
  * @property string $user_id
  * @property string|null $avatar
  * @property string|null $bio
@@ -615,6 +659,8 @@ namespace App\Models{
  * @property-read int|null $oauth_apps_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Post> $posts
  * @property-read int|null $posts_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PrivacyPolicyAcceptance> $privacyPolicyAcceptances
+ * @property-read int|null $privacy_policy_acceptances_count
  * @property-read \App\Models\Profile|null $profile
  * @property-read \App\Models\UserSettings|null $settings
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SocialAccount> $socialAccounts

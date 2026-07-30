@@ -11,5 +11,6 @@ class ErrorDto
     public function __construct(
         public string $message,
         public ?array $errors = null,
+        public ?string $code = null,
     ) {}
 }

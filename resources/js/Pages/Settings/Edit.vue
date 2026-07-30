@@ -2,6 +2,7 @@
 import { api } from '@/api';
 import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import CreatePrivacyPolicyForm from '@/Pages/Settings/Partials/CreatePrivacyPolicyForm.vue';
 import UpdateAccountSettingsForm from '@/Pages/Settings/Partials/UpdateAccountSettingsForm.vue';
 import UpdateDeviceSettingsForm from '@/Pages/Settings/Partials/UpdateDeviceSettingsForm.vue';
 import UpdateImprintForm from '@/Pages/Settings/Partials/UpdateImprintForm.vue';
@@ -146,6 +147,13 @@ if (route.name === 'socialite.traewelling.callback') {
                 class="card bg-base-100 min-w-full p-8 shadow-md"
             >
                 <UpdateImprintForm class="max-w-xl" />
+            </div>
+
+            <div
+                v-if="user.user.isAdmin"
+                class="card bg-base-100 min-w-full p-8 shadow-md"
+            >
+                <CreatePrivacyPolicyForm class="max-w-xl" />
             </div>
         </div>
     </AuthenticatedLayout>

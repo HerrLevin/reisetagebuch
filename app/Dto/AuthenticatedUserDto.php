@@ -9,7 +9,7 @@ use OpenApi\Attributes as OA;
     schema: 'AuthenticatedUserDto',
     title: 'Authenticated User DTO',
     description: 'Data Transfer Object representing the authenticated user',
-    required: ['id', 'name', 'username', 'email', 'mustVerifyEmail', 'canInviteUsers', 'traewellingConnected', 'settings', 'avatar', 'isAdmin'],
+    required: ['id', 'name', 'username', 'email', 'mustVerifyEmail', 'canInviteUsers', 'traewellingConnected', 'settings', 'avatar', 'isAdmin', 'hasAcceptedCurrentPrivacyPolicy'],
     properties: [
         new OA\Property(
             property: 'id',
@@ -73,6 +73,12 @@ use OpenApi\Attributes as OA;
             type: 'boolean',
             example: false
         ),
+        new OA\Property(
+            property: 'hasAcceptedCurrentPrivacyPolicy',
+            description: 'Indicates whether the user has accepted the privacy policy currently in effect (true when no policy has been published)',
+            type: 'boolean',
+            example: true
+        ),
     ]
 )]
 readonly class AuthenticatedUserDto
@@ -90,5 +96,6 @@ readonly class AuthenticatedUserDto
         public bool $canInviteUsers = false,
         public bool $traewellingConnected = false,
         public bool $isAdmin = false,
+        public bool $hasAcceptedCurrentPrivacyPolicy = true,
     ) {}
 }
