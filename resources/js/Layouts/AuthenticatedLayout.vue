@@ -12,7 +12,9 @@ import SideNav from '@/Layouts/Partials/SideNav.vue';
             class="container mx-auto mb-2 min-h-screen max-w-screen-xl grow px-0 pt-0 pb-10 sm:px-5 md:pt-2"
         >
             <NavBar>
-                <div class="md:hidden">
+                <div
+                    class="line-clamp-1 max-w-screen overflow-ellipsis md:hidden"
+                >
                     <slot name="header" class="md-hidden" />
                 </div>
             </NavBar>
