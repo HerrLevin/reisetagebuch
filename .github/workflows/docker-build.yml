@@ -54,20 +54,19 @@ jobs:
       - name: Determine app version
         id: app_version
         run: |
-          # If this is a semver tag (v...), use the metadata action's version and tags
+          set -euo pipefail
+
           if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
             echo "version=${{ steps.meta.outputs.version }}" >> "$GITHUB_OUTPUT"
-            echo "tags=${{ steps.meta.outputs.tags }}" >> "$GITHUB_OUTPUT"
-          # If this is the special activitypub-test branch, force the docker tag to 'activitypub-test'
-          elif [[ "${{ github.ref }}" == refs/heads/activitypub-test ]]; then
-            # Use fully qualified repository name so Docker pushes to the correct repo
-            echo "version=${{ github.sha }}" >> "$GITHUB_OUTPUT"
-            echo "tags=herrlevin/reisetagebuch:activitypub-test" >> "$GITHUB_OUTPUT"
+            TAGS="${{ steps.meta.outputs.tags }}"
           else
-            # Default: use commit SHA as version and propagate metadata tags
             echo "version=${{ github.sha }}" >> "$GITHUB_OUTPUT"
-            echo "tags=${{ steps.meta.outputs.tags }}" >> "$GITHUB_OUTPUT"
+            TAGS="${{ steps.meta.outputs.tags }}"
           fi
+
+          # normalize newlines into commas, remove trailing comma
+          TAGS=$(printf '%s' "$TAGS" | tr '\n' ',' | sed 's/,$//')
+          echo "tags=$TAGS" >> "$GITHUB_OUTPUT"
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v7
@@ -75,8 +74,6 @@ jobs:
           context: ./
           file: Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
-          # Prefer tags computed by the previous step (which may force 'activitypub-test'),
-          # fall back to metadata tags or 'latest'
           tags: ${{ steps.app_version.outputs.tags || steps.meta.outputs.tags || 'latest' }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
