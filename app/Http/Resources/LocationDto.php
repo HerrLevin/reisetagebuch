@@ -3,12 +3,13 @@
 namespace App\Http\Resources;
 
 use App\Models\Location;
+use App\Services\LocationEmojiService;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema(
     schema: 'LocationDto',
     description: 'Location Data Object',
-    required: ['id', 'name', 'latitude', 'longitude', 'distance', 'tags', 'identifiers'],
+    required: ['id', 'name', 'latitude', 'longitude', 'distance', 'tags', 'identifiers', 'emoji'],
     type: 'object'
 )]
 class LocationDto
@@ -50,6 +51,9 @@ class LocationDto
      */
     public array $tags;
 
+    #[OA\Property('emoji', description: 'Emoji representing the location based on its tags', type: 'string')]
+    public string $emoji;
+
     public function __construct(Location $location)
     {
         $this->id = $location->id;
@@ -59,5 +63,6 @@ class LocationDto
         $this->distance = $location->distance ? round($location->distance) : null;
         $this->tags = $location->tags->map(fn ($tag) => new LocationTagDto($tag))->toArray();
         $this->identifiers = $location->identifiers->map(fn ($identifier) => new LocationIdentifierDto($identifier))->toArray();
+        $this->emoji = (new LocationEmojiService)->getEmojiFromTags($location->tags);
     }
 }

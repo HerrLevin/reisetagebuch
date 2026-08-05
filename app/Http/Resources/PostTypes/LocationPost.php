@@ -66,7 +66,8 @@ class LocationPost extends BasePost
     {
         $parentBody = parent::getHtmlBody();
         $name = e($this->location->name);
-        $body = "<p>📍<strong>$name</strong></p>";
+        $emoji = $this->location->emoji;
+        $body = "<p>$emoji<strong>$name</strong></p>";
 
         return $parentBody ? nl2br($parentBody."\n\n").$body : $body;
     }
