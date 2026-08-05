@@ -73,13 +73,16 @@ async function resolveActor() {
     try {
         const response = await api.instance.get('/activitypub/resolve', {
             params: { handle },
+            validateStatus: (status) => status === 200 || status === 404,
         });
-        resolvedActor.value = response.data;
-    } catch (e) {
-        resolveError.value =
-            e.response?.status === 404
-                ? t('fediverse.not_found')
-                : t('fediverse.resolve_error');
+
+        if (response.status === 404) {
+            resolveError.value = t('fediverse.not_found');
+        } else {
+            resolvedActor.value = response.data;
+        }
+    } catch {
+        resolveError.value = t('fediverse.resolve_error');
     } finally {
         resolving.value = false;
     }
