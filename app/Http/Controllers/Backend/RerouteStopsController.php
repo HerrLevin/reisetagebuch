@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Backend;
 
+use App\Dto\Coordinate;
+use App\Dto\MotisApi\LegDto;
 use App\Dto\MotisApi\TripDto;
+use App\Enums\RouteSegmentSource;
 use App\Enums\TransportMode;
 use App\Exceptions\BrouterRouteCreationFailed;
 use App\Http\Controllers\Controller;
@@ -13,12 +16,14 @@ use App\Models\TransportTrip;
 use App\Models\TransportTripStop;
 use App\Repositories\TransportTripRepository;
 use App\Services\BrouterRequestService;
+use App\Services\GeoService;
 use Clickbar\Magellan\Data\Geometries\Geometry;
 use Clickbar\Magellan\Data\Geometries\LineString;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Clickbar\Magellan\IO\Parser\Geojson\GeojsonParser;
 use GuzzleHttp\Exception\GuzzleException;
 use Log;
+use Traewelling\GooglePolyline\MagellanPolylineTranscoder;
 
 class RerouteStopsController extends Controller
 {
@@ -28,14 +33,22 @@ class RerouteStopsController extends Controller
 
     private GeojsonParser $geoJsonParser;
 
+    private MagellanPolylineTranscoder $polylineTranscoder;
+
+    private GeoService $geoService;
+
     public function __construct(
         BrouterRequestService $brouterRequestService,
         TransportTripRepository $transportTripRepository,
-        GeojsonParser $geoJsonParser
+        GeojsonParser $geoJsonParser,
+        MagellanPolylineTranscoder $polylineTranscoder,
+        GeoService $geoService
     ) {
         $this->brouterRequestService = $brouterRequestService;
         $this->transportTripRepository = $transportTripRepository;
         $this->geoJsonParser = $geoJsonParser;
+        $this->polylineTranscoder = $polylineTranscoder;
+        $this->geoService = $geoService;
     }
 
     /**
@@ -43,30 +56,34 @@ class RerouteStopsController extends Controller
      */
     public function rerouteStops(TripDto|TransportTrip $tripDto, array $stops): void
     {
+        $leg = $tripDto instanceof TripDto ? $this->findLegForStops($tripDto, $stops) : null;
+        $mode = $tripDto instanceof TripDto ? ($leg?->mode ?? $tripDto->legs[0]?->mode) : $tripDto->mode;
+        $legGeometrySegments = $leg ? $this->splitLegGeometry($leg, $stops) : [];
+
         foreach ($stops as $key => $stop) {
-            $tripIds[$stop->transport_trip_id] = $stop->transport_trip_id;
             $previousStop = $stops[$key - 1] ?? null;
             if (! $previousStop || $stop['route_segment_id'] !== null) {
                 continue;
             }
 
-            if ($tripDto instanceof TripDto) {
-                $leg = $tripDto->legs[0] ?? null;
-                $mode = $leg?->mode;
-            } else {
-                $mode = $tripDto->mode;
-            }
-
-            $mode = TransportMode::from($mode);
-            $pathType = $mode->getRoutingType();
+            $transportMode = TransportMode::from($mode);
+            $pathType = $transportMode->getRoutingType();
             if (! $pathType) {
-                Log::warning('RerouteStops: Unsupported transport mode, interpolating', ['mode' => $mode]);
-                $this->interpolateBetween($previousStop, $stop, 'mode:'.$mode?->value);
+                Log::warning('RerouteStops: Unsupported transport mode, interpolating', ['mode' => $transportMode]);
+                $this->interpolateBetween($previousStop, $stop, 'mode:'.$transportMode->value);
 
                 continue;
             }
-            Log::debug('RerouteStops: Transport mode', ['mode' => $mode, 'pathType' => $pathType]);
-            $this->rerouteBetween($previousStop, $stop, $pathType);
+
+            Log::debug('RerouteStops: Transport mode', ['mode' => $transportMode, 'pathType' => $pathType]);
+
+            if (isset($legGeometrySegments[$key])) {
+                $this->rerouteBetweenUsingTransitous($previousStop, $stop, $pathType, $legGeometrySegments[$key]);
+
+                continue;
+            }
+
+            $this->rerouteBetweenUsingBrouter($previousStop, $stop, $pathType);
         }
 
         $tripId = array_pop($stops)->transport_trip_id;
@@ -76,6 +93,81 @@ class RerouteStopsController extends Controller
         foreach ($postIds as $postId) {
             CalculateStatsForTransportPost::dispatch($postId);
         }
+    }
+
+    private function findLegForStops(TripDto $tripDto, array $stops): ?LegDto
+    {
+        $foreignTripId = $stops[0]->transportTrip?->foreign_trip_id;
+        if (! $foreignTripId) {
+            return null;
+        }
+
+        return array_find($tripDto->legs, fn ($leg) => $leg->tripId === $foreignTripId);
+    }
+
+    /**
+     * Decodes the leg's raw Transitous polyline once and splits it into one geometry per
+     * consecutive stop pair, so route segments stay shared/deduplicated.
+     *
+     * @param  TransportTripStop[]  $stops
+     * @return array<int, Geometry> geometry for the pair ending at stop index $key
+     */
+    private function splitLegGeometry(LegDto $leg, array $stops): array
+    {
+        if (! $leg->legGeometry || count($stops) < 2) {
+            return [];
+        }
+
+        $points = $this->polylineTranscoder->decodePolyline($leg->legGeometry->points, $leg->legGeometry->precision);
+        if (count($points) < 2) {
+            return [];
+        }
+
+        $searchStart = 0;
+        $splitIndices = [];
+        foreach ($stops as $stop) {
+            $searchStart = $this->findNearestPointIndex($points, $stop->location->location, $searchStart);
+            $splitIndices[] = $searchStart;
+        }
+
+        $segments = [];
+        for ($key = 1; $key < count($stops); $key++) {
+            $from = $splitIndices[$key - 1];
+            $to = max($splitIndices[$key], $from + 1);
+            $segmentPoints = array_slice($points, $from, $to - $from + 1);
+
+            if (count($segmentPoints) < 2) {
+                continue;
+            }
+
+            $segments[$key] = LineString::make($segmentPoints);
+        }
+
+        return $segments;
+    }
+
+    /**
+     * @param  Point[]  $points
+     */
+    private function findNearestPointIndex(array $points, Point $target, int $searchStart): int
+    {
+        $targetCoordinate = new Coordinate($target->getLatitude(), $target->getLongitude());
+        $bestIndex = $searchStart;
+        $bestDistance = null;
+
+        for ($i = $searchStart; $i < count($points); $i++) {
+            $distance = $this->geoService->getDistance(
+                $targetCoordinate,
+                new Coordinate($points[$i]->getLatitude(), $points[$i]->getLongitude())
+            );
+
+            if ($bestDistance === null || $distance < $bestDistance) {
+                $bestDistance = $distance;
+                $bestIndex = $i;
+            }
+        }
+
+        return $bestIndex;
     }
 
     private function interpolateBetween(TransportTripStop $start, TransportTripStop $end, string $pathType): void
@@ -106,7 +198,7 @@ class RerouteStopsController extends Controller
         return -1;
     }
 
-    private function rerouteBetween(TransportTripStop $start, TransportTripStop $end, string $pathType): void
+    private function rerouteBetweenUsingBrouter(TransportTripStop $start, TransportTripStop $end, string $pathType): void
     {
         Log::debug('RerouteStops', [$start, $end, $pathType]);
 
@@ -140,6 +232,34 @@ class RerouteStopsController extends Controller
 
         $route = $this->interpolateGreatCircle($start, $end);
         $this->storeReroute($start, $end, $pathType, $duration, $route, true);
+    }
+
+    private function rerouteBetweenUsingTransitous(TransportTripStop $start, TransportTripStop $end, string $pathType, Geometry $geometry): void
+    {
+        $duration = $this->getDuration($start, $end);
+
+        $segment = $this->transportTripRepository->getRouteSegmentBetweenStops($start, $end, $duration, $pathType);
+
+        if ($segment && in_array($segment->source, [RouteSegmentSource::TRANSITOUS, RouteSegmentSource::MANUAL], true)) {
+            Log::debug('RerouteStops: Preferring existing transitous/manual segment', ['segment' => $segment->id]);
+            $this->transportTripRepository->setRouteSegmentForStop($start, $segment);
+
+            return;
+        }
+
+        try {
+            if ($segment) {
+                Log::debug('RerouteStops: Upgrading existing segment with transitous geometry', ['segment' => $segment->id]);
+                $segment = $this->transportTripRepository->updateRouteSegmentGeometry($segment, $geometry, RouteSegmentSource::TRANSITOUS);
+            } else {
+                $segment = $this->transportTripRepository->createRouteSegment($start->location, $end->location, $duration, $pathType, $geometry, false, RouteSegmentSource::TRANSITOUS);
+            }
+            $this->transportTripRepository->setRouteSegmentForStop($start, $segment);
+        } catch (\Exception $e) {
+            Log::error('RerouteStops: Failed to store transitous route segment, falling back to BRouter', ['error' => $e->getMessage()]);
+            report($e);
+            $this->rerouteBetweenUsingBrouter($start, $end, $pathType);
+        }
     }
 
     private function storeReroute(TransportTripStop $start, TransportTripStop $end, string $pathType, int $duration, Geometry $route, bool $interpolated = false): void

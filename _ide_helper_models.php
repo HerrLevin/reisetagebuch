@@ -628,6 +628,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property bool $interpolated
+ * @property \App\Enums\RouteSegmentSource $source
  * @property-read \App\Models\Location $fromLocation
  * @property-read \App\Models\Location $toLocation
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RouteSegment newModelQuery()
@@ -641,6 +642,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RouteSegment whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RouteSegment whereInterpolated($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RouteSegment wherePathType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RouteSegment whereSource($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RouteSegment whereToLocationId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RouteSegment whereUpdatedAt($value)
  */

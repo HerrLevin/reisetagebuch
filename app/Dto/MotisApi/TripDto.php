@@ -8,7 +8,7 @@ use OpenApi\Attributes as OA;
 #[OA\Schema(
     schema: 'MotisTripDto',
     description: 'Data Transfer Object for a Trip in the Motis API',
-    required: ['duration', 'startTime', 'endTime', 'transfers', 'legs'],
+    required: ['duration', 'startTime', 'endTime', 'transfers', 'legs', 'geometry'],
     type: 'object'
 )]
 class TripDto

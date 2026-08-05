@@ -4000,7 +4000,8 @@
                     "startTime",
                     "endTime",
                     "transfers",
-                    "legs"
+                    "legs",
+                    "geometry"
                 ],
                 "properties": {
                     "duration": {

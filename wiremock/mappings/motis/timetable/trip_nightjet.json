@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "urlPath": "/api/v5/trip",
+    "urlPath": "/api/v6/trip",
     "queryParameters": {
       "tripId": {
         "equalTo": "test-nightjet-403"

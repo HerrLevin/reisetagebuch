@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\RouteSegmentSource;
 use Clickbar\Magellan\Data\Geometries\LineString;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
@@ -18,11 +19,15 @@ class RouteSegment extends Model
         'duration',
         'path_type',
         'geometry',
+        'interpolated',
+        'source',
     ];
 
     protected $casts = [
         'path_type' => 'string',
         'geometry' => LineString::class,
+        'interpolated' => 'boolean',
+        'source' => RouteSegmentSource::class,
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
+use App\Enums\RouteSegmentSource;
 use App\Models\Location;
 use App\Models\RouteSegment;
 use App\Models\TransportPost;
@@ -14,6 +15,7 @@ use Carbon\Carbon;
 use Clickbar\Magellan\Data\Geometries\Dimension;
 use Clickbar\Magellan\Data\Geometries\Geometry;
 use Clickbar\Magellan\Data\Geometries\LineString;
+use Clickbar\Magellan\Data\Geometries\Point;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Location\Coordinate;
@@ -177,7 +179,8 @@ class TransportTripRepository
         ?int $duration = null,
         ?string $pathType = null,
         ?Geometry $geometry = null,
-        ?bool $interpolated = false
+        ?bool $interpolated = false,
+        RouteSegmentSource $source = RouteSegmentSource::BROUTER
     ): RouteSegment {
         $segment = new RouteSegment;
         $segment->from_location_id = $fromLocation->id;
@@ -185,20 +188,44 @@ class TransportTripRepository
         $segment->duration = $duration;
         $segment->path_type = $pathType;
         $segment->interpolated = $interpolated;
-        if (! $geometry->getDimension()->hasZDimension()) {
-            $points = [];
-            foreach ($geometry->getPoints() as $point) {
-                $point->setZ(0);
-                $points[] = $point;
-            }
-            $geometry = LineString::make($points, $geometry->getSrid(), Dimension::DIMENSION_3DZ);
-        }
-        $segment->geometry = $geometry;
+        $segment->source = $source;
+        $segment->geometry = $this->ensure3d($geometry);
         $this->calculateDistance($segment);
 
         $segment->save();
 
         return $segment;
+    }
+
+    public function updateRouteSegmentGeometry(
+        RouteSegment $segment,
+        Geometry $geometry,
+        RouteSegmentSource $source
+    ): RouteSegment {
+        $segment->geometry = $this->ensure3d($geometry);
+        $segment->source = $source;
+        $this->calculateDistance($segment);
+
+        $segment->save();
+
+        return $segment;
+    }
+
+    private function ensure3d(Geometry $geometry): Geometry
+    {
+        if ($geometry->getDimension()->hasZDimension()) {
+            return $geometry;
+        }
+
+        $points = [];
+        foreach ($geometry->getPoints() as $point) {
+            // Points may be shared by reference with other geometries (e.g. split
+            // route segments sharing a boundary point), so build a new instance
+            // instead of mutating the source point in place.
+            $points[] = Point::make($point->getX(), $point->getY(), 0, $point->getM(), $point->getSrid());
+        }
+
+        return LineString::make($points, $geometry->getSrid(), Dimension::DIMENSION_3DZ);
     }
 
     public function calculateDistance(RouteSegment $segment): void

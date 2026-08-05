@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2e5b17f1a55878d9f3d3139e0942e7ea",
+    "content-hash": "af6c7cf40e311eb74756e6247e64b99f",
     "packages": [
         {
             "name": "brick/math",
@@ -8217,6 +8217,46 @@
             "time": "2025-12-02T11:56:42+00:00"
         },
         {
+            "name": "traewelling/google-polyline",
+            "version": "v0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Traewelling/GooglePolyline.git",
+                "reference": "f4cd5ff435cae7eeec3fb274cf2172eacc809cfa"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Traewelling/GooglePolyline/zipball/f4cd5ff435cae7eeec3fb274cf2172eacc809cfa",
+                "reference": "f4cd5ff435cae7eeec3fb274cf2172eacc809cfa",
+                "shasum": ""
+            },
+            "require": {
+                "clickbar/laravel-magellan": "^2.0",
+                "ext-json": "*",
+                "php": ">=8.3"
+            },
+            "require-dev": {
+                "phpstan/phpstan": "^2.1",
+                "phpunit/phpunit": "^12.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Traewelling\\GooglePolyline\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "A PHP library for encoding and decoding Google Maps polylines.",
+            "support": {
+                "issues": "https://github.com/Traewelling/GooglePolyline/issues",
+                "source": "https://github.com/Traewelling/GooglePolyline/tree/v0.3"
+            },
+            "time": "2025-11-01T09:19:43+00:00"
+        },
+        {
             "name": "vlucas/phpdotenv",
             "version": "v5.6.4",
             "source": {
@@ -11675,10 +11715,10 @@
     "platform": {
         "php": "^8.4",
         "ext-dom": "*",
+        "ext-gd": "*",
         "ext-openssl": "*",
         "ext-pdo": "*",
-        "ext-simplexml": "*",
-        "ext-gd": "*"
+        "ext-simplexml": "*"
     },
     "platform-dev": {},
     "plugin-api-version": "2.9.0"
