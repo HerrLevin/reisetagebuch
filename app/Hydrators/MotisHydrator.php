@@ -5,6 +5,7 @@ namespace App\Hydrators;
 use App\Dto\MotisApi\AreaDto;
 use App\Dto\MotisApi\GeocodeResponseEntry;
 use App\Dto\MotisApi\LegDto;
+use App\Dto\MotisApi\LegGeometryDto;
 use App\Dto\MotisApi\LocationType;
 use App\Dto\MotisApi\StopDto;
 use App\Dto\MotisApi\StopPlaceDto;
@@ -113,8 +114,16 @@ class MotisHydrator
             ->setRouteColor($data['routeColor'] ?? null)
             ->setRouteTextColor($data['routeTextColor'] ?? null)
             ->setSource($data['source'])
-            ->setIntermediateStops($intermediateStops);
+            ->setIntermediateStops($intermediateStops)
+            ->setLegGeometry(isset($data['legGeometry']) ? $this->hydrateLegGeometry($data['legGeometry']) : null);
 
+    }
+
+    public function hydrateLegGeometry(array $data): LegGeometryDto
+    {
+        return new LegGeometryDto()
+            ->setPoints($data['points'])
+            ->setPrecision($data['precision'] ?? 5);
     }
 
     public function hydrateArea(array $data): AreaDto

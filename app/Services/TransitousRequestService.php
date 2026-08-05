@@ -59,7 +59,7 @@ class TransitousRequestService
         }
 
         $response = Http::withUserAgent($this->versionService->getUserAgent())
-            ->get($this->apiUrl.'/v5/stoptimes', $params);
+            ->get($this->apiUrl.'/v6/stoptimes', $params);
 
         if (! $response->ok()) {
             Log::error('Unknown response (getDepartures)', [
@@ -106,7 +106,7 @@ class TransitousRequestService
         $center = new Coordinate($point->getLatitude(), $point->getLongitude());
         $bbox = $this->geoService->getBoundingBox($center, 500);
 
-        $response = Http::withUserAgent($this->versionService->getUserAgent())->get($this->apiUrl.'/v1/map/stops', [
+        $response = Http::withUserAgent($this->versionService->getUserAgent())->get($this->apiUrl.'/v6/map/stops', [
             'min' => (string) $bbox->lowerRight,
             'max' => (string) $bbox->upperLeft,
         ]);
@@ -142,7 +142,7 @@ class TransitousRequestService
     {
         $response = Http::withUserAgent($this->versionService->getUserAgent())
             ->get(
-                $this->apiUrl.'/v5/trip',
+                $this->apiUrl.'/v6/trip',
                 [
                     'tripId' => $tripId,
                     'joinInterlinedLegs' => true,

@@ -193,6 +193,15 @@ class LegDto
     )]
     public ?string $continuesAs = null;
 
+    public ?LegGeometryDto $legGeometry = null;
+
+    public function setLegGeometry(?LegGeometryDto $legGeometry): LegDto
+    {
+        $this->legGeometry = $legGeometry;
+
+        return $this;
+    }
+
     public function setRouteColor(?string $routeColor): LegDto
     {
         $this->routeColor = $routeColor;
