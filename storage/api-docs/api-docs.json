@@ -5274,7 +5274,8 @@
                     "longitude",
                     "distance",
                     "tags",
-                    "identifiers"
+                    "identifiers",
+                    "emoji"
                 ],
                 "properties": {
                     "id": {
@@ -5314,6 +5315,10 @@
                         "items": {
                             "$ref": "#/components/schemas/LocationTagDto"
                         }
+                    },
+                    "emoji": {
+                        "description": "Emoji representing the location based on its tags",
+                        "type": "string"
                     }
                 },
                 "type": "object"

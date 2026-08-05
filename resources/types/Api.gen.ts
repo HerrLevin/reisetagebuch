@@ -1142,6 +1142,8 @@ export interface LocationDto {
   identifiers: LocationIdentifierDto[];
   /** List of location tags */
   tags: LocationTagDto[];
+  /** Emoji representing the location based on its tags */
+  emoji: string;
 }
 
 /** Location History Entry Data Transfer Object */

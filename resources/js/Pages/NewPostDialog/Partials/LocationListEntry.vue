@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import LocationListEntryInfo from '@/Pages/NewPostDialog/Partials/LocationListEntryInfo.vue';
-import { getEmojiFromTags, getName } from '@/Services/LocationTypeService';
+import { getName } from '@/Services/LocationTypeService';
 import { CircleQuestionMark } from 'lucide-vue-next';
 import { defineProps, ref } from 'vue';
 import { RouterLink } from 'vue-router';
@@ -22,13 +22,11 @@ const props = defineProps({
 });
 
 const name = ref('');
-const emoji = ref('');
 
-emoji.value = getEmojiFromTags(props.location.tags);
 name.value = getName(props.location as LocationDto);
 
 const params = {
-    emoji: emoji.value,
+    emoji: props.location.emoji,
     name: name.value,
     id: props.location.id,
 };
@@ -40,7 +38,7 @@ const params = {
         :to="{ path: '/posts/create', query: params }"
     >
         <li class="list-row hover:bg-base-200 cursor-pointer" @click="navigate">
-            <div class="text-3xl">{{ emoji }}</div>
+            <div class="text-3xl">{{ location.emoji }}</div>
             <div>
                 <div>{{ name }}</div>
                 <div

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import LocationListEntryInfo from '@/Pages/NewPostDialog/Partials/LocationListEntryInfo.vue';
-import { getEmojiFromTags } from '@/Services/LocationTypeService';
 import type { PropType } from 'vue';
 import { LocationPost } from '../../../types/Api.gen';
 
@@ -22,7 +21,7 @@ defineProps({
                 >
                     <template #activator="{ onClick }">
                         <a href="#" @click.prevent="onClick">
-                            {{ getEmojiFromTags(post.location.tags) }}
+                            {{ post.location.emoji }}
                             {{ post.location.name }}
                         </a>
                     </template>
