@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Jobs;
+namespace App\Jobs\ActivityPub;
 
 use App\Enums\Visibility;
 use App\Hydrators\ActivityPub\NoteHydrator;
 use App\Hydrators\ActivityPub\UpdateHydrator;
 use App\Models\ActivityPubFollower;
 use App\Repositories\PostRepository;
-use App\Services\ActivityPubService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Queue\Queueable;
@@ -26,7 +25,7 @@ class PushUpdateToMastodon implements ShouldQueue
         private readonly string $postId
     ) {}
 
-    public function handle(ActivityPubService $activityPub): void
+    public function handle(): void
     {
         try {
             $postDto = app(PostRepository::class)->getById($this->postId, null, false);
@@ -67,7 +66,7 @@ class PushUpdateToMastodon implements ShouldQueue
                 }
                 $usedInboxes[] = $inbox;
             }
-            $activityPub->deliverActivity($postDto->user, $follow->follower_actor_id, $inbox, $updateActivity);
+            DeliverActivityPubActivity::dispatch($postDto->user, $follow->follower_actor_id, $inbox, $updateActivity);
         }
     }
 }

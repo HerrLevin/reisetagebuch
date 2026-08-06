@@ -3,17 +3,19 @@
 namespace Tests\Unit\Jobs;
 
 use App\Enums\Visibility;
-use App\Jobs\PushDeleteToMastodon;
-use App\Jobs\PushPostToMastodon;
-use App\Jobs\PushUpdateToMastodon;
+use App\Jobs\ActivityPub\DeliverActivityPubActivity;
+use App\Jobs\ActivityPub\PushDeleteToMastodon;
+use App\Jobs\ActivityPub\PushPostToMastodon;
+use App\Jobs\ActivityPub\PushUpdateToMastodon;
 use App\Models\ActivityPubActor;
 use App\Models\ActivityPubFollower;
 use App\Models\Post;
 use App\Models\User;
-use App\Services\ActivityPubService;
 use App\Services\ActivityPubUrlGuard;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Http;
+use ReflectionProperty;
 use Tests\TestCase;
 
 class PushActivityPubJobsTest extends TestCase
@@ -74,6 +76,11 @@ class PushActivityPubJobsTest extends TestCase
         });
     }
 
+    private function jobProperty(object $job, string $name): mixed
+    {
+        return new ReflectionProperty($job, $name)->getValue($job);
+    }
+
     // ──────────────────────────────────────────────────────────────────────────
     // PushPostToMastodon – Retry-Konfiguration
     // ──────────────────────────────────────────────────────────────────────────
@@ -93,12 +100,11 @@ class PushActivityPubJobsTest extends TestCase
     public function test_push_post_does_nothing_when_post_not_found(): void
     {
         Http::fake();
+        Bus::fake();
 
-        $service = $this->createMock(ActivityPubService::class);
-        $service->expects($this->never())->method('deliverActivity');
+        (new PushPostToMastodon('00000000-0000-7000-8000-000000000000'))->handle();
 
-        (new PushPostToMastodon('00000000-0000-7000-8000-000000000000'))->handle($service);
-
+        Bus::assertNotDispatched(DeliverActivityPubActivity::class);
         Http::assertNothingSent();
     }
 
@@ -110,10 +116,11 @@ class PushActivityPubJobsTest extends TestCase
             'visibility' => Visibility::PRIVATE,
         ]);
 
-        $service = $this->createMock(ActivityPubService::class);
-        $service->expects($this->never())->method('deliverActivity');
+        Bus::fake();
 
-        (new PushPostToMastodon($post->id))->handle($service);
+        (new PushPostToMastodon($post->id))->handle();
+
+        Bus::assertNotDispatched(DeliverActivityPubActivity::class);
     }
 
     public function test_push_post_skips_unlisted_post(): void
@@ -124,10 +131,11 @@ class PushActivityPubJobsTest extends TestCase
             'visibility' => Visibility::UNLISTED,
         ]);
 
-        $service = $this->createMock(ActivityPubService::class);
-        $service->expects($this->never())->method('deliverActivity');
+        Bus::fake();
 
-        (new PushPostToMastodon($post->id))->handle($service);
+        (new PushPostToMastodon($post->id))->handle();
+
+        Bus::assertNotDispatched(DeliverActivityPubActivity::class);
     }
 
     public function test_push_post_skips_only_authenticated_post(): void
@@ -138,10 +146,11 @@ class PushActivityPubJobsTest extends TestCase
             'visibility' => Visibility::ONLY_AUTHENTICATED,
         ]);
 
-        $service = $this->createMock(ActivityPubService::class);
-        $service->expects($this->never())->method('deliverActivity');
+        Bus::fake();
 
-        (new PushPostToMastodon($post->id))->handle($service);
+        (new PushPostToMastodon($post->id))->handle();
+
+        Bus::assertNotDispatched(DeliverActivityPubActivity::class);
     }
 
     public function test_push_post_skips_when_user_has_no_followers(): void
@@ -152,10 +161,11 @@ class PushActivityPubJobsTest extends TestCase
             'visibility' => Visibility::PUBLIC,
         ]);
 
-        $service = $this->createMock(ActivityPubService::class);
-        $service->expects($this->never())->method('deliverActivity');
+        Bus::fake();
 
-        (new PushPostToMastodon($post->id))->handle($service);
+        (new PushPostToMastodon($post->id))->handle();
+
+        Bus::assertNotDispatched(DeliverActivityPubActivity::class);
     }
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -173,10 +183,11 @@ class PushActivityPubJobsTest extends TestCase
         $this->createFollower($user, 'https://server-a.example/users/bob', 'https://server-a.example/users/bob/inbox');
         $this->createFollower($user, 'https://server-b.example/users/carol', 'https://server-b.example/users/carol/inbox');
 
-        $service = $this->createMock(ActivityPubService::class);
-        $service->expects($this->exactly(2))->method('deliverActivity');
+        Bus::fake();
 
-        (new PushPostToMastodon($post->id))->handle($service);
+        (new PushPostToMastodon($post->id))->handle();
+
+        Bus::assertDispatchedTimes(DeliverActivityPubActivity::class, 2);
     }
 
     public function test_push_post_deduplicates_shared_inbox(): void
@@ -192,10 +203,11 @@ class PushActivityPubJobsTest extends TestCase
         $this->createFollower($user, 'https://mastodon.example/users/bob', 'https://mastodon.example/users/bob/inbox', $sharedInbox);
         $this->createFollower($user, 'https://mastodon.example/users/carol', 'https://mastodon.example/users/carol/inbox', $sharedInbox);
 
-        $service = $this->createMock(ActivityPubService::class);
-        $service->expects($this->once())->method('deliverActivity');
+        Bus::fake();
 
-        (new PushPostToMastodon($post->id))->handle($service);
+        (new PushPostToMastodon($post->id))->handle();
+
+        Bus::assertDispatchedTimes(DeliverActivityPubActivity::class, 1);
     }
 
     public function test_push_post_prefers_shared_inbox_over_personal_inbox(): void
@@ -209,17 +221,13 @@ class PushActivityPubJobsTest extends TestCase
         $sharedInbox = 'https://mastodon.example/inbox';
         $this->createFollower($user, 'https://mastodon.example/users/bob', 'https://mastodon.example/users/bob/inbox', $sharedInbox);
 
-        $capturedInbox = null;
-        $service = $this->createMock(ActivityPubService::class);
-        $service->expects($this->once())
-            ->method('deliverActivity')
-            ->willReturnCallback(function ($userDto, $actorId, $inbox) use (&$capturedInbox) {
-                $capturedInbox = $inbox;
-            });
+        Bus::fake();
 
-        (new PushPostToMastodon($post->id))->handle($service);
+        (new PushPostToMastodon($post->id))->handle();
 
-        $this->assertSame($sharedInbox, $capturedInbox);
+        Bus::assertDispatched(DeliverActivityPubActivity::class, function (DeliverActivityPubActivity $job) use ($sharedInbox) {
+            return $this->jobProperty($job, 'inbox') === $sharedInbox;
+        });
     }
 
     public function test_push_post_falls_back_to_personal_inbox_when_no_shared_inbox(): void
@@ -230,17 +238,13 @@ class PushActivityPubJobsTest extends TestCase
 
         $this->createFollower($user, 'https://remote.example/users/bob', $personalInbox, null);
 
-        $capturedInbox = null;
-        $service = $this->createMock(ActivityPubService::class);
-        $service->expects($this->once())
-            ->method('deliverActivity')
-            ->willReturnCallback(function ($userDto, $actorId, $inbox) use (&$capturedInbox) {
-                $capturedInbox = $inbox;
-            });
+        Bus::fake();
 
-        (new PushPostToMastodon($post->id))->handle($service);
+        (new PushPostToMastodon($post->id))->handle();
 
-        $this->assertSame($personalInbox, $capturedInbox);
+        Bus::assertDispatched(DeliverActivityPubActivity::class, function (DeliverActivityPubActivity $job) use ($personalInbox) {
+            return $this->jobProperty($job, 'inbox') === $personalInbox;
+        });
     }
 
     public function test_push_post_create_activity_has_correct_structure(): void
@@ -254,15 +258,16 @@ class PushActivityPubJobsTest extends TestCase
 
         $this->createFollower($user, 'https://remote.example/users/bob', 'https://remote.example/users/bob/inbox');
 
-        $capturedActivity = null;
-        $service = $this->createMock(ActivityPubService::class);
-        $service->expects($this->once())
-            ->method('deliverActivity')
-            ->willReturnCallback(function ($userDto, $actorId, $inbox, $activity) use (&$capturedActivity) {
-                $capturedActivity = $activity;
-            });
+        Bus::fake();
 
-        (new PushPostToMastodon($post->id))->handle($service);
+        (new PushPostToMastodon($post->id))->handle();
+
+        $capturedActivity = null;
+        Bus::assertDispatched(DeliverActivityPubActivity::class, function (DeliverActivityPubActivity $job) use (&$capturedActivity) {
+            $capturedActivity = $this->jobProperty($job, 'updateActivity');
+
+            return true;
+        });
 
         $this->assertNotNull($capturedActivity);
         $this->assertSame('Create', $capturedActivity['type']);
@@ -281,14 +286,16 @@ class PushActivityPubJobsTest extends TestCase
 
         $this->createFollower($user, 'https://remote.example/users/bob', 'https://remote.example/users/bob/inbox');
 
-        $capturedActivity = null;
-        $service = $this->createMock(ActivityPubService::class);
-        $service->method('deliverActivity')
-            ->willReturnCallback(function ($u, $a, $i, $activity) use (&$capturedActivity) {
-                $capturedActivity = $activity;
-            });
+        Bus::fake();
 
-        (new PushPostToMastodon($post->id))->handle($service);
+        (new PushPostToMastodon($post->id))->handle();
+
+        $capturedActivity = null;
+        Bus::assertDispatched(DeliverActivityPubActivity::class, function (DeliverActivityPubActivity $job) use (&$capturedActivity) {
+            $capturedActivity = $this->jobProperty($job, 'updateActivity');
+
+            return true;
+        });
 
         $expectedActorUrl = route('ap.actor', ['username' => 'alice']);
         $this->assertSame($expectedActorUrl, $capturedActivity['actor']);
@@ -304,10 +311,11 @@ class PushActivityPubJobsTest extends TestCase
         // Nur Bob hat Follower, Alice nicht
         $this->createFollower($bob, 'https://remote.example/users/carol', 'https://remote.example/users/carol/inbox');
 
-        $service = $this->createMock(ActivityPubService::class);
-        $service->expects($this->never())->method('deliverActivity');
+        Bus::fake();
 
-        (new PushPostToMastodon($alicePost->id))->handle($service);
+        (new PushPostToMastodon($alicePost->id))->handle();
+
+        Bus::assertNotDispatched(DeliverActivityPubActivity::class);
     }
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -328,20 +336,22 @@ class PushActivityPubJobsTest extends TestCase
 
     public function test_push_delete_does_nothing_when_user_not_found(): void
     {
-        $service = $this->createMock(ActivityPubService::class);
-        $service->expects($this->never())->method('deliverActivity');
+        Bus::fake();
 
-        (new PushDeleteToMastodon('post-id', '00000000-0000-7000-8000-000000000001', 'ghost'))->handle($service);
+        (new PushDeleteToMastodon('post-id', '00000000-0000-7000-8000-000000000001', 'ghost'))->handle();
+
+        Bus::assertNotDispatched(DeliverActivityPubActivity::class);
     }
 
     public function test_push_delete_skips_when_user_has_no_followers(): void
     {
         $user = $this->createUserWithKeys();
 
-        $service = $this->createMock(ActivityPubService::class);
-        $service->expects($this->never())->method('deliverActivity');
+        Bus::fake();
 
-        (new PushDeleteToMastodon('some-post-id', $user->id, $user->username))->handle($service);
+        (new PushDeleteToMastodon('some-post-id', $user->id, $user->username))->handle();
+
+        Bus::assertNotDispatched(DeliverActivityPubActivity::class);
     }
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -355,10 +365,11 @@ class PushActivityPubJobsTest extends TestCase
         $this->createFollower($user, 'https://server-a.example/users/bob', 'https://server-a.example/users/bob/inbox');
         $this->createFollower($user, 'https://server-b.example/users/carol', 'https://server-b.example/users/carol/inbox');
 
-        $service = $this->createMock(ActivityPubService::class);
-        $service->expects($this->exactly(2))->method('deliverActivity');
+        Bus::fake();
 
-        (new PushDeleteToMastodon('post-123', $user->id, $user->username))->handle($service);
+        (new PushDeleteToMastodon('post-123', $user->id, $user->username))->handle();
+
+        Bus::assertDispatchedTimes(DeliverActivityPubActivity::class, 2);
     }
 
     public function test_push_delete_deduplicates_shared_inbox(): void
@@ -369,10 +380,11 @@ class PushActivityPubJobsTest extends TestCase
         $this->createFollower($user, 'https://mastodon.example/users/bob', 'https://mastodon.example/users/bob/inbox', $sharedInbox);
         $this->createFollower($user, 'https://mastodon.example/users/carol', 'https://mastodon.example/users/carol/inbox', $sharedInbox);
 
-        $service = $this->createMock(ActivityPubService::class);
-        $service->expects($this->once())->method('deliverActivity');
+        Bus::fake();
 
-        (new PushDeleteToMastodon('post-123', $user->id, $user->username))->handle($service);
+        (new PushDeleteToMastodon('post-123', $user->id, $user->username))->handle();
+
+        Bus::assertDispatchedTimes(DeliverActivityPubActivity::class, 1);
     }
 
     public function test_push_delete_activity_has_correct_structure(): void
@@ -382,15 +394,16 @@ class PushActivityPubJobsTest extends TestCase
 
         $this->createFollower($user, 'https://remote.example/users/bob', 'https://remote.example/users/bob/inbox');
 
-        $capturedActivity = null;
-        $service = $this->createMock(ActivityPubService::class);
-        $service->expects($this->once())
-            ->method('deliverActivity')
-            ->willReturnCallback(function ($userDto, $actorId, $inbox, $activity) use (&$capturedActivity) {
-                $capturedActivity = $activity;
-            });
+        Bus::fake();
 
-        (new PushDeleteToMastodon($postId, $user->id, $user->username))->handle($service);
+        (new PushDeleteToMastodon($postId, $user->id, $user->username))->handle();
+
+        $capturedActivity = null;
+        Bus::assertDispatched(DeliverActivityPubActivity::class, function (DeliverActivityPubActivity $job) use (&$capturedActivity) {
+            $capturedActivity = $this->jobProperty($job, 'updateActivity');
+
+            return true;
+        });
 
         $this->assertNotNull($capturedActivity);
         $this->assertSame('Delete', $capturedActivity['type']);
@@ -408,14 +421,16 @@ class PushActivityPubJobsTest extends TestCase
 
         $this->createFollower($user, 'https://remote.example/users/bob', 'https://remote.example/users/bob/inbox');
 
-        $capturedActivity = null;
-        $service = $this->createMock(ActivityPubService::class);
-        $service->method('deliverActivity')
-            ->willReturnCallback(function ($u, $a, $i, $activity) use (&$capturedActivity) {
-                $capturedActivity = $activity;
-            });
+        Bus::fake();
 
-        (new PushDeleteToMastodon($postId, $user->id, $user->username))->handle($service);
+        (new PushDeleteToMastodon($postId, $user->id, $user->username))->handle();
+
+        $capturedActivity = null;
+        Bus::assertDispatched(DeliverActivityPubActivity::class, function (DeliverActivityPubActivity $job) use (&$capturedActivity) {
+            $capturedActivity = $this->jobProperty($job, 'updateActivity');
+
+            return true;
+        });
 
         $expectedObjectUrl = route('ap.post-object', ['id' => $postId]);
         $this->assertSame($expectedObjectUrl, $capturedActivity['object']['id']);
@@ -428,14 +443,16 @@ class PushActivityPubJobsTest extends TestCase
 
         $this->createFollower($user, 'https://remote.example/users/bob', 'https://remote.example/users/bob/inbox');
 
-        $capturedActivity = null;
-        $service = $this->createMock(ActivityPubService::class);
-        $service->method('deliverActivity')
-            ->willReturnCallback(function ($u, $a, $i, $activity) use (&$capturedActivity) {
-                $capturedActivity = $activity;
-            });
+        Bus::fake();
 
-        (new PushDeleteToMastodon($postId, $user->id, $user->username))->handle($service);
+        (new PushDeleteToMastodon($postId, $user->id, $user->username))->handle();
+
+        $capturedActivity = null;
+        Bus::assertDispatched(DeliverActivityPubActivity::class, function (DeliverActivityPubActivity $job) use (&$capturedActivity) {
+            $capturedActivity = $this->jobProperty($job, 'updateActivity');
+
+            return true;
+        });
 
         $this->assertSame(route('ap.actor', ['username' => 'alice']), $capturedActivity['actor']);
     }
@@ -448,10 +465,11 @@ class PushActivityPubJobsTest extends TestCase
         // Nur Bob hat Follower
         $this->createFollower($bob, 'https://remote.example/users/carol', 'https://remote.example/users/carol/inbox');
 
-        $service = $this->createMock(ActivityPubService::class);
-        $service->expects($this->never())->method('deliverActivity');
+        Bus::fake();
 
-        (new PushDeleteToMastodon('post-id', $alice->id, $alice->username))->handle($service);
+        (new PushDeleteToMastodon('post-id', $alice->id, $alice->username))->handle();
+
+        Bus::assertNotDispatched(DeliverActivityPubActivity::class);
     }
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -470,7 +488,7 @@ class PushActivityPubJobsTest extends TestCase
 
         Http::fake(['*' => Http::response('', 202)]);
 
-        (new PushPostToMastodon($post->id))->handle(app(ActivityPubService::class));
+        (new PushPostToMastodon($post->id))->handle();
 
         Http::assertSent(function ($request) use ($inboxUrl) {
             return $request->url() === $inboxUrl
@@ -495,7 +513,7 @@ class PushActivityPubJobsTest extends TestCase
 
         Http::fake(['*' => Http::response('', 202)]);
 
-        (new PushPostToMastodon($post->id))->handle(app(ActivityPubService::class));
+        (new PushPostToMastodon($post->id))->handle();
 
         Http::assertSent(function ($request) {
             $body = json_decode($request->body(), true);
@@ -516,7 +534,7 @@ class PushActivityPubJobsTest extends TestCase
 
         Http::fake(['*' => Http::response('', 202)]);
 
-        (new PushDeleteToMastodon($postId, $user->id, $user->username))->handle(app(ActivityPubService::class));
+        (new PushDeleteToMastodon($postId, $user->id, $user->username))->handle();
 
         Http::assertSent(function ($request) use ($inboxUrl) {
             $body = json_decode($request->body(), true);
@@ -539,7 +557,7 @@ class PushActivityPubJobsTest extends TestCase
 
         $this->expectException(\RuntimeException::class);
 
-        (new PushPostToMastodon($post->id))->handle(app(ActivityPubService::class));
+        (new PushPostToMastodon($post->id))->handle();
     }
 
     public function test_deliver_activity_signature_header_contains_key_id_for_actor(): void
@@ -552,7 +570,7 @@ class PushActivityPubJobsTest extends TestCase
 
         Http::fake(['*' => Http::response('', 202)]);
 
-        (new PushPostToMastodon($post->id))->handle(app(ActivityPubService::class));
+        (new PushPostToMastodon($post->id))->handle();
 
         $expectedKeyId = route('ap.actor', ['username' => 'alice']).'#main-key';
 
@@ -582,12 +600,11 @@ class PushActivityPubJobsTest extends TestCase
     public function test_push_update_does_nothing_when_post_not_found(): void
     {
         Http::fake();
+        Bus::fake();
 
-        $service = $this->createMock(ActivityPubService::class);
-        $service->expects($this->never())->method('deliverActivity');
+        (new PushUpdateToMastodon('00000000-0000-7000-8000-000000000000'))->handle();
 
-        (new PushUpdateToMastodon('00000000-0000-7000-8000-000000000000'))->handle($service);
-
+        Bus::assertNotDispatched(DeliverActivityPubActivity::class);
         Http::assertNothingSent();
     }
 
@@ -599,10 +616,11 @@ class PushActivityPubJobsTest extends TestCase
             'visibility' => Visibility::PRIVATE,
         ]);
 
-        $service = $this->createMock(ActivityPubService::class);
-        $service->expects($this->never())->method('deliverActivity');
+        Bus::fake();
 
-        (new PushUpdateToMastodon($post->id))->handle($service);
+        (new PushUpdateToMastodon($post->id))->handle();
+
+        Bus::assertNotDispatched(DeliverActivityPubActivity::class);
     }
 
     public function test_push_update_skips_unlisted_post(): void
@@ -613,10 +631,11 @@ class PushActivityPubJobsTest extends TestCase
             'visibility' => Visibility::UNLISTED,
         ]);
 
-        $service = $this->createMock(ActivityPubService::class);
-        $service->expects($this->never())->method('deliverActivity');
+        Bus::fake();
 
-        (new PushUpdateToMastodon($post->id))->handle($service);
+        (new PushUpdateToMastodon($post->id))->handle();
+
+        Bus::assertNotDispatched(DeliverActivityPubActivity::class);
     }
 
     public function test_push_update_skips_only_authenticated_post(): void
@@ -627,10 +646,11 @@ class PushActivityPubJobsTest extends TestCase
             'visibility' => Visibility::ONLY_AUTHENTICATED,
         ]);
 
-        $service = $this->createMock(ActivityPubService::class);
-        $service->expects($this->never())->method('deliverActivity');
+        Bus::fake();
 
-        (new PushUpdateToMastodon($post->id))->handle($service);
+        (new PushUpdateToMastodon($post->id))->handle();
+
+        Bus::assertNotDispatched(DeliverActivityPubActivity::class);
     }
 
     public function test_push_update_skips_when_user_has_no_followers(): void
@@ -641,10 +661,11 @@ class PushActivityPubJobsTest extends TestCase
             'visibility' => Visibility::PUBLIC,
         ]);
 
-        $service = $this->createMock(ActivityPubService::class);
-        $service->expects($this->never())->method('deliverActivity');
+        Bus::fake();
 
-        (new PushUpdateToMastodon($post->id))->handle($service);
+        (new PushUpdateToMastodon($post->id))->handle();
+
+        Bus::assertNotDispatched(DeliverActivityPubActivity::class);
     }
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -662,10 +683,11 @@ class PushActivityPubJobsTest extends TestCase
         $this->createFollower($user, 'https://server-a.example/users/bob', 'https://server-a.example/users/bob/inbox');
         $this->createFollower($user, 'https://server-b.example/users/carol', 'https://server-b.example/users/carol/inbox');
 
-        $service = $this->createMock(ActivityPubService::class);
-        $service->expects($this->exactly(2))->method('deliverActivity');
+        Bus::fake();
 
-        (new PushUpdateToMastodon($post->id))->handle($service);
+        (new PushUpdateToMastodon($post->id))->handle();
+
+        Bus::assertDispatchedTimes(DeliverActivityPubActivity::class, 2);
     }
 
     public function test_push_update_deduplicates_shared_inbox(): void
@@ -680,10 +702,11 @@ class PushActivityPubJobsTest extends TestCase
         $this->createFollower($user, 'https://mastodon.example/users/bob', 'https://mastodon.example/users/bob/inbox', $sharedInbox);
         $this->createFollower($user, 'https://mastodon.example/users/carol', 'https://mastodon.example/users/carol/inbox', $sharedInbox);
 
-        $service = $this->createMock(ActivityPubService::class);
-        $service->expects($this->once())->method('deliverActivity');
+        Bus::fake();
 
-        (new PushUpdateToMastodon($post->id))->handle($service);
+        (new PushUpdateToMastodon($post->id))->handle();
+
+        Bus::assertDispatchedTimes(DeliverActivityPubActivity::class, 1);
     }
 
     public function test_push_update_prefers_shared_inbox_over_personal_inbox(): void
@@ -697,17 +720,13 @@ class PushActivityPubJobsTest extends TestCase
         $sharedInbox = 'https://mastodon.example/inbox';
         $this->createFollower($user, 'https://mastodon.example/users/bob', 'https://mastodon.example/users/bob/inbox', $sharedInbox);
 
-        $capturedInbox = null;
-        $service = $this->createMock(ActivityPubService::class);
-        $service->expects($this->once())
-            ->method('deliverActivity')
-            ->willReturnCallback(function ($userDto, $actorId, $inbox) use (&$capturedInbox) {
-                $capturedInbox = $inbox;
-            });
+        Bus::fake();
 
-        (new PushUpdateToMastodon($post->id))->handle($service);
+        (new PushUpdateToMastodon($post->id))->handle();
 
-        $this->assertSame($sharedInbox, $capturedInbox);
+        Bus::assertDispatched(DeliverActivityPubActivity::class, function (DeliverActivityPubActivity $job) use ($sharedInbox) {
+            return $this->jobProperty($job, 'inbox') === $sharedInbox;
+        });
     }
 
     public function test_push_update_falls_back_to_personal_inbox_when_no_shared_inbox(): void
@@ -718,17 +737,13 @@ class PushActivityPubJobsTest extends TestCase
 
         $this->createFollower($user, 'https://remote.example/users/bob', $personalInbox, null);
 
-        $capturedInbox = null;
-        $service = $this->createMock(ActivityPubService::class);
-        $service->expects($this->once())
-            ->method('deliverActivity')
-            ->willReturnCallback(function ($userDto, $actorId, $inbox) use (&$capturedInbox) {
-                $capturedInbox = $inbox;
-            });
+        Bus::fake();
 
-        (new PushUpdateToMastodon($post->id))->handle($service);
+        (new PushUpdateToMastodon($post->id))->handle();
 
-        $this->assertSame($personalInbox, $capturedInbox);
+        Bus::assertDispatched(DeliverActivityPubActivity::class, function (DeliverActivityPubActivity $job) use ($personalInbox) {
+            return $this->jobProperty($job, 'inbox') === $personalInbox;
+        });
     }
 
     public function test_push_update_activity_has_correct_structure(): void
@@ -742,15 +757,16 @@ class PushActivityPubJobsTest extends TestCase
 
         $this->createFollower($user, 'https://remote.example/users/bob', 'https://remote.example/users/bob/inbox');
 
-        $capturedActivity = null;
-        $service = $this->createMock(ActivityPubService::class);
-        $service->expects($this->once())
-            ->method('deliverActivity')
-            ->willReturnCallback(function ($userDto, $actorId, $inbox, $activity) use (&$capturedActivity) {
-                $capturedActivity = $activity;
-            });
+        Bus::fake();
 
-        (new PushUpdateToMastodon($post->id))->handle($service);
+        (new PushUpdateToMastodon($post->id))->handle();
+
+        $capturedActivity = null;
+        Bus::assertDispatched(DeliverActivityPubActivity::class, function (DeliverActivityPubActivity $job) use (&$capturedActivity) {
+            $capturedActivity = $this->jobProperty($job, 'updateActivity');
+
+            return true;
+        });
 
         $this->assertNotNull($capturedActivity);
         $this->assertSame('Update', $capturedActivity['type']);
@@ -770,14 +786,16 @@ class PushActivityPubJobsTest extends TestCase
 
         $this->createFollower($user, 'https://remote.example/users/bob', 'https://remote.example/users/bob/inbox');
 
-        $capturedActivity = null;
-        $service = $this->createMock(ActivityPubService::class);
-        $service->method('deliverActivity')
-            ->willReturnCallback(function ($u, $a, $i, $activity) use (&$capturedActivity) {
-                $capturedActivity = $activity;
-            });
+        Bus::fake();
 
-        (new PushUpdateToMastodon($post->id))->handle($service);
+        (new PushUpdateToMastodon($post->id))->handle();
+
+        $capturedActivity = null;
+        Bus::assertDispatched(DeliverActivityPubActivity::class, function (DeliverActivityPubActivity $job) use (&$capturedActivity) {
+            $capturedActivity = $this->jobProperty($job, 'updateActivity');
+
+            return true;
+        });
 
         $expectedActorUrl = route('ap.actor', ['username' => 'alice']);
         $this->assertSame($expectedActorUrl, $capturedActivity['actor']);
@@ -793,10 +811,11 @@ class PushActivityPubJobsTest extends TestCase
         // Nur Bob hat Follower, Alice nicht
         $this->createFollower($bob, 'https://remote.example/users/carol', 'https://remote.example/users/carol/inbox');
 
-        $service = $this->createMock(ActivityPubService::class);
-        $service->expects($this->never())->method('deliverActivity');
+        Bus::fake();
 
-        (new PushUpdateToMastodon($alicePost->id))->handle($service);
+        (new PushUpdateToMastodon($alicePost->id))->handle();
+
+        Bus::assertNotDispatched(DeliverActivityPubActivity::class);
     }
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -818,7 +837,7 @@ class PushActivityPubJobsTest extends TestCase
 
         Http::fake(['*' => Http::response('', 202)]);
 
-        (new PushUpdateToMastodon($post->id))->handle(app(ActivityPubService::class));
+        (new PushUpdateToMastodon($post->id))->handle();
 
         Http::assertSent(function ($request) use ($inboxUrl) {
             $body = json_decode($request->body(), true);

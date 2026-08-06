@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace App\Jobs;
+namespace App\Jobs\ActivityPub;
 
-use App\Hydrators\ActivityPub\LikeHydrator;
+use App\Hydrators\ActivityPub\UndoLikeHydrator;
 use App\Models\ActivityPubPost;
 use App\Repositories\UserRepository;
-use App\Services\ActivityPubService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
-class SendApPostLikeActivity implements ShouldQueue
+class SendApPostUndoLikeActivity implements ShouldQueue
 {
     use Queueable;
 
@@ -27,13 +27,12 @@ class SendApPostLikeActivity implements ShouldQueue
     ) {}
 
     public function handle(
-        ActivityPubService $activityPub,
         UserRepository $userRepository,
-        LikeHydrator $hydrator,
+        UndoLikeHydrator $hydrator,
     ): void {
         $post = ActivityPubPost::with('actor')->find($this->apPostId);
         if (! $post) {
-            Log::info('SendApPostLikeActivity: AP post not found', ['apPostId' => $this->apPostId]);
+            Log::info('SendApPostUndoLikeActivity: AP post not found', ['apPostId' => $this->apPostId]);
 
             return;
         }
@@ -46,13 +45,14 @@ class SendApPostLikeActivity implements ShouldQueue
         $userDto = $userRepository->getUserById($this->userId);
         $actorUrl = route('ap.actor', ['username' => $userDto->username]);
 
-        $likeActivity = $hydrator->hydrate(
-            likeActivityId: $this->likeActivityId,
+        $undoActivity = $hydrator->hydrate(
+            undoActivityId: $actorUrl.'#undo-likes/'.Str::uuid(),
             actorUrl: $actorUrl,
+            likeActivityId: $this->likeActivityId,
             objectId: $post->activity_id,
         )->toArray();
 
         $inbox = $actor->shared_inbox_url ?? $actor->inbox_url;
-        $activityPub->deliverActivity($userDto, $actor->actor_uri, $inbox, $likeActivity);
+        DeliverActivityPubActivity::dispatch($userDto, $actor->actor_uri, $inbox, $undoActivity);
     }
 }

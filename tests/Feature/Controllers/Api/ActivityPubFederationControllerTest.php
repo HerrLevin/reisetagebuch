@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Controllers\Api;
 
-use App\Jobs\SendFollowToRemoteActor;
-use App\Jobs\SendUndoFollowToRemoteActor;
+use App\Jobs\ActivityPub\SendFollowToRemoteActor;
+use App\Jobs\ActivityPub\SendUndoFollowToRemoteActor;
 use App\Models\ActivityPubActor;
 use App\Models\ActivityPubFollower;
 use App\Models\ActivityPubRemoteFollow;

@@ -2,18 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\Jobs;
+namespace App\Jobs\ActivityPub;
 
-use App\Hydrators\ActivityPub\UndoLikeHydrator;
+use App\Hydrators\ActivityPub\LikeHydrator;
 use App\Models\ActivityPubPost;
 use App\Repositories\UserRepository;
-use App\Services\ActivityPubService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
-class SendApPostUndoLikeActivity implements ShouldQueue
+class SendApPostLikeActivity implements ShouldQueue
 {
     use Queueable;
 
@@ -28,13 +26,12 @@ class SendApPostUndoLikeActivity implements ShouldQueue
     ) {}
 
     public function handle(
-        ActivityPubService $activityPub,
         UserRepository $userRepository,
-        UndoLikeHydrator $hydrator,
+        LikeHydrator $hydrator,
     ): void {
         $post = ActivityPubPost::with('actor')->find($this->apPostId);
         if (! $post) {
-            Log::info('SendApPostUndoLikeActivity: AP post not found', ['apPostId' => $this->apPostId]);
+            Log::info('SendApPostLikeActivity: AP post not found', ['apPostId' => $this->apPostId]);
 
             return;
         }
@@ -47,14 +44,13 @@ class SendApPostUndoLikeActivity implements ShouldQueue
         $userDto = $userRepository->getUserById($this->userId);
         $actorUrl = route('ap.actor', ['username' => $userDto->username]);
 
-        $undoActivity = $hydrator->hydrate(
-            undoActivityId: $actorUrl.'#undo-likes/'.Str::uuid(),
-            actorUrl: $actorUrl,
+        $likeActivity = $hydrator->hydrate(
             likeActivityId: $this->likeActivityId,
+            actorUrl: $actorUrl,
             objectId: $post->activity_id,
         )->toArray();
 
         $inbox = $actor->shared_inbox_url ?? $actor->inbox_url;
-        $activityPub->deliverActivity($userDto, $actor->actor_uri, $inbox, $undoActivity);
+        DeliverActivityPubActivity::dispatch($userDto, $actor->actor_uri, $inbox, $likeActivity);
     }
 }
