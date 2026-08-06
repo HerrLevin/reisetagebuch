@@ -6,8 +6,8 @@ namespace App\Http\Controllers\Backend;
 
 use App\Dto\LikeDto;
 use App\Http\Controllers\Controller;
-use App\Jobs\SendApPostLikeActivity;
-use App\Jobs\SendApPostUndoLikeActivity;
+use App\Jobs\ActivityPub\SendApPostLikeActivity;
+use App\Jobs\ActivityPub\SendApPostUndoLikeActivity;
 use App\Repositories\ActivityPubPostRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Support\Str;

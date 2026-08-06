@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Jobs;
+namespace App\Jobs\ActivityPub;
 
 use App\Dto\ActivityPub\Objects\TombStone;
 use App\Hydrators\ActivityPub\DeleteHydrator;
 use App\Hydrators\UserHydrator;
 use App\Models\ActivityPubFollower;
 use App\Models\User;
-use App\Services\ActivityPubService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
@@ -26,7 +25,7 @@ class PushDeleteToMastodon implements ShouldQueue
         private readonly string $username
     ) {}
 
-    public function handle(ActivityPubService $activityPub): void
+    public function handle(): void
     {
         $user = User::find($this->userId);
         if (! $user) {
@@ -61,7 +60,7 @@ class PushDeleteToMastodon implements ShouldQueue
                 }
                 $usedInboxes[] = $inbox;
             }
-            $activityPub->deliverActivity($userDto, $follow->follower_actor_id, $inbox, $deleteActivity);
+            DeliverActivityPubActivity::dispatch($userDto, $follow->follower_actor_id, $inbox, $deleteActivity);
         }
     }
 }

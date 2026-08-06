@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Controllers\Api;
 
-use App\Jobs\SendApPostLikeActivity;
-use App\Jobs\SendApPostUndoLikeActivity;
+use App\Jobs\ActivityPub\SendApPostLikeActivity;
+use App\Jobs\ActivityPub\SendApPostUndoLikeActivity;
 use App\Models\ActivityPubActor;
 use App\Models\ActivityPubPost;
 use App\Models\ActivityPubPostLike;
