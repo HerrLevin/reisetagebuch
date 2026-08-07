@@ -72,7 +72,7 @@ class LocationPost extends BasePost
             $location .= ', '.$this->location->tags['addr:city'];
         }
 
-        if ($parentBody !== null) {
+        if (empty($parentBody)) {
             $body = trans('activitypub.location.base', ['location' => $location]);
         } else {
             $body = trans('activitypub.location.short', ['location' => $location]);
