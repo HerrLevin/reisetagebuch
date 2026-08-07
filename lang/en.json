@@ -1,0 +1,4 @@
+{
+    "activitypub.location.base": "I'm at :location",
+    "activitypub.location.short": "@ :location"
+}

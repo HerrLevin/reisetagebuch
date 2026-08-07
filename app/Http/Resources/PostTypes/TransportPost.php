@@ -132,7 +132,8 @@ class TransportPost extends BasePost
 
         $body = "$emoji <strong>$line</strong><br>".
             "🛤️ $origin → $destination<br>".
-            "⏱️ $duration min • 📏 $distance km";
+            "⏱️ $duration min • 📏 $distance km<br>".
+            $this->travelReason?->getEmoji();
 
         return $parentBody ? nl2br($parentBody."\n\n").$body : $body;
     }

@@ -27,4 +27,16 @@ enum TravelReason: string
             default => 0,
         };
     }
+
+    public function getEmoji(): ?string
+    {
+        return match ($this) {
+            self::COMMUTE => '🏢',
+            self::BUSINESS => '💼',
+            self::LEISURE => '🏖️',
+            self::CREW => '👨‍✈️',
+            self::ERRAND => '🛒',
+            self::OTHER => null,
+        };
+    }
 }

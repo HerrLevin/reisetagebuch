@@ -10,8 +10,8 @@ use App\Http\Resources\PostTypes\TransportPost;
 use App\Http\Resources\StopDto;
 use App\Http\Resources\TripDto;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use Tests\TestCase;
 
 class BasePostTest extends TestCase
 {
@@ -74,6 +74,7 @@ class BasePostTest extends TestCase
     {
         $post = new ReflectionClass(LocationPost::class)->newInstanceWithoutConstructor();
         $post->body = $body;
+        $post->travelReason = null;
 
         $location = new ReflectionClass(LocationDto::class)->newInstanceWithoutConstructor();
         $location->name = 'Berlin';
@@ -89,6 +90,7 @@ class BasePostTest extends TestCase
         $post->body = $body;
         $post->distance = 1000;
         $post->duration = 600;
+        $post->travelReason = null;
 
         $originStop = new ReflectionClass(StopDto::class)->newInstanceWithoutConstructor();
         $originStop->name = 'Origin';
