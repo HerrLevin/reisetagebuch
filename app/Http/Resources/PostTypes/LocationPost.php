@@ -67,7 +67,18 @@ class LocationPost extends BasePost
         $parentBody = parent::getHtmlBody();
         $name = e($this->location->name);
         $emoji = $this->location->emoji;
-        $body = "<p>$emoji<strong>$name</strong></p>";
+        $location = "$emoji $name";
+        if (! empty($this->location->tags['addr:city'])) {
+            $location .= ', '.$this->location->tags['addr:city'];
+        }
+
+        if ($parentBody !== null) {
+            $body = trans('activitypub.location.base', ['location' => $location]);
+        } else {
+            $body = trans('activitypub.location.short', ['location' => $location]);
+        }
+
+        $body .= nl2br("\n".$this->travelReason?->getEmoji());
 
         return $parentBody ? nl2br($parentBody."\n\n").$body : $body;
     }
