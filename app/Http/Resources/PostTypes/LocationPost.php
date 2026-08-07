@@ -68,8 +68,9 @@ class LocationPost extends BasePost
         $name = e($this->location->name);
         $emoji = $this->location->emoji;
         $location = "$emoji $name";
-        if (! empty($this->location->tags['addr:city'])) {
-            $location .= ', '.$this->location->tags['addr:city'];
+        $city = array_find($this->location->tags, fn ($tag) => $tag->key === 'addr:city');
+        if (! empty($city)) {
+            $location .= ', '.$city->value;
         }
 
         if (empty($parentBody)) {

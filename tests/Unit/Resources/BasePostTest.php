@@ -79,6 +79,7 @@ class BasePostTest extends TestCase
         $location = new ReflectionClass(LocationDto::class)->newInstanceWithoutConstructor();
         $location->name = 'Berlin';
         $location->emoji = '📍';
+        $location->tags = [];
         $post->location = $location;
 
         return $post;
