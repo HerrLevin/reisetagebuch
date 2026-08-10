@@ -127,7 +127,7 @@ class ActivityPubControllerTest extends TestCase
         // Cache vorbelegen – Middleware schaut hier zuerst nach dem Public Key
         $keyId = "{$actorId}#main-key";
         $cacheKey = 'ap_public_key:'.md5($keyId);
-        Cache::put($cacheKey, $publicKeyPem, 3600);
+        Cache::put($cacheKey, [$publicKeyPem, $actorId], 3600);
 
         // Http::fake() für ActivityPubService::getActorProfile()-Aufrufe
         Http::fake([
