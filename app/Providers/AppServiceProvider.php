@@ -25,9 +25,8 @@ class AppServiceProvider extends ServiceProvider
         JsonResource::withoutWrapping();
         Vite::prefetch(concurrency: 3);
 
-        // This will force all links to be with https in production
-        // This is useful when you are using a load balancer or reverse proxy
-        if (App::environment('production')) {
+        // This will force all links to be https in production or whenever APP_URL says so.
+        if (App::environment('production') || str_starts_with(config('app.url'), 'https://')) {
             URL::forceScheme('https');
         }
 

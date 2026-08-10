@@ -43,7 +43,8 @@ class ActivityPubFederationBackend extends Controller
 
     public function resolveHandle(string $userId, string $handle): ?RemoteActorProfileDto
     {
-        $profile = $this->activityPubService->resolveActorByHandle($handle);
+        $userDto = $this->userRepository->getUserById($userId);
+        $profile = $this->activityPubService->resolveActorByHandle($handle, $userDto);
         if ($profile === null) {
             return null;
         }
@@ -105,12 +106,13 @@ class ActivityPubFederationBackend extends Controller
             return;
         }
 
-        $actor = $this->activityPubService->resolveActor($actorId);
+        $userDto = $this->userRepository->getUserById($userId);
+
+        $actor = $this->activityPubService->resolveActor($actorId, $userDto);
         if ($actor === null) {
             abort(422, 'Could not reach remote actor');
         }
 
-        $userDto = $this->userRepository->getUserById($userId);
         $actorUrl = route('ap.actor', ['username' => $userDto->username]);
 
         $this->remoteFollowRepository->create(

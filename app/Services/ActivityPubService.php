@@ -19,9 +19,9 @@ class ActivityPubService
     ) {}
 
     #[ArrayShape(['inbox' => 'string|null', 'sharedInbox' => 'string|null'])]
-    public function getInbox(string $followerActorId): ?array
+    public function getInbox(string $followerActorId, ?UserDto $user = null): ?array
     {
-        $profile = $this->getActorProfile($followerActorId);
+        $profile = $this->getActorProfile($followerActorId, $user);
         if ($profile === null) {
             return null;
         }
@@ -41,15 +41,22 @@ class ActivityPubService
         'iconUrl' => 'string|null',
         'url' => 'string|null',
     ])]
-    private function getActorProfile(string $actorId): ?array
+    private function getActorProfile(string $actorId, ?UserDto $user = null): ?array
     {
         $actor = null;
         try {
             $this->urlGuard->assertSafe($actorId);
 
-            $response = Http::withHeaders([
-                'Accept' => 'application/activity+json',
-            ])->withOptions(['allow_redirects' => false])->timeout(10)->get($actorId);
+            $headers = ['Accept' => 'application/activity+json'];
+
+            if ($user !== null) {
+                $date = now()->toRfc7231String();
+                $headers['Date'] = $date;
+                $headers['Signature'] = $this->createSignature($user, 'GET', parse_url($actorId, PHP_URL_PATH), parse_url($actorId, PHP_URL_HOST), $date);
+            }
+
+            $response = Http::withHeaders($headers)
+                ->withOptions(['allow_redirects' => false])->timeout(10)->get($actorId);
 
             if ($response->successful()) {
                 $actor = $response->json();
@@ -76,7 +83,7 @@ class ActivityPubService
         return null;
     }
 
-    public function resolveActorByHandle(string $handle): ?array
+    public function resolveActorByHandle(string $handle, UserDto $user): ?array
     {
         $handle = ltrim($handle, '@');
 
@@ -86,13 +93,19 @@ class ActivityPubService
 
         [$username, $domain] = explode('@', $handle, 2);
         $resource = urlencode("acct:{$username}@{$domain}");
-        $webfingerUrl = "https://{$domain}/.well-known/webfinger?resource={$resource}";
+        $path = '/.well-known/webfinger?resource='.$resource;
+        $webfingerUrl = "https://{$domain}{$path}";
 
         try {
             $this->urlGuard->assertSafe($webfingerUrl);
 
+            $date = now()->toRfc7231String();
+            $signature = $this->createSignature($user, 'GET', $path, $domain, $date);
+
             $response = Http::withHeaders([
                 'Accept' => 'application/jrd+json, application/json',
+                'Date' => $date,
+                'Signature' => $signature,
             ])->withOptions(['allow_redirects' => false])->timeout(10)->get($webfingerUrl);
 
             if (! $response->successful()) {
@@ -117,7 +130,7 @@ class ActivityPubService
 
             $this->urlGuard->assertSafe($actorUrl);
 
-            $profile = $this->getActorProfile($actorUrl);
+            $profile = $this->getActorProfile($actorUrl, $user);
             if ($profile === null) {
                 return null;
             }
@@ -130,9 +143,9 @@ class ActivityPubService
         }
     }
 
-    public function resolveActor(string $actorUri): ?ActivityPubActor
+    public function resolveActor(string $actorUri, ?UserDto $user = null): ?ActivityPubActor
     {
-        $profile = $this->getActorProfile($actorUri);
+        $profile = $this->getActorProfile($actorUri, $user);
         if ($profile === null) {
             return null;
         }
@@ -172,7 +185,7 @@ class ActivityPubService
     {
         Log::info('Deliver Activity for actor: '.$followerActorId);
         // Fetch the follower's actor to get their inbox
-        $inbox = $inbox ?? $this->getInbox($followerActorId)['inbox'] ?? null;
+        $inbox = $inbox ?? $this->getInbox($followerActorId, $user)['inbox'] ?? null;
 
         if (! $inbox) {
             Log::warning('No inbox URL to deliver activity', ['actor' => $followerActorId]);
@@ -215,11 +228,18 @@ class ActivityPubService
         }
     }
 
-    private function createSignature(UserDto $user, string $method, string $path, string $host, string $date, string $digest): string
+    private function createSignature(UserDto $user, string $method, string $path, string $host, string $date, ?string $digest = null): string
     {
         $keyId = route('ap.actor', ['username' => $user->username]).'#main-key';
-        $headers = '(request-target) host date digest';
-        $stringToSign = '(request-target): '.strtolower($method)." {$path}\nhost: {$host}\ndate: {$date}\ndigest: {$digest}";
+        $headerNames = ['(request-target)', 'host', 'date'];
+        $stringToSign = '(request-target): '.strtolower($method)." {$path}\nhost: {$host}\ndate: {$date}";
+
+        if ($digest !== null) {
+            $headerNames[] = 'digest';
+            $stringToSign .= "\ndigest: {$digest}";
+        }
+
+        $headers = implode(' ', $headerNames);
 
         $userModel = User::whereId($user->id)->first();
 

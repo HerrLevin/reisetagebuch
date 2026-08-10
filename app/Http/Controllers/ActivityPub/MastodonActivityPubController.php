@@ -432,7 +432,7 @@ class MastodonActivityPubController extends Controller
             return response()->json(['error' => 'Invalid follow object'], 400);
         }
 
-        $actor = $this->activityPubService->resolveActor($followerActorId);
+        $actor = $this->activityPubService->resolveActor($followerActorId, $user);
 
         if ($user->requiresFollowRequest) {
             return $this->handlePendingFollow($activity, $user, $followerActorId, $actor);
@@ -643,7 +643,7 @@ class MastodonActivityPubController extends Controller
 
         if ($like->wasRecentlyCreated) {
             try {
-                $actor = $this->activityPubService->resolveActor($actorId);
+                $actor = $this->activityPubService->resolveActor($actorId, $user);
                 $postHydrator = new PostHydrator;
                 $postDto = $postHydrator->modelToDto($post);
 
