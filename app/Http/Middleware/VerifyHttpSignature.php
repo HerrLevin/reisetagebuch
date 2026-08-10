@@ -99,12 +99,13 @@ class VerifyHttpSignature
         }
 
         // Fetch the public key
-        $publicKeyPem = $this->fetchPublicKey($params['keyId']);
-        if (! $publicKeyPem) {
+        $keyInfo = $this->fetchPublicKey($params['keyId']);
+        if (! $keyInfo) {
             Log::warning('VerifyHttpSignature: could not fetch public key', ['keyId' => $params['keyId']]);
 
             return response()->json(['error' => 'Could not fetch public key'], 401);
         }
+        [$publicKeyPem, $keyOwner] = $keyInfo;
 
         // Build the signing string
         $signingStringParts = [];
@@ -153,7 +154,7 @@ class VerifyHttpSignature
             return response()->json(['error' => 'Invalid signature'], 401);
         }
 
-        $request->attributes->set('ap_verified_actor', strtok($params['keyId'], '#'));
+        $request->attributes->set('ap_verified_actor', $keyOwner);
 
         return $next($request);
     }
@@ -171,10 +172,16 @@ class VerifyHttpSignature
         return ! empty($params) ? $params : null;
     }
 
-    private function fetchPublicKey(string $keyId): ?string
+    /**
+     * @return array{0: string, 1: string}|null Tuple of [publicKeyPem, actor URI that owns the key]
+     */
+    private function fetchPublicKey(string $keyId): ?array
     {
-        // Strip fragment to get actor URL
-        $actorUrl = strtok($keyId, '#');
+        // Mastodon-style keyIds are "<actorUri>#main-key"; GoToSocial-style keyIds
+        // are their own resource ("<actorUri>/main-key") distinct from the actor
+        // URI. Either way, the fetched key document's "owner" field is the actual
+        // actor identity — don't assume the actor lives at the keyId minus fragment.
+        $keyUrl = strtok($keyId, '#');
         $cacheKey = 'ap_public_key:'.md5($keyId);
 
         $cached = Cache::get($cacheKey);
@@ -183,36 +190,39 @@ class VerifyHttpSignature
         }
 
         try {
-            $this->urlGuard->assertSafe($actorUrl);
+            $this->urlGuard->assertSafe($keyUrl);
 
             $response = Http::withHeaders([
                 'Accept' => 'application/activity+json',
-            ])->withOptions(['allow_redirects' => false])->timeout(10)->get($actorUrl);
+            ])->withOptions(['allow_redirects' => false])->timeout(10)->get($keyUrl);
 
             if ($response->successful()) {
                 $actor = $response->json();
                 $publicKey = $actor['publicKey'] ?? null;
-                if ($publicKey && ($publicKey['id'] === $keyId) && isset($publicKey['publicKeyPem'])) {
-                    Cache::put($cacheKey, $publicKey['publicKeyPem'], 3600);
+                $owner = $publicKey['owner'] ?? null;
+                if ($publicKey && ($publicKey['id'] === $keyId) && isset($publicKey['publicKeyPem']) && $owner) {
+                    $result = [$publicKey['publicKeyPem'], $owner];
+                    Cache::put($cacheKey, $result, 3600);
 
-                    return $publicKey['publicKeyPem'];
+                    return $result;
                 }
 
                 Log::warning('VerifyHttpSignature: public key not found or keyId mismatch in actor response', [
                     'keyId' => $keyId,
-                    'actor_url' => $actorUrl,
+                    'key_url' => $keyUrl,
                     'has_public_key' => isset($actor['publicKey']),
                     'actor_key_id' => $actor['publicKey']['id'] ?? null,
+                    'owner' => $owner,
                 ]);
             } else {
                 Log::warning('VerifyHttpSignature: failed to fetch actor', [
-                    'actor_url' => $actorUrl,
+                    'key_url' => $keyUrl,
                     'status' => $response->status(),
                 ]);
             }
         } catch (\Exception $e) {
             Log::error('VerifyHttpSignature: error fetching public key', [
-                'actor_url' => $actorUrl,
+                'key_url' => $keyUrl,
                 'error' => $e->getMessage(),
             ]);
         }
