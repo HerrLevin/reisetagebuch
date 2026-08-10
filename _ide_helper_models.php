@@ -58,6 +58,33 @@ namespace App\Models{
  * @property string $follower_actor_id
  * @property string $followed_user_id
  * @property string|null $activity_pub_actor_id
+ * @property string|null $follow_activity_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\ActivityPubActor|null $actor
+ * @property-read mixed $follower_inbox_url
+ * @property-read mixed $follower_shared_inbox_url
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollowRequest newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollowRequest newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollowRequest query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollowRequest whereActivityPubActorId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollowRequest whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollowRequest whereFollowActivityId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollowRequest whereFollowedUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollowRequest whereFollowerActorId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollowRequest whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubFollowRequest whereUpdatedAt($value)
+ */
+	class ActivityPubFollowRequest extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property string $id
+ * @property string $follower_actor_id
+ * @property string $followed_user_id
+ * @property string|null $activity_pub_actor_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\ActivityPubActor|null $actor

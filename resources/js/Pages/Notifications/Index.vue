@@ -4,6 +4,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import ActivityPubMentionNotification from '@/Pages/Notifications/Partials/ActivityPubMentionNotification.vue';
 import ActivityPubPostLikedNotification from '@/Pages/Notifications/Partials/ActivityPubPostLikedNotification.vue';
 import ActivityPubUserFollowedNotification from '@/Pages/Notifications/Partials/ActivityPubUserFollowedNotification.vue';
+import ActivityPubUserRequestedFollowNotification from '@/Pages/Notifications/Partials/ActivityPubUserRequestedFollowNotification.vue';
 import PostLikedNotification from '@/Pages/Notifications/Partials/PostLikedNotification.vue';
 import TraewellingCrosspostFailedNotification from '@/Pages/Notifications/Partials/TraewellingCrosspostFailedNotification.vue';
 import UserFollowedNotification from '@/Pages/Notifications/Partials/UserFollowedNotification.vue';
@@ -14,6 +15,7 @@ import {
     isActivityPubMentionNotification,
     isActivityPubPostLikedNotification,
     isActivityPubUserFollowedNotification,
+    isActivityPubUserRequestedFollowNotification,
     isPostLikedNotification,
     isTraewellingCrosspostFailedNotification,
     isUserFollowedNotification,
@@ -47,6 +49,9 @@ const getNotificationComponent = (notification: NotificationWrapper) => {
     }
     if (isActivityPubUserFollowedNotification(notification)) {
         return ActivityPubUserFollowedNotification;
+    }
+    if (isActivityPubUserRequestedFollowNotification(notification)) {
+        return ActivityPubUserRequestedFollowNotification;
     }
     if (isActivityPubPostLikedNotification(notification)) {
         return ActivityPubPostLikedNotification;

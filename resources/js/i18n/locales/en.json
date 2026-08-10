@@ -31,6 +31,11 @@
         "ap_follower": {
             "lead": "{user} started following you from the fediverse"
         },
+        "ap_follow_request": {
+            "lead": "{user} requested to follow you from the fediverse",
+            "accept": "Accept",
+            "decline": "Decline"
+        },
         "ap_liked": {
             "lead": "{user} liked your post from the fediverse"
         },

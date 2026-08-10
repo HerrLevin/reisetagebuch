@@ -56,6 +56,10 @@ Route::prefix('users')->group(function () {
         Route::prefix('activitypub')->group(function () {
             Route::get('followers', [ActivityPubFederationController::class, 'followersForUser'])->name('profile.activitypub.followers');
             Route::get('following', [ActivityPubFederationController::class, 'followingForUser'])->name('profile.activitypub.following');
+            Route::prefix('follow-requests')->group(function () {
+                Route::put('/{requestId}', [ActivityPubFederationController::class, 'approveFollowRequest'])->name('profile.activitypub.followrequest.approve');
+                Route::delete('/{requestId}', [ActivityPubFederationController::class, 'rejectFollowRequest'])->name('profile.activitypub.followrequest.reject');
+            });
         });
     });
 });

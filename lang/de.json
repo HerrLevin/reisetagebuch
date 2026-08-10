@@ -1,4 +1,6 @@
 {
     "activitypub.location.base": "Ich bin bei :location",
-    "activitypub.location.short": "@ :location"
+    "activitypub.location.short": "@ :location",
+    "activitypub.follow_request.forbidden_approve": "Du hast keine Berechtigung, diese Follow-Anfrage anzunehmen",
+    "activitypub.follow_request.forbidden_reject": "Du hast keine Berechtigung, diese Follow-Anfrage abzulehnen"
 }
