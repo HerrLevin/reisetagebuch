@@ -112,6 +112,10 @@ const submit = async () => {
                 />
 
                 <InputError class="mt-2" :message="errors.username" />
+
+                <p class="mt-2 text-sm opacity-65">
+                    {{ t('auth.register.username_immutable') }}
+                </p>
             </div>
 
             <div class="mt-4">

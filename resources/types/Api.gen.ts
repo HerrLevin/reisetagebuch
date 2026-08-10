@@ -961,12 +961,6 @@ export interface ProfileUpdateRequest {
    */
   name: string;
   /**
-   * The unique username for the user (lowercase, alphanumeric, dashes, and underscores only)
-   * @maxLength 30
-   * @example "john_doe"
-   */
-  username: string;
-  /**
    * The email address of the user (lowercase)
    * @format email
    * @maxLength 255

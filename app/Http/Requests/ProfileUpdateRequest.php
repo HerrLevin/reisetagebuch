@@ -12,7 +12,7 @@ use OpenApi\Attributes as OA;
     schema: 'ProfileUpdateRequest',
     title: 'Profile Update Request',
     description: 'Request schema for updating user profile information',
-    required: ['name', 'username', 'email'],
+    required: ['name', 'email'],
     properties: [
         new OA\Property(
             property: 'name',
@@ -20,13 +20,6 @@ use OpenApi\Attributes as OA;
             type: 'string',
             maxLength: 255,
             example: 'John Doe'
-        ),
-        new OA\Property(
-            property: 'username',
-            description: 'The unique username for the user (lowercase, alphanumeric, dashes, and underscores only)',
-            type: 'string',
-            maxLength: 30,
-            example: 'john_doe'
         ),
         new OA\Property(
             property: 'email',
@@ -49,14 +42,6 @@ class ProfileUpdateRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'username' => [
-                'required',
-                'string',
-                'lowercase',
-                'alpha_dash',
-                'max:30',
-                Rule::unique(User::class)->ignore($this->user()->id),
-            ],
             'email' => [
                 'required',
                 'string',

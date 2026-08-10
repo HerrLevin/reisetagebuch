@@ -14,7 +14,6 @@ const props = defineProps<{
 
 const form = reactive({
     name: props.user.name || '',
-    username: props.user.username || '',
     email: props.user.email || '',
 });
 
@@ -81,12 +80,16 @@ function submitForm() {
 
                 <TextInput
                     id="username"
-                    v-model="form.username"
+                    :model-value="user.username"
                     type="text"
                     class="mt-1 block w-full"
-                    required
+                    disabled
                     autocomplete="username"
                 />
+
+                <p class="mt-1 text-sm opacity-65">
+                    {{ t('settings.account_information.username_immutable') }}
+                </p>
             </div>
 
             <div>
