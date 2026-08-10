@@ -29,7 +29,7 @@ class AccountBackend extends Controller
             $request->user()->email_verified_at = null;
         }
 
-        $shouldNotifyFederation = $user->isDirty(['name', 'username']);
+        $shouldNotifyFederation = $user->isDirty('name');
 
         $user->save();
 
