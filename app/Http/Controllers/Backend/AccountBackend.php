@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Jobs\ActivityPub\PushProfileUpdateToMastodon;
 use App\Models\User;
 use App\Services\Socialite\TraewellingUser;
 use Exception;
@@ -28,7 +29,13 @@ class AccountBackend extends Controller
             $request->user()->email_verified_at = null;
         }
 
+        $shouldNotifyFederation = $user->isDirty(['name', 'username']);
+
         $user->save();
+
+        if ($shouldNotifyFederation) {
+            PushProfileUpdateToMastodon::dispatch($user->id);
+        }
     }
 
     public function destroy(Request $request, StatefulGuard|Guard $guard): bool

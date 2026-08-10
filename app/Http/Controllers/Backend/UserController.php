@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ImageUploadRequest;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Resources\UserDto;
+use App\Jobs\ActivityPub\PushProfileUpdateToMastodon;
 use App\Models\User;
 use App\Repositories\FileRepository;
 use App\Repositories\UserRepository;
@@ -43,7 +44,10 @@ class UserController extends Controller
         $avatarPath = $user->profile?->avatar;
         $avatarPath = $this->fileRepository->uploadAndReplaceFile('avatars', $upload, $avatarPath);
 
-        return $this->userRepository->updateAvatar($user, $avatarPath, $upload->getMimeType());
+        $userDto = $this->userRepository->updateAvatar($user, $avatarPath, $upload->getMimeType());
+        PushProfileUpdateToMastodon::dispatch($user->id);
+
+        return $userDto;
     }
 
     public function deleteAvatar(User $user): UserDto
@@ -52,7 +56,10 @@ class UserController extends Controller
             $this->fileRepository->deleteFile($user->profile->avatar);
         }
 
-        return $this->userRepository->updateAvatar($user, null, null);
+        $userDto = $this->userRepository->updateAvatar($user, null, null);
+        PushProfileUpdateToMastodon::dispatch($user->id);
+
+        return $userDto;
     }
 
     public function updateHeader(ImageUploadRequest $request, User $user): UserDto
@@ -61,7 +68,10 @@ class UserController extends Controller
         $headerPath = $user->profile?->header;
         $headerPath = $this->fileRepository->uploadAndReplaceFile('headers', $upload, $headerPath);
 
-        return $this->userRepository->updateHeader($user, $headerPath, $upload->getMimeType());
+        $userDto = $this->userRepository->updateHeader($user, $headerPath, $upload->getMimeType());
+        PushProfileUpdateToMastodon::dispatch($user->id);
+
+        return $userDto;
     }
 
     public function deleteHeader(User $user): UserDto
@@ -70,16 +80,22 @@ class UserController extends Controller
             $this->fileRepository->deleteFile($user->profile->header);
         }
 
-        return $this->userRepository->updateHeader($user, null, null);
+        $userDto = $this->userRepository->updateHeader($user, null, null);
+        PushProfileUpdateToMastodon::dispatch($user->id);
+
+        return $userDto;
     }
 
     public function update(UpdateProfileRequest $request, User $user): UserDto
     {
-        return $this->userRepository->updateUser(
+        $userDto = $this->userRepository->updateUser(
             $user,
             $request->name,
             $request->bio,
             $request->website
         );
+        PushProfileUpdateToMastodon::dispatch($user->id);
+
+        return $userDto;
     }
 }
