@@ -16,4 +16,17 @@ class ActivityPubFollowerRepository
             ->orderByDesc('created_at')
             ->get();
     }
+
+    public function upsertFollow(string $userId, string $followerActorId, ?string $activityPubActorId): ActivityPubFollower
+    {
+        return ActivityPubFollower::updateOrCreate(
+            [
+                'follower_actor_id' => $followerActorId,
+                'followed_user_id' => $userId,
+            ],
+            [
+                'activity_pub_actor_id' => $activityPubActorId,
+            ]
+        );
+    }
 }

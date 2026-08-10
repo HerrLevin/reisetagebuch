@@ -79,6 +79,7 @@ export enum NotificationType {
   TraewellingCrosspostFailedNotification = "TraewellingCrosspostFailedNotification",
   UserRequestedFollowNotification = "UserRequestedFollowNotification",
   ActivityPubUserFollowedNotification = "ActivityPubUserFollowedNotification",
+  ActivityPubUserRequestedFollowNotification = "ActivityPubUserRequestedFollowNotification",
   ActivityPubPostLikedNotification = "ActivityPubPostLikedNotification",
   ActivityPubMentionNotification = "ActivityPubMentionNotification",
 }
@@ -527,6 +528,37 @@ export interface ActivityPubPostLikedData {
 
 /** Data for an ActivityPub user followed notification */
 export interface ActivityPubUserFollowedData {
+  /**
+   * ActivityPub actor ID (URI) of the remote follower
+   * @format uri
+   */
+  followerActorId: string;
+  /**
+   * Preferred username of the remote follower
+   * @example "johndoe"
+   */
+  followerPreferredUsername: string;
+  /**
+   * Display name of the remote follower
+   * @example "John Doe"
+   */
+  followerDisplayName?: string | null;
+  /**
+   * Avatar URL of the remote follower
+   * @format uri
+   */
+  followerIconUrl?: string | null;
+  /**
+   * Profile URL of the remote follower
+   * @format uri
+   */
+  followerProfileUrl?: string | null;
+}
+
+/** Data for an ActivityPub follow request notification */
+export interface ActivityPubUserRequestedFollowData {
+  /** ID of the pending ActivityPub follow request */
+  followRequestId: string;
   /**
    * ActivityPub actor ID (URI) of the remote follower
    * @format uri
@@ -1874,6 +1906,48 @@ export class Api<
         method: "GET",
         secure: true,
         format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Approve a pending ActivityPub follow request from a remote actor
+     *
+     * @tags Follows
+     * @name ApproveActivityPubFollowRequest
+     * @summary Approve remote follow request
+     * @request PUT:/users/{userId}/activitypub/follow-requests/{requestId}
+     * @secure
+     */
+    approveActivityPubFollowRequest: (
+      userId: string,
+      requestId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, void>({
+        path: `/users/${userId}/activitypub/follow-requests/${requestId}`,
+        method: "PUT",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Reject a pending ActivityPub follow request from a remote actor
+     *
+     * @tags Follows
+     * @name RejectActivityPubFollowRequest
+     * @summary Reject remote follow request
+     * @request DELETE:/users/{userId}/activitypub/follow-requests/{requestId}
+     * @secure
+     */
+    rejectActivityPubFollowRequest: (
+      userId: string,
+      requestId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, void>({
+        path: `/users/${userId}/activitypub/follow-requests/${requestId}`,
+        method: "DELETE",
+        secure: true,
         ...params,
       }),
 

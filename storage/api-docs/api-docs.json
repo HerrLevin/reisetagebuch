@@ -220,6 +220,82 @@
                 }
             }
         },
+        "/users/{userId}/activitypub/follow-requests/{requestId}": {
+            "put": {
+                "tags": [
+                    "Follows"
+                ],
+                "summary": "Approve remote follow request",
+                "description": "Approve a pending ActivityPub follow request from a remote actor",
+                "operationId": "approveActivityPubFollowRequest",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "requestId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "successful operation"
+                    },
+                    "403": {
+                        "description": "Forbidden, e.g. when trying to approve on behalf of another user"
+                    },
+                    "404": {
+                        "description": "Not found, e.g. when the follow request does not exist"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Follows"
+                ],
+                "summary": "Reject remote follow request",
+                "description": "Reject a pending ActivityPub follow request from a remote actor",
+                "operationId": "rejectActivityPubFollowRequest",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "requestId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "successful operation"
+                    },
+                    "403": {
+                        "description": "Forbidden, e.g. when trying to reject on behalf of another user"
+                    },
+                    "404": {
+                        "description": "Not found, e.g. when the follow request does not exist"
+                    }
+                }
+            }
+        },
         "/activitypub/posts/{postId}/likes": {
             "post": {
                 "tags": [
@@ -4173,6 +4249,49 @@
                 },
                 "type": "object"
             },
+            "ActivityPubUserRequestedFollowData": {
+                "description": "Data for an ActivityPub follow request notification",
+                "required": [
+                    "followRequestId",
+                    "followerActorId",
+                    "followerPreferredUsername"
+                ],
+                "properties": {
+                    "followRequestId": {
+                        "description": "ID of the pending ActivityPub follow request",
+                        "type": "string"
+                    },
+                    "followerActorId": {
+                        "description": "ActivityPub actor ID (URI) of the remote follower",
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    "followerPreferredUsername": {
+                        "description": "Preferred username of the remote follower",
+                        "type": "string",
+                        "example": "johndoe"
+                    },
+                    "followerDisplayName": {
+                        "description": "Display name of the remote follower",
+                        "type": "string",
+                        "example": "John Doe",
+                        "nullable": true
+                    },
+                    "followerIconUrl": {
+                        "description": "Avatar URL of the remote follower",
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
+                    },
+                    "followerProfileUrl": {
+                        "description": "Profile URL of the remote follower",
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
             "NotificationWrapper": {
                 "description": "A wrapper for notification data",
                 "required": [
@@ -4736,6 +4855,7 @@
                     "TraewellingCrosspostFailedNotification",
                     "UserRequestedFollowNotification",
                     "ActivityPubUserFollowedNotification",
+                    "ActivityPubUserRequestedFollowNotification",
                     "ActivityPubPostLikedNotification",
                     "ActivityPubMentionNotification"
                 ]

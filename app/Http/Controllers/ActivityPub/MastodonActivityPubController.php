@@ -14,14 +14,17 @@ use App\Hydrators\ActivityPub\OrderedCollectionHydrator;
 use App\Hydrators\ActivityPub\OrderedCollectionPageHydrator;
 use App\Hydrators\ActivityPub\PersonHydrator;
 use App\Hydrators\PostHydrator;
+use App\Jobs\ActivityPub\DeliverActivityPubActivity;
 use App\Models\ActivityPubActor;
 use App\Models\ActivityPubFollower;
+use App\Models\ActivityPubFollowRequest;
 use App\Models\ActivityPubInboxItem;
 use App\Models\ActivityPubLike;
 use App\Models\User;
 use App\Notifications\ActivityPubMentionNotification;
 use App\Notifications\ActivityPubPostLikedNotification;
 use App\Notifications\ActivityPubUserFollowedNotification;
+use App\Notifications\ActivityPubUserRequestedFollowNotification;
 use App\Repositories\ActivityPubPostRepository;
 use App\Repositories\ActivityPubRemoteFollowRepository;
 use App\Repositories\NotificationRepository;
@@ -431,6 +434,10 @@ class MastodonActivityPubController extends Controller
 
         $actor = $this->activityPubService->resolveActor($followerActorId);
 
+        if ($user->requiresFollowRequest) {
+            return $this->handlePendingFollow($activity, $user, $followerActorId, $actor);
+        }
+
         $follow = ActivityPubFollower::updateOrCreate(
             [
                 'follower_actor_id' => $followerActorId,
@@ -472,6 +479,58 @@ class MastodonActivityPubController extends Controller
         return response()->json('', 202);
     }
 
+    private function handlePendingFollow(array $activity, UserDto $user, string $followerActorId, ?ActivityPubActor $actor): JsonResponse
+    {
+        // Already an established follower (e.g. re-delivered Follow, or setting was toggled on after acceptance) — just re-ack.
+        $alreadyFollowing = ActivityPubFollower::where([
+            'follower_actor_id' => $followerActorId,
+            'followed_user_id' => $user->id,
+        ])->exists();
+
+        if ($alreadyFollowing) {
+            $inboxUrl = $actor?->shared_inbox_url ?? $actor?->inbox_url;
+            if ($inboxUrl) {
+                try {
+                    $this->sendAccept($user, $activity, $inboxUrl);
+                } catch (Exception $e) {
+                    Log::error('Failed to send Accept for already-established follow', [
+                        'follower' => $followerActorId,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+
+            return response()->json('', 202);
+        }
+
+        $followRequest = ActivityPubFollowRequest::updateOrCreate(
+            [
+                'follower_actor_id' => $followerActorId,
+                'followed_user_id' => $user->id,
+            ],
+            [
+                'activity_pub_actor_id' => $actor?->id,
+                'follow_activity_id' => $activity['id'] ?? null,
+            ]
+        );
+
+        if ($followRequest->wasRecentlyCreated) {
+            $this->notificationRepository->notifyUser(
+                $user,
+                new ActivityPubUserRequestedFollowNotification(
+                    followRequestId: $followRequest->id,
+                    followerActorId: $followerActorId,
+                    followerPreferredUsername: $actor?->preferred_username ?? $followerActorId,
+                    followerDisplayName: $actor?->display_name,
+                    followerIconUrl: $actor?->local_icon_url,
+                    followerProfileUrl: $actor?->profile_url,
+                )
+            );
+        }
+
+        return response()->json('', 202);
+    }
+
     private function handleUndoFollow($activity, UserDto $user): JsonResponse
     {
         $object = $activity['object'];
@@ -499,7 +558,17 @@ class MastodonActivityPubController extends Controller
         ])->first();
 
         if (! $follower) {
-            // Already unfollowed — idempotent
+            $followRequest = ActivityPubFollowRequest::where([
+                'follower_actor_id' => $followerActorId,
+                'followed_user_id' => $user->id,
+            ])->first();
+
+            if ($followRequest) {
+                $followRequest->delete();
+                $this->notificationRepository->deleteNotificationByReferenceId($followRequest->id);
+            }
+
+            // Already unfollowed / no pending request — idempotent
             return response()->json('', 202);
         }
 
@@ -722,7 +791,7 @@ class MastodonActivityPubController extends Controller
         $acceptId = route('ap.actor', ['username' => $user->username]).'#accepts/'.uniqid();
         $accept = new AcceptHydrator()->hydrate($acceptId, $user, $followActivity)->toArray();
 
-        $this->activityPubService->deliverActivity($user, $followActivity['actor'], $inboxUrl, $accept);
+        DeliverActivityPubActivity::dispatch($user, $followActivity['actor'], $inboxUrl, $accept);
     }
 
     private function sendAcceptToInbox(UserDto $user, array $activity, string $inboxUrl): void
@@ -730,7 +799,7 @@ class MastodonActivityPubController extends Controller
         $acceptId = route('ap.actor', ['username' => $user->username]).'#accepts/'.uniqid();
         $accept = new AcceptHydrator()->hydrate($acceptId, $user, $activity)->toArray();
 
-        $this->activityPubService->deliverActivity($user, $activity['actor'], $inboxUrl, $accept);
+        DeliverActivityPubActivity::dispatch($user, $activity['actor'], $inboxUrl, $accept);
     }
 
     public function followers(string $username): JsonResponse

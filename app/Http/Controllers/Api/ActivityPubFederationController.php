@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Dto\RemoteFollowDto;
 use App\Dto\RemoteFollowerDto;
+use App\Exceptions\InsufficientRightsException;
 use App\Http\Controllers\Backend\ActivityPubFederationBackend;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -100,5 +101,59 @@ class ActivityPubFederationController extends Controller
         $this->backend->unfollow($this->auth->user()->id, (string) $request->string('actor_id'));
 
         return response(null, 204);
+    }
+
+    #[OA\Put(
+        path: '/users/{userId}/activitypub/follow-requests/{requestId}',
+        operationId: 'approveActivityPubFollowRequest',
+        description: 'Approve a pending ActivityPub follow request from a remote actor',
+        summary: 'Approve remote follow request',
+        tags: ['Follows'],
+        parameters: [
+            new OA\Parameter(name: 'userId', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'requestId', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
+        ],
+        responses: [
+            new OA\Response(response: 204, description: Controller::OA_DESC_SUCCESS),
+            new OA\Response(response: 403, description: 'Forbidden, e.g. when trying to approve on behalf of another user'),
+            new OA\Response(response: 404, description: 'Not found, e.g. when the follow request does not exist'),
+        ]
+    )]
+    public function approveFollowRequest(string $userId, string $requestId): Response
+    {
+        try {
+            $this->backend->approveFollowRequest($userId, $requestId, $this->auth->user());
+
+            return response(null, 204);
+        } catch (InsufficientRightsException $e) {
+            abort(403, $e->getMessage());
+        }
+    }
+
+    #[OA\Delete(
+        path: '/users/{userId}/activitypub/follow-requests/{requestId}',
+        operationId: 'rejectActivityPubFollowRequest',
+        description: 'Reject a pending ActivityPub follow request from a remote actor',
+        summary: 'Reject remote follow request',
+        tags: ['Follows'],
+        parameters: [
+            new OA\Parameter(name: 'userId', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'requestId', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
+        ],
+        responses: [
+            new OA\Response(response: 204, description: Controller::OA_DESC_SUCCESS),
+            new OA\Response(response: 403, description: 'Forbidden, e.g. when trying to reject on behalf of another user'),
+            new OA\Response(response: 404, description: 'Not found, e.g. when the follow request does not exist'),
+        ]
+    )]
+    public function rejectFollowRequest(string $userId, string $requestId): Response
+    {
+        try {
+            $this->backend->rejectFollowRequest($userId, $requestId, $this->auth->user());
+
+            return response(null, 204);
+        } catch (InsufficientRightsException $e) {
+            abort(403, $e->getMessage());
+        }
     }
 }

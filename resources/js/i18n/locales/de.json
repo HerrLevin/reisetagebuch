@@ -31,6 +31,11 @@
         "ap_follower": {
             "lead": "{user} folgt dir jetzt aus dem Fediverse"
         },
+        "ap_follow_request": {
+            "lead": "{user} möchte dir aus dem Fediverse folgen",
+            "accept": "Anfrage akzeptieren",
+            "decline": "Anfrage ablehnen"
+        },
         "ap_liked": {
             "lead": "{user} hat deinen Post aus dem Fediverse geliked"
         },

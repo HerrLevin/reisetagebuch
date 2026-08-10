@@ -1,4 +1,6 @@
 {
     "activitypub.location.base": "I'm at :location",
-    "activitypub.location.short": "@ :location"
+    "activitypub.location.short": "@ :location",
+    "activitypub.follow_request.forbidden_approve": "You don't have permission to approve this follow relationship",
+    "activitypub.follow_request.forbidden_reject": "You don't have permission to reject this follow relationship"
 }
