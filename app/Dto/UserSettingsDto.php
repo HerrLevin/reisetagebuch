@@ -8,7 +8,7 @@ use OpenApi\Attributes as OA;
     schema: 'UserSettingsDto',
     title: 'User Settings DTO',
     description: 'Data Transfer Object representing user settings',
-    required: ['motisRadius', 'requiresFollowRequest'],
+    required: ['motisRadius', 'requiresFollowRequest', 'hidePostsAfter'],
     properties: [
         new OA\Property(
             property: 'motisRadius',
@@ -23,6 +23,13 @@ use OpenApi\Attributes as OA;
             type: 'boolean',
             example: true
         ),
+        new OA\Property(
+            property: 'hidePostsAfter',
+            description: 'Hide posts after x days',
+            type: 'number',
+            example: 0.25,
+            nullable: true
+        ),
     ]
 )]
 readonly class UserSettingsDto
@@ -30,5 +37,6 @@ readonly class UserSettingsDto
     public function __construct(
         public ?int $motisRadius,
         public bool $requiresFollowRequest,
+        public ?float $hidePostsAfter,
     ) {}
 }

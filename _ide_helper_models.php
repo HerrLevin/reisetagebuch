@@ -932,12 +932,14 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property int|null $motis_radius
  * @property bool $requires_follow_request
+ * @property string|null $hide_posts_after
  * @property-read \App\Models\User $user
  * @method static \Database\Factories\UserSettingsFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings whereHidePostsAfter($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings whereMotisRadius($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSettings whereRequiresFollowRequest($value)

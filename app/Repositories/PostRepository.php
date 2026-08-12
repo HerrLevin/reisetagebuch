@@ -447,6 +447,23 @@ class PostRepository
             ->first();
     }
 
+    /**
+     * @return Collection<int, Post>
+     */
+    public function getPostsToAutoHide(): Collection
+    {
+        return Post::where('visibility', '!=', Visibility::PRIVATE)
+            ->whereHas('user.settings', fn (Builder $query) => $query->whereNotNull('hide_posts_after'))
+            ->with('user.settings')
+            ->get()
+            ->filter(function (Post $post) {
+                $hidePostsAfter = (float) $post->user->settings->hide_posts_after;
+
+                return $hidePostsAfter > 0 && $post->created_at->copy()->addDays($hidePostsAfter)->isPast();
+            })
+            ->values();
+    }
+
     public function updateStats(string $postId, int $distance, int $duration): void
     {
         TransportPostModel::where('post_id', $postId)->update(['distance' => $distance, 'duration' => $duration]);

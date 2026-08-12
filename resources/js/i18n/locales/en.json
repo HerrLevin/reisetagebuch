@@ -290,7 +290,13 @@
             "departures": "Departures",
             "locations": "Locations",
             "text": "Text",
-            "requires_follow_request": "Users have to make a request to follow you"
+            "requires_follow_request": "Users have to make a request to follow you",
+            "hide_after_days": "Hide posts automatically",
+            "hide_default": "Deactivated",
+            "hide_6h": "After 6 hours",
+            "hide_12h": "After 12 hours",
+            "hide_1d": "After one day",
+            "hide_days": "After {days} days"
         },
         "device_settings": {
             "title": "Device Settings",

@@ -51,6 +51,7 @@ class AuthBackend extends Controller
         return new UserSettingsDto(
             motisRadius: $user->settings?->motis_radius,
             requiresFollowRequest: $user->settings?->requires_follow_request ?? false,
+            hidePostsAfter: ! empty($user->settings?->hide_posts_after) ? (float) $user->settings->hide_posts_after : null,
         );
     }
 }

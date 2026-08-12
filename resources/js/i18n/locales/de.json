@@ -288,7 +288,13 @@
             "departures": "Abfahrten",
             "locations": "Orte",
             "text": "Text",
-            "requires_follow_request": "Nutzer müssen eine Anfrage senden, um dir folgen zu können"
+            "requires_follow_request": "Nutzer müssen eine Anfrage senden, um dir folgen zu können",
+            "hide_after_days": "Posts automatisch verstecken",
+            "hide_default": "Deaktiviert",
+            "hide_6h": "Nach 6 Stunden",
+            "hide_12h": "Nach 12 Stunden",
+            "hide_1d": "Nach einem Tag",
+            "hide_days": "Nach {days} Tagen"
         },
         "device_settings": {
             "title": "Geräteeinstellungen",

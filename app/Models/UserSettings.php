@@ -15,6 +15,7 @@ class UserSettings extends Model
         'user_id',
         'motis_radius',
         'requires_follow_request',
+        'hide_posts_after',
     ];
 
     public function user(): BelongsTo

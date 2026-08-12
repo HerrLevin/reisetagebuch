@@ -899,6 +899,11 @@ export interface UserSettingsDto {
    * @example true
    */
   requiresFollowRequest: boolean;
+  /**
+   * Hide posts after x days
+   * @example 0.25
+   */
+  hidePostsAfter: number | null;
 }
 
 export interface BasePostRequest {
@@ -978,6 +983,8 @@ export interface SettingsUpdateRequest {
   motisRadius?: 50 | 100 | 200 | 300 | 400 | 500 | null;
   /** Requires following request */
   requiresFollowRequest?: boolean | null;
+  /** Hide posts after x days */
+  hidePostsAfter?: 0.25 | 0.5 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 14 | 30 | null;
 }
 
 export interface StoreInviteCodeRequest {
