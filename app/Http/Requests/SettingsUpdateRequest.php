@@ -24,6 +24,13 @@ use OpenApi\Attributes as OA;
             type: 'boolean',
             nullable: true
         ),
+        new OA\Property(
+            property: 'hidePostsAfter',
+            description: 'Hide posts after x days',
+            type: 'number',
+            nullable: true,
+            enum: [0.25, 0.5, 1, 2, 3, 4, 5, 6, 7, 14, 30],
+        ),
     ]
 )]
 /**
@@ -36,6 +43,7 @@ class SettingsUpdateRequest extends FormRequest
         return [
             'motisRadius' => ['nullable', 'integer', Rule::in([50, 100, 200, 300, 400, 500])],
             'requiresFollowRequest' => ['nullable', 'boolean'],
+            'hidePostsAfter' => ['nullable', 'numeric', Rule::in([0.25, 0.5, 1, 2, 3, 4, 5, 6, 7, 14, 30])],
         ];
     }
 }

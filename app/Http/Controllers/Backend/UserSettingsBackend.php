@@ -25,6 +25,7 @@ class UserSettingsBackend extends Controller
 
         $settings->motis_radius = $request->motisRadius;
         $settings->requires_follow_request = $request->requiresFollowRequest;
+        $settings->hide_posts_after = $request->hidePostsAfter !== null ? (string) $request->hidePostsAfter : null;
 
         $settings->save();
     }

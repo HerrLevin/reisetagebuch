@@ -8,6 +8,7 @@ use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Http\Middleware\RequestLogger;
 use App\Jobs\DeleteOldNearbyRequests;
 use App\Jobs\DispatchRefreshJobForActiveTrips;
+use App\Jobs\HideExpiredPosts;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -52,5 +53,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command(FetchAirports::class)->daily()->runInBackground();
         $schedule->job(DispatchRefreshJobForActiveTrips::class)->everyMinute();
         $schedule->job(DeleteOldNearbyRequests::class)->daily();
+        $schedule->job(HideExpiredPosts::class)->everyFifteenMinutes();
     })
     ->create();

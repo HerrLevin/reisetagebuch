@@ -4829,7 +4829,8 @@
                 "description": "Data Transfer Object representing user settings",
                 "required": [
                     "motisRadius",
-                    "requiresFollowRequest"
+                    "requiresFollowRequest",
+                    "hidePostsAfter"
                 ],
                 "properties": {
                     "motisRadius": {
@@ -4842,6 +4843,12 @@
                         "description": "Requires follow request",
                         "type": "boolean",
                         "example": true
+                    },
+                    "hidePostsAfter": {
+                        "description": "Hide posts after x days",
+                        "type": "number",
+                        "example": 0.25,
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -5084,6 +5091,24 @@
                         "description": "Requires following request",
                         "type": "boolean",
                         "nullable": true
+                    },
+                    "hidePostsAfter": {
+                        "description": "Hide posts after x days",
+                        "type": "number",
+                        "nullable": true,
+                        "enum": [
+                            0.25,
+                            0.5,
+                            1,
+                            2,
+                            3,
+                            4,
+                            5,
+                            6,
+                            7,
+                            14,
+                            30
+                        ]
                     }
                 },
                 "type": "object"

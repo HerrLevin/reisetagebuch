@@ -16,8 +16,28 @@ const processing = ref(false);
 const recentlySuccessful = ref(false);
 
 const form = reactive({
-    motisRadius: props.user.settings.motisRadius,
+    motisRadius: props.user.settings.motisRadius as
+        | 500
+        | 50
+        | 100
+        | 200
+        | 300
+        | 400
+        | null,
     requiresFollowRequest: props.user.settings.requiresFollowRequest,
+    hidePostsAfter: props.user.settings.hidePostsAfter as
+        | 1
+        | 2
+        | 3
+        | 4
+        | 5
+        | 6
+        | 7
+        | 14
+        | 0.25
+        | 0.5
+        | 30
+        | null,
 });
 
 function formSubmit() {
@@ -114,12 +134,90 @@ function formSubmit() {
                     ]"
                 ></SelectInput>
             </div>
+            <div>
+                <InputLabel
+                    for="hidePostsAfter"
+                    :value="t('settings.account_settings.hide_after_days')"
+                />
+
+                <SelectInput
+                    id="hidePostsAfter"
+                    v-model="form.hidePostsAfter"
+                    class="mt-1 block w-full"
+                    :options="[
+                        {
+                            value: null,
+                            label: t('settings.account_settings.hide_default'),
+                        },
+                        {
+                            value: 0.25,
+                            label: t('settings.account_settings.hide_6h'),
+                        },
+                        {
+                            value: 0.5,
+                            label: t('settings.account_settings.hide_12h'),
+                        },
+                        {
+                            value: 1,
+                            label: t('settings.account_settings.hide_1d'),
+                        },
+                        {
+                            value: 2,
+                            label: t('settings.account_settings.hide_days', {
+                                days: 2,
+                            }),
+                        },
+                        {
+                            value: 3,
+                            label: t('settings.account_settings.hide_days', {
+                                days: 3,
+                            }),
+                        },
+                        {
+                            value: 4,
+                            label: t('settings.account_settings.hide_days', {
+                                days: 4,
+                            }),
+                        },
+                        {
+                            value: 5,
+                            label: t('settings.account_settings.hide_days', {
+                                days: 5,
+                            }),
+                        },
+                        {
+                            value: 6,
+                            label: t('settings.account_settings.hide_days', {
+                                days: 6,
+                            }),
+                        },
+                        {
+                            value: 7,
+                            label: t('settings.account_settings.hide_days', {
+                                days: 7,
+                            }),
+                        },
+                        {
+                            value: 14,
+                            label: t('settings.account_settings.hide_days', {
+                                days: 14,
+                            }),
+                        },
+                        {
+                            value: 32,
+                            label: t('settings.account_settings.hide_days', {
+                                days: 32,
+                            }),
+                        },
+                    ]"
+                ></SelectInput>
+            </div>
 
             <div>
                 <label>
                     <input
                         v-model="form.requiresFollowRequest"
-                        name="trackHistory"
+                        name="requiresFollowRequest"
                         type="checkbox"
                         class="toggle"
                     />
