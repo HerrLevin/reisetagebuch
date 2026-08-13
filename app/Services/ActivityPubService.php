@@ -214,14 +214,14 @@ class ActivityPubService
             'Digest' => $digest,
             'Signature' => $signature,
         ])->withBody($body, 'application/activity+json')->post($inbox);
-        Log::info('Delivered Activity to inbox: '.$inbox.' Response status: '.$data->status(), [
+        Log::debug('Delivered Activity to inbox: '.$inbox.' Response status: '.$data->status(), [
             'body' => $body,
             'Content-Type' => 'application/activity+json',
             'Date' => $date,
             'Digest' => $digest,
             'Signature' => $signature,
         ]);
-        Log::info($data->body());
+        Log::debug($data->body());
 
         if ($data->serverError()) {
             throw new \RuntimeException('Failed to deliver activity to '.$inbox.': '.$data->status());
