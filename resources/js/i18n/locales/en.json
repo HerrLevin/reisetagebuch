@@ -252,6 +252,11 @@
             "no_results": "Nothing to show here yet."
         }
     },
+    "statistics": {
+        "title": "Statistics",
+        "visited": "Been to",
+        "transited": "Travelled through"
+    },
     "settings": {
         "title": "Settings",
         "traewelling_callback": {

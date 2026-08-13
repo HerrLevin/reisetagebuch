@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Dto\AirportDto;
+use App\Models\Country;
 use App\Models\Location;
 use App\Models\LocationIdentifier;
 use App\Models\LocationPost;
@@ -301,6 +302,7 @@ class LocationRepository
     ): void {
         $location->name = $name;
         $location->location = Point::makeGeodetic($latitude, $longitude);
+        $location->country_code = $this->resolveCountryCode($location->location);
         $location->save();
 
         $location->identifiers()->updateOrCreate(
@@ -309,6 +311,23 @@ class LocationRepository
         );
 
         $location->save();
+    }
+
+    /**
+     * Simplified (1:50m) country polygons can miss narrow coastal/urban points by a
+     * couple of kilometers, so fall back to the nearest country within this tolerance
+     * rather than only exact point-in-polygon containment.
+     */
+    private const COUNTRY_LOOKUP_TOLERANCE_METERS = 5000;
+
+    public function resolveCountryCode(Point $point): ?string
+    {
+        return Country::query()
+            ->select('iso_a2')
+            ->addSelect(ST::distanceSphere('geometry', $point)->as('distance'))
+            ->where(ST::dWithinGeography('geometry', $point, self::COUNTRY_LOOKUP_TOLERANCE_METERS), '=', true)
+            ->orderBy('distance')
+            ->value('iso_a2');
     }
 
     public function canTimestampedUserWaypointBeCreated(

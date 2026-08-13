@@ -232,6 +232,28 @@ namespace App\Models{
 
 namespace App\Models{
 /**
+ * @property int $id
+ * @property string $iso_a2
+ * @property string $name
+ * @property \Clickbar\Magellan\Data\Geometries\MultiPolygon $geometry
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Database\Factories\CountryFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereGeometry($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereIsoA2($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereUpdatedAt($value)
+ */
+	class Country extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
  * @property string $id
  * @property string $origin_user_id
  * @property string $target_user_id
@@ -371,6 +393,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Clickbar\Magellan\Data\Geometries\Point $location
+ * @property string|null $country_code
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\LocationIdentifier> $identifiers
  * @property-read int|null $identifiers_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\LocationTag> $tags
@@ -379,6 +402,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Location newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Location newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Location query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Location whereCountryCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Location whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Location whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Location whereLocation($value)
@@ -738,6 +762,7 @@ namespace App\Models{
  * @property int $distance distance in kilometers
  * @property int $duration Duration in seconds
  * @property \Clickbar\Magellan\Data\Geometries\LineString|null $user_geometry
+ * @property array<array-key, mixed>|null $transited_country_codes
  * @property-read \App\Models\Location|null $destination
  * @property-read \App\Models\TransportTripStop $destinationStop
  * @property-read \App\Models\Location|null $origin
@@ -757,6 +782,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost whereManualDeparture($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost whereOriginStopId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost wherePostId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost whereTransitedCountryCodes($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost whereTransportTripId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPost whereUserGeometry($value)

@@ -30,6 +30,7 @@ import ProfileShow from '@/Pages/Profile/Show.vue';
 import ProfileShowMap from '@/Pages/Profile/ShowMap.vue';
 import SearchIndex from '@/Pages/Search/Index.vue';
 import EditSettings from '@/Pages/Settings/Edit.vue';
+import ShowStatistics from '@/Pages/Statistics/ShowStatistics.vue';
 import CreateTrip from '@/Pages/Trips/Create.vue';
 
 const routes: RouteRecordRaw[] = [
@@ -227,6 +228,12 @@ const routes: RouteRecordRaw[] = [
         name: 'profile.map',
         component: ProfileShowMap,
         props: true,
+    },
+    {
+        path: '/statistics',
+        name: 'statistics.show',
+        component: ShowStatistics,
+        meta: { auth: true },
     },
     {
         path: '/socialite/traewelling/callback',

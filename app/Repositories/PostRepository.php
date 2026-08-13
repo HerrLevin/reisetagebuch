@@ -38,16 +38,20 @@ class PostRepository
 
     private ActivityPubPostRepository $activityPubPostRepository;
 
+    private CountryRepository $countryRepository;
+
     public function __construct(
         ?PostHydrator $postHydrator = null,
         ?HashTagRepository $hashTagRepository = null,
         ?PostMetaInfoRepository $postMetaInfoRepository = null,
         ?ActivityPubPostRepository $activityPubPostRepository = null,
+        ?CountryRepository $countryRepository = null,
     ) {
         $this->postHydrator = $postHydrator ?? new PostHydrator;
         $this->hashTagRepository = $hashTagRepository ?? new HashTagRepository;
         $this->postMetaInfoRepository = $postMetaInfoRepository ?? new PostMetaInfoRepository;
         $this->activityPubPostRepository = $activityPubPostRepository ?? new ActivityPubPostRepository;
+        $this->countryRepository = $countryRepository ?? new CountryRepository;
     }
 
     public function storeLocation(
@@ -464,9 +468,13 @@ class PostRepository
             ->values();
     }
 
-    public function updateStats(string $postId, int $distance, int $duration): void
+    public function updateStats(string $postId, int $distance, int $duration, array $transitedCountryCodes = []): void
     {
-        TransportPostModel::where('post_id', $postId)->update(['distance' => $distance, 'duration' => $duration]);
+        TransportPostModel::where('post_id', $postId)->update([
+            'distance' => $distance,
+            'duration' => $duration,
+            'transited_country_codes' => $transitedCountryCodes,
+        ]);
     }
 
     public function updateTransportGeometry(TransportPostModel $transportPost, ?LineString $geometry): void
@@ -713,5 +721,10 @@ class PostRepository
             ->pluck('locationPost.location_id')
             ->unique()
             ->count();
+    }
+
+    public function getVisitedCountriesCountForUser(string $userId): int
+    {
+        return count($this->countryRepository->getVisitedCountryCodes($userId));
     }
 }

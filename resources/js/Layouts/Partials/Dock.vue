@@ -3,11 +3,11 @@ import NotificationBell from '@/Components/Notifications/NotificationBell.vue';
 import { LocationService } from '@/Services/LocationService';
 import { useUserStore } from '@/stores/user';
 import {
+    ChartColumn,
     House,
     List,
     MapPin,
     Plus,
-    Route,
     SquarePen,
     User,
 } from 'lucide-vue-next';
@@ -113,11 +113,11 @@ const isDeparturesRoute = () => {
             </RouterLink>
             <template v-if="user.user">
                 <RouterLink
-                    :to="{ name: 'trips.create' }"
+                    :to="{ name: 'statistics.show' }"
                     active-class="dock-active"
                 >
-                    <Route class="size-[1.2em]" />
-                    <span class="dock-label">{{ t('new_route.title') }}</span>
+                    <ChartColumn class="size-[1.2em]" />
+                    <span class="dock-label">{{ t('statistics.title') }}</span>
                 </RouterLink>
                 <RouterLink
                     :to="{ name: 'notifications' }"

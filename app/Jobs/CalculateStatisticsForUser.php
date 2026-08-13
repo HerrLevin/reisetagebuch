@@ -30,6 +30,7 @@ class CalculateStatisticsForUser implements ShouldQueue
         $distance = $postRepository->getTotalDistanceForUser($this->userId);
         $duration = $postRepository->getTotalDurationForUser($this->userId);
         $visitedLocations = $postRepository->getVisitedLocationsForUser($this->userId);
+        $visitedCountries = $postRepository->getVisitedCountriesCountForUser($this->userId);
 
         $repository->setData(
             $this->userId,
@@ -37,6 +38,7 @@ class CalculateStatisticsForUser implements ShouldQueue
             $posts['transport'],
             $posts['location'],
             $visitedLocations,
+            $visitedCountries,
             $followCounts['followers'],
             $followCounts['followings'],
             $distance,

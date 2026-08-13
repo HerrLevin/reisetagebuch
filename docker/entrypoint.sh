@@ -25,6 +25,12 @@ echo "Running Laravel artisan commands..."
 # echo "Running migrations..."
 php artisan migrate --force
 
+echo "Importing/updating country boundary data..."
+php artisan app:import-countries
+
+echo "Backfilling country data for existing locations and transport posts..."
+php artisan app:backfill-country-data
+
 echo "Clearing caches..."
 php artisan optimize
 

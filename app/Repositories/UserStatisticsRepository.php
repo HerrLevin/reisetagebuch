@@ -121,6 +121,7 @@ class UserStatisticsRepository
         int $transportPostsCount,
         int $locationPostsCount,
         int $visitedLocationsCount,
+        int $visitedCountriesCount,
         int $followersCount,
         int $followingCount,
         int $travelledDistance,
@@ -136,13 +137,11 @@ class UserStatisticsRepository
             'transport_posts_count' => $transportPostsCount,
             'location_posts_count' => $locationPostsCount,
             'visited_locations_count' => $visitedLocationsCount,
+            'visited_countries_count' => $visitedCountriesCount,
             'followers_count' => $followersCount,
             'following_count' => $followingCount,
             'travelled_distance' => $travelledDistance,
             'travelled_duration' => $travelledDuration,
-
-            // todo: implement these statistics later
-            // 'visited_countries_count' => $user->trips()->distinct('country')->count('country'),
         ]);
     }
 }
