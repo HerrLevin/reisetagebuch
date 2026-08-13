@@ -123,7 +123,7 @@ class HideExpiredPostsTest extends TestCase
 
         Bus::fake();
 
-        (new HideExpiredPosts)->handle();
+        (new HideExpiredPosts)->handle(app(PostRepository::class));
 
         Bus::assertDispatched(HideExpiredPostJob::class, function (HideExpiredPostJob $job) use ($post) {
             return $this->jobProperty($job, 'postId') === $post->id;
@@ -140,7 +140,7 @@ class HideExpiredPostsTest extends TestCase
 
         Bus::fake();
 
-        (new HideExpiredPosts)->handle();
+        (new HideExpiredPosts)->handle(app(PostRepository::class));
 
         Bus::assertNotDispatched(HideExpiredPostJob::class);
     }
