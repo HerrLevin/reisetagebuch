@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Backend;
 
+use App\Enums\TransportMode;
 use App\Http\Controllers\Controller;
 use App\Models\Post;
+use App\Repositories\CountryRepository;
 use App\Repositories\PostRepository;
 use App\Repositories\TransportTripRepository;
 use App\Repositories\UserStatisticsRepository;
@@ -19,21 +21,12 @@ use Throwable;
 
 class CalculateTransportStatsController extends Controller
 {
-    private PostRepository $postRepository;
-
-    private TransportTripRepository $transportTripRepository;
-
-    private UserStatisticsRepository $statisticsRepository;
-
     public function __construct(
-        PostRepository $postRepository,
-        TransportTripRepository $transportTripRepository,
-        UserStatisticsRepository $statisticsRepository
-    ) {
-        $this->postRepository = $postRepository;
-        $this->transportTripRepository = $transportTripRepository;
-        $this->statisticsRepository = $statisticsRepository;
-    }
+        private readonly PostRepository $postRepository,
+        private readonly TransportTripRepository $transportTripRepository,
+        private readonly UserStatisticsRepository $statisticsRepository,
+        private readonly CountryRepository $countryRepository,
+    ) {}
 
     private function getPost(string $transportPostId): ?Post
     {
@@ -61,12 +54,61 @@ class CalculateTransportStatsController extends Controller
         }
 
         $duration = $this->calculateDuration($post);
+        $transitedCountryCodes = $this->calculateTransitedCountryCodes($post);
 
         $originalDistance = $post->transportPost->distance;
         $originalDuration = $post->transportPost->duration;
 
-        $this->postRepository->updateStats($post->id, $distance, $duration);
+        $this->postRepository->updateStats($post->id, $distance, $duration, $transitedCountryCodes);
         $this->statisticsRepository->updateTransportPostStats($post->user_id, $distance, $duration, $originalDistance, $originalDuration);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function calculateTransitedCountryCodes(Post $post): array
+    {
+        $mode = $post->transportPost->transportTrip?->mode;
+        if ($mode !== null && TransportMode::tryFrom($mode) === TransportMode::AIRPLANE) {
+            return [];
+        }
+
+        $lineString = $post->transportPost->user_geometry ?? $this->buildLineStringForPost($post);
+        if ($lineString === null || count($lineString->getPoints()) < 2) {
+            return [];
+        }
+
+        return $this->countryRepository->getCountriesAlongLine($lineString);
+    }
+
+    private function buildLineStringForPost(Post $post): ?LineString
+    {
+        try {
+            $stops = $this->transportTripRepository->getStopsBetween(
+                $post->transportPost->transport_trip_id,
+                $post->transportPost->originStop->stop_sequence,
+                $post->transportPost->destinationStop->stop_sequence,
+            );
+            // remove last stop, its route segment leads to the next stop after the destination
+            $stops->pop();
+
+            $points = [];
+            foreach ($stops as $stop) {
+                if ($stop->routeSegment?->geometry) {
+                    array_push($points, ...$stop->routeSegment->geometry->getPoints());
+                }
+            }
+
+            if (empty($points)) {
+                return null;
+            }
+
+            return LineString::make($points);
+        } catch (Throwable $e) {
+            Log::error('Error building line string for transport post', ['error' => $e->getMessage()]);
+
+            return null;
+        }
     }
 
     private function calculateDistance(Post $post): ?int

@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\ActivityPubFederationController;
 use App\Http\Controllers\Api\ActivityPubPostInteractionController;
 use App\Http\Controllers\Api\AppConfigurationController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CountryController;
 use App\Http\Controllers\Api\CypressController;
 use App\Http\Controllers\Api\FollowController;
 use App\Http\Controllers\Api\ImprintController;
@@ -31,6 +32,10 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::get('profile/{username}', [UserController::class, 'show']);
+
+Route::prefix('statistics')->middleware('auth:api')->group(function () {
+    Route::get('countries', [CountryController::class, 'index'])->name('statistics.countries');
+});
 
 Route::prefix('users')->group(function () {
     Route::get('search', [UserController::class, 'search'])->name('users.search');

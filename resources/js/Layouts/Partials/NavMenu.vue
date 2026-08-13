@@ -5,10 +5,10 @@ import { useUserStore } from '@/stores/user';
 import {
     CirclePlus,
     House,
+    ChartColumn,
     List,
     MapPin,
     SquarePen,
-    User,
 } from 'lucide-vue-next';
 import { onMounted, onUnmounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -114,14 +114,13 @@ const isHomeRoute = () => {
             <li>
                 <RouterLink
                     :to="{
-                        name: 'profile.show',
-                        params: { username: user.user.username },
+                        name: 'statistics.show',
                     }"
                     class="btn btn-ghost"
                     active-class="btn-active"
                 >
-                    <User class="size-5" />
-                    {{ t('profile.title') }}
+                    <ChartColumn class="size-5" />
+                    {{ t('statistics.title') }}
                 </RouterLink>
             </li>
         </template>

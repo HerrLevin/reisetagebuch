@@ -23,12 +23,14 @@ class TransportPost extends Model
         'distance',
         'duration',
         'user_geometry',
+        'transited_country_codes',
     ];
 
     protected $casts = [
         'manual_departure' => 'datetime',
         'manual_arrival' => 'datetime',
         'user_geometry' => LineString::class,
+        'transited_country_codes' => 'array',
     ];
 
     public function origin(): BelongsTo

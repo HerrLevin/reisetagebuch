@@ -1,0 +1,100 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "ISO_A2": "DE",
+                "ISO_A2_EH": "DE",
+                "ADM0_A3": "DEU",
+                "NAME": "Germany"
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [5, 47],
+                        [15, 47],
+                        [15, 55],
+                        [5, 55],
+                        [5, 47]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "ISO_A2": "-99",
+                "ISO_A2_EH": "FR",
+                "ADM0_A3": "FRA",
+                "NAME": "France"
+            },
+            "geometry": {
+                "type": "MultiPolygon",
+                "coordinates": [
+                    [
+                        [
+                            [-5, 42],
+                            [8, 42],
+                            [8, 51],
+                            [-5, 51],
+                            [-5, 42]
+                        ]
+                    ],
+                    [
+                        [
+                            [-54, 3],
+                            [-53, 3],
+                            [-53, 4],
+                            [-54, 4],
+                            [-54, 3]
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "ISO_A2": "-99",
+                "ISO_A2_EH": "-99",
+                "ADM0_A3": "KOS",
+                "NAME": "Kosovo"
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [20, 42],
+                        [21, 42],
+                        [21, 43],
+                        [20, 43],
+                        [20, 42]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "ISO_A2": "-99",
+                "ISO_A2_EH": "-99",
+                "ADM0_A3": "XXX",
+                "NAME": "Nowhereland"
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [100, 42],
+                        [101, 42],
+                        [101, 43],
+                        [100, 43],
+                        [100, 42]
+                    ]
+                ]
+            }
+        }
+    ]
+}

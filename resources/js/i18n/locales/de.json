@@ -250,6 +250,11 @@
             "no_results": "Hier gibt es noch nichts zu sehen."
         }
     },
+    "statistics": {
+        "title": "Statistiken",
+        "visited": "Besucht",
+        "transited": "Durchreist"
+    },
     "settings": {
         "title": "Einstellungen",
         "traewelling_callback": {

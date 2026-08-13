@@ -1130,6 +1130,14 @@ export interface UpdateProfileRequest {
   website?: string | null;
 }
 
+/** Countries a user has visited or merely travelled through */
+export interface CountriesDto {
+  /** ISO A2 codes of countries the user has visited (location post, or a transport post origin/destination) */
+  visited: string[];
+  /** ISO A2 codes of countries the user has only travelled through (crossed by a non-flight transport post route, without a stop) */
+  transitedOnly: string[];
+}
+
 export interface InviteDto {
   /** The unique identifier of the invite code */
   id: string;
@@ -2608,6 +2616,25 @@ export class Api<
         any
       >({
         path: `/auth/invite/${code}`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  statistics = {
+    /**
+     * @description Return the ISO A2 codes of countries a user has visited or merely travelled through
+     *
+     * @tags Statistics
+     * @name GetCountriesForUser
+     * @summary User country insights
+     * @request GET:/statistics/countries
+     * @secure
+     */
+    getCountriesForUser: (params: RequestParams = {}) =>
+      this.request<CountriesDto, any>({
+        path: `/statistics/countries`,
         method: "GET",
         secure: true,
         format: "json",

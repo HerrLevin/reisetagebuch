@@ -41,3 +41,24 @@ select {
 .maplibregl-ctrl-top-right {
     z-index: auto !important;
 }
+
+.maplibregl-popup-content {
+    background-color: var(--color-base-100);
+    color: var(--color-base-content);
+}
+
+.maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+    border-top-color: var(--color-base-100);
+}
+
+.maplibregl-popup-anchor-top .maplibregl-popup-tip {
+    border-bottom-color: var(--color-base-100);
+}
+
+.maplibregl-popup-anchor-left .maplibregl-popup-tip {
+    border-right-color: var(--color-base-100);
+}
+
+.maplibregl-popup-anchor-right .maplibregl-popup-tip {
+    border-left-color: var(--color-base-100);
+}

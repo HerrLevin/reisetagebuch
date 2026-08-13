@@ -779,6 +779,28 @@
                 }
             }
         },
+        "/statistics/countries": {
+            "get": {
+                "tags": [
+                    "Statistics"
+                ],
+                "summary": "User country insights",
+                "description": "Return the ISO A2 codes of countries a user has visited or merely travelled through",
+                "operationId": "getCountriesForUser",
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CountriesDto"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/users/{userId}/followers": {
             "get": {
                 "tags": [
@@ -5371,6 +5393,30 @@
                 },
                 "type": "object"
             },
+            "CountriesDto": {
+                "description": "Countries a user has visited or merely travelled through",
+                "required": [
+                    "visited",
+                    "transitedOnly"
+                ],
+                "properties": {
+                    "visited": {
+                        "description": "ISO A2 codes of countries the user has visited (location post, or a transport post origin/destination)",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "transitedOnly": {
+                        "description": "ISO A2 codes of countries the user has only travelled through (crossed by a non-flight transport post route, without a stop)",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "type": "object"
+            },
             "InviteDto": {
                 "required": [
                     "id",
@@ -6069,6 +6115,10 @@
         {
             "name": "Authentication",
             "description": "Authentication"
+        },
+        {
+            "name": "Statistics",
+            "description": "Statistics"
         },
         {
             "name": "App",
