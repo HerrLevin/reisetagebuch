@@ -86,6 +86,21 @@ const map = useMap();
 const hoveredCountryName = ref<string | null>(null);
 const hoveredCoordinates = ref<LngLatLike | null>(null);
 let hoverListenersRegistered = false;
+let hoveredFeatureId: string | number | undefined;
+
+function isVisitedOrTransited(isoA2: string | undefined): boolean {
+    return (
+        !!isoA2 &&
+        (visited.value.includes(isoA2) || transitedOnly.value.includes(isoA2))
+    );
+}
+
+function setHoverState(id: string | number | undefined, hover: boolean) {
+    if (id === undefined) {
+        return;
+    }
+    map.map?.setFeatureState({ source: 'countries', id }, { hover });
+}
 
 watchEffect(() => {
     if (hoverListenersRegistered || !map.isLoaded || !countriesGeoJson.value) {
@@ -94,19 +109,47 @@ watchEffect(() => {
     hoverListenersRegistered = true;
 
     map.map?.on('mousemove', LAYER_ID, (e: MapLayerMouseEvent) => {
+        const feature = e.features?.[0];
+        const isoA2 = feature?.properties?.iso_a2 as string | undefined;
+        const visitedOrTransited = isVisitedOrTransited(isoA2);
+
         if (map.map) {
-            map.map.getCanvas().style.cursor = 'pointer';
+            map.map.getCanvas().style.cursor = visitedOrTransited
+                ? 'pointer'
+                : '';
         }
-        hoveredCountryName.value =
-            (e.features?.[0]?.properties?.name as string) ?? null;
-        hoveredCoordinates.value = e.lngLat;
+
+        if (
+            hoveredFeatureId !== undefined &&
+            hoveredFeatureId !== feature?.id
+        ) {
+            setHoverState(hoveredFeatureId, false);
+            hoveredFeatureId = undefined;
+        }
+
+        if (feature?.id !== undefined) {
+            hoveredFeatureId = feature.id;
+            setHoverState(hoveredFeatureId, true);
+        }
+
+        if (visitedOrTransited) {
+            hoveredCountryName.value =
+                (feature?.properties?.name as string) ?? null;
+            hoveredCoordinates.value = e.lngLat;
+        } else {
+            hoveredCountryName.value = null;
+            hoveredCoordinates.value = null;
+        }
     });
 
     map.map?.on('mouseleave', LAYER_ID, () => {
         if (map.map) {
             map.map.getCanvas().style.cursor = '';
         }
+        setHoverState(hoveredFeatureId, false);
+        hoveredFeatureId = undefined;
         hoveredCountryName.value = null;
+        hoveredCoordinates.value = null;
     });
 });
 
@@ -120,6 +163,17 @@ const fillColor = computed(
             transitedOnly.value.length > 0 ? transitedOnly.value : [''],
             TRANSITED_COLOR,
             'rgba(0, 0, 0, 0)',
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ] as any,
+);
+
+const fillOpacity = computed(
+    () =>
+        [
+            'case',
+            ['boolean', ['feature-state', 'hover'], false],
+            0.85,
+            0.6,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ] as any,
 );
@@ -137,12 +191,13 @@ const fillColor = computed(
             v-if="countriesGeoJson"
             source-id="countries"
             :data="countriesGeoJson"
+            promote-id="iso_a2"
         >
             <mgl-fill-layer
                 :layer-id="LAYER_ID"
                 :paint="{
                     'fill-color': fillColor,
-                    'fill-opacity': 0.6,
+                    'fill-opacity': fillOpacity,
                 }"
             >
             </mgl-fill-layer>
