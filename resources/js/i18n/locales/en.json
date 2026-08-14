@@ -549,5 +549,15 @@
         "bus": "Bus",
         "ferry": "Ferry",
         "subway": "Subway"
+    },
+    "active_transport_post": {
+        "title": "Active Journey",
+        "no_active_post": "You have no active transport post right now.",
+        "no_active_post_hint": "Once you're travelling on a transport post, it will show up here so you can log your stopovers.",
+        "overwrite_confirm": "This stop, or a later stop, already has a logged time. Overwrite it?",
+        "logged_arrival": "Logged arrival",
+        "logged_departure": "Logged departure",
+        "log_stopovers": "Log Stopovers",
+        "edit_stop_times_title": "Edit times for {name}"
     }
 }

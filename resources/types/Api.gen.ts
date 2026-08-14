@@ -987,6 +987,15 @@ export interface SettingsUpdateRequest {
   hidePostsAfter?: 0.25 | 0.5 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 14 | 30 | null;
 }
 
+export interface StopoverLogRequest {
+  /**
+   * The client-observed time at which the arrival/departure occurred, in ISO 8601 format. Using the time observed on the device (rather than the time the request reaches the server) keeps the logged time accurate under poor network reception.
+   * @format date-time
+   * @example "2024-08-01T10:00:00Z"
+   */
+  timestamp: string;
+}
+
 export interface StoreInviteCodeRequest {
   /**
    * The expiration date of the invite code
@@ -1336,6 +1345,43 @@ export interface StopDto {
   arrivalDelay: number | null;
   /** Departure delay in minutes */
   departureDelay: number | null;
+}
+
+/** A single stopover of a transport post journey, including the user-logged actual arrival/departure */
+export interface TransportPostStopoverDto {
+  /**
+   * Unique identifier for the stop
+   * @format uuid
+   */
+  id: string;
+  /** Location Data Object */
+  location: LocationDto;
+  /** Sequence number of the stop within the trip */
+  sequence: number;
+  /**
+   * Scheduled arrival time in ISO 8601 format
+   * @format date-time
+   */
+  scheduledArrivalTime: string | null;
+  /**
+   * Scheduled departure time in ISO 8601 format
+   * @format date-time
+   */
+  scheduledDepartureTime: string | null;
+  /** Arrival delay in minutes */
+  arrivalDelay: number | null;
+  /** Departure delay in minutes */
+  departureDelay: number | null;
+  /**
+   * User-logged actual arrival time in ISO 8601 format
+   * @format date-time
+   */
+  manualArrivalTime: string | null;
+  /**
+   * User-logged actual departure time in ISO 8601 format
+   * @format date-time
+   */
+  manualDepartureTime: string | null;
 }
 
 /** Data Transfer Object for a Transport Trip */
@@ -2933,6 +2979,136 @@ export class Api<
         body: data,
         secure: true,
         type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Get the authenticated user's currently active transport post (a journey currently in progress). Returns null if the user has no active transport post.
+     *
+     * @tags Posts, TransportPosts
+     * @name GetActiveTransportPost
+     * @summary Get active transport post
+     * @request GET:/posts/transport/active
+     * @secure
+     */
+    getActiveTransportPost: (params: RequestParams = {}) =>
+      this.request<TransportPost, any>({
+        path: `/posts/transport/active`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Get all stopovers of a transport post journey, from origin to destination, in sequence order, including any user-logged actual arrival/departure times
+     *
+     * @tags Posts, TransportPosts
+     * @name GetStopoversForTransportPost
+     * @summary Get transport post stopovers
+     * @request GET:/posts/{id}/transport/stopovers
+     * @secure
+     */
+    getStopoversForTransportPost: (id: string, params: RequestParams = {}) =>
+      this.request<TransportPostStopoverDto[], void>({
+        path: `/posts/${id}/transport/stopovers`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Log the actual arrival time at a stopover for the given transport post
+     *
+     * @tags Posts, TransportPosts
+     * @name LogStopoverArrival
+     * @summary Log stopover arrival
+     * @request POST:/posts/{id}/transport/stopovers/{stopId}/arrival
+     * @secure
+     */
+    logStopoverArrival: (
+      id: string,
+      stopId: string,
+      data: StopoverLogRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<TransportPostStopoverDto[], void>({
+        path: `/posts/${id}/transport/stopovers/${stopId}/arrival`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Clear a previously logged actual arrival time at a stopover for the given transport post
+     *
+     * @tags Posts, TransportPosts
+     * @name ClearStopoverArrival
+     * @summary Clear stopover arrival
+     * @request DELETE:/posts/{id}/transport/stopovers/{stopId}/arrival
+     * @secure
+     */
+    clearStopoverArrival: (
+      id: string,
+      stopId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<TransportPostStopoverDto[], void>({
+        path: `/posts/${id}/transport/stopovers/${stopId}/arrival`,
+        method: "DELETE",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Log the actual departure time from a stopover for the given transport post
+     *
+     * @tags Posts, TransportPosts
+     * @name LogStopoverDeparture
+     * @summary Log stopover departure
+     * @request POST:/posts/{id}/transport/stopovers/{stopId}/departure
+     * @secure
+     */
+    logStopoverDeparture: (
+      id: string,
+      stopId: string,
+      data: StopoverLogRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<TransportPostStopoverDto[], void>({
+        path: `/posts/${id}/transport/stopovers/${stopId}/departure`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Clear a previously logged actual departure time from a stopover for the given transport post
+     *
+     * @tags Posts, TransportPosts
+     * @name ClearStopoverDeparture
+     * @summary Clear stopover departure
+     * @request DELETE:/posts/{id}/transport/stopovers/{stopId}/departure
+     * @secure
+     */
+    clearStopoverDeparture: (
+      id: string,
+      stopId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<TransportPostStopoverDto[], void>({
+        path: `/posts/${id}/transport/stopovers/${stopId}/departure`,
+        method: "DELETE",
+        secure: true,
         format: "json",
         ...params,
       }),

@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { api } from '@/api';
 import router from '@/router';
+import EditTimesDialog from '@/Components/Post/Partials/EditTimesDialog.vue';
 import { getOwnShareText, getShareText } from '@/Services/PostTextService';
+import { calculateDelay, getDepartureTime } from '@/Services/TripTimeService';
 import { useUserStore } from '@/stores/user';
 import { isTransportPost } from '@/types/PostTypes';
 import {
+    CircleX,
     ClockPlus,
     Ellipsis,
     LogOut,
@@ -100,8 +103,8 @@ function arriveNow(): void {
 }
 
 function submit(
-    departure: string | undefined,
-    arrival: string | undefined,
+    departure: string | null | undefined,
+    arrival: string | null | undefined,
 ): void {
     blur();
     const post = props.post;
@@ -121,6 +124,60 @@ function submit(
         .catch((error_) => {
             alert(error_.response.data.message);
         });
+}
+
+const editTimesDialog = useTemplateRef('editTimesDialog');
+const editManualDeparture = ref<DateTime | null>(null);
+const editManualArrival = ref<DateTime | null>(null);
+
+function openEditTimesDialog(): void {
+    blur();
+    const post = props.post;
+    if (!isTransportPost(post)) {
+        return;
+    }
+    editManualDeparture.value = post.manualDepartureTime
+        ? DateTime.fromISO(post.manualDepartureTime)
+        : null;
+    editManualArrival.value = post.manualArrivalTime
+        ? DateTime.fromISO(post.manualArrivalTime)
+        : null;
+    editTimesDialog.value?.show();
+}
+
+function saveManualTimes(): void {
+    submit(
+        editManualDeparture.value ? editManualDeparture.value.toISO() : null,
+        editManualArrival.value ? editManualArrival.value.toISO() : null,
+    );
+}
+
+function departNowInDialog(): void {
+    const post = props.post;
+    if (!isTransportPost(post)) {
+        return;
+    }
+    editManualDeparture.value = DateTime.now().set({
+        second: 0,
+        millisecond: 0,
+    });
+    const delay = calculateDelay(
+        getDepartureTime(post.originStop),
+        editManualDeparture.value.toISO(),
+        post.originStop.departureDelay,
+    );
+    if (delay && delay > 1 && post.destinationStop?.arrivalTime) {
+        editManualArrival.value = DateTime.fromISO(
+            post.destinationStop.arrivalTime,
+        ).plus({ minutes: delay });
+    }
+}
+
+function arriveNowInDialog(): void {
+    editManualArrival.value = DateTime.now().set({
+        second: 30,
+        millisecond: 0,
+    });
 }
 
 function deletePost() {
@@ -233,15 +290,10 @@ function blur() {
                 </li>
                 <template v-if="isTransportPost(post)">
                     <li>
-                        <RouterLink
-                            :to="{
-                                name: 'posts.edit.transport-times',
-                                params: { postId: post.id },
-                            }"
-                        >
+                        <a href="#" @click.prevent="openEditTimesDialog()">
                             <ClockPlus class="size-4" />
                             {{ t('posts.edit.change_times') }}
-                        </RouterLink>
+                        </a>
                     </li>
                     <li>
                         <RouterLink
@@ -331,4 +383,55 @@ function blur() {
             <button>{{ t('verbs.close') }}</button>
         </form>
     </dialog>
+    <EditTimesDialog
+        v-if="isTransportPost(post)"
+        ref="editTimesDialog"
+        v-model:departure="editManualDeparture"
+        v-model:arrival="editManualArrival"
+        :title="t('edit_transport_times.title')"
+        :departure-label="t('edit_transport_times.departure')"
+        :arrival-label="t('edit_transport_times.arrival')"
+        @save="saveManualTimes"
+    >
+        <template #departure-extra>
+            <div class="flex gap-2">
+                <button
+                    type="button"
+                    class="btn btn-outline"
+                    @click="editManualDeparture = null"
+                >
+                    <CircleX class="size-5" />
+                    {{ t('edit_transport_times.clear_departure') }}
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    @click="departNowInDialog()"
+                >
+                    <PlaneTakeoff class="size-5" />
+                    {{ t('edit_transport_times.depart_now') }}
+                </button>
+            </div>
+        </template>
+        <template #arrival-extra>
+            <div class="flex gap-2">
+                <button
+                    type="button"
+                    class="btn btn-outline"
+                    @click="editManualArrival = null"
+                >
+                    <CircleX class="size-5" />
+                    {{ t('edit_transport_times.clear_arrival') }}
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    @click="arriveNowInDialog()"
+                >
+                    <PlaneLanding class="size-5" />
+                    {{ t('edit_transport_times.arrive_now') }}
+                </button>
+            </div>
+        </template>
+    </EditTimesDialog>
 </template>

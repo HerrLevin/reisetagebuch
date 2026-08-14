@@ -23,6 +23,7 @@ use App\Http\Requests\TransportTimesUpdateRequest;
 use App\Http\Resources\PostTypes\BasePost;
 use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
+use App\Http\Resources\TransportPostStopoverDto;
 use App\Jobs\ActivityPub\PushDeleteToMastodon;
 use App\Jobs\ActivityPub\PushPostToMastodon;
 use App\Jobs\ActivityPub\PushUpdateToMastodon;
@@ -289,6 +290,153 @@ class PostController extends Controller
      */
     public function updateTimesTransport(string $postId, TransportTimesUpdateRequest $request, User $user): TransportPost
     {
+        $post = $this->resolveEditableTransportPost($postId, $user);
+
+        return $this->applyManualTransportTimes(
+            $post,
+            $request->manualDepartureTime,
+            $request->has('manualDepartureTime'),
+            $request->manualArrivalTime,
+            $request->has('manualArrivalTime')
+        );
+    }
+
+    /**
+     * @throws Throwable
+     */
+    private function applyManualTransportTimes(TransportPost $post, ?string $manualDepartureTime, bool $updateDeparture, ?string $manualArrivalTime, bool $updateArrival, bool $syncStopoverLogs = true): TransportPost
+    {
+        $departureUtc = $manualDepartureTime !== null ? Carbon::parse($manualDepartureTime)->utc() : null;
+        $arrivalUtc = $manualArrivalTime !== null ? Carbon::parse($manualArrivalTime)->utc() : null;
+
+        $post = $this->postRepository->updateTransportTimes($post, $departureUtc?->toIso8601ZuluString(), $updateDeparture, $arrivalUtc?->toIso8601ZuluString(), $updateArrival);
+
+        if ($syncStopoverLogs) {
+            if ($updateDeparture) {
+                if ($departureUtc !== null) {
+                    $this->postRepository->logStopoverDeparture($post->id, $post->originStop->id, $departureUtc);
+                } else {
+                    $this->postRepository->clearStopoverDeparture($post->id, $post->originStop->id);
+                }
+            }
+            if ($updateArrival) {
+                if ($arrivalUtc !== null) {
+                    $this->postRepository->logStopoverArrival($post->id, $post->destinationStop->id, $arrivalUtc);
+                } else {
+                    $this->postRepository->clearStopoverArrival($post->id, $post->destinationStop->id);
+                }
+            }
+        }
+
+        $this->calculateTransportStatsController->calculateStatsForPost($post->id);
+
+        TraewellingEditPostJob::dispatch($post);
+        $this->dispatchUpdate($post);
+
+        return $post;
+    }
+
+    public function getActiveTransportPost(User $user): ?TransportPost
+    {
+        $post = $this->postRepository->getActiveTransportPostForUser($user);
+
+        return $post instanceof TransportPost ? $post : null;
+    }
+
+    /**
+     * @return TransportPostStopoverDto[]
+     */
+    public function getStopoversForTransportPost(string $postId, ?User $visitingUser = null): array
+    {
+        $post = $this->postRepository->getById($postId, $visitingUser);
+        if (! $post instanceof TransportPost) {
+            abort(422, 'Not a transport post');
+        }
+
+        return $this->postRepository->getStopoverLogsForTransportPost($post->id);
+    }
+
+    /**
+     * @return TransportPostStopoverDto[]
+     *
+     * @throws AuthorizationException
+     * @throws Throwable
+     */
+    public function logStopoverArrival(string $postId, string $stopId, User $user, Carbon $timestamp): array
+    {
+        $post = $this->resolveEditableTransportPost($postId, $user);
+
+        $stopovers = $this->postRepository->logStopoverArrival($post->id, $stopId, $timestamp);
+
+        if ($stopId === $post->destinationStop->id) {
+            $this->applyManualTransportTimes($post, null, false, $timestamp->toIso8601String(), true, false);
+        }
+
+        return $stopovers;
+    }
+
+    /**
+     * @return TransportPostStopoverDto[]
+     *
+     * @throws AuthorizationException
+     * @throws Throwable
+     */
+    public function logStopoverDeparture(string $postId, string $stopId, User $user, Carbon $timestamp): array
+    {
+        $post = $this->resolveEditableTransportPost($postId, $user);
+
+        $stopovers = $this->postRepository->logStopoverDeparture($post->id, $stopId, $timestamp);
+
+        if ($stopId === $post->originStop->id) {
+            $this->applyManualTransportTimes($post, $timestamp->toIso8601String(), true, null, false, false);
+        }
+
+        return $stopovers;
+    }
+
+    /**
+     * @return TransportPostStopoverDto[]
+     *
+     * @throws AuthorizationException
+     * @throws Throwable
+     */
+    public function clearStopoverArrival(string $postId, string $stopId, User $user): array
+    {
+        $post = $this->resolveEditableTransportPost($postId, $user);
+
+        $stopovers = $this->postRepository->clearStopoverArrival($post->id, $stopId);
+
+        if ($stopId === $post->destinationStop->id) {
+            $this->applyManualTransportTimes($post, null, false, null, true, false);
+        }
+
+        return $stopovers;
+    }
+
+    /**
+     * @return TransportPostStopoverDto[]
+     *
+     * @throws AuthorizationException
+     * @throws Throwable
+     */
+    public function clearStopoverDeparture(string $postId, string $stopId, User $user): array
+    {
+        $post = $this->resolveEditableTransportPost($postId, $user);
+
+        $stopovers = $this->postRepository->clearStopoverDeparture($post->id, $stopId);
+
+        if ($stopId === $post->originStop->id) {
+            $this->applyManualTransportTimes($post, null, true, null, false, false);
+        }
+
+        return $stopovers;
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    private function resolveEditableTransportPost(string $postId, User $user): TransportPost
+    {
         $post = $this->postRepository->getById($postId, Auth::user());
         if ($user->cannot('update', $post)) {
             throw new AuthorizationException('You do not have permission to update this post.');
@@ -297,19 +445,6 @@ class PostController extends Controller
         if (! $post instanceof TransportPost) {
             abort(422, 'Not a transport post');
         }
-
-        $post = $this->postRepository->updateTransportTimes(
-            $post,
-            $request->manualDepartureTime,
-            $request->has('manualDepartureTime'),
-            $request->manualArrivalTime,
-            $request->has('manualArrivalTime')
-        );
-
-        $this->calculateTransportStatsController->calculateStatsForPost($post->id);
-
-        TraewellingEditPostJob::dispatch($post);
-        $this->dispatchUpdate($post);
 
         return $post;
     }

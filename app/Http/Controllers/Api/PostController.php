@@ -12,6 +12,7 @@ use App\Http\Requests\BasePostRequest;
 use App\Http\Requests\FilterPostsRequest;
 use App\Http\Requests\LocationBasePostRequest;
 use App\Http\Requests\MassEditPostRequest;
+use App\Http\Requests\StopoverLogRequest;
 use App\Http\Requests\TransportBasePostCreateRequest;
 use App\Http\Requests\TransportPostExitUpdateRequest;
 use App\Http\Requests\TransportTimesUpdateRequest;
@@ -19,7 +20,10 @@ use App\Http\Requests\TransportTrackUploadRequest;
 use App\Http\Resources\PostTypes\BasePost;
 use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
+use App\Http\Resources\TransportPostStopoverDto;
+use Carbon\Carbon;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
@@ -450,6 +454,268 @@ class PostController extends Controller
     public function update(string $postId, BasePostRequest $request): BasePost|TransportPost|LocationPost
     {
         return $this->postController->updatePost($postId, $request, $this->auth->user());
+    }
+
+    #[OA\Get(
+        path: '/posts/transport/active',
+        operationId: 'getActiveTransportPost',
+        description: "Get the authenticated user's currently active transport post (a journey currently in progress). Returns null if the user has no active transport post.",
+        summary: 'Get active transport post',
+        security: [
+            [
+                'passport' => [],
+            ],
+        ],
+        tags: ['Posts', 'TransportPosts'],
+        responses: [
+            new OA\Response(response: 200, description: 'successful operation', content: new OA\JsonContent(ref: TransportPost::class)),
+        ]
+    )]
+    public function getActiveTransportPost(): JsonResponse
+    {
+        $dto = $this->postController->getActiveTransportPost($this->auth->user());
+
+        // response()->json(null) would serialize to `{}` (Symfony treats a null
+        // payload as "no data given"), so encode explicitly to preserve `null`.
+        return JsonResponse::fromJsonString(json_encode($dto));
+    }
+
+    #[OA\Get(
+        path: '/posts/{id}/transport/stopovers',
+        operationId: 'getStopoversForTransportPost',
+        description: 'Get all stopovers of a transport post journey, from origin to destination, in sequence order, including any user-logged actual arrival/departure times',
+        summary: 'Get transport post stopovers',
+        security: [
+            [
+                'passport' => [],
+            ],
+        ],
+        tags: ['Posts', 'TransportPosts'],
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                description: 'Post id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'string', format: 'uuid')
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'successful operation',
+                content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: TransportPostStopoverDto::class))
+            ),
+            new OA\Response(response: 403, description: 'Forbidden'),
+            new OA\Response(response: 404, description: 'Resource Not Found'),
+            new OA\Response(response: 422, description: 'Not a transport post'),
+        ]
+    )]
+    public function getStopoversForTransportPost(string $postId): array
+    {
+        return $this->postController->getStopoversForTransportPost($postId, $this->auth->user());
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    #[OA\Post(
+        path: '/posts/{id}/transport/stopovers/{stopId}/arrival',
+        operationId: 'logStopoverArrival',
+        description: 'Log the actual arrival time at a stopover for the given transport post',
+        summary: 'Log stopover arrival',
+        security: [
+            [
+                'passport' => [],
+            ],
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(ref: StopoverLogRequest::class)
+        ),
+        tags: ['Posts', 'TransportPosts'],
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                description: 'Post id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'string', format: 'uuid')
+            ),
+            new OA\Parameter(
+                name: 'stopId',
+                description: 'Transport trip stop id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'string', format: 'uuid')
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'successful operation',
+                content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: TransportPostStopoverDto::class))
+            ),
+            new OA\Response(response: 400, description: 'Bad request'),
+            new OA\Response(response: 403, description: 'Forbidden'),
+            new OA\Response(response: 404, description: 'Resource Not Found'),
+            new OA\Response(response: 422, description: 'Not a transport post, or stop is not part of this journey'),
+        ]
+    )]
+    public function logStopoverArrival(string $postId, string $stopId, StopoverLogRequest $request): array
+    {
+        try {
+            return $this->postController->logStopoverArrival($postId, $stopId, $this->auth->user(), Carbon::parse($request->timestamp)->utc());
+        } catch (NegativePeriodException $exception) {
+            abort(400, $exception->getMessage());
+        }
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    #[OA\Post(
+        path: '/posts/{id}/transport/stopovers/{stopId}/departure',
+        operationId: 'logStopoverDeparture',
+        description: 'Log the actual departure time from a stopover for the given transport post',
+        summary: 'Log stopover departure',
+        security: [
+            [
+                'passport' => [],
+            ],
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(ref: StopoverLogRequest::class)
+        ),
+        tags: ['Posts', 'TransportPosts'],
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                description: 'Post id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'string', format: 'uuid')
+            ),
+            new OA\Parameter(
+                name: 'stopId',
+                description: 'Transport trip stop id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'string', format: 'uuid')
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'successful operation',
+                content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: TransportPostStopoverDto::class))
+            ),
+            new OA\Response(response: 400, description: 'Bad request'),
+            new OA\Response(response: 403, description: 'Forbidden'),
+            new OA\Response(response: 404, description: 'Resource Not Found'),
+            new OA\Response(response: 422, description: 'Not a transport post, or stop is not part of this journey'),
+        ]
+    )]
+    public function logStopoverDeparture(string $postId, string $stopId, StopoverLogRequest $request): array
+    {
+        try {
+            return $this->postController->logStopoverDeparture($postId, $stopId, $this->auth->user(), Carbon::parse($request->timestamp)->utc());
+        } catch (NegativePeriodException $exception) {
+            abort(400, $exception->getMessage());
+        }
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    #[OA\Delete(
+        path: '/posts/{id}/transport/stopovers/{stopId}/arrival',
+        operationId: 'clearStopoverArrival',
+        description: 'Clear a previously logged actual arrival time at a stopover for the given transport post',
+        summary: 'Clear stopover arrival',
+        security: [
+            [
+                'passport' => [],
+            ],
+        ],
+        tags: ['Posts', 'TransportPosts'],
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                description: 'Post id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'string', format: 'uuid')
+            ),
+            new OA\Parameter(
+                name: 'stopId',
+                description: 'Transport trip stop id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'string', format: 'uuid')
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'successful operation',
+                content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: TransportPostStopoverDto::class))
+            ),
+            new OA\Response(response: 403, description: 'Forbidden'),
+            new OA\Response(response: 404, description: 'Resource Not Found'),
+            new OA\Response(response: 422, description: 'Not a transport post, or stop is not part of this journey'),
+        ]
+    )]
+    public function clearStopoverArrival(string $postId, string $stopId): array
+    {
+        return $this->postController->clearStopoverArrival($postId, $stopId, $this->auth->user());
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    #[OA\Delete(
+        path: '/posts/{id}/transport/stopovers/{stopId}/departure',
+        operationId: 'clearStopoverDeparture',
+        description: 'Clear a previously logged actual departure time from a stopover for the given transport post',
+        summary: 'Clear stopover departure',
+        security: [
+            [
+                'passport' => [],
+            ],
+        ],
+        tags: ['Posts', 'TransportPosts'],
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                description: 'Post id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'string', format: 'uuid')
+            ),
+            new OA\Parameter(
+                name: 'stopId',
+                description: 'Transport trip stop id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'string', format: 'uuid')
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'successful operation',
+                content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: TransportPostStopoverDto::class))
+            ),
+            new OA\Response(response: 403, description: 'Forbidden'),
+            new OA\Response(response: 404, description: 'Resource Not Found'),
+            new OA\Response(response: 422, description: 'Not a transport post, or stop is not part of this journey'),
+        ]
+    )]
+    public function clearStopoverDeparture(string $postId, string $stopId): array
+    {
+        return $this->postController->clearStopoverDeparture($postId, $stopId, $this->auth->user());
     }
 
     /**
