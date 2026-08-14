@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { PropType } from 'vue';
+import RemoteFollowButton from '@/Pages/Profile/Partials/RemoteFollowButton.vue';
+import { ref } from 'vue';
 import { RemoteFollowDto, RemoteFollowerDto } from '../../../../types/Api.gen';
 
-defineProps({
-    actor: {
-        type: Object as PropType<RemoteFollowDto | RemoteFollowerDto>,
-        required: true,
-    },
-});
+const props = defineProps<{
+    actor: RemoteFollowDto | RemoteFollowerDto;
+}>();
+
+const followState = ref<string | null>(
+    'state' in props.actor ? props.actor.state : null,
+);
 
 function instanceOf(actorId: string): string {
     try {
@@ -43,4 +45,9 @@ function instanceOf(actorId: string): string {
             @{{ actor.preferredUsername }}@{{ instanceOf(actor.actorId) }}
         </p>
     </div>
+    <RemoteFollowButton
+        v-if="'state' in actor"
+        v-model:follow-state="followState"
+        :actor-id="actor.actorId"
+    />
 </template>
