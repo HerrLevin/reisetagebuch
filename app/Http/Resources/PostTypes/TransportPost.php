@@ -124,13 +124,14 @@ class TransportPost extends BasePost
     {
         $parentBody = parent::getHtmlBody();
         $emoji = $this->trip->mode?->getEmoji();
-        $line = e($this->trip->lineName);
+        $line = e($this->trip->displayName ?? $this->trip->lineName);
+        $number = $this->trip->tripShortName ? ' ('.e($this->trip->tripShortName).')' : '';
         $origin = e($this->originStop->name);
         $destination = e($this->destinationStop->name);
         $duration = round($this->duration / 60);
         $distance = round($this->distance / 1000, 1);
 
-        $body = "$emoji <strong>$line</strong><br>".
+        $body = "$emoji <strong>$line</strong> $number<br>".
             "🛤️ $origin → $destination<br>".
             "⏱️ $duration min • 📏 $distance km<br>".
             $this->travelReason?->getEmoji();
