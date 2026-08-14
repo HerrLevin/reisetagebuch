@@ -85,6 +85,84 @@ class ActiveTransportPostControllerTest extends TestCase
         $response->assertJsonPath('3.id', $stops[3]->id);
     }
 
+    public function test_get_active_transport_post_accounts_for_destination_arrival_delay(): void
+    {
+        $user = User::factory()->create();
+        $trip = TransportTrip::factory()->create();
+
+        $originStop = TransportTripStop::factory()->create([
+            'transport_trip_id' => $trip->id,
+            'stop_sequence' => 0,
+            'arrival_time' => null,
+            'departure_time' => now()->subHours(2),
+            'departure_delay' => 0,
+        ]);
+        // Scheduled arrival is in the past, but a delay pushes the real
+        // (predicted) arrival into the future, so the journey is still active.
+        $destinationStop = TransportTripStop::factory()->create([
+            'transport_trip_id' => $trip->id,
+            'stop_sequence' => 1,
+            'arrival_time' => now()->subMinutes(10),
+            'departure_time' => null,
+            'arrival_delay' => 20 * 60,
+        ]);
+
+        $post = Post::factory()->create(['user_id' => $user->id]);
+        TransportPost::factory()->create([
+            'post_id' => $post->id,
+            'transport_trip_id' => $trip->id,
+            'origin_stop_id' => $originStop->id,
+            'destination_stop_id' => $destinationStop->id,
+            'manual_departure' => null,
+            'manual_arrival' => null,
+        ]);
+
+        Passport::actingAs($user);
+        $response = $this->getJson(route('posts.transport.active'));
+
+        $response->assertOk();
+        $response->assertJsonPath('id', $post->id);
+    }
+
+    public function test_get_active_transport_post_excludes_journey_arrived_early(): void
+    {
+        $user = User::factory()->create();
+        $trip = TransportTrip::factory()->create();
+
+        $originStop = TransportTripStop::factory()->create([
+            'transport_trip_id' => $trip->id,
+            'stop_sequence' => 0,
+            'arrival_time' => null,
+            'departure_time' => now()->subHours(2),
+            'departure_delay' => 0,
+        ]);
+        // Scheduled arrival is in the future, but a negative delay means the
+        // train already really arrived, so the journey is no longer active.
+        $destinationStop = TransportTripStop::factory()->create([
+            'transport_trip_id' => $trip->id,
+            'stop_sequence' => 1,
+            'arrival_time' => now()->addMinutes(10),
+            'departure_time' => null,
+            'arrival_delay' => -20 * 60,
+        ]);
+
+        $post = Post::factory()->create(['user_id' => $user->id]);
+        TransportPost::factory()->create([
+            'post_id' => $post->id,
+            'transport_trip_id' => $trip->id,
+            'origin_stop_id' => $originStop->id,
+            'destination_stop_id' => $destinationStop->id,
+            'manual_departure' => null,
+            'manual_arrival' => null,
+        ]);
+
+        Passport::actingAs($user);
+        $response = $this->getJson(route('posts.transport.active'));
+
+        $response->assertOk();
+        $response->assertContent('null');
+    }
+
     public function test_get_active_transport_post_returns_null_when_no_active_journey(): void
     {
         $user = User::factory()->create();

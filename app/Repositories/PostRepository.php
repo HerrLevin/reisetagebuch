@@ -516,17 +516,31 @@ class PostRepository
     {
         $now = Carbon::now();
 
+        // arrival_delay/departure_delay are in seconds and must be added to the
+        // scheduled time to get the real (predicted) time; manual overrides are
+        // already real times and are used as-is.
+        $realDeparture = 'COALESCE('
+            .'transport_posts.manual_departure, '
+            .'origin_stops.departure_time + make_interval(secs => COALESCE(origin_stops.departure_delay, 0)), '
+            .'origin_stops.arrival_time + make_interval(secs => COALESCE(origin_stops.arrival_delay, 0))'
+            .')';
+        $realArrival = 'COALESCE('
+            .'transport_posts.manual_arrival, '
+            .'destination_stops.arrival_time + make_interval(secs => COALESCE(destination_stops.arrival_delay, 0)), '
+            .'destination_stops.departure_time + make_interval(secs => COALESCE(destination_stops.departure_delay, 0))'
+            .')';
+
         $postId = TransportPostModel::query()
             ->join('posts', 'posts.id', '=', 'transport_posts.post_id')
             ->join('transport_trip_stops as origin_stops', 'origin_stops.id', '=', 'transport_posts.origin_stop_id')
             ->join('transport_trip_stops as destination_stops', 'destination_stops.id', '=', 'transport_posts.destination_stop_id')
             ->where('posts.user_id', $user->id)
-            ->whereRaw('COALESCE(transport_posts.manual_departure, origin_stops.departure_time, origin_stops.arrival_time) <= ?', [$now])
-            ->where(function (Builder $query) use ($now) {
-                $query->whereRaw('COALESCE(transport_posts.manual_arrival, destination_stops.arrival_time, destination_stops.departure_time) IS NULL')
-                    ->orWhereRaw('COALESCE(transport_posts.manual_arrival, destination_stops.arrival_time, destination_stops.departure_time) >= ?', [$now]);
+            ->whereRaw("{$realDeparture} <= ?", [$now])
+            ->where(function (Builder $query) use ($now, $realArrival) {
+                $query->whereRaw("{$realArrival} IS NULL")
+                    ->orWhereRaw("{$realArrival} >= ?", [$now]);
             })
-            ->orderByRaw('COALESCE(transport_posts.manual_departure, origin_stops.departure_time, origin_stops.arrival_time) DESC')
+            ->orderByRaw("{$realDeparture} DESC")
             ->value('transport_posts.post_id');
 
         return $postId ? $this->getById($postId, $user) : null;
