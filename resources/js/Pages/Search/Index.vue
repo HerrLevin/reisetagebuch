@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { api } from '@/api';
+import RemoteFollowButton from '@/Pages/Profile/Partials/RemoteFollowButton.vue';
 import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import UserListCard from '@/Pages/Posts/Partials/UserListCard.vue';
@@ -51,7 +52,6 @@ const debouncedSearch = debounce(() => searchLocalUsers(), 300);
 const resolvedActor = ref<RemoteActorProfileDto | null>(null);
 const resolveError = ref<string | null>(null);
 const resolving = ref(false);
-const following = ref(false);
 let lastResolvedQuery: string | null = null;
 
 function instanceOf(actorId: string): string {
@@ -100,29 +100,6 @@ function onInput() {
         lastResolvedQuery = null;
         resolvedActor.value = null;
         resolveError.value = null;
-    }
-}
-
-async function follow() {
-    if (!resolvedActor.value) return;
-    following.value = true;
-
-    try {
-        await api.instance.post('/activitypub/follow', {
-            actor_id: resolvedActor.value.actorId,
-        });
-        resolvedActor.value.followState = 'pending';
-    } finally {
-        following.value = false;
-    }
-}
-
-async function unfollow(actorId: string) {
-    await api.instance.delete('/activitypub/follow', {
-        data: { actor_id: actorId },
-    });
-    if (resolvedActor.value?.actorId === actorId) {
-        resolvedActor.value.followState = null;
     }
 }
 </script>
@@ -223,34 +200,10 @@ async function unfollow(actorId: string) {
                             <!-- eslint-enable vue/no-v-html -->
                         </div>
 
-                        <button
-                            v-if="!resolvedActor.followState"
-                            class="btn btn-primary btn-sm shrink-0"
-                            :disabled="following"
-                            @click="follow"
-                        >
-                            {{ t('fediverse.follow') }}
-                        </button>
-                        <button
-                            v-else-if="resolvedActor.followState === 'pending'"
-                            class="btn btn-sm shrink-0"
-                            disabled
-                        >
-                            {{ t('fediverse.pending') }}
-                        </button>
-                        <button
-                            v-else-if="resolvedActor.followState === 'accepted'"
-                            class="btn btn-sm shrink-0"
-                            @click="unfollow(resolvedActor.actorId)"
-                        >
-                            {{ t('fediverse.unfollow') }}
-                        </button>
-                        <span
-                            v-else-if="resolvedActor.followState === 'rejected'"
-                            class="badge badge-error badge-sm shrink-0"
-                        >
-                            {{ t('fediverse.rejected') }}
-                        </span>
+                        <RemoteFollowButton
+                            v-model:follow-state="resolvedActor.followState"
+                            :actor-id="resolvedActor.actorId"
+                        />
                     </div>
                 </div>
             </div>
