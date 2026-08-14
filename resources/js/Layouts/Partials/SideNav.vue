@@ -5,6 +5,7 @@ import {
     Handshake,
     History,
     LogOut,
+    Navigation,
     Route,
     Search,
     Settings,
@@ -32,6 +33,14 @@ defineProps({
 });
 
 const links = [
+    {
+        link: {
+            name: 'posts.transport.active',
+        },
+        label: 'active_transport_post.title',
+        icon: Navigation,
+        condition: !!user.user,
+    },
     {
         link: {
             name: 'profile.show',

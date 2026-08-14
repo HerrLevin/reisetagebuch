@@ -137,6 +137,9 @@ Route::middleware('auth:api')->group(function () {
             Route::post('/location', [PostController::class, 'storeLocation'])->name('posts.create.post.store');
             Route::post('/mass-edit', [PostController::class, 'massEdit'])->name('api.posts.mass-edit');
 
+            Route::post('/transport', [PostController::class, 'storeTransport'])->name('posts.create.transport-post.store');
+            Route::get('/transport/active', [PostController::class, 'getActiveTransportPost'])->name('posts.transport.active');
+
             Route::prefix('{postId}')->group(function () {
                 Route::post('/likes', [LikeController::class, 'store'])
                     ->name('posts.like');
@@ -152,14 +155,23 @@ Route::middleware('auth:api')->group(function () {
                     Route::put('/times', [PostController::class, 'updateTimesTransport'])->name('posts.update.transport-times');
                     Route::post('/track', [PostController::class, 'uploadTransportTrack'])->name('posts.upload.transport-track');
                     Route::delete('/track', [PostController::class, 'deleteTransportTrack'])->name('posts.delete.transport-track');
+
+                    Route::prefix('stopovers')->group(function () {
+                        Route::get('/', [PostController::class, 'getStopoversForTransportPost'])->name('posts.transport.stopovers.list');
+
+                        Route::prefix('{stopId}')->group(function () {
+                            Route::post('/arrival', [PostController::class, 'logStopoverArrival'])->name('posts.transport.stopovers.arrival');
+                            Route::post('/departure', [PostController::class, 'logStopoverDeparture'])->name('posts.transport.stopovers.departure');
+                            Route::delete('/arrival', [PostController::class, 'clearStopoverArrival'])->name('posts.transport.stopovers.arrival.clear');
+                            Route::delete('/departure', [PostController::class, 'clearStopoverDeparture'])->name('posts.transport.stopovers.departure.clear');
+                        });
+                    });
                 });
 
                 Route::prefix('traewelling')->group(function () {
                     Route::post('/retry', [PostController::class, 'retryTraewellingCrosspost'])->name('posts.traewelling.retry');
                 });
             });
-
-            Route::post('/transport', [PostController::class, 'storeTransport'])->name('posts.create.transport-post.store');
         });
 
         Route::prefix('map')->group(function () {

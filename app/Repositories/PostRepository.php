@@ -13,6 +13,7 @@ use App\Exceptions\StationNotOnTripException;
 use App\Http\Resources\PostTypes\BasePost;
 use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
+use App\Http\Resources\TransportPostStopoverDto;
 use App\Hydrators\PostHydrator;
 use App\Models\Location;
 use App\Models\Post;
@@ -40,18 +41,22 @@ class PostRepository
 
     private CountryRepository $countryRepository;
 
+    private TransportPostStopoverLogRepository $transportPostStopoverLogRepository;
+
     public function __construct(
         ?PostHydrator $postHydrator = null,
         ?HashTagRepository $hashTagRepository = null,
         ?PostMetaInfoRepository $postMetaInfoRepository = null,
         ?ActivityPubPostRepository $activityPubPostRepository = null,
         ?CountryRepository $countryRepository = null,
+        ?TransportPostStopoverLogRepository $transportPostStopoverLogRepository = null,
     ) {
         $this->postHydrator = $postHydrator ?? new PostHydrator;
         $this->hashTagRepository = $hashTagRepository ?? new HashTagRepository;
         $this->postMetaInfoRepository = $postMetaInfoRepository ?? new PostMetaInfoRepository;
         $this->activityPubPostRepository = $activityPubPostRepository ?? new ActivityPubPostRepository;
         $this->countryRepository = $countryRepository ?? new CountryRepository;
+        $this->transportPostStopoverLogRepository = $transportPostStopoverLogRepository ?? new TransportPostStopoverLogRepository;
     }
 
     public function storeLocation(
@@ -505,6 +510,114 @@ class PostRepository
         }
 
         return $this->postHydrator->modelToDto($post, true);
+    }
+
+    public function getActiveTransportPostForUser(User $user): BasePost|LocationPost|TransportPost|null
+    {
+        $now = Carbon::now();
+
+        $postId = TransportPostModel::query()
+            ->join('posts', 'posts.id', '=', 'transport_posts.post_id')
+            ->join('transport_trip_stops as origin_stops', 'origin_stops.id', '=', 'transport_posts.origin_stop_id')
+            ->join('transport_trip_stops as destination_stops', 'destination_stops.id', '=', 'transport_posts.destination_stop_id')
+            ->where('posts.user_id', $user->id)
+            ->whereRaw('COALESCE(transport_posts.manual_departure, origin_stops.departure_time, origin_stops.arrival_time) <= ?', [$now])
+            ->where(function (Builder $query) use ($now) {
+                $query->whereRaw('COALESCE(transport_posts.manual_arrival, destination_stops.arrival_time, destination_stops.departure_time) IS NULL')
+                    ->orWhereRaw('COALESCE(transport_posts.manual_arrival, destination_stops.arrival_time, destination_stops.departure_time) >= ?', [$now]);
+            })
+            ->orderByRaw('COALESCE(transport_posts.manual_departure, origin_stops.departure_time, origin_stops.arrival_time) DESC')
+            ->value('transport_posts.post_id');
+
+        return $postId ? $this->getById($postId, $user) : null;
+    }
+
+    /**
+     * @return TransportPostStopoverDto[]
+     */
+    public function getStopoverLogsForTransportPost(string $postId): array
+    {
+        /** @var TransportPostModel $transportPost */
+        $transportPost = TransportPostModel::where('post_id', $postId)
+            ->with(['originStop', 'destinationStop'])
+            ->firstOrFail();
+
+        $stops = TransportTripStop::where('transport_trip_id', $transportPost->transport_trip_id)
+            ->whereBetween('stop_sequence', [$transportPost->originStop->stop_sequence, $transportPost->destinationStop->stop_sequence])
+            ->orderBy('stop_sequence')
+            ->with('location')
+            ->get();
+
+        $logs = $this->transportPostStopoverLogRepository->getLogsForTransportPost($transportPost->id)
+            ->keyBy('transport_trip_stop_id');
+
+        return $stops->map(fn (TransportTripStop $stop) => new TransportPostStopoverDto($stop, $logs->get($stop->id)))->all();
+    }
+
+    /**
+     * @return TransportPostStopoverDto[]
+     */
+    public function logStopoverArrival(string $postId, string $stopId, Carbon $timestamp): array
+    {
+        [$transportPost, $stop] = $this->resolveJourneyStop($postId, $stopId);
+        $this->transportPostStopoverLogRepository->logArrival($transportPost, $stop, $timestamp);
+
+        return $this->getStopoverLogsForTransportPost($postId);
+    }
+
+    /**
+     * @return TransportPostStopoverDto[]
+     */
+    public function logStopoverDeparture(string $postId, string $stopId, Carbon $timestamp): array
+    {
+        [$transportPost, $stop] = $this->resolveJourneyStop($postId, $stopId);
+        $this->transportPostStopoverLogRepository->logDeparture($transportPost, $stop, $timestamp);
+
+        return $this->getStopoverLogsForTransportPost($postId);
+    }
+
+    /**
+     * @return TransportPostStopoverDto[]
+     */
+    public function clearStopoverArrival(string $postId, string $stopId): array
+    {
+        [$transportPost, $stop] = $this->resolveJourneyStop($postId, $stopId);
+        $this->transportPostStopoverLogRepository->clearArrival($transportPost, $stop);
+
+        return $this->getStopoverLogsForTransportPost($postId);
+    }
+
+    /**
+     * @return TransportPostStopoverDto[]
+     */
+    public function clearStopoverDeparture(string $postId, string $stopId): array
+    {
+        [$transportPost, $stop] = $this->resolveJourneyStop($postId, $stopId);
+        $this->transportPostStopoverLogRepository->clearDeparture($transportPost, $stop);
+
+        return $this->getStopoverLogsForTransportPost($postId);
+    }
+
+    /**
+     * @return array{0: TransportPostModel, 1: TransportTripStop}
+     */
+    private function resolveJourneyStop(string $postId, string $stopId): array
+    {
+        /** @var TransportPostModel $transportPost */
+        $transportPost = TransportPostModel::where('post_id', $postId)
+            ->with(['originStop', 'destinationStop'])
+            ->firstOrFail();
+
+        /** @var TransportTripStop $stop */
+        $stop = TransportTripStop::where('id', $stopId)->firstOrFail();
+
+        if ($stop->transport_trip_id !== $transportPost->transport_trip_id ||
+            $stop->stop_sequence < $transportPost->originStop->stop_sequence ||
+            $stop->stop_sequence > $transportPost->destinationStop->stop_sequence) {
+            abort(422, 'Stop is not part of this transport post\'s journey');
+        }
+
+        return [$transportPost, $stop];
     }
 
     /**

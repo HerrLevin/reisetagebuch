@@ -793,6 +793,31 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property string $id
+ * @property string $transport_post_id
+ * @property string $transport_trip_stop_id
+ * @property \Illuminate\Support\Carbon|null $manual_arrival User-logged actual arrival time at the stop, in UTC
+ * @property \Illuminate\Support\Carbon|null $manual_departure User-logged actual departure time from the stop, in UTC
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\TransportPost $transportPost
+ * @property-read \App\Models\TransportTripStop $transportTripStop
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPostStopoverLog newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPostStopoverLog newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPostStopoverLog query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPostStopoverLog whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPostStopoverLog whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPostStopoverLog whereManualArrival($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPostStopoverLog whereManualDeparture($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPostStopoverLog whereTransportPostId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPostStopoverLog whereTransportTripStopId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportPostStopoverLog whereUpdatedAt($value)
+ */
+	class TransportPostStopoverLog extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property string $id
  * @property string|null $foreign_trip_id Unique identifier for the trip in the external system
  * @property string|null $provider Name of the data provider, e.g., "TransportAPI"
  * @property string $mode Transport mode, e.g., "bus", "train", "car"

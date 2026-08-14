@@ -2590,6 +2590,356 @@
                 ]
             }
         },
+        "/posts/transport/active": {
+            "get": {
+                "tags": [
+                    "Posts",
+                    "TransportPosts"
+                ],
+                "summary": "Get active transport post",
+                "description": "Get the authenticated user's currently active transport post (a journey currently in progress). Returns null if the user has no active transport post.",
+                "operationId": "getActiveTransportPost",
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TransportPost"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/posts/{id}/transport/stopovers": {
+            "get": {
+                "tags": [
+                    "Posts",
+                    "TransportPosts"
+                ],
+                "summary": "Get transport post stopovers",
+                "description": "Get all stopovers of a transport post journey, from origin to destination, in sequence order, including any user-logged actual arrival/departure times",
+                "operationId": "getStopoversForTransportPost",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Post id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/TransportPostStopoverDto"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "422": {
+                        "description": "Not a transport post"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/posts/{id}/transport/stopovers/{stopId}/arrival": {
+            "post": {
+                "tags": [
+                    "Posts",
+                    "TransportPosts"
+                ],
+                "summary": "Log stopover arrival",
+                "description": "Log the actual arrival time at a stopover for the given transport post",
+                "operationId": "logStopoverArrival",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Post id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "stopId",
+                        "in": "path",
+                        "description": "Transport trip stop id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StopoverLogRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/TransportPostStopoverDto"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "422": {
+                        "description": "Not a transport post, or stop is not part of this journey"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Posts",
+                    "TransportPosts"
+                ],
+                "summary": "Clear stopover arrival",
+                "description": "Clear a previously logged actual arrival time at a stopover for the given transport post",
+                "operationId": "clearStopoverArrival",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Post id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "stopId",
+                        "in": "path",
+                        "description": "Transport trip stop id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/TransportPostStopoverDto"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "422": {
+                        "description": "Not a transport post, or stop is not part of this journey"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/posts/{id}/transport/stopovers/{stopId}/departure": {
+            "post": {
+                "tags": [
+                    "Posts",
+                    "TransportPosts"
+                ],
+                "summary": "Log stopover departure",
+                "description": "Log the actual departure time from a stopover for the given transport post",
+                "operationId": "logStopoverDeparture",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Post id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "stopId",
+                        "in": "path",
+                        "description": "Transport trip stop id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StopoverLogRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/TransportPostStopoverDto"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "422": {
+                        "description": "Not a transport post, or stop is not part of this journey"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Posts",
+                    "TransportPosts"
+                ],
+                "summary": "Clear stopover departure",
+                "description": "Clear a previously logged actual departure time from a stopover for the given transport post",
+                "operationId": "clearStopoverDeparture",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Post id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "stopId",
+                        "in": "path",
+                        "description": "Transport trip stop id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/TransportPostStopoverDto"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "422": {
+                        "description": "Not a transport post, or stop is not part of this journey"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
         "/posts/{id}/transport/exit": {
             "put": {
                 "tags": [
@@ -5135,6 +5485,20 @@
                 },
                 "type": "object"
             },
+            "StopoverLogRequest": {
+                "required": [
+                    "timestamp"
+                ],
+                "properties": {
+                    "timestamp": {
+                        "description": "The client-observed time at which the arrival/departure occurred, in ISO 8601 format. Using the time observed on the device (rather than the time the request reaches the server) keeps the logged time accurate under poor network reception.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-08-01T10:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
             "StoreInviteCodeRequest": {
                 "required": [],
                 "properties": {
@@ -5827,6 +6191,69 @@
                     "departureDelay": {
                         "description": "Departure delay in minutes",
                         "type": "integer",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "TransportPostStopoverDto": {
+                "description": "A single stopover of a transport post journey, including the user-logged actual arrival/departure",
+                "required": [
+                    "id",
+                    "location",
+                    "sequence",
+                    "scheduledArrivalTime",
+                    "scheduledDepartureTime",
+                    "arrivalDelay",
+                    "departureDelay",
+                    "manualArrivalTime",
+                    "manualDepartureTime"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier for the stop",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "location": {
+                        "$ref": "#/components/schemas/LocationDto"
+                    },
+                    "sequence": {
+                        "description": "Sequence number of the stop within the trip",
+                        "type": "integer"
+                    },
+                    "scheduledArrivalTime": {
+                        "description": "Scheduled arrival time in ISO 8601 format",
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "scheduledDepartureTime": {
+                        "description": "Scheduled departure time in ISO 8601 format",
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "arrivalDelay": {
+                        "description": "Arrival delay in minutes",
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "departureDelay": {
+                        "description": "Departure delay in minutes",
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "manualArrivalTime": {
+                        "description": "User-logged actual arrival time in ISO 8601 format",
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "manualDepartureTime": {
+                        "description": "User-logged actual departure time in ISO 8601 format",
+                        "type": "string",
+                        "format": "date-time",
                         "nullable": true
                     }
                 },

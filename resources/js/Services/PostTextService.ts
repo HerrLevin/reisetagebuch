@@ -48,7 +48,7 @@ export function prettyDates(post: AllPosts): string {
         }
     }
 
-    return `@ ${getDisplayDate(post.created_at)}`;
+    return `@ ${getDisplayDate(post.createdAt)}`;
 }
 
 export function getDisplayDate(dateString: string): string {
