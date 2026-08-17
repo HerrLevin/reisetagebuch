@@ -16,6 +16,14 @@ export function setupApiAuth(token: string | null) {
     }
 }
 
+api.instance.interceptors.request.use((config) => {
+    const token = useAuthStore().token;
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
 // middleware to clear the token if the api returns a 401
 api.instance.interceptors.response.use(
     (response) => response,
