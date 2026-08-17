@@ -9,44 +9,28 @@ import { CircleX, Pencil, PlaneLanding, PlaneTakeoff } from 'lucide-vue-next';
 import { DateTime } from 'luxon';
 import { computed, onMounted, ref, useTemplateRef } from 'vue';
 import { useI18n } from 'vue-i18n';
-import {
-    TransportPost,
-    TransportPostStopoverDto,
-} from '../../../types/Api.gen';
+import { TransportPostStopoverDto } from '../../../types/Api.gen';
+import { useActiveTransportPostStore } from '@/stores/activeTransportPost';
 
 const { t } = useI18n();
 
 const title = t('active_transport_post.title');
-const loading = ref(true);
-const post = ref<TransportPost | null>(null);
-const stopovers = ref<TransportPostStopoverDto[]>([]);
+const activePost = useActiveTransportPostStore();
 
 const subtitle = computed(() =>
-    post.value ? `${getBaseText(post.value)} (${prettyDates(post.value)})` : '',
+    activePost.activeTransportPost
+        ? `${getBaseText(activePost.activeTransportPost)} (${prettyDates(activePost.activeTransportPost)})`
+        : '',
 );
 
 function fetchActivePost() {
-    loading.value = true;
-    api.posts
-        .getActiveTransportPost()
-        .then((response) => {
-            post.value = response.data as TransportPost | null;
-            useTitle(post.value ? `${title} · ${subtitle.value}` : title);
-
-            return post.value
-                ? api.posts.getStopoversForTransportPost(post.value.id)
-                : null;
-        })
-        .then((response) => {
-            stopovers.value = response?.data ?? [];
-        })
-        .catch(() => {
-            post.value = null;
-            stopovers.value = [];
-        })
-        .finally(() => {
-            loading.value = false;
-        });
+    activePost.fetchPost().then(() => {
+        useTitle(
+            activePost.activeTransportPost
+                ? `${title} · ${subtitle.value}`
+                : title,
+        );
+    });
 }
 
 function delayInMinutes(delaySeconds: number | null): number | null {
@@ -75,48 +59,52 @@ function formatActualTime(time: string | null): string | null {
 }
 
 function laterStopAlreadyLogged(index: number): boolean {
-    return stopovers.value
+    return activePost.stopovers
         .slice(index + 1)
         .some((stop) => stop.manualArrivalTime || stop.manualDepartureTime);
 }
 
 function logArrival(stop: TransportPostStopoverDto, index: number) {
     const timestamp = new Date().toISOString();
-    if (!post.value) {
+    if (!activePost.activeTransportPost) {
         return;
     }
     if (
         (laterStopAlreadyLogged(index) ||
-            stopovers.value[index].manualDepartureTime) &&
+            activePost.stopovers[index].manualDepartureTime) &&
         !confirm(t('active_transport_post.overwrite_confirm'))
     ) {
         return;
     }
 
     api.posts
-        .logStopoverArrival(post.value.id, stop.id, { timestamp })
+        .logStopoverArrival(activePost.activeTransportPost.id, stop.id, {
+            timestamp,
+        })
         .then((response) => {
-            stopovers.value = response.data;
+            activePost.stopovers = response.data;
         });
 }
 
 function logDeparture(stop: TransportPostStopoverDto, index: number) {
     const timestamp = new Date().toISOString();
-    if (!post.value) {
+    if (!activePost.activeTransportPost) {
         return;
     }
     if (
         (laterStopAlreadyLogged(index) ||
-            stopovers.value[index].manualDepartureTime) &&
+            activePost.stopovers[index].manualDepartureTime) &&
         !confirm(t('active_transport_post.overwrite_confirm'))
     ) {
         return;
     }
 
     api.posts
-        .logStopoverDeparture(post.value.id, stop.id, { timestamp })
+        .logStopoverDeparture(activePost.activeTransportPost.id, stop.id, {
+            timestamp,
+        })
         .then((response) => {
-            stopovers.value = response.data;
+            activePost.stopovers = response.data;
         });
 }
 
@@ -129,7 +117,7 @@ const editArrival = ref<DateTime | null>(null);
 const editShowDeparture = computed(
     () =>
         editingIndex.value !== null &&
-        editingIndex.value < stopovers.value.length - 1,
+        editingIndex.value < activePost.stopovers.length - 1,
 );
 const editShowArrival = computed(
     () => editingIndex.value !== null && editingIndex.value > 0,
@@ -158,7 +146,7 @@ function openEditDialog(stop: TransportPostStopoverDto, index: number) {
 }
 
 function saveStopoverTimes() {
-    if (!post.value || !editingStop.value) {
+    if (!activePost.activeTransportPost || !editingStop.value) {
         return;
     }
     const stopId = editingStop.value.id;
@@ -166,29 +154,37 @@ function saveStopoverTimes() {
 
     if (editShowArrival.value && editArrival.value) {
         requests.push(
-            api.posts.logStopoverArrival(post.value.id, stopId, {
-                timestamp: editArrival.value.toISO() as string,
-            }),
+            api.posts.logStopoverArrival(
+                activePost.activeTransportPost.id,
+                stopId,
+                {
+                    timestamp: editArrival.value.toISO() as string,
+                },
+            ),
         );
     }
     if (editShowDeparture.value && editDeparture.value) {
         requests.push(
-            api.posts.logStopoverDeparture(post.value.id, stopId, {
-                timestamp: editDeparture.value.toISO() as string,
-            }),
+            api.posts.logStopoverDeparture(
+                activePost.activeTransportPost.id,
+                stopId,
+                {
+                    timestamp: editDeparture.value.toISO() as string,
+                },
+            ),
         );
     }
 
     Promise.all(requests).then((responses) => {
         const last = responses[responses.length - 1];
         if (last) {
-            stopovers.value = last.data;
+            activePost.stopovers = last.data;
         }
     });
 }
 
 function applyClearResponse(stopoverList: TransportPostStopoverDto[]) {
-    stopovers.value = stopoverList;
+    activePost.stopovers = stopoverList;
     const updated = stopoverList.find((s) => s.id === editingStop.value?.id);
     if (!updated) {
         return;
@@ -199,20 +195,26 @@ function applyClearResponse(stopoverList: TransportPostStopoverDto[]) {
 }
 
 function clearArrival() {
-    if (!post.value || !editingStop.value) {
+    if (!activePost.activeTransportPost || !editingStop.value) {
         return;
     }
     api.posts
-        .clearStopoverArrival(post.value.id, editingStop.value.id)
+        .clearStopoverArrival(
+            activePost.activeTransportPost.id,
+            editingStop.value.id,
+        )
         .then((response) => applyClearResponse(response.data));
 }
 
 function clearDeparture() {
-    if (!post.value || !editingStop.value) {
+    if (!activePost.activeTransportPost || !editingStop.value) {
         return;
     }
     api.posts
-        .clearStopoverDeparture(post.value.id, editingStop.value.id)
+        .clearStopoverDeparture(
+            activePost.activeTransportPost.id,
+            editingStop.value.id,
+        )
         .then((response) => applyClearResponse(response.data));
 }
 
@@ -225,9 +227,12 @@ onMounted(fetchActivePost);
             <h2 class="text-xl leading-tight font-semibold">{{ title }}</h2>
         </template>
 
-        <div v-if="loading" class="skeleton h-40 w-full" />
+        <div v-if="activePost.loadingPost" class="skeleton h-40 w-full" />
 
-        <div v-else-if="!post" class="card bg-base-100 min-w-full shadow-md">
+        <div
+            v-else-if="!activePost.activeTransportPost"
+            class="card bg-base-100 min-w-full shadow-md"
+        >
             <div class="card-body items-center text-center">
                 <p>{{ t('active_transport_post.no_active_post') }}</p>
                 <p class="text-sm opacity-70">
@@ -242,7 +247,7 @@ onMounted(fetchActivePost);
 
                 <ul class="list w-full">
                     <li
-                        v-for="(stop, index) in stopovers"
+                        v-for="(stop, index) in activePost.stopovers"
                         :key="stop.id"
                         class="list-row items-center"
                     >
@@ -267,7 +272,11 @@ onMounted(fetchActivePost);
                                         "
                                     />
                                 </span>
-                                <span v-if="index < stopovers.length - 1">
+                                <span
+                                    v-if="
+                                        index < activePost.stopovers.length - 1
+                                    "
+                                >
                                     {{ t('edit_transport_times.departure') }}:
                                     {{
                                         formatScheduledTime(
@@ -325,7 +334,7 @@ onMounted(fetchActivePost);
                                 </span>
                             </button>
                             <button
-                                v-if="index < stopovers.length - 1"
+                                v-if="index < activePost.stopovers.length - 1"
                                 class="btn btn-sm btn-primary"
                                 @click="logDeparture(stop, index)"
                             >
