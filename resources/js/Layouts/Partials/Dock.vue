@@ -153,7 +153,13 @@ const isDeparturesRoute = () => {
     padding-bottom: calc(4rem + env(safe-area-inset-bottom));
 }
 .fab-margin {
-    margin-bottom: calc(4rem + env(safe-area-inset-bottom));
+    position: fixed;
+    left: 1rem;
+    width: 75%;
+    /* Same clearance the fab button gets above the dock (1rem bottom
+       offset + 4rem dock height), so both float at the same height. */
+    bottom: calc(5rem + env(safe-area-inset-bottom));
+    z-index: 30;
 }
 .fab:focus-within::before {
     content: '';
