@@ -9,12 +9,6 @@ import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import CardBack from '@/Pages/Posts/Partials/CardBack.vue';
 import { getColorForPost } from '@/Services/DepartureTypeService';
-import {
-    getArrivalDelay,
-    getArrivalTime,
-    getDepartureDelay,
-    getDepartureTime,
-} from '@/Services/TripTimeService';
 import { useUserStore } from '@/stores/user';
 import { isLocationPost, isTransportPost } from '@/types/PostTypes';
 import { GeometryCollection } from 'geojson';
@@ -23,6 +17,7 @@ import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { BasePost, LocationPost, TransportPost } from '../../../types/Api.gen';
+import { getTransportProgress } from '@/Services/TimeFormattingService';
 
 const { t } = useI18n();
 const vueRouter = useRouter();
@@ -164,31 +159,7 @@ onUnmounted(() => {
 watch(() => props.postId, fetchLikes, { immediate: true });
 
 const progress = computed(() => {
-    if (!isTransportPost(post.value)) return 0;
-
-    const transportPost = post.value as TransportPost;
-    const departureDelay = getDepartureDelay(transportPost) || 0;
-    const departureTime = getDepartureTime(transportPost.originStop)
-        ?.plus({ minutes: departureDelay })
-        .toISO();
-    const arrivalDelay = getArrivalDelay(transportPost) || 0;
-    const arrivalTime = getArrivalTime(transportPost.destinationStop)
-        ?.plus({ minutes: arrivalDelay })
-        .toISO();
-
-    if (!departureTime || !arrivalTime) return 0;
-
-    const departure = new Date(departureTime).getTime();
-    const arrival = new Date(arrivalTime).getTime();
-    const now = currentTime.value;
-
-    if (now < departure) return 0;
-    if (now > arrival) return 100;
-
-    const totalDuration = arrival - departure;
-    const elapsed = now - departure;
-
-    return Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
+    return getTransportProgress(post.value, currentTime.value);
 });
 
 watchEffect(() => {
