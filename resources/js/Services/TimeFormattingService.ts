@@ -1,6 +1,17 @@
-import { getArrivalTime, getDepartureTime } from '@/Services/TripTimeService';
+import {
+    getArrivalDelay,
+    getArrivalTime,
+    getDepartureDelay,
+    getDepartureTime,
+} from '@/Services/TripTimeService';
+import { isTransportPost } from '@/types/PostTypes';
 import { DateTime, DateTimeMaybeValid } from 'luxon';
-import { StopDto } from '../../types/Api.gen';
+import {
+    BasePost,
+    LocationPost,
+    StopDto,
+    TransportPost,
+} from '../../types/Api.gen';
 
 export function formatDelayAbsoluteAmount(minutes: number): string {
     if (minutes < 60) {
@@ -67,4 +78,34 @@ function formatStopTime(
     }
 
     return null;
+}
+
+export function getTransportProgress(
+    post: BasePost | TransportPost | LocationPost | null,
+    now: number = Date.now(),
+) {
+    if (!isTransportPost(post)) return 0;
+
+    const transportPost = post as TransportPost;
+    const departureDelay = getDepartureDelay(transportPost) || 0;
+    const departureTime = getDepartureTime(transportPost.originStop)
+        ?.plus({ minutes: departureDelay })
+        .toISO();
+    const arrivalDelay = getArrivalDelay(transportPost) || 0;
+    const arrivalTime = getArrivalTime(transportPost.destinationStop)
+        ?.plus({ minutes: arrivalDelay })
+        .toISO();
+
+    if (!departureTime || !arrivalTime) return 0;
+
+    const departure = new Date(departureTime).getTime();
+    const arrival = new Date(arrivalTime).getTime();
+
+    if (now < departure) return 0;
+    if (now > arrival) return 100;
+
+    const totalDuration = arrival - departure;
+    const elapsed = now - departure;
+
+    return Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
 }

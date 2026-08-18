@@ -14,6 +14,7 @@ import {
 import { onMounted, onUnmounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { RouterLink, useRoute } from 'vue-router';
+import TravelCompanion from '@/Layouts/Partials/TravelCompanion.vue';
 
 const { t } = useI18n();
 
@@ -59,6 +60,9 @@ const isDeparturesRoute = () => {
 
 <template>
     <div class="md:invisible">
+        <div class="fab-margin active-post-card md:w-85">
+            <TravelCompanion />
+        </div>
         <div class="fab">
             <div
                 tabindex="0"
@@ -148,7 +152,15 @@ const isDeparturesRoute = () => {
 .fab {
     padding-bottom: calc(4rem + env(safe-area-inset-bottom));
 }
-
+.fab-margin {
+    position: fixed;
+    left: 1rem;
+    width: 75%;
+    /* Same clearance the fab button gets above the dock (1rem bottom
+       offset + 4rem dock height), so both float at the same height. */
+    bottom: calc(5rem + env(safe-area-inset-bottom));
+    z-index: 30;
+}
 .fab:focus-within::before {
     content: '';
     position: fixed;
