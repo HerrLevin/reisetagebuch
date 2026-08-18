@@ -13,6 +13,7 @@ import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { getCurrentOrNextStopover } from '@/Services/TripStopoverService';
 import { TransportPostStopoverDto } from '../../../types/Api.gen';
 
+const travelCompanionModal = ref<HTMLDialogElement | null>(null);
 const activePost = useActiveTransportPostStore();
 const nextStopover = ref<TransportPostStopoverDto | null>(null);
 const progress = ref(0);
@@ -54,8 +55,8 @@ onMounted(() => {
 <template>
     <div
         v-if="activePost.activeTransportPost"
-        onclick="my_modal_5.showModal()"
         class="btn btn-lg bg-base-300 text-base-content/65 w-full flex-col gap-0 px-2 pt-0 pb-2 text-start text-sm shadow-xl"
+        @click="travelCompanionModal?.showModal()"
     >
         <div class="flex w-full justify-between text-xs font-normal">
             <div class="line-clamp-1 overflow-ellipsis">
@@ -89,11 +90,11 @@ onMounted(() => {
     </div>
     <dialog
         v-if="activePost.activeTransportPost"
-        id="my_modal_5"
-        class="modal modal-bottom"
+        ref="travelCompanionModal"
+        class="modal modal-bottom md:modal-middle"
     >
-        <div class="modal-box">
-            <div class="flex w-full justify-between">
+        <div class="modal-box max-w-5xl md:w-11/12">
+            <div class="mb-8 flex w-full justify-between">
                 <div class="line-clamp-1 font-bold overflow-ellipsis">
                     <div
                         v-show="activePost.activeTransportPost.trip.lineName"

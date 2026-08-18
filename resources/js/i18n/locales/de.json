@@ -553,8 +553,6 @@
         "no_active_post": "Du hast gerade keinen aktiven Transport-Beitrag.",
         "no_active_post_hint": "Sobald du auf einem Transport-Beitrag unterwegs bist, erscheint er hier, damit du deine Zwischenhalte protokollieren kannst.",
         "overwrite_confirm": "Für diesen oder einen späteren Halt ist bereits eine Zeit protokolliert. Überschreiben?",
-        "logged_arrival": "Protokollierte Ankunft",
-        "logged_departure": "Protokollierte Abfahrt",
         "log_stopovers": "Zwischenhalte protokollieren",
         "edit_stop_times_title": "Zeiten für {name} bearbeiten"
     }

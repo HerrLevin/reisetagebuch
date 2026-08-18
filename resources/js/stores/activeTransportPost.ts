@@ -13,7 +13,11 @@ export const useActiveTransportPostStore = defineStore(
 
         const fetchPost = async (force = false) => {
             // only refresh every 5 minutes
-            if (!force && activeTransportPost.value && refreshedAt.value) {
+            if (
+                !force &&
+                activeTransportPost.value !== null &&
+                refreshedAt.value
+            ) {
                 const now = new Date();
                 const diff =
                     (now.getTime() - refreshedAt.value.getTime()) / 1000;
@@ -26,6 +30,7 @@ export const useActiveTransportPostStore = defineStore(
                 .getActiveTransportPost()
                 .then((response) => {
                     activeTransportPost.value = response.data;
+                    refreshedAt.value = new Date();
                     fetchStopovers();
                 })
                 .catch((error) => {

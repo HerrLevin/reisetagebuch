@@ -9,7 +9,8 @@ import {
 import { api } from '@/api';
 import { computed, PropType, ref, useTemplateRef } from 'vue';
 import { useI18n } from 'vue-i18n';
-import Delay from '@/Components/Post/Partials/Delay.vue';
+import DelayedTime from '@/Components/Post/Partials/DelayedTime.vue';
+import Time from '@/Components/Post/Partials/Time.vue';
 
 const { t } = useI18n();
 const props = defineProps({
@@ -31,25 +32,11 @@ function delayInMinutes(delaySeconds: number | null): number | null {
     return delaySeconds !== null ? Math.floor(delaySeconds / 60) : null;
 }
 
-function formatScheduledTime(
-    time: string | null,
-    delaySeconds: number | null,
-): string | null {
+function parseTime(time: string | null): DateTime | null {
     if (!time) {
         return null;
     }
-    const scheduled = DateTime.fromISO(time);
-    const adjusted = delaySeconds
-        ? scheduled.plus({ seconds: delaySeconds })
-        : scheduled;
-
-    return adjusted.toLocaleString(DateTime.TIME_SIMPLE);
-}
-
-function formatActualTime(time: string | null): string | null {
-    return time
-        ? DateTime.fromISO(time).toLocaleString(DateTime.TIME_WITH_SECONDS)
-        : null;
+    return DateTime.fromISO(time);
 }
 
 function laterStopAlreadyLogged(index: number): boolean {
@@ -211,83 +198,91 @@ function clearDeparture() {
 
 <template>
     <ul class="list w-full">
-        <li
-            v-for="(stop, index) in props.stopovers"
-            :key="stop.id"
-            class="list-row items-center px-0"
-        >
-            <div class="list-col-grow">
-                <div class="font-medium">
-                    {{ stop.location.name }}
+        <template v-for="(stop, index) in props.stopovers" :key="stop.id">
+            <li class="p-0 text-xs tracking-wide">
+                {{ stop.location.name }}
+            </li>
+            <li class="list-row items-center px-0 py-1">
+                <div class="list-col-grow">
+                    <div class="flex flex-wrap gap-x-1 text-xs opacity-70">
+                        <div class="flex-col">
+                            <Time
+                                v-if="index > 0"
+                                :time="parseTime(stop.scheduledArrivalTime)"
+                            />
+                            <Time
+                                v-if="index < props.stopovers.length - 1"
+                                :time="parseTime(stop.scheduledDepartureTime)"
+                            />
+                        </div>
+                        <div class="flex-col">
+                            <DelayedTime
+                                v-if="index > 0"
+                                :time="parseTime(stop.scheduledArrivalTime)"
+                                :delay="delayInMinutes(stop.arrivalDelay)"
+                            />
+                            <DelayedTime
+                                v-if="index < props.stopovers.length - 1"
+                                :time="parseTime(stop.scheduledDepartureTime)"
+                                :delay="delayInMinutes(stop.departureDelay)"
+                            />
+                        </div>
+                        <div class="flex-col text-cyan-400">
+                            <Time
+                                :time="parseTime(stop.manualArrivalTime)"
+                                placeholder=""
+                            />
+                            <Time
+                                :time="parseTime(stop.manualDepartureTime)"
+                                placeholder=""
+                            />
+                        </div>
+                    </div>
                 </div>
-                <div class="flex flex-wrap gap-x-4 text-xs opacity-70">
-                    <span v-if="index > 0">
-                        {{ t('edit_transport_times.arrival') }}:
-                        {{
-                            formatScheduledTime(
-                                stop.scheduledArrivalTime,
-                                stop.arrivalDelay,
-                            ) ?? '–'
-                        }}
-                        <Delay :delay="delayInMinutes(stop.arrivalDelay)" />
-                    </span>
-                    <span v-if="index < props.stopovers.length - 1">
-                        {{ t('edit_transport_times.departure') }}:
-                        {{
-                            formatScheduledTime(
-                                stop.scheduledDepartureTime,
-                                stop.departureDelay,
-                            ) ?? '–'
-                        }}
-                        <Delay :delay="delayInMinutes(stop.departureDelay)" />
-                    </span>
+                <div class="flex gap-2">
+                    <button
+                        v-if="index > 0"
+                        class="btn btn-xs md:btn-sm btn-outline"
+                        :class="{
+                            'btn-soft':
+                                laterStopAlreadyLogged(index) ||
+                                props.stopovers[index].manualDepartureTime ||
+                                props.stopovers[index].manualArrivalTime,
+                        }"
+                        @click="logArrival(stop, index)"
+                    >
+                        <PlaneLanding class="size-4" />
+                        <span class="hidden md:inline">
+                            {{ t('edit_transport_times.arrive_now') }}
+                        </span>
+                    </button>
+                    <button
+                        v-if="index < props.stopovers.length - 1"
+                        class="btn btn-xs md:btn-sm btn-primary"
+                        :class="{
+                            'btn-soft':
+                                laterStopAlreadyLogged(index) ||
+                                props.stopovers[index].manualDepartureTime,
+                        }"
+                        @click="logDeparture(stop, index)"
+                    >
+                        <PlaneTakeoff class="size-4" />
+                        <span class="hidden md:inline">
+                            {{ t('edit_transport_times.depart_now') }}
+                        </span>
+                    </button>
+                    <button
+                        class="btn btn-xs md:btn-sm btn-ghost"
+                        @click="openEditDialog(stop, index)"
+                    >
+                        <Pencil class="size-4" />
+                        <span class="hidden md:inline">
+                            {{ t('verbs.edit') }}
+                        </span>
+                    </button>
                 </div>
-                <div
-                    v-if="stop.manualArrivalTime || stop.manualDepartureTime"
-                    class="text-success flex flex-wrap gap-x-4 text-xs font-medium"
-                >
-                    <span v-if="stop.manualArrivalTime">
-                        {{ t('active_transport_post.logged_arrival') }}:
-                        {{ formatActualTime(stop.manualArrivalTime) }}
-                    </span>
-                    <span v-if="stop.manualDepartureTime">
-                        {{ t('active_transport_post.logged_departure') }}:
-                        {{ formatActualTime(stop.manualDepartureTime) }}
-                    </span>
-                </div>
-            </div>
-            <div class="flex gap-2">
-                <button
-                    v-if="index > 0"
-                    class="btn btn-sm btn-outline"
-                    @click="logArrival(stop, index)"
-                >
-                    <PlaneLanding class="size-4" />
-                    <span class="hidden md:inline">
-                        {{ t('edit_transport_times.arrive_now') }}
-                    </span>
-                </button>
-                <button
-                    v-if="index < props.stopovers.length - 1"
-                    class="btn btn-sm btn-primary"
-                    @click="logDeparture(stop, index)"
-                >
-                    <PlaneTakeoff class="size-4" />
-                    <span class="hidden md:inline">
-                        {{ t('edit_transport_times.depart_now') }}
-                    </span>
-                </button>
-                <button
-                    class="btn btn-sm btn-ghost"
-                    @click="openEditDialog(stop, index)"
-                >
-                    <Pencil class="size-4" />
-                    <span class="hidden md:inline">
-                        {{ t('verbs.edit') }}
-                    </span>
-                </button>
-            </div>
-        </li>
+            </li>
+        </template>
     </ul>
 
     <EditTimesDialog
@@ -303,7 +298,11 @@ function clearDeparture() {
         @save="saveStopoverTimes"
     >
         <template v-if="editingStop?.manualArrivalTime" #arrival-extra>
-            <button type="button" class="btn btn-outline" @click="clearArrival">
+            <button
+                type="button"
+                class="btn btn-sm btn-outline"
+                @click="clearArrival"
+            >
                 <CircleX class="size-5" />
                 {{ t('edit_transport_times.clear_arrival') }}
             </button>
@@ -311,7 +310,7 @@ function clearDeparture() {
         <template v-if="editingStop?.manualDepartureTime" #departure-extra>
             <button
                 type="button"
-                class="btn btn-outline"
+                class="btn btn-sm btn-outline"
                 @click="clearDeparture"
             >
                 <CircleX class="size-5" />

@@ -394,41 +394,41 @@ function blur() {
         @save="saveManualTimes"
     >
         <template #departure-extra>
-            <div class="flex gap-2">
+            <div class="flex w-full justify-between gap-2">
                 <button
                     type="button"
-                    class="btn btn-outline"
+                    class="btn btn-outline btn-sm"
                     @click="editManualDeparture = null"
                 >
-                    <CircleX class="size-5" />
+                    <CircleX class="size-4" />
                     {{ t('edit_transport_times.clear_departure') }}
                 </button>
                 <button
                     type="button"
-                    class="btn btn-primary"
+                    class="btn btn-primary btn-sm"
                     @click="departNowInDialog()"
                 >
-                    <PlaneTakeoff class="size-5" />
+                    <PlaneTakeoff class="size-4" />
                     {{ t('edit_transport_times.depart_now') }}
                 </button>
             </div>
         </template>
         <template #arrival-extra>
-            <div class="flex gap-2">
+            <div class="flex w-full justify-between gap-2">
                 <button
                     type="button"
-                    class="btn btn-outline"
+                    class="btn btn-outline btn-sm"
                     @click="editManualArrival = null"
                 >
-                    <CircleX class="size-5" />
+                    <CircleX class="size-4" />
                     {{ t('edit_transport_times.clear_arrival') }}
                 </button>
                 <button
                     type="button"
-                    class="btn btn-primary"
+                    class="btn btn-primary btn-sm"
                     @click="arriveNowInDialog()"
                 >
-                    <PlaneLanding class="size-5" />
+                    <PlaneLanding class="size-4" />
                     {{ t('edit_transport_times.arrive_now') }}
                 </button>
             </div>
