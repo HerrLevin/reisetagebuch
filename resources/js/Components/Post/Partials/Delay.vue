@@ -2,24 +2,23 @@
 import { formatDelay } from '@/Services/TimeFormattingService';
 import { PropType } from 'vue';
 
-const props = defineProps({
+defineProps({
     delay: {
         type: Number as PropType<number | null>,
         required: false,
         default: null,
     },
 });
-
-const absDelay = Math.abs(props.delay || 0);
 </script>
 
 <template>
     <p v-if="delay !== null" class="text-xs font-medium">
         (<span
             :class="{
-                'text-green-500': absDelay < 2,
-                'text-yellow-500': absDelay < 5 && absDelay >= 2,
-                'text-red-500': absDelay >= 5,
+                'text-pink-500': delay < 0,
+                'text-green-500': delay < 2,
+                'text-yellow-500': delay < 5 && delay >= 2,
+                'text-red-500': delay >= 5,
             }"
             >{{ formatDelay(delay) }}</span
         >)

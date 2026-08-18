@@ -4,6 +4,7 @@ import Footer from '@/Layouts/Partials/Footer.vue';
 import LocationHistoryChecker from '@/Layouts/Partials/LocationHistoryChecker.vue';
 import NavBar from '@/Layouts/Partials/NavBar.vue';
 import SideNav from '@/Layouts/Partials/SideNav.vue';
+import TravelCompanion from '@/Layouts/Partials/TravelCompanion.vue';
 </script>
 
 <template>
@@ -25,6 +26,9 @@ import SideNav from '@/Layouts/Partials/SideNav.vue';
                 <div class="col-span-1 hidden md:block">
                     <div class="card bg-base-100 min-w-full p-0 shadow-md">
                         <SideNav />
+                    </div>
+                    <div class="mt-2">
+                        <TravelCompanion />
                     </div>
                 </div>
                 <div class="col-span-4">
