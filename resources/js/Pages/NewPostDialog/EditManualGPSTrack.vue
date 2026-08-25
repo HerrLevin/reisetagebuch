@@ -69,7 +69,10 @@ function submit() {
             });
         })
         .catch((error) => {
-            alert(error.error.message);
+            alert(
+                error?.response?.data?.message ||
+                    t('edit_manual_tracking.upload_error'),
+            );
             uploading.value = false;
         });
 }
@@ -124,7 +127,7 @@ watch(() => props.postId, fetchPost, { immediate: true });
                             id="gps_file"
                             type="file"
                             class="file-input input-bordered w-full"
-                            accept=".gpx, .geojson, .json"
+                            accept=".gpx,.geojson,.json,application/gpx+xml,application/geo+json,application/json,text/xml,application/xml"
                             @change="gpsUpload"
                         />
                     </div>

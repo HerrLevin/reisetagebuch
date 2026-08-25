@@ -193,6 +193,7 @@
         "delete_track": "Delete Track",
         "no_file": "No file selected. Please choose a GPX or GeoJSON file to upload.",
         "invalid_file": "Invalid file format. Please upload a GPX or GeoJSON file.",
+        "upload_error": "The track could not be uploaded. Please check the file and try again.",
         "preview": "Track Preview",
         "confirm_delete": "Are you sure you want to delete the existing track?"
     },

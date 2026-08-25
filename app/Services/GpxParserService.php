@@ -7,12 +7,17 @@ namespace App\Services;
 use Clickbar\Magellan\Data\Geometries\LineString;
 use Clickbar\Magellan\Data\Geometries\Point;
 use SimpleXMLElement;
+use Throwable;
 
 class GpxParserService
 {
     public function parse(string $gpxContent): LineString
     {
-        $xml = new SimpleXMLElement($gpxContent);
+        try {
+            $xml = new SimpleXMLElement($gpxContent);
+        } catch (Throwable) {
+            abort(422, 'Invalid GPX file');
+        }
 
         // Handle GPX namespace
         $namespaces = $xml->getNamespaces(true);
