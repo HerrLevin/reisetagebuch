@@ -19,6 +19,6 @@ class CalculateStatsForTransportPost implements ShouldQueue
 
     public function handle(): void
     {
-        app(CalculateTransportStatsController::class)->calculateStatsForPost($this->postId);
+        app(CalculateTransportStatsController::class)->calculateStatsForPost($this->postId, true);
     }
 }

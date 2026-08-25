@@ -64,7 +64,7 @@ class CalculateTransportStatsControllerTest extends TestCase
             app(TransportTripRepository::class),
             app(UserStatisticsRepository::class),
             app(CountryRepository::class),
-        )->calculateStatsForPost($post->id);
+        )->calculateStatsForPost($post->id, countryCalculation: true);
 
         $this->assertSame(['ZZ'], $post->transportPost->fresh()->transited_country_codes);
     }
