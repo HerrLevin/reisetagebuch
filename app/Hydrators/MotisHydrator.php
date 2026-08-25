@@ -56,11 +56,11 @@ class MotisHydrator
             ->setStopId($data['stopId'])
             ->setLatitude((float) $data['lat'])
             ->setLongitude((float) $data['lon'])
-            ->setArrival(! empty($data['arrival']) ? Carbon::parse($data['arrival']) : null)
+            ->setArrival(! empty($data['arrival']) ? Carbon::parse($data['arrival'])->utc() : null)
             ->setCancelled(! empty($data['cancelled']) ? (bool) $data['cancelled'] : null)
-            ->setDeparture(! empty($data['departure']) ? Carbon::parse($data['departure']) : null)
-            ->setScheduledArrival(! empty($data['scheduledArrival']) ? Carbon::parse($data['scheduledArrival']) : null)
-            ->setScheduledDeparture(! empty($data['scheduledDeparture']) ? Carbon::parse($data['scheduledDeparture']) : null);
+            ->setDeparture(! empty($data['departure']) ? Carbon::parse($data['departure'])->utc() : null)
+            ->setScheduledArrival(! empty($data['scheduledArrival']) ? Carbon::parse($data['scheduledArrival'])->utc() : null)
+            ->setScheduledDeparture(! empty($data['scheduledDeparture']) ? Carbon::parse($data['scheduledDeparture'])->utc() : null);
     }
 
     public function hydrateTrip(array $data): TripDto
@@ -72,8 +72,8 @@ class MotisHydrator
 
         return new TripDto()
             ->setDuration($data['duration'])
-            ->setStartTime(! empty($data['startTime']) ? Carbon::parse($data['startTime']) : null)
-            ->setEndTime(! empty($data['endTime']) ? Carbon::parse($data['endTime']) : null)
+            ->setStartTime(! empty($data['startTime']) ? Carbon::parse($data['startTime'])->utc() : null)
+            ->setEndTime(! empty($data['endTime']) ? Carbon::parse($data['endTime'])->utc() : null)
             ->setTransfers($data['transfers'])
             ->setLegs($legs);
     }
@@ -95,11 +95,11 @@ class MotisHydrator
 
         return new LegDto()
             ->setDuration($data['duration'])
-            ->setStartTime(! empty($data['startTime']) ? Carbon::parse($data['startTime']) : null)
-            ->setEndTime(! empty($data['endTime']) ? Carbon::parse($data['endTime']) : null)
+            ->setStartTime(! empty($data['startTime']) ? Carbon::parse($data['startTime'])->utc() : null)
+            ->setEndTime(! empty($data['endTime']) ? Carbon::parse($data['endTime'])->utc() : null)
             ->setRealTime($data['realTime'])
-            ->setScheduledStartTime(! empty($data['scheduledStartTime']) ? Carbon::parse($data['scheduledStartTime']) : null)
-            ->setScheduledEndTime(! empty($data['scheduledEndTime']) ? Carbon::parse($data['scheduledEndTime']) : null)
+            ->setScheduledStartTime(! empty($data['scheduledStartTime']) ? Carbon::parse($data['scheduledStartTime'])->utc() : null)
+            ->setScheduledEndTime(! empty($data['scheduledEndTime']) ? Carbon::parse($data['scheduledEndTime'])->utc() : null)
             ->setMode($data['mode'])
             ->setFrom($this->hydrateStopPlace($data['from']))
             ->setTo($this->hydrateStopPlace($data['to']))
