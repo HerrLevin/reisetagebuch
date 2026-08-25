@@ -22,6 +22,11 @@ const props = defineProps({
         type: Array as PropType<TransportPostStopoverDto[]>,
         required: true,
     },
+    editable: {
+        type: Boolean,
+        required: false,
+        default: true,
+    },
 });
 
 const emit = defineEmits<{
@@ -217,29 +222,34 @@ function clearDeparture() {
                         </div>
                         <div class="flex-col">
                             <DelayedTime
-                                v-if="index > 0"
+                                v-if="index > 0 && stop.arrivalDelay !== null"
                                 :time="parseTime(stop.scheduledArrivalTime)"
                                 :delay="delayInMinutes(stop.arrivalDelay)"
                             />
                             <DelayedTime
-                                v-if="index < props.stopovers.length - 1"
+                                v-if="
+                                    index < props.stopovers.length - 1 &&
+                                    stop.departureDelay !== null
+                                "
                                 :time="parseTime(stop.scheduledDepartureTime)"
                                 :delay="delayInMinutes(stop.departureDelay)"
                             />
                         </div>
                         <div class="flex-col text-cyan-400">
                             <Time
+                                v-if="index > 0"
                                 :time="parseTime(stop.manualArrivalTime)"
-                                placeholder=""
+                                placeholder="&nbsp;"
                             />
                             <Time
+                                v-if="index < props.stopovers.length - 1"
                                 :time="parseTime(stop.manualDepartureTime)"
-                                placeholder=""
+                                placeholder="&nbsp;"
                             />
                         </div>
                     </div>
                 </div>
-                <div class="flex gap-2">
+                <div v-if="props.editable" class="flex gap-2">
                     <button
                         v-if="index > 0"
                         class="btn btn-xs md:btn-sm btn-outline"

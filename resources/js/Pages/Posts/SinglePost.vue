@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { api } from '@/api';
-import Map from '@/Components/Map.vue';
+import Map, { StopoverPopupInfo } from '@/Components/Map.vue';
 import Post from '@/Components/Post/Post.vue';
 import PostMetaInfo from '@/Components/Post/PostMetaInfo.vue';
 import PostSkeleton from '@/Components/Post/PostSkeleton.vue';
 import TransportPostStats from '@/Components/Post/TransportPostStats.vue';
+import TransportPostStopovers from '@/Components/Post/TransportPostStopovers.vue';
 import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import CardBack from '@/Pages/Posts/Partials/CardBack.vue';
@@ -35,6 +36,7 @@ const startPoint = ref(null as LngLat | null);
 const endPoint = ref(null as LngLat | null);
 const lineString = ref(null as GeometryCollection | null);
 const stopovers = ref(null as GeometryCollection | null);
+const stopoverDetails = ref<StopoverPopupInfo[] | null>(null);
 const heading = ref('');
 const pageTitle = ref('');
 const loading = ref(false);
@@ -108,6 +110,27 @@ function mapPostDetails() {
             })
             .catch(() => {
                 stopovers.value = null;
+            });
+
+        api.posts
+            .getStopoversForTransportPost(tPost.id)
+            .then((response) => {
+                stopoverDetails.value = response.data
+                    .slice(1, -1)
+                    .map((stop) => ({
+                        name: stop.location.name,
+                        longitude: stop.location.longitude,
+                        latitude: stop.location.latitude,
+                        scheduledArrivalTime: stop.scheduledArrivalTime,
+                        scheduledDepartureTime: stop.scheduledDepartureTime,
+                        arrivalDelay: stop.arrivalDelay,
+                        departureDelay: stop.departureDelay,
+                        manualArrivalTime: stop.manualArrivalTime,
+                        manualDepartureTime: stop.manualDepartureTime,
+                    }));
+            })
+            .catch(() => {
+                stopoverDetails.value = null;
             });
     } else {
         startPoint.value = null;
@@ -189,6 +212,7 @@ function deleted() {
                 :end-point="endPoint"
                 :line-string="lineString"
                 :stop-overs="stopovers"
+                :stopover-details="stopoverDetails"
                 :show-geo-position="user.user?.id === post.user.id"
                 :line-color="
                     isTransportPost(post) ? getColorForPost(post) : undefined
@@ -215,6 +239,12 @@ function deleted() {
         <div v-if="loading" class="skeleton my-5 h-20 w-full" />
 
         <TransportPostStats
+            v-if="isTransportPost(post)"
+            :post="post as TransportPost"
+            class="mt-4"
+        />
+
+        <TransportPostStopovers
             v-if="isTransportPost(post)"
             :post="post as TransportPost"
             class="mt-4"

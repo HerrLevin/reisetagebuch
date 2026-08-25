@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import BaseMapWrapper from '@/Components/Maps/BaseMapWrapper.vue';
+import DelayedTime from '@/Components/Post/Partials/DelayedTime.vue';
+import Time from '@/Components/Post/Partials/Time.vue';
 import {
     MglCircleLayer,
     MglFullscreenControl,
@@ -7,6 +9,8 @@ import {
     MglGeolocateControl,
     MglLineLayer,
     MglNavigationControl,
+    MglPopup,
+    useMap,
 } from '@indoorequal/vue-maplibre-gl';
 import type {
     Feature,
@@ -14,8 +18,29 @@ import type {
     GeometryCollection,
     MultiPoint,
 } from 'geojson';
-import { LngLat, LngLatBounds, LngLatBoundsLike } from 'maplibre-gl';
+import {
+    LngLat,
+    LngLatBounds,
+    LngLatBoundsLike,
+    MapLayerMouseEvent,
+} from 'maplibre-gl';
+import { DateTime } from 'luxon';
 import { computed, PropType, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
+
+export interface StopoverPopupInfo {
+    name: string;
+    longitude: number;
+    latitude: number;
+    scheduledArrivalTime: string | null;
+    scheduledDepartureTime: string | null;
+    arrivalDelay: number | null;
+    departureDelay: number | null;
+    manualArrivalTime: string | null;
+    manualDepartureTime: string | null;
+}
 
 const props = defineProps({
     startPoint: {
@@ -35,6 +60,11 @@ const props = defineProps({
     },
     stopOvers: {
         type: Object as PropType<MultiPoint | null>,
+        default: null,
+        required: false,
+    },
+    stopoverDetails: {
+        type: Array as PropType<StopoverPopupInfo[] | null>,
         default: null,
         required: false,
     },
@@ -242,6 +272,76 @@ watch(
     { immediate: true },
 );
 
+const mapContext = useMap();
+
+const stopoverDetailSource = computed<FeatureCollection | null>(() => {
+    if (!props.stopoverDetails || props.stopoverDetails.length === 0) {
+        return null;
+    }
+
+    return {
+        type: 'FeatureCollection',
+        features: props.stopoverDetails.map((stop) => ({
+            type: 'Feature',
+            properties: {
+                name: stop.name,
+                scheduledArrivalTime: stop.scheduledArrivalTime,
+                scheduledDepartureTime: stop.scheduledDepartureTime,
+                arrivalDelay: stop.arrivalDelay,
+                departureDelay: stop.departureDelay,
+                manualArrivalTime: stop.manualArrivalTime,
+                manualDepartureTime: stop.manualDepartureTime,
+            },
+            geometry: {
+                type: 'Point',
+                coordinates: [stop.longitude, stop.latitude],
+            },
+        })),
+    };
+});
+
+const stopPinSource = computed(
+    () => stopoverDetailSource.value ?? stopOverSource.value,
+);
+
+const activeStopover = ref<StopoverPopupInfo | null>(null);
+const activeStopoverCoordinates = ref<[number, number] | null>(null);
+
+function showStopoverPopup(event: MapLayerMouseEvent) {
+    if (!stopoverDetailSource.value) {
+        return;
+    }
+
+    const feature = event.features?.[0];
+    if (!feature || feature.geometry.type !== 'Point') {
+        return;
+    }
+
+    activeStopover.value = feature.properties as StopoverPopupInfo;
+    activeStopoverCoordinates.value = feature.geometry.coordinates as [
+        number,
+        number,
+    ];
+    if (mapContext.map) {
+        mapContext.map.getCanvas().style.cursor = 'pointer';
+    }
+}
+
+function parseIsoTime(time: string | null): DateTime | null {
+    if (!time) {
+        return null;
+    }
+    return DateTime.fromISO(time);
+}
+
+function hideStopoverPopup() {
+    activeStopover.value = null;
+    activeStopoverCoordinates.value = null;
+    if (mapContext.map) {
+        mapContext.map.getCanvas().style.cursor = '';
+    }
+}
+
 const animatedPointSource = computed(() => {
     if (
         !geoJsonSource.value ||
@@ -339,21 +439,97 @@ const animatedPointSource = computed(() => {
             </mgl-circle-layer>
         </mgl-geo-json-source>
         <mgl-geo-json-source
-            v-if="stopOverSource"
+            v-if="stopPinSource"
             source-id="stops"
-            :data="stopOverSource"
+            :data="stopPinSource"
         >
             <mgl-circle-layer
                 layer-id="stopsResource"
                 :paint="{
-                    'circle-radius': 2,
+                    'circle-radius': stopoverDetailSource ? 5 : 2,
                     'circle-color': '#fff',
                     'circle-stroke-color': lineColor,
                     'circle-stroke-width': 2,
                 }"
+                @click="showStopoverPopup"
+                @mouseenter="showStopoverPopup"
+                @mouseleave="hideStopoverPopup"
             >
             </mgl-circle-layer>
         </mgl-geo-json-source>
+        <mgl-popup
+            v-if="activeStopover && activeStopoverCoordinates"
+            :coordinates="activeStopoverCoordinates"
+            :close-button="false"
+            anchor="bottom"
+            @close="hideStopoverPopup"
+        >
+            <div class="min-w-40 p-1 text-xs">
+                <div class="mb-1 text-sm font-semibold">
+                    {{ activeStopover.name }}
+                </div>
+                <div
+                    v-if="activeStopover.scheduledArrivalTime"
+                    class="flex flex-wrap items-center gap-x-1"
+                >
+                    <span class="opacity-70">
+                        {{ t('edit_transport_times.arrival') }}:
+                    </span>
+                    <Time
+                        :time="
+                            parseIsoTime(activeStopover.scheduledArrivalTime)
+                        "
+                    />
+                    <DelayedTime
+                        v-if="activeStopover.arrivalDelay !== null"
+                        :time="
+                            parseIsoTime(activeStopover.scheduledArrivalTime)
+                        "
+                        :delay="Math.floor(activeStopover.arrivalDelay / 60)"
+                    />
+                    <span
+                        v-if="activeStopover.manualArrivalTime"
+                        class="text-cyan-400"
+                    >
+                        <Time
+                            :time="
+                                parseIsoTime(activeStopover.manualArrivalTime)
+                            "
+                        />
+                    </span>
+                </div>
+                <div
+                    v-if="activeStopover.scheduledDepartureTime"
+                    class="flex flex-wrap items-center gap-x-1"
+                >
+                    <span class="opacity-70">
+                        {{ t('edit_transport_times.departure') }}:
+                    </span>
+                    <Time
+                        :time="
+                            parseIsoTime(activeStopover.scheduledDepartureTime)
+                        "
+                    />
+                    <DelayedTime
+                        v-if="activeStopover.departureDelay !== null"
+                        :time="
+                            parseIsoTime(activeStopover.scheduledDepartureTime)
+                        "
+                        :delay="Math.floor(activeStopover.departureDelay / 60)"
+                    />
+                    <span
+                        v-if="activeStopover.manualDepartureTime"
+                        class="text-cyan-400"
+                    >
+                        <Time
+                            :time="
+                                parseIsoTime(activeStopover.manualDepartureTime)
+                            "
+                        />
+                    </span>
+                </div>
+            </div>
+        </mgl-popup>
         <mgl-geo-json-source
             v-if="animatedPointSource"
             source-id="animated-point"

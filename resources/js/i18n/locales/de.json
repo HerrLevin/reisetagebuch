@@ -382,6 +382,10 @@
         "duration": "Dauer",
         "speed": "Durchschnittsgeschwindigkeit",
         "speed_unit": "km/h",
+        "stopovers": {
+            "title": "Zwischenhalte",
+            "next_stop": "Nächster Halt: {name}"
+        },
         "meta_info": {
             "title": "Zusatzinformationen",
             "vehicle_id": "Fahrzeugnummer",

@@ -384,6 +384,10 @@
         "duration": "Duration",
         "speed": "Average Speed",
         "speed_unit": "kph",
+        "stopovers": {
+            "title": "Stopovers",
+            "next_stop": "Next: {name}"
+        },
         "meta_info": {
             "title": "Additional Information",
             "vehicle_id": "Vehicle ID",
