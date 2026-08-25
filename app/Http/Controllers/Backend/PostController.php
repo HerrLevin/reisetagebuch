@@ -27,6 +27,7 @@ use App\Http\Resources\TransportPostStopoverDto;
 use App\Jobs\ActivityPub\PushDeleteToMastodon;
 use App\Jobs\ActivityPub\PushPostToMastodon;
 use App\Jobs\ActivityPub\PushUpdateToMastodon;
+use App\Jobs\CalculateCountryStatsForPost;
 use App\Jobs\CalculateStatsForTransportPost;
 use App\Jobs\PrefetchJob;
 use App\Jobs\TraewellingChangeExitJob;
@@ -177,6 +178,7 @@ class PostController extends Controller
 
         TraewellingCrossCheckInJob::dispatch($post->id);
         $this->calculateTransportStatsController->calculateStatsForPost($post->id);
+        CalculateCountryStatsForPost::dispatch($post->id);
         PrefetchJob::dispatch($stopStopover->location->location);
         $this->dispatchPost($post);
 
@@ -329,6 +331,7 @@ class PostController extends Controller
         }
 
         $this->calculateTransportStatsController->calculateStatsForPost($post->id);
+        CalculateCountryStatsForPost::dispatch($post->id);
 
         TraewellingEditPostJob::dispatch($post);
         $this->dispatchUpdate($post);
@@ -480,6 +483,7 @@ class PostController extends Controller
         TraewellingChangeExitJob::dispatch($post);
         $this->dispatchUpdate($post);
         $this->calculateTransportStatsController->calculateStatsForPost($post->id);
+        CalculateCountryStatsForPost::dispatch($post->id);
 
         return $post;
     }
@@ -551,6 +555,7 @@ class PostController extends Controller
         $internalPost = $this->postRepository->internalGetById($postId);
         $this->postRepository->updateTransportGeometry($internalPost->transportPost, $geometry);
         $this->calculateTransportStatsController->calculateStatsForPost($post->id);
+        CalculateCountryStatsForPost::dispatch($post->id);
         $this->dispatchUpdate($post);
 
         return $this->postRepository->getById($postId, $user);
@@ -585,6 +590,7 @@ class PostController extends Controller
         $this->postRepository->updateTransportGeometry($internalPost->transportPost, null);
 
         $this->calculateTransportStatsController->calculateStatsForPost($post->id);
+        CalculateCountryStatsForPost::dispatch($post->id);
         $this->dispatchUpdate($post);
 
         return $this->postRepository->getById($postId, $user);

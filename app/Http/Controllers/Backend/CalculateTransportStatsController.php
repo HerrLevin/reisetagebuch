@@ -40,7 +40,7 @@ class CalculateTransportStatsController extends Controller
         return $post;
     }
 
-    public function calculateStatsForPost(string $transportPostId): void
+    public function calculateStatsForPost(string $transportPostId, bool $countryCalculation = false): void
     {
         $post = $this->getPost($transportPostId);
         if ($post === null) {
@@ -54,7 +54,7 @@ class CalculateTransportStatsController extends Controller
         }
 
         $duration = $this->calculateDuration($post);
-        $transitedCountryCodes = $this->calculateTransitedCountryCodes($post);
+        $transitedCountryCodes = $countryCalculation ? $this->calculateTransitedCountryCodes($post) : [];
 
         $originalDistance = $post->transportPost->distance;
         $originalDuration = $post->transportPost->duration;
