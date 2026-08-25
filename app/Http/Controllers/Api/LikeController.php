@@ -34,7 +34,7 @@ class LikeController extends Controller
     )]
     public function index(string $postId): array
     {
-        return $this->likeController->index($postId);
+        return $this->likeController->index($postId, $this->auth->user());
     }
 
     #[OA\Post(

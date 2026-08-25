@@ -30,16 +30,16 @@ class LikeController extends Controller
     /**
      * @return UserDto[]
      */
-    public function index(string $postId): array
+    public function index(string $postId, ?User $user = null): array
     {
-        $post = $this->postRepository->getById($postId);
+        $post = $this->postRepository->getById($postId, $user);
 
         return $this->likeRepository->getLikesByPostId($post->id);
     }
 
     public function store(User $user, string $postId): LikeDto
     {
-        $post = $this->postRepository->getById($postId);
+        $post = $this->postRepository->getById($postId, $user);
         $like = $this->likeRepository->store($user->id, $postId);
 
         if ($like->wasRecentlyCreated) {
@@ -51,7 +51,7 @@ class LikeController extends Controller
 
     public function destroy(User $user, string $postId): LikeDto
     {
-        $post = $this->postRepository->getById($postId);
+        $post = $this->postRepository->getById($postId, $user);
         $like = $this->likeRepository->getLike($user->id, $post->id);
 
         if ($like === null) {

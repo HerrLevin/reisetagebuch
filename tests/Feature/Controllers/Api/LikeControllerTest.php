@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Controllers\Api;
 
+use App\Enums\Visibility;
 use App\Models\ActivityPubActor;
 use App\Models\ActivityPubLike;
 use App\Models\Like;
@@ -81,5 +82,50 @@ class LikeControllerTest extends TestCase
 
         $response->assertOk();
         $response->assertJsonFragment(['likesCount' => 2]);
+    }
+
+    public function test_authenticated_user_can_like_a_post_with_only_authenticated_visibility(): void
+    {
+        $author = User::factory()->create();
+        $post = Post::factory()->create(['user_id' => $author->id, 'visibility' => Visibility::ONLY_AUTHENTICATED]);
+
+        $liker = User::factory()->create();
+        Passport::actingAs($liker);
+
+        $response = $this->postJson(route('posts.like', ['postId' => $post->id]));
+
+        $response->assertOk();
+        $this->assertDatabaseHas('likes', ['user_id' => $liker->id, 'post_id' => $post->id]);
+    }
+
+    public function test_authenticated_user_can_unlike_a_post_with_only_authenticated_visibility(): void
+    {
+        $author = User::factory()->create();
+        $post = Post::factory()->create(['user_id' => $author->id, 'visibility' => Visibility::ONLY_AUTHENTICATED]);
+
+        $liker = User::factory()->create();
+        Like::create(['user_id' => $liker->id, 'post_id' => $post->id]);
+
+        Passport::actingAs($liker);
+        $response = $this->deleteJson(route('posts.unlike', ['postId' => $post->id]));
+
+        $response->assertOk();
+        $this->assertDatabaseMissing('likes', ['user_id' => $liker->id, 'post_id' => $post->id]);
+    }
+
+    public function test_authenticated_user_can_list_likes_on_a_post_with_only_authenticated_visibility(): void
+    {
+        $author = User::factory()->create();
+        $post = Post::factory()->create(['user_id' => $author->id, 'visibility' => Visibility::ONLY_AUTHENTICATED]);
+
+        $liker = User::factory()->create();
+        Like::create(['user_id' => $liker->id, 'post_id' => $post->id]);
+
+        $viewer = User::factory()->create();
+        Passport::actingAs($viewer);
+        $response = $this->getJson(route('posts.likes', ['post' => $post->id]));
+
+        $response->assertOk();
+        $response->assertJsonCount(1);
     }
 }
