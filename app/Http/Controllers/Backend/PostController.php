@@ -563,7 +563,11 @@ class PostController extends Controller
 
     private function parseGeoJsonTrack(string $content): LineString
     {
-        $parsed = app(GeojsonParser::class)->parse($content);
+        try {
+            $parsed = app(GeojsonParser::class)->parse($content);
+        } catch (Throwable) {
+            abort(422, 'Invalid GeoJSON file');
+        }
 
         if (! $parsed instanceof LineString) {
             abort(422, 'GeoJSON must contain a LineString geometry');
