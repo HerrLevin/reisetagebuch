@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\App;
+use Log;
 use Throwable;
 
 class PrefetchJob implements ShouldQueue
@@ -30,6 +31,12 @@ class PrefetchJob implements ShouldQueue
 
     public function handle(): void
     {
+        if (config('app.dev.skip_prefetch')) {
+            Log::debug('Skipping prefetch job');
+
+            return;
+        }
+
         try {
             $attempts = method_exists($this, 'attempts') ? $this->attempts() : null;
         } catch (Throwable) {

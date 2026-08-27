@@ -62,4 +62,7 @@ return [
         'cypress' => env('APP_TESTING_CYPRESS', false),
         'cypress_token' => env('APP_TESTING_CYPRESS_TOKEN', 'testing'),
     ],
+    'dev' => [
+        'skip_prefetch' => env('APP_DEV_SKIP_PREFETCH', false),
+    ],
 ];
