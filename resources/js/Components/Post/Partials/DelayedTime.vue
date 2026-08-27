@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { PropType } from 'vue';
+import { computed, PropType } from 'vue';
 import { DateTime } from 'luxon';
 import Time from '@/Components/Post/Partials/Time.vue';
 
-defineProps({
+const props = defineProps({
     time: {
         type: Object as PropType<DateTime | null>,
         required: false,
@@ -20,12 +20,19 @@ defineProps({
         default: null,
     },
 });
+
+const delayedTime = computed(() => {
+    if (props.time && props.delay !== null) {
+        return props.time.plus({ minutes: props.delay });
+    }
+    return props.time;
+});
 </script>
 
 <template>
     <Time
         v-if="delay !== null"
-        :time="time"
+        :time="delayedTime"
         :format="format"
         :class="{
             'text-pink-500': delay < 0,
