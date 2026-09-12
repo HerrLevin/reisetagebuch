@@ -2,6 +2,7 @@
 import { api } from '@/api';
 import { useTitle } from '@/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { getServerOrigin } from '@/Services/ServerConfig';
 import { DateTime } from 'luxon';
 import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -53,8 +54,8 @@ function humanTimestamp(timestamp: string | null): string {
     return DateTime.fromISO(timestamp).toLocaleString(DateTime.DATETIME_MED);
 }
 
-function copy(id: string): void {
-    const registerRoute = `${window.location.origin}/register`;
+async function copy(id: string): Promise<void> {
+    const registerRoute = `${await getServerOrigin()}/register`;
     navigator.clipboard
         .writeText(registerRoute + '?invite=' + id)
         .then(() => {

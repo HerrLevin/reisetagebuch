@@ -95,6 +95,17 @@
             "acceptRequiredNotice": "Please review and accept the current privacy policy to continue using the app."
         }
     },
+    "connect_server": {
+        "title": "Connect to your instance",
+        "message": "Reisetagebuch is a federated network of self-hosted instances. Enter the address of the instance you'd like to use.",
+        "url_label": "Instance address",
+        "url_placeholder": "my-instance.example.com",
+        "submit": "Continue",
+        "not_found": "Could not reach a Reisetagebuch instance at this address. Please check the URL and try again.",
+        "change_title": "Server",
+        "change_current": "Currently connected to {url}",
+        "change_button": "Change server"
+    },
     "auth": {
         "confirm_password_title": "Confirm Password",
         "confirm_password": "This is a secure area of the application. Please confirm your password before continuing.",

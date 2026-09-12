@@ -93,6 +93,17 @@
             "acceptRequiredNotice": "Bitte akzeptiere die aktuelle Datenschutzerklärung, um die App weiter zu nutzen."
         }
     },
+    "connect_server": {
+        "title": "Mit deiner Instanz verbinden",
+        "message": "Reisetagebuch ist ein föderiertes Netzwerk aus selbst gehosteten Instanzen. Gib die Adresse der Instanz ein, die du nutzen möchtest.",
+        "url_label": "Instanz-Adresse",
+        "url_placeholder": "meine-instanz.beispiel.de",
+        "submit": "Weiter",
+        "not_found": "Unter dieser Adresse konnte keine Reisetagebuch-Instanz erreicht werden. Bitte überprüfe die URL und versuche es erneut.",
+        "change_title": "Server",
+        "change_current": "Aktuell verbunden mit {url}",
+        "change_button": "Server wechseln"
+    },
     "auth": {
         "confirm_password_title": "Passwort bestätigen",
         "confirm_password": "Dies ist ein sicherer Bereich der Anwendung. Bitte bestätige dein Passwort, bevor du fortfahren kannst.",

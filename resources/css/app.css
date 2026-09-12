@@ -2,6 +2,10 @@
 @plugin '@tailwindcss/typography';
 @import 'maplibre-gl/dist/maplibre-gl.css';
 
+/* Explicit source so content is still detected when this file is built with
+   a different Vite `root` (e.g. the Capacitor build, see vite.capacitor.config.mts) */
+@source '../js';
+
 @plugin 'daisyui' {
     themes:
         light --default,
