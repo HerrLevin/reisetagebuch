@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Reisetagebuch</string>
+    <string name="title_activity_main">Reisetagebuch</string>
+    <string name="package_name">ch.reisetagebu.beta</string>
+    <string name="custom_url_scheme">ch.reisetagebu.beta</string>
+</resources>

@@ -6,8 +6,10 @@ import CreatePrivacyPolicyForm from '@/Pages/Settings/Partials/CreatePrivacyPoli
 import UpdateAccountSettingsForm from '@/Pages/Settings/Partials/UpdateAccountSettingsForm.vue';
 import UpdateDeviceSettingsForm from '@/Pages/Settings/Partials/UpdateDeviceSettingsForm.vue';
 import UpdateImprintForm from '@/Pages/Settings/Partials/UpdateImprintForm.vue';
+import { getServerUrl, isNative } from '@/Services/ServerConfig';
+import { useAuthStore } from '@/stores/auth';
 import { useUserStore } from '@/stores/user';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import DeleteUserForm from './Partials/DeleteUserForm.vue';
@@ -20,9 +22,23 @@ useTitle('Settings');
 const route = useRoute();
 const router = useRouter();
 const user = useUserStore();
+const authStore = useAuthStore();
 user.fetchUser(true);
 
 const processingTraewelling = ref(false);
+const serverUrl = ref('');
+
+onMounted(async () => {
+    if (isNative()) {
+        serverUrl.value = await getServerUrl();
+    }
+});
+
+function changeServer() {
+    authStore.logout().finally(() => {
+        router.push({ name: 'connect-server' });
+    });
+}
 
 function connectTraewelling() {
     api.socialite.connectTraewelling().then((response) => {
@@ -96,6 +112,30 @@ if (route.name === 'socialite.traewelling.callback') {
         </template>
 
         <div v-if="user.user" class="min-w-full space-y-6">
+            <div
+                v-if="isNative()"
+                class="card bg-base-100 min-w-full p-8 shadow-md"
+            >
+                <div class="max-w-xl space-y-2">
+                    <h3 class="text-lg font-medium">
+                        {{ t('connect_server.change_title') }}
+                    </h3>
+                    <p class="text-base-content/70 text-sm">
+                        {{
+                            t('connect_server.change_current', {
+                                url: serverUrl,
+                            })
+                        }}
+                    </p>
+                    <button
+                        class="btn btn-outline btn-sm"
+                        type="button"
+                        @click="changeServer()"
+                    >
+                        {{ t('connect_server.change_button') }}
+                    </button>
+                </div>
+            </div>
             <div class="card bg-base-100 min-w-full p-8 shadow-md">
                 <UpdateDeviceSettingsForm :user="user.user" class="max-w-xl" />
             </div>

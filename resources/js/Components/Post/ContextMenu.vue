@@ -3,6 +3,7 @@ import { api } from '@/api';
 import router from '@/router';
 import EditTimesDialog from '@/Components/Post/Partials/EditTimesDialog.vue';
 import { getOwnShareText, getShareText } from '@/Services/PostTextService';
+import { getServerOrigin } from '@/Services/ServerConfig';
 import { calculateDelay, getDepartureTime } from '@/Services/TripTimeService';
 import { useUserStore } from '@/stores/user';
 import { isTransportPost } from '@/types/PostTypes';
@@ -200,7 +201,7 @@ const isSameUser = () => {
     return props.post.user.id === user.user?.id;
 };
 
-function sharePost(): void {
+async function sharePost(): Promise<void> {
     blur();
 
     const shareData = {
@@ -208,7 +209,7 @@ function sharePost(): void {
         text: isSameUser()
             ? getOwnShareText(props.post)
             : getShareText(props.post),
-        url: `${window.location.origin}/posts/${props.post.id}`,
+        url: `${await getServerOrigin()}/posts/${props.post.id}`,
     };
 
     if (navigator.canShare && navigator.canShare(shareData)) {
