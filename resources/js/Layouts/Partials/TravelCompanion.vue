@@ -9,19 +9,25 @@ import { getRouteBadgeStyle } from '@/Services/DepartureTypeService';
 import { getPostLineName } from '@/Services/LineNameFormattingService';
 import StopOverList from '@/Pages/Posts/Partials/StopOverList.vue';
 import { useActiveTransportPostStore } from '@/stores/activeTransportPost';
+import { useAuthStore } from '@/stores/auth';
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { getCurrentOrNextStopover } from '@/Services/TripStopoverService';
 import { TransportPostStopoverDto } from '../../../types/Api.gen';
 
 const travelCompanionModal = ref<HTMLDialogElement | null>(null);
 const activePost = useActiveTransportPostStore();
+const authStore = useAuthStore();
 const nextStopover = ref<TransportPostStopoverDto | null>(null);
 const progress = ref(0);
-const refreshInterval = setInterval(() => {
-    getNextStopover();
-    calculateProgress();
-    activePost.fetchPost();
-}, 1000);
+let refreshInterval: ReturnType<typeof setInterval> | null = null;
+
+if (authStore.isAuthenticated()) {
+    refreshInterval = setInterval(() => {
+        getNextStopover();
+        calculateProgress();
+        activePost.fetchPost();
+    }, 1000);
+}
 
 function calculateProgress(): void {
     progress.value = getTransportProgress(activePost.activeTransportPost);
@@ -44,11 +50,15 @@ function getFormattedArrivalTime(): string | null {
     );
 }
 onBeforeUnmount(() => {
-    clearInterval(refreshInterval);
+    if (refreshInterval) {
+        clearInterval(refreshInterval);
+    }
 });
 
 onMounted(() => {
-    activePost.fetchPost();
+    if (authStore.isAuthenticated()) {
+        activePost.fetchPost();
+    }
 });
 </script>
 
