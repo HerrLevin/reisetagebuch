@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useLocationHistoryStore } from '@/stores/locationHistory';
 import { useUserStore } from '@/stores/user';
 import { onMounted, useTemplateRef } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -6,27 +7,22 @@ import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 
 const user = useUserStore();
+const locationHistory = useLocationHistoryStore();
 
 const deleteModal = useTemplateRef('confirmLocationTrackingModal');
 
-const maxAge = 60 * 60 * 24 * 365; // 1 year
-
 function track() {
-    document.cookie = 'rtb_allow_history=true; path=/; max-age=' + maxAge;
+    locationHistory.setAllowHistory(true);
     deleteModal.value?.close();
 }
 
 function dontTrack() {
-    document.cookie = 'rtb_disallow_history=true; path=/; max-age=' + maxAge;
+    locationHistory.setAllowHistory(false);
     deleteModal.value?.close();
 }
 
 onMounted(() => {
-    if (
-        !document.cookie.includes('rtb_allow_history') &&
-        !document.cookie.includes('rtb_disallow_history') &&
-        !!user.user
-    ) {
+    if (locationHistory.allowHistory === null && !!user.user) {
         deleteModal.value?.showModal();
     }
 });

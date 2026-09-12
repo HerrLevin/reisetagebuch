@@ -3,13 +3,14 @@
  * Store position in localStorage and refresh if it has been more than 5 minutes
  */
 import { api } from '@/api';
+import { Geolocation, Position } from '@capacitor/geolocation';
 
 export class LocationService {
     private static readonly REFRESH_INTERVAL = 30; // 30 Seconds
 
     public static async getPosition(
         isAuthenticated: boolean,
-    ): Promise<GeolocationPosition> {
+    ): Promise<Position> {
         if (!isAuthenticated) {
             throw new Error('User is not authenticated.');
         }
@@ -23,12 +24,12 @@ export class LocationService {
         return position;
     }
 
-    private static getFromLocalStorage(): GeolocationPosition | null {
+    private static getFromLocalStorage(): Position | null {
         const position = localStorage.getItem('position');
         const maxTime = Date.now() - this.REFRESH_INTERVAL;
 
         if (position) {
-            const parsedPosition: GeolocationPosition = JSON.parse(position);
+            const parsedPosition: Position = JSON.parse(position);
             if (parsedPosition.timestamp > maxTime) {
                 return parsedPosition;
             } else {
@@ -38,24 +39,20 @@ export class LocationService {
         return null;
     }
 
-    private static saveToLocalStorage(position: GeolocationPosition): void {
+    private static saveToLocalStorage(position: Position): void {
         localStorage.setItem('position', JSON.stringify(position));
     }
 
-    public static async getCurrentPosition(): Promise<GeolocationPosition> {
-        if (!navigator.geolocation) {
-            throw new Error('Geolocation is not supported by this browser.');
-        }
-
-        return new Promise((resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(
-                (position) => resolve(position),
-                (error) => reject(error),
-            );
-        });
+    // Uses the Capacitor Geolocation plugin rather than the bare
+    // navigator.geolocation Web API: WKWebView does not implement the
+    // Geolocation Web API on its own, so this is required for the app to
+    // get a location at all when running natively (see Info.plist /
+    // AndroidManifest.xml for the corresponding permission declarations).
+    public static async getCurrentPosition(): Promise<Position> {
+        return Geolocation.getCurrentPosition();
     }
 
-    public static prefetchLocationData(position: GeolocationPosition): void {
+    public static prefetchLocationData(position: Position): void {
         api.location
             .prefetchLocation({
                 latitude: position.coords.latitude,

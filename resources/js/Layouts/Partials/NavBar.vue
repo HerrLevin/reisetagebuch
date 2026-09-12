@@ -75,3 +75,14 @@ if (!user.user && user.isAuthenticated()) {
         </div>
     </div>
 </template>
+
+<style scoped>
+/* On native iOS/Android the WebView draws edge-to-edge under the status
+   bar/notch, and this navbar sits flush against the top of the screen on
+   mobile widths (see AuthenticatedLayout.vue's px-0/pt-0). Extend the bar's
+   own background into the safe area instead of letting its content sit
+   under the status bar; resolves to 0 on web/PWA where there's no inset. */
+.navbar {
+    padding-top: env(safe-area-inset-top);
+}
+</style>

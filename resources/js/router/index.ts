@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 
 import ConfirmPassword from '@/Pages/Auth/ConfirmPassword.vue';
+import ConnectServer from '@/Pages/Auth/ConnectServer.vue';
 import ForgotPassword from '@/Pages/Auth/ForgotPassword.vue';
 import Login from '@/Pages/Auth/Login.vue';
 import Register from '@/Pages/Auth/Register.vue';
@@ -41,6 +42,12 @@ const routes: RouteRecordRaw[] = [
         redirect: () => {
             return { path: '/login' };
         },
+    },
+    {
+        path: '/connect',
+        name: 'connect-server',
+        component: ConnectServer,
+        meta: { guest: true },
     },
     {
         path: '/login',
