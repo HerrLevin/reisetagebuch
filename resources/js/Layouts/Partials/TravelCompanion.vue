@@ -75,7 +75,10 @@ onMounted(() => {
                 {{ getFormattedArrivalTime() }}
             </div>
         </div>
-        <div v-if="nextStopover" class="flex w-full justify-between">
+        <div
+            v-if="nextStopover"
+            class="line-clamp1 flex w-full justify-between overflow-ellipsis"
+        >
             <p>
                 <CircleChevronRight class="inline-block size-3" />
                 {{ nextStopover.location.name }}
