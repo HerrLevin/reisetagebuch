@@ -140,7 +140,7 @@ defineExpose({ show, close });
 </script>
 
 <template>
-    <dialog ref="dialog" class="modal" @close="onClose">
+    <dialog ref="dialog" class="modal" @click.stop @close="onClose">
         <div class="modal-box max-w-xl">
             <h3 class="text-lg font-bold">{{ title }}</h3>
             <p v-if="subtitle" class="pt-1 text-sm opacity-70">
