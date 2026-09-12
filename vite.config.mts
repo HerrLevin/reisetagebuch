@@ -3,13 +3,31 @@ import vue from '@vitejs/plugin-vue';
 import laravel from 'laravel-vite-plugin';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 export default defineConfig({
+    optimizeDeps: {
+        exclude: ['maplibre-gl'],
+    },
     plugins: [
         tailwindcss(),
         laravel({
             input: 'resources/js/app.ts',
             refresh: true,
+        }),
+        viteStaticCopy({
+            targets: [
+                {
+                    src: 'node_modules/maplibre-gl/dist/maplibre-gl-worker.mjs',
+                    dest: 'assets',
+                    rename: { stripBase: true },
+                },
+                {
+                    src: 'node_modules/maplibre-gl/dist/maplibre-gl-shared.mjs',
+                    dest: 'assets',
+                    rename: { stripBase: true },
+                },
+            ],
         }),
         vue({
             template: {
