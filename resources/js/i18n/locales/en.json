@@ -175,6 +175,7 @@
     "edit_transport_times": {
         "title": "Edit Transport Times",
         "arrival_before_departure_error": "Arrival time cannot be before departure time.",
+        "departure_before_arrival_error": "Departure time cannot be before arrival time.",
         "departure": "Departure",
         "time": "Time",
         "arrival": "Arrival",

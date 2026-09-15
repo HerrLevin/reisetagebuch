@@ -172,7 +172,8 @@
     },
     "edit_transport_times": {
         "title": "Beförderungszeiten bearbeiten",
-        "arrival_before_departure_error": "Abfahrtszeit kann nicht vor der Ankunftszeit liegen.",
+        "arrival_before_departure_error": "Ankunftszeit kann nicht vor der Abfahrtszeit liegen.",
+        "departure_before_arrival_error": "Abfahrtszeit kann nicht vor der Ankunftszeit liegen.",
         "departure": "Abfahrt",
         "time": "Zeit",
         "arrival": "Ankunft",
