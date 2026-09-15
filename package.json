@@ -28,7 +28,7 @@
         "autoprefixer": "^10.4.12",
         "axios": "^1.8.2",
         "concurrently": "^10.0.0",
-        "cypress": "^15.13.0",
+        "cypress": "^16.0.0",
         "daisyui": "^5.5.3",
         "eslint": "^10.0.0",
         "eslint-plugin-vue": "^10.3.0",
