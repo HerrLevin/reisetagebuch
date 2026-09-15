@@ -5,7 +5,7 @@ import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
 
-withDefaults(
+const props = withDefaults(
     defineProps<{
         title: string;
         subtitle?: string;
@@ -51,9 +51,17 @@ function onClose() {
 }
 
 function submit() {
-    if (departure.value && arrival.value && arrival.value < departure.value) {
-        alert(t('edit_transport_times.arrival_before_departure_error'));
-        return;
+    if (departure.value && arrival.value) {
+        // arrivalFirst: arrival happens first, departure follows (e.g. a stopover).
+        // Otherwise: departure happens first, arrival follows (e.g. a whole journey).
+        if (props.arrivalFirst && departure.value < arrival.value) {
+            alert(t('edit_transport_times.departure_before_arrival_error'));
+            return;
+        }
+        if (!props.arrivalFirst && arrival.value < departure.value) {
+            alert(t('edit_transport_times.arrival_before_departure_error'));
+            return;
+        }
     }
     saved = true;
     emit('save');
