@@ -1,5 +1,6 @@
 import router from '@/router';
 import { useAuthStore } from '@/stores/auth';
+import { useHttpErrorStore } from '@/stores/httpError';
 import { useUserStore } from '@/stores/user';
 import { Api } from '../types/Api.gen';
 
@@ -61,11 +62,7 @@ api.instance.interceptors.response.use(
                         .then((r) => r);
                 }
             } else {
-                router
-                    .push({
-                        name: 'forbidden',
-                    })
-                    .then((r) => r);
+                useHttpErrorStore().setError(403);
             }
         }
 
@@ -73,11 +70,7 @@ api.instance.interceptors.response.use(
             error.response?.status === 404 &&
             !error.config?.url?.includes('/app/privacy-policy')
         ) {
-            router
-                .push({
-                    name: 'not-found',
-                })
-                .then((r) => r);
+            useHttpErrorStore().setError(404);
         }
         return Promise.reject(error);
     },
