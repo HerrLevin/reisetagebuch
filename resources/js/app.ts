@@ -5,9 +5,13 @@ import App from '@/App.vue';
 import i18n from '@/i18n';
 import router from '@/router';
 import { useAuthStore } from '@/stores/auth';
+import { setWorkerUrl } from 'maplibre-gl';
+import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import { createPinia } from 'pinia';
 import { createPersistedState } from 'pinia-plugin-persistedstate';
 import { createApp } from 'vue';
+
+setWorkerUrl(maplibreWorkerUrl);
 
 const pinia = createPinia();
 pinia.use(createPersistedState());
