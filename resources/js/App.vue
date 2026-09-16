@@ -1,10 +1,14 @@
 <script setup lang="ts">
+import Forbidden from '@/Pages/Errors/Forbidden.vue';
+import NotFound from '@/Pages/Errors/NotFound.vue';
 import { useAuthStore } from '@/stores/auth';
+import { useHttpErrorStore } from '@/stores/httpError';
 import { useUserStore } from '@/stores/user';
 import { watch } from 'vue';
 
 const authStore = useAuthStore();
 const userStore = useUserStore();
+const httpErrorStore = useHttpErrorStore();
 
 // When auth token changes, fetch user data
 watch(
@@ -25,5 +29,7 @@ if (authStore.isAuthenticated()) {
 </script>
 
 <template>
-    <router-view />
+    <Forbidden v-if="httpErrorStore.status === 403" />
+    <NotFound v-else-if="httpErrorStore.status === 404" />
+    <router-view v-else />
 </template>

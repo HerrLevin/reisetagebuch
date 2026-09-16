@@ -7,6 +7,7 @@ import router from '@/router';
 import { useAuthStore } from '@/stores/auth';
 import { setWorkerUrl } from 'maplibre-gl';
 import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
+import { useHttpErrorStore } from '@/stores/httpError';
 import { createPinia } from 'pinia';
 import { createPersistedState } from 'pinia-plugin-persistedstate';
 import { createApp } from 'vue';
@@ -26,7 +27,9 @@ const authStore = useAuthStore();
 authStore.initializeAuth();
 
 // Set up navigation guard after pinia is available
+const httpErrorStore = useHttpErrorStore();
 router.beforeEach((to, _from, next) => {
+    httpErrorStore.clearError();
     if (to.meta.auth && !authStore.isAuthenticated()) {
         next({ name: 'login' });
     } else if (to.meta.guest && authStore.isAuthenticated()) {
