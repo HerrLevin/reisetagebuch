@@ -4,7 +4,6 @@ import {
     defineConfigWithVueTs,
     vueTsConfigs,
 } from '@vue/eslint-config-typescript';
-import oxlint from 'eslint-plugin-oxlint';
 import pluginVue from 'eslint-plugin-vue';
 
 export default defineConfigWithVueTs(
@@ -40,7 +39,4 @@ export default defineConfigWithVueTs(
             'vue/no-v-html': 'error',
         },
     },
-    // Must stay last: turns off ESLint rules already covered by oxlint,
-    // so oxlint (run separately, see `npm run lint`) is the source of truth for them.
-    ...oxlint.buildFromOxlintConfigFile('./.oxlintrc.json'),
 );
