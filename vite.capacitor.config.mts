@@ -35,4 +35,9 @@ export default defineConfig({
         outDir: fileURLToPath(new URL('./dist-capacitor', import.meta.url)),
         emptyOutDir: true,
     },
+    // See vite.config.mts for why this is `format: 'es'` rather than
+    // renaming the chunk to `.cjs` to force a classic worker.
+    worker: {
+        format: 'es',
+    },
 });
