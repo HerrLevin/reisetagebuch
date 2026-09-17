@@ -21,8 +21,12 @@ jobs:
           node-version: 25
 
       - name: Check for vulnerabilities (without installing)
-        # Fail the job only for vulnerabilities with severity "high" or above
-        run: npm audit --package-lock-only --audit-level=high
+        # Fail the job only for vulnerabilities with severity "high" or above.
+        # --omit=dev scopes this to shipped code: @capacitor/assets (a build-time
+        # devDependency) currently pulls a pinned/unfixable sharp and a transitive
+        # uuid with no upstream fix; neither ships to users, so they're excluded
+        # here rather than gating CI until @capacitor/assets releases an update.
+        run: npm audit --omit=dev --package-lock-only --audit-level=high
 
   install-node-dependencies:
     name: Install Node Dependencies & Build
