@@ -44,7 +44,7 @@ if (!user.user && user.isAuthenticated()) {
                         <div class="bg-primary size-10 rounded-full">
                             <img
                                 v-if="user.user?.avatar"
-                                :src="`/files/` + user.user?.avatar"
+                                :src="user.user?.avatar"
                                 :alt="user.user?.name"
                             />
                         </div>
@@ -57,7 +57,7 @@ if (!user.user && user.isAuthenticated()) {
                         <div class="bg-primary size-10 rounded-full">
                             <img
                                 v-if="user.user?.avatar"
-                                :src="`/files/` + user.user?.avatar"
+                                :src="user.user?.avatar"
                                 :alt="user.user?.name"
                             />
                         </div>
