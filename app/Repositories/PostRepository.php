@@ -529,12 +529,35 @@ class PostRepository
             .'destination_stops.arrival_time + make_interval(secs => COALESCE(destination_stops.arrival_delay, 0)), '
             .'destination_stops.departure_time + make_interval(secs => COALESCE(destination_stops.departure_delay, 0))'
             .')';
+        // Same as $realArrival but without the manual override, used only to
+        // tell whether we have realtime data at all vs. a bare schedule.
+        $liveArrival = 'COALESCE('
+            .'destination_stops.arrival_time + make_interval(secs => COALESCE(destination_stops.arrival_delay, 0)), '
+            .'destination_stops.departure_time + make_interval(secs => COALESCE(destination_stops.departure_delay, 0))'
+            .')';
+        $plannedArrival = 'COALESCE(destination_stops.arrival_time, destination_stops.departure_time)';
 
-        $postId = TransportPostModel::query()
+        // Once a journey's arrival has passed, keep it "active" for a short
+        // grace period so it doesn't disappear from the check-in flow the
+        // instant it ends: 15 minutes past a realtime-adjusted arrival, or 60
+        // minutes past a purely scheduled one when there's no realtime data
+        // yet. A manually logged arrival is authoritative and gets no grace
+        // period — once it has passed, the journey is immediately inactive.
+        $graceEnd = 'CASE '
+            .'WHEN transport_posts.manual_arrival IS NOT NULL THEN transport_posts.manual_arrival '
+            .'WHEN destination_stops.arrival_delay IS NOT NULL OR destination_stops.departure_delay IS NOT NULL '
+            ."THEN {$liveArrival} + make_interval(mins => ".config('app.active_post.grace_start').') '
+            ."ELSE {$plannedArrival} + make_interval(mins => ".config('app.active_post.grace_end').') '
+            .'END';
+
+        $baseQuery = fn () => TransportPostModel::query()
             ->join('posts', 'posts.id', '=', 'transport_posts.post_id')
             ->join('transport_trip_stops as origin_stops', 'origin_stops.id', '=', 'transport_posts.origin_stop_id')
             ->join('transport_trip_stops as destination_stops', 'destination_stops.id', '=', 'transport_posts.destination_stop_id')
-            ->where('posts.user_id', $user->id)
+            ->where('posts.user_id', $user->id);
+
+        // 1. A journey that is currently in progress.
+        $postId = $baseQuery()
             ->whereRaw("{$realDeparture} <= ?", [$now])
             ->where(function (Builder $query) use ($now, $realArrival) {
                 $query->whereRaw("{$realArrival} IS NULL")
@@ -542,6 +565,25 @@ class PostRepository
             })
             ->orderByRaw("{$realDeparture} DESC")
             ->value('transport_posts.post_id');
+
+        // 2. No active journey: the next one departing within 10 minutes.
+        if (! $postId) {
+            $postId = $baseQuery()
+                ->whereRaw("{$realDeparture} > ?", [$now])
+                ->whereRaw("{$realDeparture} <= ?", [$now->copy()->addMinutes(10)])
+                ->orderByRaw("{$realDeparture} ASC")
+                ->value('transport_posts.post_id');
+        }
+
+        // 3. No upcoming journey either: fall back to the most recently
+        // ended journey, as long as it's still within its grace period.
+        if (! $postId) {
+            $postId = $baseQuery()
+                ->whereRaw("{$realDeparture} <= ?", [$now])
+                ->whereRaw("{$graceEnd} >= ?", [$now])
+                ->orderByRaw("{$realDeparture} DESC")
+                ->value('transport_posts.post_id');
+        }
 
         return $postId ? $this->getById($postId, $user) : null;
     }
