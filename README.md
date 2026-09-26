@@ -27,3 +27,19 @@ It's a crossover between [Träwelling](https://github.com/traewelling/traewellin
 - Swarm import
 - Träwelling import
 - more... (See [project board](https://github.com/users/HerrLevin/projects/2))
+
+## Mobile App (Capacitor)
+
+The iOS and Android apps are built with [Capacitor](https://capacitorjs.com/), wrapping a standalone
+build of the SPA (separate from the Laravel-served web build). To build and sync the native projects:
+
+```bash
+npm ci
+npm run build:capacitor
+npx cap sync
+```
+
+`npm run build:capacitor` builds `resources/capacitor` via `vite.capacitor.config.mts` into `dist-capacitor`,
+which is the `webDir` the native shells load. `npm run cap:sync` runs both build and sync steps together.
+
+After syncing, open the native projects with `npm run cap:ios` or `npm run cap:android`.
