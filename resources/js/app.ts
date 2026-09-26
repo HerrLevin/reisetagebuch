@@ -5,6 +5,7 @@ import { initApi } from '@/api';
 import App from '@/App.vue';
 import i18n from '@/i18n';
 import router from '@/router';
+import { initBackButtonHandler } from '@/Services/BackButton';
 import { getServerUrl, isNative } from '@/Services/ServerConfig';
 import { useAuthStore } from '@/stores/auth';
 import { useHttpErrorStore } from '@/stores/httpError';
@@ -20,6 +21,7 @@ setWorkerUrl(maplibreWorkerUrl);
 // very first route's components), so the axios client targets the right
 // instance host on native builds.
 await initApi();
+initBackButtonHandler();
 
 const pinia = createPinia();
 pinia.use(createPersistedState());
