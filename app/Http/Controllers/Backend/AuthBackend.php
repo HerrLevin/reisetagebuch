@@ -12,12 +12,14 @@ use App\Models\User;
 use App\Repositories\PrivacyPolicyRepository;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Contracts\Auth\StatefulGuard;
+use Illuminate\Routing\UrlGenerator;
 use Laravel\Passport\Guards\TokenGuard;
 
 class AuthBackend extends Controller
 {
     public function __construct(
-        private readonly PrivacyPolicyRepository $privacyPolicyRepository
+        private readonly PrivacyPolicyRepository $privacyPolicyRepository,
+        private readonly UrlGenerator $urlGenerator
     ) {}
 
     public function getAuthenticatedUser(StatefulGuard|TokenGuard|User $guardOrUser)
@@ -29,7 +31,7 @@ class AuthBackend extends Controller
             name: $user->name,
             username: $user->username,
             email: $user->email,
-            avatar: $user->profile?->avatar,
+            avatar: $user->profile?->avatar ? $this->urlGenerator->to('/files/'.$user->profile?->avatar) : null,
             mustVerifyEmail: $user instanceof MustVerifyEmail && ! $user->hasVerifiedEmail(),
             settings: $this->getSettings($user),
             canInviteUsers: config('app.invite.enabled') && $user->can('create', Invite::class),
