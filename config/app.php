@@ -65,4 +65,8 @@ return [
     'dev' => [
         'skip_prefetch' => env('APP_DEV_SKIP_PREFETCH', false),
     ],
+    'active_post' => [
+        'grace_start' => env('APP_ACTIVE_POST_GRACE_START', 15),
+        'grace_end' => env('APP_ACTIVE_POST_GRACE_END', 60),
+    ],
 ];

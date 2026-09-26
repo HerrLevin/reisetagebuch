@@ -137,13 +137,14 @@ class ActiveTransportPostControllerTest extends TestCase
             'departure_delay' => 0,
         ]);
         // Scheduled arrival is in the future, but a negative delay means the
-        // train already really arrived, so the journey is no longer active.
+        // train really arrived 30 minutes ago, which is beyond the 15-minute
+        // realtime grace period, so the journey is no longer active.
         $destinationStop = TransportTripStop::factory()->create([
             'transport_trip_id' => $trip->id,
             'stop_sequence' => 1,
             'arrival_time' => now()->addMinutes(10),
             'departure_time' => null,
-            'arrival_delay' => -20 * 60,
+            'arrival_delay' => -40 * 60,
         ]);
 
         $post = Post::factory()->create(['user_id' => $user->id]);
@@ -166,6 +167,140 @@ class ActiveTransportPostControllerTest extends TestCase
     public function test_get_active_transport_post_returns_null_when_no_active_journey(): void
     {
         $user = User::factory()->create();
+
+        Passport::actingAs($user);
+        $response = $this->getJson(route('posts.transport.active'));
+
+        $response->assertOk();
+        $response->assertContent('null');
+    }
+
+    private function createTransportPost(User $user, array $originStopOverrides, array $destinationStopOverrides, array $transportPostOverrides = []): Post
+    {
+        $trip = TransportTrip::factory()->create();
+
+        $originStop = TransportTripStop::factory()->create(array_merge([
+            'transport_trip_id' => $trip->id,
+            'stop_sequence' => 0,
+        ], $originStopOverrides));
+        $destinationStop = TransportTripStop::factory()->create(array_merge([
+            'transport_trip_id' => $trip->id,
+            'stop_sequence' => 1,
+        ], $destinationStopOverrides));
+
+        $post = Post::factory()->create(['user_id' => $user->id]);
+        TransportPost::factory()->create(array_merge([
+            'post_id' => $post->id,
+            'transport_trip_id' => $trip->id,
+            'origin_stop_id' => $originStop->id,
+            'destination_stop_id' => $destinationStop->id,
+            'manual_departure' => null,
+            'manual_arrival' => null,
+        ], $transportPostOverrides));
+
+        return $post;
+    }
+
+    public function test_get_active_transport_post_falls_back_to_journey_departing_soon(): void
+    {
+        $user = User::factory()->create();
+        // No active journey, but this one departs in 5 minutes.
+        $post = $this->createTransportPost(
+            $user,
+            ['arrival_time' => null, 'departure_time' => now()->addMinutes(5), 'departure_delay' => 0],
+            ['arrival_time' => now()->addHours(1), 'departure_time' => null, 'arrival_delay' => 0],
+        );
+
+        Passport::actingAs($user);
+        $response = $this->getJson(route('posts.transport.active'));
+
+        $response->assertOk();
+        $response->assertJsonPath('id', $post->id);
+    }
+
+    public function test_get_active_transport_post_ignores_journey_departing_beyond_ten_minutes(): void
+    {
+        $user = User::factory()->create();
+        // Departs in 15 minutes, outside the 10-minute lookahead window.
+        $this->createTransportPost(
+            $user,
+            ['arrival_time' => null, 'departure_time' => now()->addMinutes(15), 'departure_delay' => 0],
+            ['arrival_time' => now()->addHours(1), 'departure_time' => null, 'arrival_delay' => 0],
+        );
+
+        Passport::actingAs($user);
+        $response = $this->getJson(route('posts.transport.active'));
+
+        $response->assertOk();
+        $response->assertContent('null');
+    }
+
+    public function test_get_active_transport_post_shows_recently_ended_journey_within_realtime_grace_period(): void
+    {
+        $user = User::factory()->create();
+        // Real (delay-adjusted) arrival was 10 minutes ago, within the
+        // 15-minute realtime grace period.
+        $post = $this->createTransportPost(
+            $user,
+            ['arrival_time' => null, 'departure_time' => now()->subHours(2), 'departure_delay' => 0],
+            ['arrival_time' => now()->subMinutes(10), 'departure_time' => null, 'arrival_delay' => 0],
+        );
+
+        Passport::actingAs($user);
+        $response = $this->getJson(route('posts.transport.active'));
+
+        $response->assertOk();
+        $response->assertJsonPath('id', $post->id);
+    }
+
+    public function test_get_active_transport_post_shows_recently_ended_journey_within_scheduled_grace_period(): void
+    {
+        $user = User::factory()->create();
+        // No realtime data at all (delays are null): scheduled arrival was
+        // 45 minutes ago, within the 60-minute scheduled grace period.
+        $post = $this->createTransportPost(
+            $user,
+            ['arrival_time' => null, 'departure_time' => now()->subHours(2), 'departure_delay' => null],
+            ['arrival_time' => now()->subMinutes(45), 'departure_time' => null, 'arrival_delay' => null, 'departure_delay' => null],
+        );
+
+        Passport::actingAs($user);
+        $response = $this->getJson(route('posts.transport.active'));
+
+        $response->assertOk();
+        $response->assertJsonPath('id', $post->id);
+    }
+
+    public function test_get_active_transport_post_excludes_journey_beyond_scheduled_grace_period(): void
+    {
+        $user = User::factory()->create();
+        // No realtime data: scheduled arrival was 70 minutes ago, beyond the
+        // 60-minute scheduled grace period.
+        $this->createTransportPost(
+            $user,
+            ['arrival_time' => null, 'departure_time' => now()->subHours(2), 'departure_delay' => null],
+            ['arrival_time' => now()->subMinutes(70), 'departure_time' => null, 'arrival_delay' => null, 'departure_delay' => null],
+        );
+
+        Passport::actingAs($user);
+        $response = $this->getJson(route('posts.transport.active'));
+
+        $response->assertOk();
+        $response->assertContent('null');
+    }
+
+    public function test_get_active_transport_post_respects_manual_arrival_without_grace_period(): void
+    {
+        $user = User::factory()->create();
+        // The scheduled/realtime arrival would still be within its grace
+        // period, but a manual arrival was logged 5 minutes ago, which is
+        // authoritative and has no grace period.
+        $this->createTransportPost(
+            $user,
+            ['arrival_time' => null, 'departure_time' => now()->subHours(2), 'departure_delay' => 0],
+            ['arrival_time' => now()->subMinutes(5), 'departure_time' => null, 'arrival_delay' => 0],
+            ['manual_arrival' => now()->subMinutes(5)],
+        );
 
         Passport::actingAs($user);
         $response = $this->getJson(route('posts.transport.active'));
