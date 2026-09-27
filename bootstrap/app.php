@@ -6,6 +6,7 @@ use App\Http\Middleware\ApiMiddleware;
 use App\Http\Middleware\EnsurePrivacyPolicyAccepted;
 use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Http\Middleware\RequestLogger;
+use App\Jobs\BackfillLocationTimezones;
 use App\Jobs\DeleteOldNearbyRequests;
 use App\Jobs\DispatchRefreshJobForActiveTrips;
 use App\Jobs\HideExpiredPosts;
@@ -54,5 +55,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->job(DispatchRefreshJobForActiveTrips::class)->everyMinute();
         $schedule->job(DeleteOldNearbyRequests::class)->daily();
         $schedule->job(HideExpiredPosts::class)->everyFifteenMinutes();
+        $schedule->job(BackfillLocationTimezones::class)->everyFifteenMinutes();
     })
     ->create();
