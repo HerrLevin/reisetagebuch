@@ -8,6 +8,7 @@ use App\Http\Resources\StopDto;
 use App\Http\Resources\TripDto;
 use App\Http\Resources\UserDto;
 use App\Models\Post;
+use Carbon\Carbon;
 use Clickbar\Magellan\IO\Generator\Geojson\GeojsonGenerator;
 use OpenApi\Attributes as OA;
 
@@ -120,6 +121,44 @@ class TransportPost extends BasePost
         return $post->updated_at;
     }
 
+    private function parseTime(?string $timeString, ?string $timezone): ?Carbon
+    {
+        if ($timeString === null) {
+            return null;
+        }
+
+        return Carbon::parse($timeString)->setTimezone($timezone ?? 'UTC');
+    }
+
+    private function getDelay(?string $manualTime, ?Carbon $actualTime, ?int $defaultDelay): ?string
+    {
+        $delay = $defaultDelay;
+
+        if ($manualTime !== null && $actualTime !== null) {
+            $delay = (int) round($actualTime->diffInMinutes(Carbon::parse($manualTime)));
+        }
+
+        if ($delay !== null && $delay > 0) {
+            return '+'.$delay;
+        }
+
+        return $delay;
+    }
+
+    private function formatTime(?Carbon $time, ?string $delay): ?string
+    {
+        if ($time === null) {
+            return null;
+        }
+
+        $formattedTime = e($time->format('H:i'));
+        if ($delay !== null && $delay !== 0) {
+            $formattedTime .= " ($delay min)";
+        }
+
+        return $formattedTime;
+    }
+
     public function getHtmlBody(): ?string
     {
         $parentBody = parent::getHtmlBody();
@@ -131,10 +170,25 @@ class TransportPost extends BasePost
         $duration = round($this->duration / 60);
         $distance = round($this->distance / 1000, 1);
 
+        $departureTime = $this->parseTime($this->originStop->departureTime ?? $this->originStop->arrivalTime, $this->originStop->location->timezone ?? 'UTC');
+        $departureDelay = $this->getDelay($this->manualDepartureTime, $departureTime, $this->originStop->departureDelay);
+        $departure = $this->formatTime($departureTime, $departureDelay);
+
+        $arrivalTime = $this->parseTime($this->destinationStop->arrivalTime ?? $this->destinationStop->departureTime, $this->destinationStop->location->timezone ?? 'UTC');
+        $arrivalDelay = $this->getDelay($this->manualArrivalTime, $arrivalTime, $this->destinationStop->arrivalDelay);
+        $arrival = $this->formatTime($arrivalTime, $arrivalDelay);
+
         $body = "$emoji <strong>$line</strong> $number<br>".
             "🛤️ $origin → $destination<br>".
             "⏱️ $duration min • 📏 $distance km<br>".
             $this->travelReason?->getEmoji();
+
+        if ($departure !== null) {
+            $body .= "<br>▶️ $departure";
+        }
+        if ($arrival !== null) {
+            $body .= "<br>⏹️ $arrival";
+        }
 
         return $parentBody ? nl2br($parentBody."\n\n").$body : $body;
     }

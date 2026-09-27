@@ -11,6 +11,7 @@ use App\Models\RequestLocation;
 use App\Models\TimestampedUserWaypoint;
 use App\Models\TransportPost;
 use App\Services\OsmNameService;
+use App\Services\TimeZoneLookupService;
 use Carbon\Carbon;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Clickbar\Magellan\Database\PostgisFunctions\ST;
@@ -22,9 +23,12 @@ class LocationRepository
 {
     private OsmNameService $osmNameService;
 
-    public function __construct(OsmNameService $osmNameService)
+    private TimeZoneLookupService $timeZoneLookupService;
+
+    public function __construct(OsmNameService $osmNameService, TimeZoneLookupService $timeZoneLookupService)
     {
         $this->osmNameService = $osmNameService;
+        $this->timeZoneLookupService = $timeZoneLookupService;
     }
 
     public function getLocationsForUser(string $userId, Carbon $fromDate, Carbon $untilDate): Collection
@@ -303,6 +307,11 @@ class LocationRepository
         $location->name = $name;
         $location->location = Point::makeGeodetic($latitude, $longitude);
         $location->country_code = $this->resolveCountryCode($location->location);
+
+        if ($location->timezone === null) {
+            $location->timezone = $this->timeZoneLookupService->lookup($latitude, $longitude);
+        }
+
         $location->save();
 
         $location->identifiers()->updateOrCreate(

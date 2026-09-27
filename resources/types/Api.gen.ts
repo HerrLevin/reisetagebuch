@@ -1188,6 +1188,8 @@ export interface LocationDto {
   longitude: number;
   /** Distance to the location in meters */
   distance: number | null;
+  /** IANA timezone identifier of the location, if known */
+  timezone: string | null;
   /** List of location identifiers */
   identifiers: LocationIdentifierDto[];
   /** List of location tags */
