@@ -76,6 +76,16 @@ Route::prefix('posts/{post}')->group(function () {
         ->name('posts.likes');
 });
 
+Route::get('/posts/{postId}/transport/stopovers', [PostController::class, 'getStopoversForTransportPost'])
+    ->name('posts.transport.stopovers.list');
+
+Route::prefix('map')->group(function () {
+    Route::get('/linestring', [MapController::class, 'getLineStringBetween'])
+        ->name('posts.get.linestring');
+    Route::get('/stopovers', [MapController::class, 'getStopsBetween'])
+        ->name('posts.get.stopovers');
+});
+
 Route::prefix('app')->group(function () {
     Route::get('configuration', [AppConfigurationController::class, 'index'])
         ->name('app.configuration');
@@ -157,8 +167,6 @@ Route::middleware('auth:api')->group(function () {
                     Route::delete('/track', [PostController::class, 'deleteTransportTrack'])->name('posts.delete.transport-track');
 
                     Route::prefix('stopovers')->group(function () {
-                        Route::get('/', [PostController::class, 'getStopoversForTransportPost'])->name('posts.transport.stopovers.list');
-
                         Route::prefix('{stopId}')->group(function () {
                             Route::post('/arrival', [PostController::class, 'logStopoverArrival'])->name('posts.transport.stopovers.arrival');
                             Route::post('/departure', [PostController::class, 'logStopoverDeparture'])->name('posts.transport.stopovers.departure');
@@ -172,13 +180,6 @@ Route::middleware('auth:api')->group(function () {
                     Route::post('/retry', [PostController::class, 'retryTraewellingCrosspost'])->name('posts.traewelling.retry');
                 });
             });
-        });
-
-        Route::prefix('map')->group(function () {
-            Route::get('/linestring', [MapController::class, 'getLineStringBetween'])
-                ->name('posts.get.linestring');
-            Route::get('/stopovers', [MapController::class, 'getStopsBetween'])
-                ->name('posts.get.stopovers');
         });
 
         Route::prefix('notifications')->group(function () {
