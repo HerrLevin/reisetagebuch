@@ -255,9 +255,7 @@ class PostRepository
         ?TravelRole $travelRole = null
     ): BasePost|LocationPost|TransportPost {
         try {
-            // If published_at would be more than 10 minutes in the future, set it to 10 minutes before departure
-            $publishedAt = $originStop->departure_time ?? $originStop->arrival_time ?? Carbon::now();
-            $publishedAt = $publishedAt->subMinutes(10);
+            $publishedAt = $this->resolveTransportPublishedAt($originStop);
 
             DB::beginTransaction();
             /** @var Post $post */
@@ -293,6 +291,21 @@ class PostRepository
         }
 
         return $this->postHydrator->modelToDto($post, true);
+    }
+
+    private function resolveTransportPublishedAt(TransportTripStop $originStop, ?Carbon $manualDeparture = null): Carbon
+    {
+        $realTime = $manualDeparture
+            ?? $this->realStopTime($originStop->departure_time, $originStop->departure_delay)
+            ?? $this->realStopTime($originStop->arrival_time, $originStop->arrival_delay)
+            ?? Carbon::now();
+
+        return $realTime->clone()->subMinutes(10);
+    }
+
+    private function realStopTime(?Carbon $time, ?int $delaySeconds): ?Carbon
+    {
+        return $time?->clone()->addSeconds($delaySeconds ?? 0);
     }
 
     private function basePostQuery(): Builder
@@ -685,7 +698,7 @@ class PostRepository
         try {
             DB::beginTransaction();
             /** @var Post $post */
-            $post = Post::where('id', $transportPost->id)->with('transportPost')->firstOrFail();
+            $post = Post::where('id', $transportPost->id)->with('transportPost.originStop')->firstOrFail();
 
             if ($updateDeparture) {
                 $post->transportPost->manual_departure = $manualDepartureTime ? Carbon::parse($manualDepartureTime)->toIso8601ZuluString() : null;
@@ -703,6 +716,16 @@ class PostRepository
                 }
             }
             $post->transportPost->save();
+
+            // Keep published_at in sync with the (possibly corrected) departure time,
+            // so the feed position keeps reflecting when the journey really happened.
+            if ($updateDeparture) {
+                $post->published_at = $this->resolveTransportPublishedAt(
+                    $post->transportPost->originStop,
+                    $post->transportPost->manual_departure,
+                );
+                $post->save();
+            }
 
             DB::commit();
 
