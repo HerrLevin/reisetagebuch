@@ -49,7 +49,7 @@ return [
 
     'timeapi' => [
         'url' => env('APP_TIMEAPI_URL', 'https://timeapi.io/api/timezone/coordinate'),
-        'backfill_limit' => env('APP_TIMEAPI_BACKFILL_LIMIT', 100),
+        'backfill_limit' => env('APP_TIMEAPI_BACKFILL_LIMIT', 10),
     ],
 
     'registration' => env('APP_REGISTRATION', true),
