@@ -16,6 +16,8 @@ class ActivityPubPost extends Model
         'activity_id',
         'url',
         'content',
+        'in_reply_to',
+        'mentions',
         'published_at',
     ];
 
@@ -23,6 +25,7 @@ class ActivityPubPost extends Model
     {
         return [
             'published_at' => 'datetime',
+            'mentions' => 'array',
         ];
     }
 

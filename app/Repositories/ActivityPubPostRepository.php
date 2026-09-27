@@ -10,6 +10,7 @@ use App\Models\ActivityPubPostLike;
 use App\Models\ActivityPubRemoteFollow;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class ActivityPubPostRepository
@@ -18,12 +19,17 @@ class ActivityPubPostRepository
         private readonly ActivityPubPostHydrator $hydrator = new ActivityPubPostHydrator,
     ) {}
 
+    /**
+     * @param  array<int, string>  $mentions
+     */
     public function findOrCreateByActivityId(
         string $activityPubActorId,
         string $activityId,
         ?string $url,
         ?string $content,
         Carbon $publishedAt,
+        ?string $inReplyTo = null,
+        array $mentions = [],
     ): ActivityPubPost {
         return ActivityPubPost::firstOrCreate(
             ['activity_id' => $activityId],
@@ -32,6 +38,8 @@ class ActivityPubPostRepository
                 'activity_pub_actor_id' => $activityPubActorId,
                 'url' => $url,
                 'content' => $content,
+                'in_reply_to' => $inReplyTo,
+                'mentions' => $mentions,
                 'published_at' => $publishedAt,
             ]
         );
@@ -88,6 +96,23 @@ class ActivityPubPostRepository
         return ActivityPubPost::with('actor')
             ->whereIn('activity_pub_actor_id', $actorIds)
             ->where('published_at', '<', $before)
+            ->where(function ($query) use ($followedActorUris) {
+                // Show top-level posts always. A reply is only shown if it's part of a
+                // self-reply thread by the same followed actor, or it mentions another
+                // actor the user also follows
+                $query->whereNull('in_reply_to')
+                    ->orWhereExists(function ($sub) {
+                        $sub->select(DB::raw(1))
+                            ->from('activity_pub_posts as parent')
+                            ->whereColumn('parent.activity_id', 'activity_pub_posts.in_reply_to')
+                            ->whereColumn('parent.activity_pub_actor_id', 'activity_pub_posts.activity_pub_actor_id');
+                    })
+                    ->orWhere(function ($query) use ($followedActorUris) {
+                        foreach ($followedActorUris as $actorUri) {
+                            $query->orWhereJsonContains('mentions', $actorUri);
+                        }
+                    });
+            })
             ->withCount('likes')
             ->withExists(['userLikes as liked_by_user' => function ($q) use ($userId) {
                 $q->where('user_id', $userId);
