@@ -70,6 +70,32 @@ class BasePostTest extends TestCase
         $this->assertStringNotContainsString('&amp;lt;', $html);
     }
 
+    public function test_transport_post_html_body_formats_times_in_the_stops_local_timezone(): void
+    {
+        $post = $this->makeTransportPost('');
+        $post->originStop->departureTime = '2026-01-15T10:00:00+00:00';
+        $post->originStop->location->timezone = 'Asia/Tokyo';
+        $post->destinationStop->arrivalTime = '2026-01-15T12:00:00+00:00';
+        $post->destinationStop->location->timezone = 'America/New_York';
+
+        $html = $post->getHtmlBody();
+
+        // UTC 10:00 in Tokyo (UTC+9) is 19:00
+        $this->assertStringContainsString('▶️ 19:00', $html);
+        // UTC 12:00 in New York (UTC-5 in January) is 07:00
+        $this->assertStringContainsString('⏹️ 07:00', $html);
+    }
+
+    public function test_transport_post_html_body_falls_back_to_utc_when_timezone_is_unknown(): void
+    {
+        $post = $this->makeTransportPost('');
+        $post->originStop->departureTime = '2026-01-15T10:00:00+00:00';
+
+        $html = $post->getHtmlBody();
+
+        $this->assertStringContainsString('▶️ 10:00', $html);
+    }
+
     private function makeLocationPost(string $body): LocationPost
     {
         $post = new ReflectionClass(LocationPost::class)->newInstanceWithoutConstructor();
@@ -95,10 +121,12 @@ class BasePostTest extends TestCase
 
         $originStop = new ReflectionClass(StopDto::class)->newInstanceWithoutConstructor();
         $originStop->name = 'Origin';
+        $originStop->location = new ReflectionClass(LocationDto::class)->newInstanceWithoutConstructor();
         $post->originStop = $originStop;
 
         $destinationStop = new ReflectionClass(StopDto::class)->newInstanceWithoutConstructor();
         $destinationStop->name = 'Destination';
+        $destinationStop->location = new ReflectionClass(LocationDto::class)->newInstanceWithoutConstructor();
         $post->destinationStop = $destinationStop;
 
         $trip = new ReflectionClass(TripDto::class)->newInstanceWithoutConstructor();

@@ -47,6 +47,10 @@ return [
         'radius' => env('APP_NEARBY_RADIUS', 500),
     ],
 
+    'timeapi' => [
+        'url' => env('APP_TIMEAPI_URL', 'https://timeapi.io/api/timezone/coordinate'),
+    ],
+
     'registration' => env('APP_REGISTRATION', true),
 
     'invite' => [
