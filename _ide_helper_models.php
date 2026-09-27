@@ -398,6 +398,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Clickbar\Magellan\Data\Geometries\Point $location
  * @property string|null $country_code
+ * @property string|null $timezone IANA timezone identifier, e.g. Europe/Berlin
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\LocationIdentifier> $identifiers
  * @property-read int|null $identifiers_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\LocationTag> $tags
@@ -411,6 +412,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Location whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Location whereLocation($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Location whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Location whereTimezone($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Location whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Location whereUpdatedAt($value)
  */

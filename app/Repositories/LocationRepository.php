@@ -245,6 +245,11 @@ class LocationRepository
             ->delete();
     }
 
+    public function getLocationsWithMissingTimezone(int $limit): Collection
+    {
+        return Location::whereNull('timezone')->limit($limit)->get();
+    }
+
     public function getNearbyLocations(Point $position): Collection|SupportCollection
     {
         return Location::select()
