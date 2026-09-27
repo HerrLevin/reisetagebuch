@@ -238,6 +238,8 @@ class MastodonActivityPubController extends Controller
         $content = $object['content'] ?? null;
         $objectUrl = $object['url'] ?? null;
         $published = $object['published'] ?? null;
+        $inReplyTo = $object['inReplyTo'] ?? null;
+        $inReplyTo = is_string($inReplyTo) ? $inReplyTo : ($inReplyTo['id'] ?? null);
 
         if (! $noteId) {
             return response()->json('', 202);
@@ -257,6 +259,8 @@ class MastodonActivityPubController extends Controller
             url: is_string($objectUrl) ? $objectUrl : null,
             content: is_string($content) ? $this->contentSanitizer->sanitize($content) : null,
             publishedAt: $published ? Carbon::parse($published) : Carbon::now(),
+            inReplyTo: $inReplyTo,
+            mentions: $this->extractMentionHrefs($object['tag'] ?? []),
         );
 
         Log::info('Stored AP post', ['noteId' => $noteId, 'actor' => $actorId]);
@@ -268,25 +272,39 @@ class MastodonActivityPubController extends Controller
         return response()->json('', 202);
     }
 
-    private function notifyMentionedUsers(array $object, ActivityPubActor $actor, string $postId): void
+    /**
+     * @return array<int, string>
+     */
+    private function extractMentionHrefs(mixed $tags): array
     {
-        $tags = $object['tag'] ?? [];
         if (! is_array($tags)) {
-            return;
+            return [];
         }
 
-        $actorPrefix = str_replace('PLACEHOLDER', '', route('ap.actor', ['username' => 'PLACEHOLDER']));
-        $postBody = isset($object['content']) && is_string($object['content'])
-            ? substr(strip_tags($object['content']), 0, 100)
-            : null;
-
+        $hrefs = [];
         foreach ($tags as $tag) {
             if (! is_array($tag) || ($tag['type'] ?? null) !== 'Mention') {
                 continue;
             }
 
             $href = $tag['href'] ?? null;
-            if (! is_string($href) || ! str_starts_with($href, $actorPrefix)) {
+            if (is_string($href)) {
+                $hrefs[] = $href;
+            }
+        }
+
+        return array_values(array_unique($hrefs));
+    }
+
+    private function notifyMentionedUsers(array $object, ActivityPubActor $actor, string $postId): void
+    {
+        $actorPrefix = str_replace('PLACEHOLDER', '', route('ap.actor', ['username' => 'PLACEHOLDER']));
+        $postBody = isset($object['content']) && is_string($object['content'])
+            ? substr(strip_tags($object['content']), 0, 100)
+            : null;
+
+        foreach ($this->extractMentionHrefs($object['tag'] ?? []) as $href) {
+            if (! str_starts_with($href, $actorPrefix)) {
                 continue;
             }
 

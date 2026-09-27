@@ -158,6 +158,8 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon $published_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null $in_reply_to
+ * @property array<array-key, mixed>|null $mentions
  * @property-read \App\Models\ActivityPubActor $actor
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ActivityPubPostLike> $likes
  * @property-read int|null $likes_count
@@ -171,6 +173,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPost whereContent($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPost whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPost whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPost whereInReplyTo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPost whereMentions($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPost wherePublishedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPost whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPost whereUrl($value)
