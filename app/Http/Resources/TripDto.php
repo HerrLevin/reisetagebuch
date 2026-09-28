@@ -85,8 +85,12 @@ class TripDto
     )]
     public ?string $routeTextColor = null;
 
-    public function __construct(TransportTrip $trip)
+    public function __construct(?TransportTrip $trip = null)
     {
+        if ($trip === null) {
+            return;
+        }
+
         $this->id = $trip->id;
         $this->foreignId = $trip->foreign_trip_id;
         $this->mode = TransportMode::tryFrom($trip->mode);
@@ -96,5 +100,23 @@ class TripDto
         $this->displayName = $trip->display_name;
         $this->routeColor = $trip->route_color;
         $this->routeTextColor = $trip->route_text_color;
+    }
+
+    public static function fromRemote(array $data): self
+    {
+        $dto = new self;
+        $dto->id = (string) ($data['id'] ?? '');
+        $dto->foreignId = $data['foreignId'] ?? null;
+        // $mode is non-nullable; unlike the local constructor, remote data can plausibly
+        // be missing/invalid, so fall back to OTHER rather than risk a TypeError.
+        $dto->mode = TransportMode::tryFrom($data['mode'] ?? '') ?? TransportMode::OTHER;
+        $dto->lineName = $data['lineName'] ?? null;
+        $dto->routeLongName = $data['routeLongName'] ?? null;
+        $dto->tripShortName = $data['tripShortName'] ?? null;
+        $dto->displayName = $data['displayName'] ?? null;
+        $dto->routeColor = $data['routeColor'] ?? null;
+        $dto->routeTextColor = $data['routeTextColor'] ?? null;
+
+        return $dto;
     }
 }

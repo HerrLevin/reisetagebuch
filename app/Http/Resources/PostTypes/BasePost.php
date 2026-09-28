@@ -5,6 +5,7 @@ namespace App\Http\Resources\PostTypes;
 use App\Enums\PostMetaInfo\MetaInfoValueType;
 use App\Enums\Visibility;
 use App\Http\Resources\UserDto;
+use App\Models\ActivityPubPost;
 use App\Models\Post;
 use App\Traits\JsonResponseObject;
 use Carbon\Carbon;
@@ -108,6 +109,29 @@ class BasePost
 
                 return $group->first()->value;
             })->toArray() ?? [];
+    }
+
+    /**
+     * Reconstructs a post DTO from a cached federated ActivityPubPost row, rather than a
+     * local Eloquent Post. Used as the base of the fromRemote() chain: LocationPost::fromRemote()
+     * and TransportPost::fromRemote() call parent::fromRemote() and get back an instance of
+     * their own class via late static binding (`new static`).
+     */
+    public static function fromRemote(ActivityPubPost $post, UserDto $userDto): static
+    {
+        $dto = new static;
+        $dto->id = $post->id;
+        $dto->user = $userDto;
+        $dto->body = $post->content;
+        $dto->visibility = Visibility::PUBLIC;
+        $dto->sourceUrl = $post->url ?? $post->activity_id;
+        $dto->publishedAt = $post->published_at->toIso8601String();
+        $dto->createdAt = $post->created_at->toIso8601String();
+        $dto->updatedAt = $post->updated_at->toIso8601String();
+        $dto->likesCount = $post->likes_count ?? 0;
+        $dto->likedByUser = (bool) ($post->liked_by_user ?? false);
+
+        return $dto;
     }
 
     public function getHtmlBody(): ?string

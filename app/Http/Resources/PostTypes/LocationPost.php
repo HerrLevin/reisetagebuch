@@ -6,6 +6,7 @@ use App\Enums\PostMetaInfo\MetaInfoKey;
 use App\Enums\PostMetaInfo\TravelReason;
 use App\Http\Resources\LocationDto;
 use App\Http\Resources\UserDto;
+use App\Models\ActivityPubPost;
 use App\Models\Post;
 use OpenApi\Attributes as OA;
 
@@ -40,13 +41,31 @@ class LocationPost extends BasePost
     )]
     public ?string $visitedAt;
 
-    public function __construct(Post $post, UserDto $userDto)
+    public function __construct(?Post $post = null, ?UserDto $userDto = null)
     {
         parent::__construct($post, $userDto);
+
+        if ($post === null) {
+            return;
+        }
+
         $this->location = new LocationDto($post->locationPost->location);
         $this->travelReason = TravelReason::tryFrom($post->metaInfos->where('key', MetaInfoKey::TRAVEL_REASON)->first()?->value);
         $this->visitedAt = $post->locationPost->visited_at?->toIso8601String();
         $this->updatedAt = $this->getUpdatedAt($post)?->toIso8601String();
+    }
+
+    public static function fromRemote(ActivityPubPost $post, UserDto $userDto, array $data = []): static
+    {
+        $dto = parent::fromRemote($post, $userDto);
+        // $data is the flat 'location' sub-payload itself (see NoteHydrator::buildLocationPayload()
+        // — travelReason/visitedAt are siblings of the location-core fields, not nested under
+        // another 'location' key), so LocationDto reads straight from $data.
+        $dto->location = LocationDto::fromRemote($data);
+        $dto->travelReason = isset($data['travelReason']) ? TravelReason::tryFrom($data['travelReason']) : null;
+        $dto->visitedAt = $data['visitedAt'] ?? null;
+
+        return $dto;
     }
 
     private function getUpdatedAt(Post $post)
