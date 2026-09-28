@@ -101,10 +101,18 @@ Run the test suite:
 ```
 
 ## Queue Workers
-To start queue workers, run:
+
+Queue jobs are processed by [Laravel Horizon](https://laravel.com/docs/horizon), which runs automatically as its own
+Sail service (`horizon`) whenever you run `sail up -d`. The scheduler (`schedule:work`) also runs as its own Sail
+service (`scheduler`), so cron-based jobs run without any extra setup.
+
+You can monitor queues, throughput and failed jobs on the Horizon dashboard at
+[http://localhost/horizon](http://localhost/horizon) (requires an admin user).
+
+If you need to restart the workers after changing job or queue code, run:
 
 ```bash
-./vendor/bin/sail artisan queue:work
+./vendor/bin/sail artisan horizon:terminate
 ```
 
 ## Next Steps

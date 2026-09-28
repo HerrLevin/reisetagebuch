@@ -14,61 +14,24 @@ The easiest way to get started is by using Docker Compose.
 
 This is the recommended way to run Reisetagebuch, as it handles all dependencies including the database.
 
-This is a sample `docker-compose.yml` file you can use:
-```yaml
-services:
-    rtb.prod:
-        restart: always
-        image: herrlevin/reisetagebuch:main
-        env_file: .env
-        volumes:
-            - ./app/public:/var/www/html/storage/app/public # Persist uploaded files
-        depends_on:
-            - pgsql
-            - redis
+The `rtb.prod` service serves the web application and runs the scheduler. Queued jobs are processed separately by
+[Laravel Horizon](https://laravel.com/docs/horizon), running in its own `horizon` service so it can be scaled
+independently of the web server. 
+You can find a docker compose sample, ready to copy, here:
+[docker-compose.example.yml](https://github.com/HerrLevin/reisetagebuch/blob/main/docker-compose.example.yml)
 
-    pgsql:
-        restart: always
-        platform: 'linux/amd64' # Force x86_64 architecture for Postgres, because they don't support arm64 yet
-        image: 'postgis/postgis:17-master'
-        environment:
-            PGPASSWORD: '${DB_PASSWORD:-secret}'
-            POSTGRES_DB: '${DB_DATABASE}'
-            POSTGRES_USER: '${DB_USERNAME}'
-            POSTGRES_PASSWORD: '${DB_PASSWORD:-secret}'
-        ports:
-            - '5432:5432'
-        volumes:
-            - ./pgsql:/var/lib/postgresql/data
-        healthcheck:
-            test:
-                - CMD
-                - pg_isready
-                - '-q'
-                - '-d'
-                - '${DB_DATABASE}'
-                - '-U'
-                - '${DB_USERNAME}'
-            retries: 3
-            timeout: 5s
-
-    redis:
-        restart: always
-        image: 'redis:alpine'
-        volumes:
-            - ./redis.conf:/etc/redis/redis.conf
-            - ./redis:/data
-        command: [ "redis-server", "/etc/redis/redis.conf" ]
-        networks:
-            - rtb-prod
-        healthcheck:
-            test:
-                - CMD
-                - redis-cli
-                - ping
-            retries: 3
-            timeout: 5s
+::: tip
+You can run multiple Horizon workers by scaling the `horizon` service, e.g.:
+```bash
+docker compose up -d --scale horizon=3
 ```
+Each replica registers itself as its own Horizon "master supervisor" in Redis, so they coordinate automatically
+and won't double-process jobs. On first deploy, run migrations explicitly before starting workers, since
+`depends_on`'s healthcheck only waits for `rtb.prod`'s web server to respond, not for its migrations to finish:
+```bash
+docker compose run --rm rtb.prod php artisan migrate
+```
+:::
 
 You'll also need a `.env` file with your configuration. You can use the provided `.env.example` as a starting point.
 

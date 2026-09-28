@@ -51,6 +51,7 @@ return Application::configure(basePath: dirname(__DIR__))
         });
     })
     ->withSchedule(function (Schedule $schedule) {
+        $schedule->command('horizon:snapshot')->everyFiveMinutes();
         $schedule->command(FetchAirports::class)->daily()->runInBackground();
         $schedule->job(DispatchRefreshJobForActiveTrips::class)->everyMinute();
         $schedule->job(DeleteOldNearbyRequests::class)->daily();
