@@ -22,10 +22,24 @@ class LocationIdentifierDto
     #[OA\Property('identifier', description: 'The location identifier value', type: 'string')]
     public string $identifier;
 
-    public function __construct(LocationIdentifier $locationTag)
+    public function __construct(?LocationIdentifier $locationTag = null)
     {
+        if ($locationTag === null) {
+            return;
+        }
+
         $this->type = $locationTag->type;
         $this->origin = $locationTag->origin;
         $this->identifier = $locationTag->identifier;
+    }
+
+    public static function fromRemote(array $data): self
+    {
+        $dto = new self;
+        $dto->type = (string) ($data['type'] ?? '');
+        $dto->origin = (string) ($data['origin'] ?? '');
+        $dto->identifier = (string) ($data['identifier'] ?? '');
+
+        return $dto;
     }
 }

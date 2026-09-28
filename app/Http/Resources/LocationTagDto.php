@@ -19,9 +19,22 @@ class LocationTagDto
     #[OpenApi\Property('value', description: 'Value of the location tag', type: 'string')]
     public string $value;
 
-    public function __construct(LocationTag $locationTag)
+    public function __construct(?LocationTag $locationTag = null)
     {
+        if ($locationTag === null) {
+            return;
+        }
+
         $this->key = $locationTag->key;
         $this->value = $locationTag->value;
+    }
+
+    public static function fromRemote(array $data): self
+    {
+        $dto = new self;
+        $dto->key = (string) ($data['key'] ?? '');
+        $dto->value = (string) ($data['value'] ?? '');
+
+        return $dto;
     }
 }

@@ -132,6 +132,21 @@ class PostRepositoryTest extends TestCase
         $this->assertContains($ownPublicPost->id, $ids);
     }
 
+    public function test_anonymous_dashboard_viewer_cannot_see_only_authenticated_posts()
+    {
+        $owner = User::factory()->create();
+        $repo = new PostRepository;
+
+        $publicPost = Post::factory()->create(['user_id' => $owner->id, 'visibility' => Visibility::PUBLIC->value]);
+        $onlyAuthPost = Post::factory()->create(['user_id' => $owner->id, 'visibility' => Visibility::ONLY_AUTHENTICATED->value]);
+
+        $result = $repo->getGlobalTimeline(null);
+        $ids = collect($result->items)->pluck('id')->all();
+
+        $this->assertContains($publicPost->id, $ids);
+        $this->assertNotContains($onlyAuthPost->id, $ids);
+    }
+
     public function test_unauthenticated_user_cannot_access_private_post()
     {
         $owner = User::factory()->create();
