@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Dto\AirportDto;
+use App\Jobs\LookupLocationTimezoneJob;
 use App\Models\Country;
 use App\Models\Location;
 use App\Models\LocationIdentifier;
@@ -245,9 +246,19 @@ class LocationRepository
             ->delete();
     }
 
+    /**
+     * Locations missing a timezone, prioritizing ones originating from transitous
+     * (motis) since those are the stops actually rendered in transport posts.
+     */
     public function getLocationsWithMissingTimezone(int $limit): Collection
     {
-        return Location::whereNull('timezone')->limit($limit)->get();
+        return Location::whereNull('timezone')
+            ->withExists(['identifiers as has_transitous_origin' => function (Builder $query) {
+                $query->where('origin', 'motis');
+            }])
+            ->orderByDesc('has_transitous_origin')
+            ->limit($limit)
+            ->get();
     }
 
     public function getNearbyLocations(Point $position): Collection|SupportCollection
@@ -312,12 +323,9 @@ class LocationRepository
         $location->name = $name;
         $location->location = Point::makeGeodetic($latitude, $longitude);
         $location->country_code = $this->resolveCountryCode($location->location);
-
-        if ($location->timezone === null) {
-            $location->timezone = $this->timeZoneLookupService->lookup($latitude, $longitude);
-        }
-
         $location->save();
+
+        $this->ensureTimezone($location);
 
         $location->identifiers()->updateOrCreate(
             ['identifier' => $identifier, 'type' => $identifierType, 'origin' => $origin],
@@ -325,6 +333,43 @@ class LocationRepository
         );
 
         $location->save();
+    }
+
+    public function ensureTimezone(Location $location): void
+    {
+        if ($location->timezone !== null) {
+            return;
+        }
+
+        LookupLocationTimezoneJob::dispatch($location->id);
+    }
+
+    /**
+     * Synchronously resolves and persists the location's timezone via an external lookup.
+     * Intended to be called only from within a queued job (see LookupLocationTimezoneJob) —
+     * use ensureTimezone() from request-handling code instead.
+     *
+     * @return bool true if the timezone was newly resolved and saved.
+     */
+    public function resolveTimezoneNow(Location $location): bool
+    {
+        if ($location->timezone !== null) {
+            return false;
+        }
+
+        $timezone = $this->timeZoneLookupService->lookup(
+            $location->location->getLatitude(),
+            $location->location->getLongitude(),
+        );
+
+        if ($timezone === null) {
+            return false;
+        }
+
+        $location->timezone = $timezone;
+        $location->save();
+
+        return true;
     }
 
     /**

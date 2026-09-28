@@ -2,11 +2,11 @@
 
 namespace Tests\Feature\Jobs;
 
+use App\Jobs\ActivityPub\PushLocationTimezoneChangeToMastodon;
 use App\Jobs\BackfillLocationTimezones;
 use App\Jobs\LookupLocationTimezoneJob;
 use App\Models\Location;
 use App\Repositories\LocationRepository;
-use App\Services\TimeZoneLookupService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Http;
@@ -75,7 +75,7 @@ class BackfillLocationTimezonesTest extends TestCase
             '*' => Http::response(['timeZone' => 'Europe/Berlin']),
         ]);
 
-        (new LookupLocationTimezoneJob($location->id))->handle(app(TimeZoneLookupService::class));
+        (new LookupLocationTimezoneJob($location->id))->handle(app(LocationRepository::class));
 
         $this->assertSame('Europe/Berlin', $location->fresh()->timezone);
     }
@@ -88,7 +88,7 @@ class BackfillLocationTimezonesTest extends TestCase
             '*' => Http::response(null, 500),
         ]);
 
-        (new LookupLocationTimezoneJob($location->id))->handle(app(TimeZoneLookupService::class));
+        (new LookupLocationTimezoneJob($location->id))->handle(app(LocationRepository::class));
 
         $this->assertNull($location->fresh()->timezone);
     }
@@ -101,7 +101,7 @@ class BackfillLocationTimezonesTest extends TestCase
             '*' => Http::response(['timeZone' => 'Asia/Tokyo']),
         ]);
 
-        (new LookupLocationTimezoneJob($location->id))->handle(app(TimeZoneLookupService::class));
+        (new LookupLocationTimezoneJob($location->id))->handle(app(LocationRepository::class));
 
         Http::assertNothingSent();
         $this->assertSame('Europe/Berlin', $location->fresh()->timezone);
@@ -112,8 +112,38 @@ class BackfillLocationTimezonesTest extends TestCase
         Http::fake();
 
         (new LookupLocationTimezoneJob('00000000-0000-7000-8000-000000000000'))
-            ->handle(app(TimeZoneLookupService::class));
+            ->handle(app(LocationRepository::class));
 
         Http::assertNothingSent();
+    }
+
+    public function test_lookup_job_pushes_active_posts_for_the_location_to_mastodon_when_timezone_is_resolved(): void
+    {
+        $location = Location::factory()->create(['timezone' => null]);
+
+        Http::fake([
+            '*' => Http::response(['timeZone' => 'Europe/Berlin']),
+        ]);
+        Bus::fake();
+
+        (new LookupLocationTimezoneJob($location->id))->handle(app(LocationRepository::class));
+
+        Bus::assertDispatched(PushLocationTimezoneChangeToMastodon::class, function (PushLocationTimezoneChangeToMastodon $job) use ($location) {
+            return $this->jobProperty($job, 'locationId') === $location->id;
+        });
+    }
+
+    public function test_lookup_job_does_not_push_to_mastodon_when_timezone_lookup_fails(): void
+    {
+        $location = Location::factory()->create(['timezone' => null]);
+
+        Http::fake([
+            '*' => Http::response(null, 500),
+        ]);
+        Bus::fake();
+
+        (new LookupLocationTimezoneJob($location->id))->handle(app(LocationRepository::class));
+
+        Bus::assertNotDispatched(PushLocationTimezoneChangeToMastodon::class);
     }
 }

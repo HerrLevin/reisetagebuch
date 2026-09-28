@@ -486,6 +486,24 @@ class PostRepository
             ->values();
     }
 
+    /**
+     * IDs of still-public transport posts that start or finish at the given location,
+     * used to re-push those posts to Mastodon after the location's timezone changes.
+     *
+     * @return Collection<int, string>
+     */
+    public function getActivePostIdsForLocation(string $locationId): Collection
+    {
+        return TransportPostModel::query()
+            ->where(function (Builder $query) use ($locationId) {
+                $query->whereHas('originStop', fn (Builder $q) => $q->where('location_id', $locationId))
+                    ->orWhereHas('destinationStop', fn (Builder $q) => $q->where('location_id', $locationId));
+            })
+            ->whereHas('post', fn (Builder $q) => $q->where('visibility', Visibility::PUBLIC))
+            ->where('created_at', '>=', Carbon::now()->subDays(config('app.active_post.repush_days')))
+            ->pluck('post_id');
+    }
+
     public function updateStats(string $postId, int $distance, int $duration, array $transitedCountryCodes = []): void
     {
         TransportPostModel::where('post_id', $postId)->update([
