@@ -1,0 +1,100 @@
+services:
+    # Serves the web application (nginx + php-fpm) and runs the scheduler.
+    # Does NOT process queued jobs — that's handled by the `horizon` service below.
+    rtb.prod:
+        restart: always
+        image: herrlevin/reisetagebuch:latest
+        env_file: .env
+        volumes:
+            - ./app/public:/var/www/html/storage/app/public # Persist uploaded files
+        depends_on:
+            - pgsql
+            - redis
+        healthcheck:
+            test: ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://localhost/up']
+            interval: 30s
+            timeout: 5s
+            start_period: 10s
+            retries: 3
+
+    # Processes queued jobs via Laravel Horizon. Uses the same image as `rtb.prod`, but
+    # overrides the container command to run only `artisan horizon`, skipping migrations,
+    # nginx and php-fpm.
+    #
+    # Scale to multiple Horizon workers with:
+    #   docker compose -f docker-compose.example.yml up -d --scale horizon=3
+    # Each replica registers itself as its own Horizon "master supervisor" in Redis, so
+    # they coordinate automatically and won't double-process jobs.
+    horizon:
+        restart: always
+        image: herrlevin/reisetagebuch:latest
+        command: ['php', 'artisan', 'horizon']
+        # at least as long as config/horizon.php's supervisor `timeout` (60s) so Docker doesn't
+        # SIGKILL mid-shutdown.
+        stop_grace_period: 65s
+        env_file: .env
+        volumes:
+            - ./app/public:/var/www/html/storage/app/public # Jobs may read/write uploaded files
+        depends_on:
+            pgsql:
+                condition: service_started
+            redis:
+                condition: service_started
+            rtb.prod:
+                # Only waits for rtb.prod's healthcheck (nginx responding), not for its
+                # migrations to finish. On first deploy, run migrations explicitly before
+                # starting workers, e.g.: docker compose run --rm rtb.prod php artisan migrate
+                condition: service_healthy
+        healthcheck:
+            # Exit codes from horizon:status: 0 = running, 1 = paused, 2 = inactive.
+            # Since master supervisors are named after the container hostname but
+            # horizon:status checks all of them, this reports the whole fleet's state,
+            # not just this replica's — a crashed process still exits the container
+            # (PID 1), so `restart: always` handles that case independently.
+            test: ['CMD', 'php', 'artisan', 'horizon:status']
+            interval: 30s
+            timeout: 10s
+            start_period: 10s
+            retries: 3
+
+    pgsql:
+        restart: always
+        platform: 'linux/amd64' # Force x86_64 architecture for Postgres, because they don't support arm64 yet
+        image: 'postgis/postgis:17-master'
+        environment:
+            PGPASSWORD: '${DB_PASSWORD:-secret}'
+            POSTGRES_DB: '${DB_DATABASE}'
+            POSTGRES_USER: '${DB_USERNAME}'
+            POSTGRES_PASSWORD: '${DB_PASSWORD:-secret}'
+        ports:
+            - '5432:5432'
+        volumes:
+            - ./pgsql:/var/lib/postgresql/data
+        healthcheck:
+            test:
+                - CMD
+                - pg_isready
+                - '-q'
+                - '-d'
+                - '${DB_DATABASE}'
+                - '-U'
+                - '${DB_USERNAME}'
+            retries: 3
+            timeout: 5s
+
+    redis:
+        restart: always
+        image: 'redis:alpine'
+        volumes:
+            - ./redis:/data
+        command: ['redis-server', '--requirepass', '${REDIS_PASSWORD}']
+        healthcheck:
+            test:
+                - CMD
+                - redis-cli
+                - '--no-auth-warning'
+                - '-a'
+                - '${REDIS_PASSWORD}'
+                - ping
+            retries: 3
+            timeout: 5s

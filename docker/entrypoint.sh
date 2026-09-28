@@ -31,8 +31,8 @@ php artisan optimize
 echo "Generating Passport keys (skipped if they already exist)..."
 php artisan passport:keys || true
 
-echo "Restart queue workers..."
-php artisan queue:restart
+echo "Restart Horizon workers..."
+php artisan horizon:terminate
 
 echo "Importing/updating country boundary data..."
 php artisan app:startup-imports

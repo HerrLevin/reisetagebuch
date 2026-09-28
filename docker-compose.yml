@@ -25,6 +25,49 @@ services:
             - pgsql
             - redis
             - mailpit
+    horizon:
+        build:
+            context: './vendor/laravel/sail/runtimes/8.4'
+            dockerfile: Dockerfile
+            args:
+                WWWGROUP: '${WWWGROUP}'
+        image: 'sail-8.4/app'
+        extra_hosts:
+            - 'host.docker.internal:host-gateway'
+        environment:
+            WWWUSER: '${WWWUSER}'
+            LARAVEL_SAIL: 1
+        volumes:
+            - '.:/var/www/html'
+        networks:
+            - sail
+        depends_on:
+            - pgsql
+            - redis
+        command: ['php', '/var/www/html/artisan', 'horizon']
+        # at least as long as config/horizon.php's supervisor `timeout` (60s) so Docker doesn't
+        # SIGKILL mid-shutdown.
+        stop_grace_period: 65s
+    scheduler:
+        build:
+            context: './vendor/laravel/sail/runtimes/8.4'
+            dockerfile: Dockerfile
+            args:
+                WWWGROUP: '${WWWGROUP}'
+        image: 'sail-8.4/app'
+        extra_hosts:
+            - 'host.docker.internal:host-gateway'
+        environment:
+            WWWUSER: '${WWWUSER}'
+            LARAVEL_SAIL: 1
+        volumes:
+            - '.:/var/www/html'
+        networks:
+            - sail
+        depends_on:
+            - pgsql
+            - redis
+        command: ['php', '/var/www/html/artisan', 'schedule:work']
     pgsql:
         platform: 'linux/amd64' # Force x86_64 architecture for Postgres, because they don't support arm64 yet
         image: 'postgis/postgis:18-master'
