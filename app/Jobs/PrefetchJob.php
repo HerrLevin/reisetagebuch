@@ -23,6 +23,7 @@ class PrefetchJob implements ShouldQueue
     {
         $this->point = $point;
         $this->locationController = $locationController;
+        $this->queue = 'overpass-prefetch';
     }
 
     public int $tries = 2;

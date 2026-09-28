@@ -23,7 +23,9 @@ class SendApPostLikeActivity implements ShouldQueue
         private readonly string $userId,
         private readonly string $apPostId,
         private readonly string $likeActivityId,
-    ) {}
+    ) {
+        $this->queue = 'activitypub';
+    }
 
     public function handle(
         UserRepository $userRepository,

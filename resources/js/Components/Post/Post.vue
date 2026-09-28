@@ -140,14 +140,13 @@ const relativeCreatedAt = computed(() => {
                 }}
             </span>
         </div>
-        <!-- Fediverse posts have HTML content -->
+        <!-- Plain federated Notes carry HTML in `body`, rendered via v-html. -->
         <!-- eslint-disable vue/no-v-html -->
         <div
             v-if="localPost.sourceUrl && localPost.body"
             class="ap-post-content list-col-wrap my-2 ps-3 text-xs"
             v-html="localPost.body"
         />
-        <!-- eslint-enable vue/no-v-html -->
         <p
             v-else-if="localPost.body"
             class="list-col-wrap my-2 ps-3 text-xs whitespace-pre-wrap"

@@ -45,7 +45,7 @@ class ActivityPubService
     {
         $actor = null;
         try {
-            $this->urlGuard->assertSafe($actorId);
+            $actorIp = $this->urlGuard->assertSafe($actorId);
 
             $headers = ['Accept' => 'application/activity+json'];
 
@@ -56,7 +56,10 @@ class ActivityPubService
             }
 
             $response = Http::withHeaders($headers)
-                ->withOptions(['allow_redirects' => false])->timeout(10)->get($actorId);
+                ->withOptions([
+                    'allow_redirects' => false,
+                    'curl' => $this->urlGuard->pinOption($actorId, $actorIp),
+                ])->timeout(10)->get($actorId);
 
             if ($response->successful()) {
                 $actor = $response->json();
@@ -97,7 +100,7 @@ class ActivityPubService
         $webfingerUrl = "https://{$domain}{$path}";
 
         try {
-            $this->urlGuard->assertSafe($webfingerUrl);
+            $webfingerIp = $this->urlGuard->assertSafe($webfingerUrl);
 
             $date = now()->toRfc7231String();
             $signature = $this->createSignature($user, 'GET', $path, $domain, $date);
@@ -106,7 +109,10 @@ class ActivityPubService
                 'Accept' => 'application/jrd+json, application/json',
                 'Date' => $date,
                 'Signature' => $signature,
-            ])->withOptions(['allow_redirects' => false])->timeout(10)->get($webfingerUrl);
+            ])->withOptions([
+                'allow_redirects' => false,
+                'curl' => $this->urlGuard->pinOption($webfingerUrl, $webfingerIp),
+            ])->timeout(10)->get($webfingerUrl);
 
             if (! $response->successful()) {
                 Log::warning('WebFinger lookup failed', ['handle' => $handle, 'status' => $response->status()]);
@@ -196,7 +202,7 @@ class ActivityPubService
         // Inbox URLs originate from the remote actor's own profile JSON, so they
         // must be re-validated here even though the actor URI was already checked
         // when the profile was fetched/stored.
-        $this->urlGuard->assertSafe($inbox);
+        $inboxIp = $this->urlGuard->assertSafe($inbox);
 
         // Prepare the request
         $body = json_encode($activity, JSON_UNESCAPED_SLASHES);
@@ -213,6 +219,9 @@ class ActivityPubService
             'Date' => $date,
             'Digest' => $digest,
             'Signature' => $signature,
+        ])->withOptions([
+            'allow_redirects' => false,
+            'curl' => $this->urlGuard->pinOption($inbox, $inboxIp),
         ])->withBody($body, 'application/activity+json')->post($inbox);
         Log::debug('Delivered Activity to inbox: '.$inbox.' Response status: '.$data->status(), [
             'body' => $body,

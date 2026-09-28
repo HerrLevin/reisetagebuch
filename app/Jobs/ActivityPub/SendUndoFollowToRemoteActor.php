@@ -24,7 +24,9 @@ class SendUndoFollowToRemoteActor implements ShouldQueue
         private readonly string $remoteActorId,
         private readonly string $followActivityId,
         private readonly string $inboxUrl,
-    ) {}
+    ) {
+        $this->queue = 'activitypub';
+    }
 
     public function handle(
         UserRepository $userRepository,

@@ -5,22 +5,34 @@ import {
     formatFullNumber,
     formatShortenedNumber,
 } from '@/Services/NumberFormattingService';
-import { PropType, useTemplateRef } from 'vue';
+import { useUserStore } from '@/stores/user';
+import { computed, PropType, useTemplateRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { UserDto } from '../../../../types/Api.gen';
 
 const { t, locale } = useI18n();
+const authUser = useUserStore();
 
-defineProps({
+const props = defineProps({
     user: {
         type: Object as PropType<UserDto>,
         default: () => ({}),
     },
 });
 
+const canViewFollowList = computed(
+    () =>
+        props.user.id === authUser.user?.id ||
+        !props.user.requiresFollowRequest ||
+        props.user.isFollowed,
+);
+
 const followListModal = useTemplateRef('followListModal');
 
 function openFollowList(mode: 'followers' | 'following') {
+    if (!canViewFollowList.value) {
+        return;
+    }
     followListModal.value?.open(mode);
 }
 </script>
@@ -29,7 +41,12 @@ function openFollowList(mode: 'followers' | 'following') {
     <div class="flex flex-wrap gap-x-3">
         <button
             type="button"
-            class="link link-hover tooltip flex cursor-pointer"
+            class="tooltip flex"
+            :class="
+                canViewFollowList
+                    ? 'link link-hover cursor-pointer'
+                    : 'cursor-default'
+            "
             :data-tip="formatFullNumber(user.statistics.followersCount, locale)"
             @click="openFollowList('followers')"
         >
@@ -45,7 +62,12 @@ function openFollowList(mode: 'followers' | 'following') {
         </button>
         <button
             type="button"
-            class="link link-hover tooltip flex cursor-pointer"
+            class="tooltip flex"
+            :class="
+                canViewFollowList
+                    ? 'link link-hover cursor-pointer'
+                    : 'cursor-default'
+            "
             :data-tip="formatFullNumber(user.statistics.followingCount, locale)"
             @click="openFollowList('following')"
         >

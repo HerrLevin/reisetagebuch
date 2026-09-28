@@ -24,6 +24,7 @@ class TraewellingDeletePostJob implements ShouldQueue
         $traewellingPostId = $post->metaInfos->where('key', MetaInfoKey::TRAEWELLING_TRIP_ID)->first()?->value;
         $this->traewellingPostId = (int) $traewellingPostId;
         $this->userId = $post->user_id;
+        $this->queue = 'traewelling';
     }
 
     public function handle(): void

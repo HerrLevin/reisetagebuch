@@ -23,7 +23,9 @@ class PushDeleteToMastodon implements ShouldQueue
         private readonly string $postId,
         private readonly string $userId,
         private readonly string $username
-    ) {}
+    ) {
+        $this->queue = 'activitypub';
+    }
 
     public function handle(): void
     {

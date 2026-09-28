@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Dto\ActivityPub\Extensions\RtbIdentifierData;
 use App\Models\LocationIdentifier;
 use OpenApi\Attributes as OA;
 
@@ -22,10 +23,24 @@ class LocationIdentifierDto
     #[OA\Property('identifier', description: 'The location identifier value', type: 'string')]
     public string $identifier;
 
-    public function __construct(LocationIdentifier $locationTag)
+    public function __construct(?LocationIdentifier $locationTag = null)
     {
+        if ($locationTag === null) {
+            return;
+        }
+
         $this->type = $locationTag->type;
         $this->origin = $locationTag->origin;
         $this->identifier = $locationTag->identifier;
+    }
+
+    public static function fromRtb(RtbIdentifierData $data): self
+    {
+        $dto = new self;
+        $dto->type = $data->type;
+        $dto->origin = $data->origin;
+        $dto->identifier = $data->identifier;
+
+        return $dto;
     }
 }

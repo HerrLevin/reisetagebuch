@@ -12,7 +12,9 @@ class PushLocationTimezoneChangeToMastodon implements ShouldQueue
 
     public function __construct(
         private readonly string $locationId
-    ) {}
+    ) {
+        $this->queue = 'activitypub';
+    }
 
     public function handle(PostRepository $postRepository): void
     {

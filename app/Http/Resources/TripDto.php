@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Dto\ActivityPub\Extensions\RtbTripData;
 use App\Enums\TransportMode;
 use App\Models\TransportTrip;
 use OpenApi\Attributes as OA;
@@ -85,8 +86,12 @@ class TripDto
     )]
     public ?string $routeTextColor = null;
 
-    public function __construct(TransportTrip $trip)
+    public function __construct(?TransportTrip $trip = null)
     {
+        if ($trip === null) {
+            return;
+        }
+
         $this->id = $trip->id;
         $this->foreignId = $trip->foreign_trip_id;
         $this->mode = TransportMode::tryFrom($trip->mode);
@@ -96,5 +101,21 @@ class TripDto
         $this->displayName = $trip->display_name;
         $this->routeColor = $trip->route_color;
         $this->routeTextColor = $trip->route_text_color;
+    }
+
+    public static function fromRtb(RtbTripData $data): self
+    {
+        $dto = new self;
+        $dto->id = $data->id;
+        $dto->foreignId = $data->foreignId;
+        $dto->mode = $data->mode;
+        $dto->lineName = $data->lineName;
+        $dto->routeLongName = $data->routeLongName;
+        $dto->tripShortName = $data->tripShortName;
+        $dto->displayName = $data->displayName;
+        $dto->routeColor = $data->routeColor;
+        $dto->routeTextColor = $data->routeTextColor;
+
+        return $dto;
     }
 }

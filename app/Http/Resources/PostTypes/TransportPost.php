@@ -2,11 +2,13 @@
 
 namespace App\Http\Resources\PostTypes;
 
+use App\Dto\ActivityPub\Extensions\RtbTransportExtension;
 use App\Enums\PostMetaInfo\MetaInfoKey;
 use App\Enums\PostMetaInfo\TravelReason;
 use App\Http\Resources\StopDto;
 use App\Http\Resources\TripDto;
 use App\Http\Resources\UserDto;
+use App\Models\ActivityPubPost;
 use App\Models\Post;
 use Carbon\Carbon;
 use Clickbar\Magellan\IO\Generator\Geojson\GeojsonGenerator;
@@ -89,9 +91,14 @@ class TransportPost extends BasePost
     )]
     public ?array $userGeometry = null;
 
-    public function __construct(Post $post, UserDto $userDto, bool $withGeometry = false)
+    public function __construct(?Post $post = null, ?UserDto $userDto = null, bool $withGeometry = false)
     {
         parent::__construct($post, $userDto);
+
+        if ($post === null) {
+            return;
+        }
+
         $asdf = $post->transportPost->originStop;
         $this->originStop = new StopDto($asdf);
         $this->destinationStop = new StopDto($post->transportPost->destinationStop);
@@ -106,6 +113,28 @@ class TransportPost extends BasePost
         if ($withGeometry && $post->transportPost->user_geometry !== null) {
             $this->userGeometry = (new GeojsonGenerator)->generate($post->transportPost->user_geometry);
         }
+    }
+
+    public static function fromRemote(ActivityPubPost $post, UserDto $userDto, ?RtbTransportExtension $extension = null): static
+    {
+        $dto = parent::fromRemote($post, $userDto);
+
+        if ($extension === null) {
+            return $dto;
+        }
+
+        $dto->body = $extension->body;
+        $dto->originStop = StopDto::fromRtb($extension->originStop);
+        $dto->destinationStop = StopDto::fromRtb($extension->destinationStop);
+        $dto->trip = TripDto::fromRtb($extension->trip);
+        $dto->manualDepartureTime = $extension->manualDepartureTime;
+        $dto->manualArrivalTime = $extension->manualArrivalTime;
+        $dto->travelReason = $extension->travelReason;
+        $dto->distance = $extension->distance;
+        $dto->duration = $extension->duration;
+        $dto->userGeometry = $extension->userGeometry;
+
+        return $dto;
     }
 
     private function getUpdatedAt(Post $post)
