@@ -30,6 +30,7 @@ class ActivityPubPostRepository
         Carbon $publishedAt,
         ?string $inReplyTo = null,
         array $mentions = [],
+        ?array $extensionData = null,
     ): ActivityPubPost {
         return ActivityPubPost::firstOrCreate(
             ['activity_id' => $activityId],
@@ -40,6 +41,7 @@ class ActivityPubPostRepository
                 'content' => $content,
                 'in_reply_to' => $inReplyTo,
                 'mentions' => $mentions,
+                'extension_data' => $extensionData,
                 'published_at' => $publishedAt,
             ]
         );

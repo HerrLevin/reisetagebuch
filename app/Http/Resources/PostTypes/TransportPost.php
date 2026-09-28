@@ -7,6 +7,7 @@ use App\Enums\PostMetaInfo\TravelReason;
 use App\Http\Resources\StopDto;
 use App\Http\Resources\TripDto;
 use App\Http\Resources\UserDto;
+use App\Models\ActivityPubPost;
 use App\Models\Post;
 use Carbon\Carbon;
 use Clickbar\Magellan\IO\Generator\Geojson\GeojsonGenerator;
@@ -89,9 +90,14 @@ class TransportPost extends BasePost
     )]
     public ?array $userGeometry = null;
 
-    public function __construct(Post $post, UserDto $userDto, bool $withGeometry = false)
+    public function __construct(?Post $post = null, ?UserDto $userDto = null, bool $withGeometry = false)
     {
         parent::__construct($post, $userDto);
+
+        if ($post === null) {
+            return;
+        }
+
         $asdf = $post->transportPost->originStop;
         $this->originStop = new StopDto($asdf);
         $this->destinationStop = new StopDto($post->transportPost->destinationStop);
@@ -106,6 +112,22 @@ class TransportPost extends BasePost
         if ($withGeometry && $post->transportPost->user_geometry !== null) {
             $this->userGeometry = (new GeojsonGenerator)->generate($post->transportPost->user_geometry);
         }
+    }
+
+    public static function fromRemote(ActivityPubPost $post, UserDto $userDto, array $data = []): static
+    {
+        $dto = parent::fromRemote($post, $userDto);
+        $dto->originStop = StopDto::fromRemote($data['originStop'] ?? []);
+        $dto->destinationStop = StopDto::fromRemote($data['destinationStop'] ?? []);
+        $dto->trip = TripDto::fromRemote($data['trip'] ?? []);
+        $dto->manualDepartureTime = $data['manualDepartureTime'] ?? null;
+        $dto->manualArrivalTime = $data['manualArrivalTime'] ?? null;
+        $dto->travelReason = isset($data['travelReason']) ? TravelReason::tryFrom($data['travelReason']) : null;
+        $dto->distance = (int) ($data['distance'] ?? 0);
+        $dto->duration = (int) ($data['duration'] ?? 0);
+        $dto->userGeometry = $data['userGeometry'] ?? null;
+
+        return $dto;
     }
 
     private function getUpdatedAt(Post $post)

@@ -32,6 +32,7 @@ use App\Repositories\PostRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\UserStatisticsRepository;
 use App\Services\ActivityPubContentSanitizer;
+use App\Services\ActivityPubExtensionParser;
 use App\Services\ActivityPubService;
 use Carbon\Carbon;
 use Exception;
@@ -40,6 +41,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 class MastodonActivityPubController extends Controller
 {
@@ -253,6 +255,13 @@ class MastodonActivityPubController extends Controller
             return response()->json('', 202);
         }
 
+        $extension = null;
+        try {
+            $extension = app(ActivityPubExtensionParser::class)->parse($object);
+        } catch (Throwable $e) {
+            Log::warning('RTB extension parsing threw unexpectedly, ignoring extension', ['error' => $e->getMessage()]);
+        }
+
         $post = $this->activityPubPostRepository->findOrCreateByActivityId(
             activityPubActorId: $actor->id,
             activityId: $noteId,
@@ -261,6 +270,7 @@ class MastodonActivityPubController extends Controller
             publishedAt: $published ? Carbon::parse($published) : Carbon::now(),
             inReplyTo: $inReplyTo,
             mentions: $this->extractMentionHrefs($object['tag'] ?? []),
+            extensionData: $extension,
         );
 
         Log::info('Stored AP post', ['noteId' => $noteId, 'actor' => $actorId]);

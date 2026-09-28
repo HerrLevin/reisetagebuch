@@ -69,8 +69,12 @@ class StopDto
     )]
     public ?int $departureDelay = null;
 
-    public function __construct(TransportTripStop $stop)
+    public function __construct(?TransportTripStop $stop = null)
     {
+        if ($stop === null) {
+            return;
+        }
+
         $this->id = $stop->id;
         $this->name = $stop->location->name;
         $this->location = new LocationDto($stop->location);
@@ -78,5 +82,19 @@ class StopDto
         $this->departureTime = $stop->departure_time?->toIso8601String();
         $this->arrivalDelay = $stop->arrival_delay;
         $this->departureDelay = $stop->departure_delay;
+    }
+
+    public static function fromRemote(array $data): self
+    {
+        $dto = new self;
+        $dto->id = (string) ($data['id'] ?? '');
+        $dto->name = (string) ($data['name'] ?? '');
+        $dto->location = LocationDto::fromRemote($data['location'] ?? []);
+        $dto->arrivalTime = $data['arrivalTime'] ?? null;
+        $dto->departureTime = $data['departureTime'] ?? null;
+        $dto->arrivalDelay = $data['arrivalDelay'] ?? null;
+        $dto->departureDelay = $data['departureDelay'] ?? null;
+
+        return $dto;
     }
 }
