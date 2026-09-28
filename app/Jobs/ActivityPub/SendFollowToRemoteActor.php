@@ -23,7 +23,9 @@ class SendFollowToRemoteActor implements ShouldQueue
     public function __construct(
         private readonly string $userId,
         private readonly string $remoteActorId,
-    ) {}
+    ) {
+        $this->queue = 'activitypub';
+    }
 
     public function handle(
         UserRepository $userRepository,

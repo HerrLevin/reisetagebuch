@@ -18,6 +18,7 @@ class TraewellingCrossCheckInJob implements ShouldQueue
     {
         $this->postId = $postId;
         $this->crossPostController = $crossPostController ?? app(CrossPostController::class);
+        $this->queue = 'traewelling';
     }
 
     public function handle(): void

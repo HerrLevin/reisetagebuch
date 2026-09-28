@@ -38,11 +38,20 @@ class ActivityPubFederationController extends Controller
         return response()->json($profile);
     }
 
+    /**
+     * Return the remote (ActivityPub) actors a user follows.
+     *
+     * @throws InsufficientRightsException
+     */
     public function following(): JsonResponse
     {
-        return response()->json(
-            $this->backend->listFollowing($this->auth->user()->id)
-        );
+        try {
+            return response()->json(
+                $this->backend->listFollowing($this->auth->user()->id, $this->auth->user())
+            );
+        } catch (InsufficientRightsException $e) {
+            abort(403, $e->getMessage());
+        }
     }
 
     #[OA\Get(
@@ -62,7 +71,11 @@ class ActivityPubFederationController extends Controller
     )]
     public function followersForUser(string $userId): JsonResponse
     {
-        return response()->json($this->backend->listFollowers($userId));
+        try {
+            return response()->json($this->backend->listFollowers($userId, $this->auth->user()));
+        } catch (InsufficientRightsException $e) {
+            abort(403, $e->getMessage());
+        }
     }
 
     #[OA\Get(
@@ -82,7 +95,11 @@ class ActivityPubFederationController extends Controller
     )]
     public function followingForUser(string $userId): JsonResponse
     {
-        return response()->json($this->backend->listFollowing($userId));
+        try {
+            return response()->json($this->backend->listFollowing($userId, $this->auth->user()));
+        } catch (InsufficientRightsException $e) {
+            abort(403, $e->getMessage());
+        }
     }
 
     public function follow(Request $request): Response

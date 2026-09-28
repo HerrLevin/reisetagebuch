@@ -12,7 +12,7 @@ import CardBack from '@/Pages/Posts/Partials/CardBack.vue';
 import { getColorForPost } from '@/Services/DepartureTypeService';
 import { useUserStore } from '@/stores/user';
 import { isLocationPost, isTransportPost } from '@/types/PostTypes';
-import { GeometryCollection } from 'geojson';
+import { GeometryCollection, MultiPoint } from 'geojson';
 import { LngLat } from 'maplibre-gl';
 import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -27,6 +27,7 @@ import {
     getTransportEffectiveTimes,
     getTransportProgress,
 } from '@/Services/TimeFormattingService';
+import { loadFederatedTripGeometry } from '@/Services/FederatedTripStopoverService';
 
 const { t } = useI18n();
 const vueRouter = useRouter();
@@ -43,9 +44,11 @@ const props = defineProps({
 const startPoint = ref(null as LngLat | null);
 const endPoint = ref(null as LngLat | null);
 const lineString = ref(null as GeometryCollection | null);
-const stopovers = ref(null as GeometryCollection | null);
+const stopovers = ref(null as MultiPoint | null);
 const stopoverList = ref<TransportPostStopoverDto[]>([]);
+const federatedStopoverDetails = ref<StopoverPopupInfo[] | null>(null);
 const stopoverDetails = computed<StopoverPopupInfo[] | null>(() => {
+    if (federatedStopoverDetails.value) return federatedStopoverDetails.value;
     if (stopoverList.value.length === 0) return null;
 
     return stopoverList.value.slice(1, -1).map((stop) => ({
@@ -113,39 +116,63 @@ function mapPostDetails() {
         if (post.value.userGeometry) {
             lineString.value = post.value.userGeometry as GeometryCollection;
         } else {
+            lineString.value = null;
+        }
+
+        if (!tPost.sourceUrl) {
+            federatedStopoverDetails.value = null;
+
+            if (!post.value.userGeometry) {
+                api.map
+                    .getLineStringBetween({
+                        from: tPost.originStop.id,
+                        to: tPost.destinationStop.id,
+                    })
+                    .then((response) => {
+                        lineString.value = response.data as GeometryCollection;
+                    })
+                    .catch(() => {
+                        lineString.value = null;
+                    });
+            }
+
             api.map
-                .getLineStringBetween({
+                .getStopsBetween({
                     from: tPost.originStop.id,
                     to: tPost.destinationStop.id,
                 })
                 .then((response) => {
-                    lineString.value = response.data as GeometryCollection;
+                    stopovers.value = response.data as MultiPoint;
                 })
                 .catch(() => {
-                    lineString.value = null;
+                    stopovers.value = null;
                 });
+
+            api.posts
+                .getStopoversForTransportPost(tPost.id)
+                .then((response) => {
+                    stopoverList.value = response.data;
+                })
+                .catch(() => {
+                    stopoverList.value = [];
+                });
+        } else {
+            stopovers.value = null;
+            stopoverList.value = [];
+            federatedStopoverDetails.value = null;
+
+            if (!post.value.userGeometry) {
+                loadFederatedTripGeometry(tPost).then((result) => {
+                    if (!result) {
+                        return;
+                    }
+                    lineString.value = result.lineString;
+                    stopovers.value = result.stopovers;
+                    federatedStopoverDetails.value = result.stopoverDetails;
+                    stopoverList.value = result.postStopovers;
+                });
+            }
         }
-
-        api.map
-            .getStopsBetween({
-                from: tPost.originStop.id,
-                to: tPost.destinationStop.id,
-            })
-            .then((response) => {
-                stopovers.value = response.data as GeometryCollection;
-            })
-            .catch(() => {
-                stopovers.value = null;
-            });
-
-        api.posts
-            .getStopoversForTransportPost(tPost.id)
-            .then((response) => {
-                stopoverList.value = response.data;
-            })
-            .catch(() => {
-                stopoverList.value = [];
-            });
     } else {
         startPoint.value = null;
         endPoint.value = null;

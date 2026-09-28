@@ -2,10 +2,12 @@
 
 namespace App\Http\Resources\PostTypes;
 
+use App\Dto\ActivityPub\Extensions\RtbLocationExtension;
 use App\Enums\PostMetaInfo\MetaInfoKey;
 use App\Enums\PostMetaInfo\TravelReason;
 use App\Http\Resources\LocationDto;
 use App\Http\Resources\UserDto;
+use App\Models\ActivityPubPost;
 use App\Models\Post;
 use OpenApi\Attributes as OA;
 
@@ -40,13 +42,34 @@ class LocationPost extends BasePost
     )]
     public ?string $visitedAt;
 
-    public function __construct(Post $post, UserDto $userDto)
+    public function __construct(?Post $post = null, ?UserDto $userDto = null)
     {
         parent::__construct($post, $userDto);
+
+        if ($post === null) {
+            return;
+        }
+
         $this->location = new LocationDto($post->locationPost->location);
         $this->travelReason = TravelReason::tryFrom($post->metaInfos->where('key', MetaInfoKey::TRAVEL_REASON)->first()?->value);
         $this->visitedAt = $post->locationPost->visited_at?->toIso8601String();
         $this->updatedAt = $this->getUpdatedAt($post)?->toIso8601String();
+    }
+
+    public static function fromRemote(ActivityPubPost $post, UserDto $userDto, ?RtbLocationExtension $extension = null): static
+    {
+        $dto = parent::fromRemote($post, $userDto);
+
+        if ($extension === null) {
+            return $dto;
+        }
+
+        $dto->body = $extension->body;
+        $dto->location = LocationDto::fromRtb($extension->location);
+        $dto->travelReason = $extension->travelReason;
+        $dto->visitedAt = $extension->visitedAt;
+
+        return $dto;
     }
 
     private function getUpdatedAt(Post $post)

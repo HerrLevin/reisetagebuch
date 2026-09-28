@@ -44,6 +44,13 @@ class FollowRepository
         return $followers->map(fn (User $user) => $this->userHydrator->modelToDto($user))->toArray();
     }
 
+    public function isFollowing(string $originUserId, string $targetUserId): bool
+    {
+        return Follow::where('origin_user_id', $originUserId)
+            ->where('target_user_id', $targetUserId)
+            ->exists();
+    }
+
     public function getFollowRequests(string $userId): array
     {
         $followers = User::findOrFail($userId)->followings()->with('originUser')->get()->pluck('originUser');

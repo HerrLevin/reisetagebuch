@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Dto\ActivityPub\Extensions\RtbExtension;
 use App\Http\Resources\PostTypes\BasePost;
 use App\Hydrators\ActivityPub\ActivityPubPostHydrator;
 use App\Models\ActivityPubActor;
@@ -30,19 +31,30 @@ class ActivityPubPostRepository
         Carbon $publishedAt,
         ?string $inReplyTo = null,
         array $mentions = [],
+        ?RtbExtension $extensionData = null,
     ): ActivityPubPost {
-        return ActivityPubPost::firstOrCreate(
-            ['activity_id' => $activityId],
-            [
-                'id' => Str::uuid(),
-                'activity_pub_actor_id' => $activityPubActorId,
-                'url' => $url,
-                'content' => $content,
-                'in_reply_to' => $inReplyTo,
-                'mentions' => $mentions,
-                'published_at' => $publishedAt,
-            ]
-        );
+        $existing = ActivityPubPost::where('activity_id', $activityId)->first();
+
+        if ($existing) {
+            if ($existing->extension_data === null && $extensionData !== null) {
+                $existing->extension_data = $extensionData;
+                $existing->save();
+            }
+
+            return $existing;
+        }
+
+        return ActivityPubPost::create([
+            'id' => Str::uuid(),
+            'activity_pub_actor_id' => $activityPubActorId,
+            'activity_id' => $activityId,
+            'url' => $url,
+            'content' => $content,
+            'in_reply_to' => $inReplyTo,
+            'mentions' => $mentions,
+            'extension_data' => $extensionData,
+            'published_at' => $publishedAt,
+        ]);
     }
 
     public function deleteByActivityId(string $activityId, string $activityPubActorId): void
@@ -62,6 +74,7 @@ class ActivityPubPostRepository
         ?string $content,
         ?string $inReplyTo,
         array $mentions,
+        ?RtbExtension $extensionData = null,
     ): bool {
         return ActivityPubPost::where('activity_id', $activityId)
             ->where('activity_pub_actor_id', $activityPubActorId)
@@ -70,6 +83,7 @@ class ActivityPubPostRepository
                 'content' => $content,
                 'in_reply_to' => $inReplyTo,
                 'mentions' => $mentions,
+                'extension_data' => $extensionData?->toArray(),
             ]) > 0;
     }
 

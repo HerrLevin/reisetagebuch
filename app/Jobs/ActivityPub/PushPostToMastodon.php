@@ -22,7 +22,9 @@ class PushPostToMastodon implements ShouldQueue
 
     public function __construct(
         private readonly string $postId
-    ) {}
+    ) {
+        $this->queue = 'activitypub';
+    }
 
     public function handle(): void
     {

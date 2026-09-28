@@ -21,7 +21,9 @@ class PushProfileUpdateToMastodon implements ShouldQueue
 
     public function __construct(
         private readonly string $userId
-    ) {}
+    ) {
+        $this->queue = 'activitypub';
+    }
 
     public function handle(UserRepository $userRepository): void
     {
