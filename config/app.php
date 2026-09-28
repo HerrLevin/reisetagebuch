@@ -73,5 +73,6 @@ return [
     'active_post' => [
         'grace_start' => env('APP_ACTIVE_POST_GRACE_START', 15),
         'grace_end' => env('APP_ACTIVE_POST_GRACE_END', 60),
+        'repush_days' => env('APP_ACTIVE_POST_REPUSH_DAYS', 7),
     ],
 ];

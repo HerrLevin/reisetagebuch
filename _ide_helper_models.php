@@ -397,8 +397,8 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Clickbar\Magellan\Data\Geometries\Point $location
- * @property string|null $country_code
  * @property string|null $timezone IANA timezone identifier, e.g. Europe/Berlin
+ * @property string|null $country_code
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\LocationIdentifier> $identifiers
  * @property-read int|null $identifiers_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\LocationTag> $tags

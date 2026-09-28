@@ -2,8 +2,9 @@
 
 namespace App\Jobs;
 
+use App\Jobs\ActivityPub\PushLocationTimezoneChangeToMastodon;
 use App\Models\Location;
-use App\Services\TimeZoneLookupService;
+use App\Repositories\LocationRepository;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
@@ -15,24 +16,16 @@ class LookupLocationTimezoneJob implements ShouldQueue
         private readonly string $locationId
     ) {}
 
-    public function handle(TimeZoneLookupService $timeZoneLookupService): void
+    public function handle(LocationRepository $locationRepository): void
     {
         $location = Location::find($this->locationId);
 
-        if ($location === null || $location->timezone !== null) {
+        if ($location === null) {
             return;
         }
 
-        $timezone = $timeZoneLookupService->lookup(
-            $location->location->getLatitude(),
-            $location->location->getLongitude(),
-        );
-
-        if ($timezone === null) {
-            return;
+        if ($locationRepository->resolveTimezoneNow($location)) {
+            PushLocationTimezoneChangeToMastodon::dispatch($location->id);
         }
-
-        $location->timezone = $timezone;
-        $location->save();
     }
 }
