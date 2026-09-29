@@ -15,7 +15,6 @@ use App\Http\Requests\MassEditPostRequest;
 use App\Http\Requests\StopoverLogRequest;
 use App\Http\Requests\TransportBasePostCreateRequest;
 use App\Http\Requests\TransportPostExitUpdateRequest;
-use App\Http\Requests\TransportTimesUpdateRequest;
 use App\Http\Requests\TransportTrackUploadRequest;
 use App\Http\Resources\PostTypes\BasePost;
 use App\Http\Resources\PostTypes\LocationPost;
@@ -755,49 +754,6 @@ class PostController extends Controller
     public function updateTransportPostExit(string $postId, TransportPostExitUpdateRequest $request): TransportPost
     {
         return $this->postController->updateTransportPostExit($postId, $request, $this->auth->user());
-    }
-
-    /**
-     * @throws AuthorizationException
-     */
-    #[OA\Put(
-        path: '/posts/{id}/transport/times',
-        operationId: 'updateTransportTimes',
-        description: 'Update transport times for a transport post',
-        summary: 'Update transport times',
-        security: [
-            [
-                'passport' => [],
-            ],
-        ],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(ref: TransportTimesUpdateRequest::class)
-        ),
-        tags: ['Posts', 'TransportPosts'],
-        parameters: [
-            new OA\Parameter(
-                name: 'id',
-                description: 'Post id',
-                in: 'path',
-                required: true,
-                schema: new OA\Schema(type: 'string', format: 'uuid')
-            ),
-        ],
-        responses: [
-            new OA\Response(response: 200, description: 'successful operation', content: new OA\JsonContent(ref: TransportPost::class)),
-            new OA\Response(response: 400, description: 'Bad request'),
-            new OA\Response(response: 403, description: 'Forbidden'),
-            new OA\Response(response: 404, description: 'Resource Not Found'),
-        ]
-    )]
-    public function updateTimesTransport(string $postId, TransportTimesUpdateRequest $request): TransportPost
-    {
-        try {
-            return $this->postController->updateTimesTransport($postId, $request, $this->auth->user());
-        } catch (NegativePeriodException $exception) {
-            abort(400, $exception->getMessage());
-        }
     }
 
     /**

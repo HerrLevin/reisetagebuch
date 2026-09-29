@@ -9,7 +9,6 @@ use App\Enums\PostMetaInfo\MetaInfoKey;
 use App\Enums\PostMetaInfo\TravelReason;
 use App\Enums\PostMetaInfo\TravelRole;
 use App\Enums\Visibility;
-use App\Exceptions\NegativePeriodException;
 use App\Exceptions\OriginAfterDestinationException;
 use App\Exceptions\StationNotOnTripException;
 use App\Http\Controllers\Controller;
@@ -19,7 +18,6 @@ use App\Http\Requests\LocationBasePostRequest;
 use App\Http\Requests\MassEditPostRequest;
 use App\Http\Requests\TransportBasePostCreateRequest;
 use App\Http\Requests\TransportPostExitUpdateRequest;
-use App\Http\Requests\TransportTimesUpdateRequest;
 use App\Http\Resources\PostTypes\BasePost;
 use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
@@ -283,24 +281,6 @@ class PostController extends Controller
         }
 
         $this->postRepository->delete($post);
-    }
-
-    /**
-     * @throws AuthorizationException
-     * @throws NegativePeriodException
-     * @throws Throwable
-     */
-    public function updateTimesTransport(string $postId, TransportTimesUpdateRequest $request, User $user): TransportPost
-    {
-        $post = $this->resolveEditableTransportPost($postId, $user);
-
-        return $this->applyManualTransportTimes(
-            $post,
-            $request->manualDepartureTime,
-            $request->has('manualDepartureTime'),
-            $request->manualArrivalTime,
-            $request->has('manualArrivalTime')
-        );
     }
 
     /**

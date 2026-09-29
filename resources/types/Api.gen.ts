@@ -3140,30 +3140,6 @@ export class Api<
       }),
 
     /**
-     * @description Update transport times for a transport post
-     *
-     * @tags Posts, TransportPosts
-     * @name UpdateTransportTimes
-     * @summary Update transport times
-     * @request PUT:/posts/{id}/transport/times
-     * @secure
-     */
-    updateTransportTimes: (
-      id: string,
-      data: TransportTimesUpdateRequest,
-      params: RequestParams = {},
-    ) =>
-      this.request<TransportPost, void>({
-        path: `/posts/${id}/transport/times`,
-        method: "PUT",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
      * @description Upload a GPX or GeoJSON track file for a transport post
      *
      * @tags Posts, TransportPosts

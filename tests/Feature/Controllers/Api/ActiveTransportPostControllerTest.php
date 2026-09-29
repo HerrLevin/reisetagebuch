@@ -497,7 +497,7 @@ class ActiveTransportPostControllerTest extends TestCase
         $this->assertNull($response->json('manualArrivalTime'));
     }
 
-    public function test_update_transport_times_updates_origin_and_destination_stopover_logs(): void
+    public function test_logging_departure_and_arrival_updates_both_stopover_logs(): void
     {
         $user = User::factory()->create();
         [$post, , $stops] = $this->createActiveJourney($user);
@@ -506,11 +506,14 @@ class ActiveTransportPostControllerTest extends TestCase
 
         $departureTimestamp = now()->subHours(2)->toIso8601String();
         $arrivalTimestamp = now()->addHours(2)->toIso8601String();
-        $response = $this->putJson(route('posts.update.transport-times', ['postId' => $post->id]), [
-            'manualDepartureTime' => $departureTimestamp,
-            'manualArrivalTime' => $arrivalTimestamp,
-        ]);
-        $response->assertOk();
+        $this->postJson(route('posts.transport.stopovers.departure', [
+            'postId' => $post->id,
+            'stopId' => $stops[0]->id,
+        ]), ['timestamp' => $departureTimestamp])->assertOk();
+        $this->postJson(route('posts.transport.stopovers.arrival', [
+            'postId' => $post->id,
+            'stopId' => $stops[3]->id,
+        ]), ['timestamp' => $arrivalTimestamp])->assertOk();
 
         $response = $this->getJson(route('posts.transport.stopovers.list', ['postId' => $post->id]));
         $response->assertOk();
@@ -525,23 +528,30 @@ class ActiveTransportPostControllerTest extends TestCase
         );
     }
 
-    public function test_clearing_manual_transport_times_clears_origin_and_destination_stopover_logs(): void
+    public function test_clearing_departure_and_arrival_clears_both_stopover_logs(): void
     {
         $user = User::factory()->create();
         [$post, , $stops] = $this->createActiveJourney($user);
 
         Passport::actingAs($user);
 
-        $this->putJson(route('posts.update.transport-times', ['postId' => $post->id]), [
-            'manualDepartureTime' => now()->subHours(2)->toIso8601String(),
-            'manualArrivalTime' => now()->addHours(2)->toIso8601String(),
-        ])->assertOk();
+        $this->postJson(route('posts.transport.stopovers.departure', [
+            'postId' => $post->id,
+            'stopId' => $stops[0]->id,
+        ]), ['timestamp' => now()->subHours(2)->toIso8601String()])->assertOk();
+        $this->postJson(route('posts.transport.stopovers.arrival', [
+            'postId' => $post->id,
+            'stopId' => $stops[3]->id,
+        ]), ['timestamp' => now()->addHours(2)->toIso8601String()])->assertOk();
 
-        $response = $this->putJson(route('posts.update.transport-times', ['postId' => $post->id]), [
-            'manualDepartureTime' => null,
-            'manualArrivalTime' => null,
-        ]);
-        $response->assertOk();
+        $this->deleteJson(route('posts.transport.stopovers.departure.clear', [
+            'postId' => $post->id,
+            'stopId' => $stops[0]->id,
+        ]))->assertOk();
+        $this->deleteJson(route('posts.transport.stopovers.arrival.clear', [
+            'postId' => $post->id,
+            'stopId' => $stops[3]->id,
+        ]))->assertOk();
 
         $response = $this->getJson(route('posts.transport.stopovers.list', ['postId' => $post->id]));
         $response->assertOk();
@@ -568,7 +578,7 @@ class ActiveTransportPostControllerTest extends TestCase
         $this->assertSame('2024-06-01T10:00:00+00:00', $stopover['manualArrivalTime']);
     }
 
-    public function test_update_transport_times_normalizes_non_utc_offset_and_cascades_to_stopover_log(): void
+    public function test_logging_departure_and_arrival_normalizes_non_utc_offset_and_cascades_to_stopover_log(): void
     {
         $user = User::factory()->create();
         [$post, , $stops] = $this->createActiveJourney($user);
@@ -576,13 +586,14 @@ class ActiveTransportPostControllerTest extends TestCase
         Passport::actingAs($user);
 
         // 12:00 in +02:00 is 10:00 UTC, 22:00 in +02:00 is 20:00 UTC
-        $response = $this->putJson(route('posts.update.transport-times', ['postId' => $post->id]), [
-            'manualDepartureTime' => '2024-06-01T12:00:00.000+02:00',
-            'manualArrivalTime' => '2024-06-01T22:00:00.000+02:00',
-        ]);
-        $response->assertOk();
-        $response->assertJsonPath('manualDepartureTime', '2024-06-01T10:00:00+00:00');
-        $response->assertJsonPath('manualArrivalTime', '2024-06-01T20:00:00+00:00');
+        $this->postJson(route('posts.transport.stopovers.departure', [
+            'postId' => $post->id,
+            'stopId' => $stops[0]->id,
+        ]), ['timestamp' => '2024-06-01T12:00:00.000+02:00'])->assertOk();
+        $this->postJson(route('posts.transport.stopovers.arrival', [
+            'postId' => $post->id,
+            'stopId' => $stops[3]->id,
+        ]), ['timestamp' => '2024-06-01T22:00:00.000+02:00'])->assertOk();
 
         $response = $this->getJson(route('posts.transport.stopovers.list', ['postId' => $post->id]));
         $response->assertOk();
