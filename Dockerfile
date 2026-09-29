@@ -2,7 +2,7 @@
 FROM composer:latest AS builder
 WORKDIR /app
 COPY . .
-RUN composer install --no-dev --optimize-autoloader --ignore-platform-req=ext-gd
+RUN composer install --no-dev --optimize-autoloader --ignore-platform-req=ext-gd --ignore-platform-req=ext-pcntl
 
 # Stage 2: Build PHP application
 FROM php:8.5-fpm-alpine
@@ -40,6 +40,7 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
         bcmath \
         gd \
         intl \
+        pcntl \
         pdo_mysql \
         pdo_pgsql \
         pdo_sqlite \
