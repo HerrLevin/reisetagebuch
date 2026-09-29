@@ -16,6 +16,7 @@ import {
     TransportPostExitUpdateRequest,
 } from '../../../types/Api.gen';
 import { getTripLineName } from '@/Services/LineNameFormattingService';
+import { useActiveTransportPostStore } from '@/stores/activeTransportPost';
 
 const { t } = useI18n();
 const vueRouter = useRouter();
@@ -113,6 +114,7 @@ function submit(stopover: StopPlaceDto) {
                 stopId: stopover.tripStopId,
             } as TransportPostExitUpdateRequest)
             .then(() => {
+                useActiveTransportPostStore().fetchPost(true);
                 vueRouter.push(`/posts/${postId.value}`);
             });
         return;

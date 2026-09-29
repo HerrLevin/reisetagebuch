@@ -12,6 +12,7 @@ import {
     TravelReason,
     Visibility,
 } from '../../../types/Api.gen';
+import { useActiveTransportPostStore } from '@/stores/activeTransportPost';
 
 const { t } = useI18n();
 const vueRouter = useRouter();
@@ -61,6 +62,7 @@ function submitForm() {
         })
         .finally(() => {
             loading.value = false;
+            useActiveTransportPostStore().fetchPost(true);
         });
 }
 </script>

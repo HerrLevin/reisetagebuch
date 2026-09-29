@@ -2999,65 +2999,6 @@
                 ]
             }
         },
-        "/posts/{id}/transport/times": {
-            "put": {
-                "tags": [
-                    "Posts",
-                    "TransportPosts"
-                ],
-                "summary": "Update transport times",
-                "description": "Update transport times for a transport post",
-                "operationId": "updateTransportTimes",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Post id",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/TransportTimesUpdateRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/TransportPost"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    },
-                    "404": {
-                        "description": "Resource Not Found"
-                    }
-                },
-                "security": [
-                    {
-                        "passport": []
-                    }
-                ]
-            }
-        },
         "/posts/{id}/transport/track": {
             "post": {
                 "tags": [

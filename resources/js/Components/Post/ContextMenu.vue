@@ -24,7 +24,14 @@ import { DateTime } from 'luxon';
 import { PropType, ref, useTemplateRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { RouterLink } from 'vue-router';
-import { BasePost, TransportPost } from '../../../types/Api.gen';
+import {
+    BasePost,
+    TransportPost,
+    TransportPostStopoverDto,
+} from '../../../types/Api.gen';
+import { useActiveTransportPostStore } from '@/stores/activeTransportPost';
+
+const activePostStore = useActiveTransportPostStore();
 
 const { t } = useI18n();
 
@@ -91,7 +98,7 @@ function departNow(): void {
     }
 
     const now = DateTime.now();
-    submit(now.toISO(), undefined);
+    updateDepartureTime(post, now.toISO());
 }
 
 function arriveNow(): void {
@@ -100,7 +107,33 @@ function arriveNow(): void {
         return;
     }
     const now = DateTime.now();
-    submit(undefined, now.toISO());
+    updateArrivalTime(post, now.toISO());
+}
+
+function updateDepartureTime(post: TransportPost, departure: string): void {
+    api.posts
+        .logStopoverDeparture(post.id, post.originStop.id, {
+            timestamp: departure,
+        })
+        .then((data) => {
+            updateTimes(data.data);
+        })
+        .catch((error_) => {
+            alert(error_.response.data.message);
+        });
+}
+
+function updateArrivalTime(post: TransportPost, arrival: string): void {
+    api.posts
+        .logStopoverArrival(post.id, post.destinationStop.id, {
+            timestamp: arrival,
+        })
+        .then((data) => {
+            updateTimes(data.data);
+        })
+        .catch((error_) => {
+            alert(error_.response.data.message);
+        });
 }
 
 function submit(
@@ -112,19 +145,47 @@ function submit(
     if (!isTransportPost(post)) {
         return;
     }
-    const data = {
-        manualDepartureTime: departure,
-        manualArrivalTime: arrival,
-    };
 
     api.posts
-        .updateTransportTimes(post.id, data)
-        .then((response) => {
-            emit('update:post', response.data);
-        })
-        .catch((error_) => {
-            alert(error_.response.data.message);
+        .clearStopoverDeparture(post.id, post.originStop.id)
+        .then((data) => {
+            updateTimes(data.data);
         });
+
+    if (departure) {
+        updateDepartureTime(post, departure);
+    }
+
+    api.posts
+        .clearStopoverArrival(post.id, post.destinationStop.id)
+        .then((data) => {
+            updateTimes(data.data);
+        });
+
+    if (arrival) {
+        updateArrivalTime(post, arrival);
+    }
+}
+
+function updateTimes(stopover: TransportPostStopoverDto[]): void {
+    const post = props.post;
+    if (!isTransportPost(post)) {
+        return;
+    }
+    activePostStore.updateStopovers(stopover);
+
+    const originStop = stopover.find((stop) => stop.id === post.originStop.id);
+    const destinationStop = stopover.find(
+        (stop) => stop.id === post.destinationStop.id,
+    );
+
+    post.manualDepartureTime = originStop
+        ? originStop.manualDepartureTime
+        : null;
+    post.manualArrivalTime = destinationStop
+        ? destinationStop.manualArrivalTime
+        : null;
+    emit('update:post', post);
 }
 
 const editTimesDialog = useTemplateRef('editTimesDialog');
@@ -194,6 +255,7 @@ function deletePost() {
         })
         .finally(() => {
             deleteProcessing.value = false;
+            activePostStore.fetchPost(true);
         });
 }
 

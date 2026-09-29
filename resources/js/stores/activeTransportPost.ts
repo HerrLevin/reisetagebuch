@@ -12,16 +12,16 @@ export const useActiveTransportPostStore = defineStore(
         const refreshedAt = ref<Date | null>(null);
 
         const fetchPost = async (force = false) => {
-            // only refresh every 5 minutes
-            if (
-                !force &&
-                activeTransportPost.value !== null &&
-                refreshedAt.value
-            ) {
+            if (!force && refreshedAt.value !== null) {
                 const now = new Date();
                 const diff =
                     (now.getTime() - refreshedAt.value.getTime()) / 1000;
-                if (diff < 300 && activeTransportPost.value) {
+                // only refresh every 5 minutes
+                if (activeTransportPost.value !== null && diff < 300) {
+                    return;
+                }
+                // only fetch every 10 seconds if there is no active transport post
+                if (activeTransportPost.value == null && diff < 10) {
                     return;
                 }
             }
@@ -53,12 +53,17 @@ export const useActiveTransportPostStore = defineStore(
                 });
         };
 
+        const updateStopovers = (newStopovers: TransportPostStopoverDto[]) => {
+            stopovers.value = newStopovers;
+        };
+
         return {
             activeTransportPost,
             stopovers,
             loadingPost,
             fetchPost,
             fetchStopovers,
+            updateStopovers,
         };
     },
     {
