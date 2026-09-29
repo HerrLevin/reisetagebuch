@@ -34,7 +34,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(BasePost::class, PostPolicy::class);
         Gate::policy(Invite::class, InvitePolicy::class);
 
-        if ($this->app->environment('local')) {
+        if ($this->app->environment('local') || config('telescope.enabled')) {
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
             $this->app->register(TelescopeServiceProvider::class);
         }

@@ -3,10 +3,23 @@
 use App\Http\Controllers\ActivityPub\MastodonActivityPubController;
 use App\Http\Controllers\ActivityPub\NodeInfoController;
 use App\Http\Controllers\ActivityPub\WellKnownController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Middleware\VerifyHttpSignature;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
+
+// Session login for admins only, used to reach browser-only tools (Horizon,
+// Telescope) that the SPA's bearer-token auth can't attach to a page navigation.
+// Not used by the app itself.
+Route::middleware('guest')->group(function () {
+    Route::get('admin/login', [AuthenticatedSessionController::class, 'create'])->name('admin.login');
+    Route::post('admin/login', [AuthenticatedSessionController::class, 'store'])
+        ->middleware('throttle:5,1');
+});
+Route::post('admin/logout', [AuthenticatedSessionController::class, 'destroy'])
+    ->middleware('auth')
+    ->name('admin.logout');
 
 // File serving route
 Route::middleware('cache.headers:public;max_age=2628000;etag')->get('/files/{path}', function ($path) {

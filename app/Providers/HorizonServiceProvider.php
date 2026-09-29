@@ -36,7 +36,7 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
                 return false;
             }
 
-            return Gate::check('viewHorizon', [$request->user()]) || app()->environment('local');
+            return Gate::check('viewHorizon', [$request->user()]);
         });
     }
 
