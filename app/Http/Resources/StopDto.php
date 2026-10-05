@@ -55,7 +55,7 @@ class StopDto
 
     #[OA\Property(
         property: 'arrivalDelay',
-        description: 'Arrival delay in minutes',
+        description: 'Arrival delay in seconds',
         type: 'integer',
         nullable: true
     )]
@@ -63,7 +63,7 @@ class StopDto
 
     #[OA\Property(
         property: 'departureDelay',
-        description: 'Departure delay in minutes',
+        description: 'Departure delay in seconds',
         type: 'integer',
         nullable: true
     )]

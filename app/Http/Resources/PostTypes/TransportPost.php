@@ -135,11 +135,11 @@ class TransportPost extends BasePost
         $delay = $defaultDelay;
 
         if ($manualTime !== null && $actualTime !== null) {
-            $delay = (int) round($actualTime->diffInMinutes(Carbon::parse($manualTime)));
+            $delay = (int) $actualTime->diffInSeconds(Carbon::parse($manualTime));
         }
 
         if ($delay !== null && $delay > 0) {
-            return '+'.$delay;
+            return '+'.round($delay / 60);
         }
 
         return $delay;
