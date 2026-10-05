@@ -6131,12 +6131,12 @@
                         "nullable": true
                     },
                     "arrivalDelay": {
-                        "description": "Arrival delay in minutes",
+                        "description": "Arrival delay in seconds",
                         "type": "integer",
                         "nullable": true
                     },
                     "departureDelay": {
-                        "description": "Departure delay in minutes",
+                        "description": "Departure delay in seconds",
                         "type": "integer",
                         "nullable": true
                     }
@@ -6182,12 +6182,12 @@
                         "nullable": true
                     },
                     "arrivalDelay": {
-                        "description": "Arrival delay in minutes",
+                        "description": "Arrival delay in seconds",
                         "type": "integer",
                         "nullable": true
                     },
                     "departureDelay": {
-                        "description": "Departure delay in minutes",
+                        "description": "Departure delay in seconds",
                         "type": "integer",
                         "nullable": true
                     },

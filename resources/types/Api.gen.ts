@@ -1343,9 +1343,9 @@ export interface StopDto {
    * @format date-time
    */
   departureTime: string | null;
-  /** Arrival delay in minutes */
+  /** Arrival delay in seconds */
   arrivalDelay: number | null;
-  /** Departure delay in minutes */
+  /** Departure delay in seconds */
   departureDelay: number | null;
 }
 
@@ -1370,9 +1370,9 @@ export interface TransportPostStopoverDto {
    * @format date-time
    */
   scheduledDepartureTime: string | null;
-  /** Arrival delay in minutes */
+  /** Arrival delay in seconds */
   arrivalDelay: number | null;
-  /** Departure delay in minutes */
+  /** Departure delay in seconds */
   departureDelay: number | null;
   /**
    * User-logged actual arrival time in ISO 8601 format
