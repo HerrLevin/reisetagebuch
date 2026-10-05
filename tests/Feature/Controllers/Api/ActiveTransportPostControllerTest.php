@@ -85,6 +85,20 @@ class ActiveTransportPostControllerTest extends TestCase
         $response->assertJsonPath('3.id', $stops[3]->id);
     }
 
+    public function test_get_stopovers_for_transport_post_exposes_cancelled_status(): void
+    {
+        $user = User::factory()->create();
+        [$post, , $stops] = $this->createActiveJourney($user);
+        $stops[2]->update(['cancelled' => true]);
+
+        Passport::actingAs($user);
+        $response = $this->getJson(route('posts.transport.stopovers.list', ['postId' => $post->id]));
+
+        $response->assertOk();
+        $response->assertJsonPath('2.cancelled', true);
+        $response->assertJsonPath('0.cancelled', false);
+    }
+
     public function test_get_active_transport_post_accounts_for_destination_arrival_delay(): void
     {
         $user = User::factory()->create();

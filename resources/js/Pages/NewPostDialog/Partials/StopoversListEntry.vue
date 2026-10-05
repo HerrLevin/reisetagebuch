@@ -45,7 +45,10 @@ onMounted(() => {
     <li
         ref="row"
         class="list-row hover:bg-base-200 cursor-pointer grid-cols-8"
-        :class="{ 'bg-base-300': selected }"
+        :class="{
+            'bg-base-300': selected,
+            'text-error line-through': stop.cancelled,
+        }"
     >
         <div class="col col-span-6">
             {{ stop.name }}

@@ -7,8 +7,11 @@ import {
 } from '@/Services/LineNameFormattingService';
 import MotisTimeService from '@/Services/MotisTimeService';
 import { defineProps, PropType, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { RouterLink } from 'vue-router';
 import { StopDto, StopTimeDto } from '../../../../types/Api.gen';
+
+const { t } = useI18n();
 
 const props = defineProps({
     stopTime: {
@@ -100,8 +103,18 @@ function getRouteColor(stopTime: StopTimeDto) {
                 </div>
             </div>
             <div class="col col-span-6">
-                <div>
+                <div
+                    :class="{
+                        'text-error line-through': stopTime.place.cancelled,
+                    }"
+                >
                     {{ stopTime.headSign }}
+                    <span
+                        v-if="stopTime.place.cancelled"
+                        class="badge badge-error badge-xs ml-1 no-underline"
+                    >
+                        {{ t('common.cancelled') }}
+                    </span>
                 </div>
                 <div
                     v-if="stopTime.place.name !== stop.name"
@@ -116,6 +129,7 @@ function getRouteColor(stopTime: StopTimeDto) {
                     :time="time"
                     :delay="delay"
                     :real-time="props.stopTime.realTime"
+                    :cancelled="!!props.stopTime.place.cancelled"
                 />
             </div>
         </li>

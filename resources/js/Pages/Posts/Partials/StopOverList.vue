@@ -204,8 +204,17 @@ function clearDeparture() {
 <template>
     <ul class="list w-full">
         <template v-for="(stop, index) in props.stopovers" :key="stop.id">
-            <li class="p-0 text-xs tracking-wide">
+            <li
+                class="p-0 text-xs tracking-wide"
+                :class="{ 'text-error line-through': stop.cancelled }"
+            >
                 {{ stop.location.name }}
+                <span
+                    v-if="stop.cancelled"
+                    class="badge badge-error badge-xs ml-1 no-underline"
+                >
+                    {{ t('common.cancelled') }}
+                </span>
             </li>
             <li class="list-row items-center px-0 py-1">
                 <div class="list-col-grow">

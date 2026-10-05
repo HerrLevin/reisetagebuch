@@ -16,15 +16,19 @@ defineProps({
         type: Boolean,
         default: false,
     },
+    cancelled: {
+        type: Boolean,
+        default: false,
+    },
 });
 </script>
 
 <template>
     <div
         :class="{
-            'text-warning': delay < 4 && delay >= 2,
-            'text-success': delay < 2 && delay >= 0 && realTime,
-            'text-error': delay >= 4,
+            'text-warning': !cancelled && delay < 4 && delay >= 2,
+            'text-success': !cancelled && delay < 2 && delay >= 0 && realTime,
+            'text-error line-through': cancelled || delay >= 4,
         }"
     >
         {{ time }}
