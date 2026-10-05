@@ -9,7 +9,7 @@ use OpenApi\Attributes as OA;
 #[OA\Schema(
     schema: 'TransportPostStopoverDto',
     description: 'A single stopover of a transport post journey, including the user-logged actual arrival/departure',
-    required: ['id', 'location', 'sequence', 'scheduledArrivalTime', 'scheduledDepartureTime', 'arrivalDelay', 'departureDelay', 'manualArrivalTime', 'manualDepartureTime'],
+    required: ['id', 'location', 'sequence', 'scheduledArrivalTime', 'scheduledDepartureTime', 'arrivalDelay', 'departureDelay', 'manualArrivalTime', 'manualDepartureTime', 'cancelled'],
     type: 'object'
 )]
 class TransportPostStopoverDto
@@ -88,6 +88,13 @@ class TransportPostStopoverDto
     )]
     public ?string $manualDepartureTime = null;
 
+    #[OA\Property(
+        property: 'cancelled',
+        description: 'Whether this stopover is cancelled, per real-time data',
+        type: 'boolean'
+    )]
+    public bool $cancelled;
+
     public function __construct(TransportTripStop $stop, ?TransportPostStopoverLog $log = null)
     {
         $this->id = $stop->id;
@@ -99,5 +106,6 @@ class TransportPostStopoverDto
         $this->departureDelay = $stop->departure_delay;
         $this->manualArrivalTime = $log?->manual_arrival?->toIso8601String();
         $this->manualDepartureTime = $log?->manual_departure?->toIso8601String();
+        $this->cancelled = $stop->cancelled;
     }
 }

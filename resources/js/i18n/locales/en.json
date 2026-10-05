@@ -372,6 +372,7 @@
     },
     "common": {
         "cancel": "Cancel",
+        "cancelled": "Cancelled",
         "saving": "Saving...",
         "load_more": "Load More"
     },

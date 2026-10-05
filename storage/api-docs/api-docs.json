@@ -6154,7 +6154,8 @@
                     "arrivalDelay",
                     "departureDelay",
                     "manualArrivalTime",
-                    "manualDepartureTime"
+                    "manualDepartureTime",
+                    "cancelled"
                 ],
                 "properties": {
                     "id": {
@@ -6202,6 +6203,10 @@
                         "type": "string",
                         "format": "date-time",
                         "nullable": true
+                    },
+                    "cancelled": {
+                        "description": "Whether this stopover is cancelled, per real-time data",
+                        "type": "boolean"
                     }
                 },
                 "type": "object"

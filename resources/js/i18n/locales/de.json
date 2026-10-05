@@ -370,6 +370,7 @@
     },
     "common": {
         "cancel": "Abbrechen",
+        "cancelled": "Ausgefallen",
         "saving": "Speichern...",
         "load_more": "Mehr laden"
     },

@@ -1384,6 +1384,8 @@ export interface TransportPostStopoverDto {
    * @format date-time
    */
   manualDepartureTime: string | null;
+  /** Whether this stopover is cancelled, per real-time data */
+  cancelled: boolean;
 }
 
 /** Data Transfer Object for a Transport Trip */
