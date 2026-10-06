@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Dto\ActivityPub\Extensions\RtbIdentifierData;
 use App\Models\LocationIdentifier;
 use OpenApi\Attributes as OA;
 
@@ -33,12 +34,12 @@ class LocationIdentifierDto
         $this->identifier = $locationTag->identifier;
     }
 
-    public static function fromRemote(array $data): self
+    public static function fromRtb(RtbIdentifierData $data): self
     {
         $dto = new self;
-        $dto->type = (string) ($data['type'] ?? '');
-        $dto->origin = (string) ($data['origin'] ?? '');
-        $dto->identifier = (string) ($data['identifier'] ?? '');
+        $dto->type = $data->type;
+        $dto->origin = $data->origin;
+        $dto->identifier = $data->identifier;
 
         return $dto;
     }

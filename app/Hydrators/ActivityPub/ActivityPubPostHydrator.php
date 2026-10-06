@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Hydrators\ActivityPub;
 
+use App\Dto\ActivityPub\Extensions\RtbLocationExtension;
+use App\Dto\ActivityPub\Extensions\RtbTransportExtension;
 use App\Http\Resources\PostTypes\BasePost;
 use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
@@ -19,11 +21,12 @@ class ActivityPubPostHydrator
     public function modelToDto(ActivityPubPost $post): BasePost
     {
         $userDto = $this->buildUserDto($post);
+        $extension = $post->extension_data;
 
         try {
-            return match ($post->extension_data['postType'] ?? null) {
-                'location' => LocationPost::fromRemote($post, $userDto, $post->extension_data['location'] ?? []),
-                'transport' => TransportPost::fromRemote($post, $userDto, $post->extension_data['transport'] ?? []),
+            return match (true) {
+                $extension instanceof RtbLocationExtension => LocationPost::fromRemote($post, $userDto, $extension),
+                $extension instanceof RtbTransportExtension => TransportPost::fromRemote($post, $userDto, $extension),
                 default => BasePost::fromRemote($post, $userDto),
             };
         } catch (Throwable $e) {

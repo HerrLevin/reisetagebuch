@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\PostTypes;
 
+use App\Dto\ActivityPub\Extensions\RtbLocationExtension;
 use App\Enums\PostMetaInfo\MetaInfoKey;
 use App\Enums\PostMetaInfo\TravelReason;
 use App\Http\Resources\LocationDto;
@@ -55,15 +56,17 @@ class LocationPost extends BasePost
         $this->updatedAt = $this->getUpdatedAt($post)?->toIso8601String();
     }
 
-    public static function fromRemote(ActivityPubPost $post, UserDto $userDto, array $data = []): static
+    public static function fromRemote(ActivityPubPost $post, UserDto $userDto, ?RtbLocationExtension $extension = null): static
     {
         $dto = parent::fromRemote($post, $userDto);
-        // $data is the flat 'location' sub-payload itself (see NoteHydrator::buildLocationPayload()
-        // — travelReason/visitedAt are siblings of the location-core fields, not nested under
-        // another 'location' key), so LocationDto reads straight from $data.
-        $dto->location = LocationDto::fromRemote($data);
-        $dto->travelReason = isset($data['travelReason']) ? TravelReason::tryFrom($data['travelReason']) : null;
-        $dto->visitedAt = $data['visitedAt'] ?? null;
+
+        if ($extension === null) {
+            return $dto;
+        }
+
+        $dto->location = LocationDto::fromRtb($extension->location);
+        $dto->travelReason = $extension->travelReason;
+        $dto->visitedAt = $extension->visitedAt;
 
         return $dto;
     }

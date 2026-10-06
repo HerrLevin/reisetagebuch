@@ -2,6 +2,10 @@
 
 namespace Tests\Unit\Services;
 
+use App\Dto\ActivityPub\Extensions\RtbLocationExtension;
+use App\Dto\ActivityPub\Extensions\RtbTransportExtension;
+use App\Enums\PostMetaInfo\TravelReason;
+use App\Enums\TransportMode;
 use App\Services\ActivityPubExtensionParser;
 use Tests\TestCase;
 
@@ -88,23 +92,30 @@ class ActivityPubExtensionParserTest extends TestCase
     {
         $result = $this->parser()->parse($this->validLocationExtension());
 
-        $this->assertNotNull($result);
-        $this->assertSame('location', $result['postType']);
-        $this->assertSame('Berlin Hbf', $result['location']['name']);
-        $this->assertSame(52.52, $result['location']['latitude']);
-        $this->assertSame('leisure', $result['location']['travelReason']);
+        $this->assertInstanceOf(RtbLocationExtension::class, $result);
+        $this->assertSame('Berlin Hbf', $result->location->name);
+        $this->assertSame(52.52, $result->location->latitude);
+        $this->assertSame(TravelReason::LEISURE, $result->travelReason);
     }
 
     public function test_parses_a_valid_transport_extension(): void
     {
         $result = $this->parser()->parse($this->validTransportExtension());
 
-        $this->assertNotNull($result);
-        $this->assertSame('transport', $result['postType']);
-        $this->assertSame('trip-1', $result['transport']['trip']['id']);
-        $this->assertSame('RAIL', $result['transport']['trip']['mode']);
-        $this->assertSame(12345, $result['transport']['distance']);
-        $this->assertNotNull($result['transport']['userGeometry']);
+        $this->assertInstanceOf(RtbTransportExtension::class, $result);
+        $this->assertSame('trip-1', $result->trip->id);
+        $this->assertSame(TransportMode::RAIL, $result->trip->mode);
+        $this->assertSame(12345, $result->distance);
+        $this->assertNotNull($result->userGeometry);
+    }
+
+    public function test_parsed_location_extension_casts_back_to_the_original_wire_shape(): void
+    {
+        $extension = $this->validLocationExtension();
+
+        $result = $this->parser()->parse($extension);
+
+        $this->assertSame($extension['rtbExtension'], $result->toArray());
     }
 
     public function test_missing_extension_key_returns_null(): void
@@ -164,8 +175,8 @@ class ActivityPubExtensionParserTest extends TestCase
 
         $result = $this->parser()->parse($extension);
 
-        $this->assertNotNull($result);
-        $this->assertNull($result['location']['travelReason']);
+        $this->assertInstanceOf(RtbLocationExtension::class, $result);
+        $this->assertNull($result->travelReason);
     }
 
     public function test_malformed_tags_are_dropped_individually(): void
@@ -179,8 +190,8 @@ class ActivityPubExtensionParserTest extends TestCase
 
         $result = $this->parser()->parse($extension);
 
-        $this->assertNotNull($result);
-        $this->assertCount(1, $result['location']['tags']);
+        $this->assertInstanceOf(RtbLocationExtension::class, $result);
+        $this->assertCount(1, $result->location->tags);
     }
 
     public function test_oversized_geometry_is_dropped_but_transport_still_parses(): void
@@ -193,8 +204,8 @@ class ActivityPubExtensionParserTest extends TestCase
 
         $result = $this->parser()->parse($extension);
 
-        $this->assertNotNull($result);
-        $this->assertNull($result['transport']['userGeometry']);
+        $this->assertInstanceOf(RtbTransportExtension::class, $result);
+        $this->assertNull($result->userGeometry);
     }
 
     public function test_missing_origin_stop_rejects_whole_transport_payload(): void
@@ -234,8 +245,8 @@ class ActivityPubExtensionParserTest extends TestCase
             ],
         ]);
 
-        $this->assertNotNull($result);
-        $this->assertSame([], $result['location']['tags']);
-        $this->assertSame([], $result['location']['identifiers']);
+        $this->assertInstanceOf(RtbLocationExtension::class, $result);
+        $this->assertSame([], $result->location->tags);
+        $this->assertSame([], $result->location->identifiers);
     }
 }
