@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Dto\ActivityPub\Extensions\RtbExtension;
 use App\Http\Resources\PostTypes\BasePost;
 use App\Hydrators\ActivityPub\ActivityPubPostHydrator;
 use App\Models\ActivityPubActor;
@@ -30,7 +31,7 @@ class ActivityPubPostRepository
         Carbon $publishedAt,
         ?string $inReplyTo = null,
         array $mentions = [],
-        ?array $extensionData = null,
+        ?RtbExtension $extensionData = null,
     ): ActivityPubPost {
         return ActivityPubPost::firstOrCreate(
             ['activity_id' => $activityId],

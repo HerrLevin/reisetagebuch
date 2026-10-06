@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Controllers\ActivityPub;
 
+use App\Dto\ActivityPub\Extensions\RtbLocationExtension;
 use App\Http\Middleware\VerifyHttpSignature;
 use App\Models\ActivityPubActor;
 use App\Models\ActivityPubFollower;
@@ -1549,8 +1550,8 @@ class ActivityPubControllerTest extends TestCase
 
         $response->assertStatus(202);
         $post = ActivityPubPost::where('activity_id', $noteId)->firstOrFail();
-        $this->assertSame('location', $post->extension_data['postType']);
-        $this->assertSame('Berlin Hbf', $post->extension_data['location']['name']);
+        $this->assertInstanceOf(RtbLocationExtension::class, $post->extension_data);
+        $this->assertSame('Berlin Hbf', $post->extension_data->location->name);
     }
 
     public function test_create_note_with_malformed_rtb_extension_still_stores_plain_note(): void

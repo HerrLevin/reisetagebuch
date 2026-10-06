@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\PostTypes;
 
+use App\Dto\ActivityPub\Extensions\RtbTransportExtension;
 use App\Enums\PostMetaInfo\MetaInfoKey;
 use App\Enums\PostMetaInfo\TravelReason;
 use App\Http\Resources\StopDto;
@@ -114,18 +115,23 @@ class TransportPost extends BasePost
         }
     }
 
-    public static function fromRemote(ActivityPubPost $post, UserDto $userDto, array $data = []): static
+    public static function fromRemote(ActivityPubPost $post, UserDto $userDto, ?RtbTransportExtension $extension = null): static
     {
         $dto = parent::fromRemote($post, $userDto);
-        $dto->originStop = StopDto::fromRemote($data['originStop'] ?? []);
-        $dto->destinationStop = StopDto::fromRemote($data['destinationStop'] ?? []);
-        $dto->trip = TripDto::fromRemote($data['trip'] ?? []);
-        $dto->manualDepartureTime = $data['manualDepartureTime'] ?? null;
-        $dto->manualArrivalTime = $data['manualArrivalTime'] ?? null;
-        $dto->travelReason = isset($data['travelReason']) ? TravelReason::tryFrom($data['travelReason']) : null;
-        $dto->distance = (int) ($data['distance'] ?? 0);
-        $dto->duration = (int) ($data['duration'] ?? 0);
-        $dto->userGeometry = $data['userGeometry'] ?? null;
+
+        if ($extension === null) {
+            return $dto;
+        }
+
+        $dto->originStop = StopDto::fromRtb($extension->originStop);
+        $dto->destinationStop = StopDto::fromRtb($extension->destinationStop);
+        $dto->trip = TripDto::fromRtb($extension->trip);
+        $dto->manualDepartureTime = $extension->manualDepartureTime;
+        $dto->manualArrivalTime = $extension->manualArrivalTime;
+        $dto->travelReason = $extension->travelReason;
+        $dto->distance = $extension->distance;
+        $dto->duration = $extension->duration;
+        $dto->userGeometry = $extension->userGeometry;
 
         return $dto;
     }

@@ -19,6 +19,15 @@ export default defineConfig({
                     { text: 'Configuration', link: '/configuration' },
                 ],
             },
+            {
+                text: 'Federation',
+                items: [
+                    {
+                        text: 'ActivityPub extensions',
+                        link: '/activitypub-extensions',
+                    },
+                ],
+            },
         ],
 
         socialLinks: [

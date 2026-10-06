@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Dto\ActivityPub\Extensions\RtbStopData;
 use App\Models\TransportTripStop;
 use OpenApi\Attributes as OA;
 
@@ -84,16 +85,16 @@ class StopDto
         $this->departureDelay = $stop->departure_delay;
     }
 
-    public static function fromRemote(array $data): self
+    public static function fromRtb(RtbStopData $data): self
     {
         $dto = new self;
-        $dto->id = (string) ($data['id'] ?? '');
-        $dto->name = (string) ($data['name'] ?? '');
-        $dto->location = LocationDto::fromRemote($data['location'] ?? []);
-        $dto->arrivalTime = $data['arrivalTime'] ?? null;
-        $dto->departureTime = $data['departureTime'] ?? null;
-        $dto->arrivalDelay = $data['arrivalDelay'] ?? null;
-        $dto->departureDelay = $data['departureDelay'] ?? null;
+        $dto->id = $data->id;
+        $dto->name = $data->name;
+        $dto->location = LocationDto::fromRtb($data->location);
+        $dto->arrivalTime = $data->arrivalTime;
+        $dto->departureTime = $data->departureTime;
+        $dto->arrivalDelay = $data->arrivalDelay;
+        $dto->departureDelay = $data->departureDelay;
 
         return $dto;
     }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Dto\ActivityPub\Extensions\RtbTagData;
 use App\Models\LocationTag;
 use OpenApi\Attributes as OpenApi;
 
@@ -29,11 +30,11 @@ class LocationTagDto
         $this->value = $locationTag->value;
     }
 
-    public static function fromRemote(array $data): self
+    public static function fromRtb(RtbTagData $data): self
     {
         $dto = new self;
-        $dto->key = (string) ($data['key'] ?? '');
-        $dto->value = (string) ($data['value'] ?? '');
+        $dto->key = $data->key;
+        $dto->value = $data->value;
 
         return $dto;
     }

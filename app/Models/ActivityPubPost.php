@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\RtbExtensionCast;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -27,7 +28,7 @@ class ActivityPubPost extends Model
         return [
             'published_at' => 'datetime',
             'mentions' => 'array',
-            'extension_data' => 'array',
+            'extension_data' => RtbExtensionCast::class,
         ];
     }
 

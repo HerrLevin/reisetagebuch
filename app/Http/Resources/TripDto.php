@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Dto\ActivityPub\Extensions\RtbTripData;
 use App\Enums\TransportMode;
 use App\Models\TransportTrip;
 use OpenApi\Attributes as OA;
@@ -102,20 +103,18 @@ class TripDto
         $this->routeTextColor = $trip->route_text_color;
     }
 
-    public static function fromRemote(array $data): self
+    public static function fromRtb(RtbTripData $data): self
     {
         $dto = new self;
-        $dto->id = (string) ($data['id'] ?? '');
-        $dto->foreignId = $data['foreignId'] ?? null;
-        // $mode is non-nullable; unlike the local constructor, remote data can plausibly
-        // be missing/invalid, so fall back to OTHER rather than risk a TypeError.
-        $dto->mode = TransportMode::tryFrom($data['mode'] ?? '') ?? TransportMode::OTHER;
-        $dto->lineName = $data['lineName'] ?? null;
-        $dto->routeLongName = $data['routeLongName'] ?? null;
-        $dto->tripShortName = $data['tripShortName'] ?? null;
-        $dto->displayName = $data['displayName'] ?? null;
-        $dto->routeColor = $data['routeColor'] ?? null;
-        $dto->routeTextColor = $data['routeTextColor'] ?? null;
+        $dto->id = $data->id;
+        $dto->foreignId = $data->foreignId;
+        $dto->mode = $data->mode;
+        $dto->lineName = $data->lineName;
+        $dto->routeLongName = $data->routeLongName;
+        $dto->tripShortName = $data->tripShortName;
+        $dto->displayName = $data->displayName;
+        $dto->routeColor = $data->routeColor;
+        $dto->routeTextColor = $data->routeTextColor;
 
         return $dto;
     }

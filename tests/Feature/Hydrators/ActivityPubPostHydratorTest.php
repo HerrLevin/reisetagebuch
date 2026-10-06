@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Hydrators;
 
+use App\Dto\ActivityPub\Extensions\RtbLocationData;
+use App\Dto\ActivityPub\Extensions\RtbLocationExtension;
 use App\Http\Resources\PostTypes\BasePost;
 use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
@@ -126,13 +128,51 @@ class ActivityPubPostHydratorTest extends TestCase
         $this->assertStringContainsString('RE1', $dto->getHtmlBody());
     }
 
+    public function test_extension_data_accepts_a_dto_instance_directly_on_write(): void
+    {
+        $extension = new RtbLocationExtension(
+            rtbVersion: 1,
+            location: new RtbLocationData(
+                id: 'loc-1',
+                name: 'Berlin Hbf',
+                latitude: 52.52,
+                longitude: 13.405,
+                timezone: 'Europe/Berlin',
+                emoji: '🚉',
+                tags: [],
+                identifiers: [],
+            ),
+            travelReason: null,
+            visitedAt: null,
+        );
+
+        $actor = ActivityPubActor::factory()->create();
+        $post = ActivityPubPost::create([
+            'id' => Str::uuid(),
+            'activity_pub_actor_id' => $actor->id,
+            'activity_id' => 'https://remote.example/notes/'.Str::uuid(),
+            'content' => 'Hello world',
+            'extension_data' => $extension,
+            'published_at' => now(),
+        ]);
+
+        $fresh = ActivityPubPost::find($post->id);
+
+        $this->assertInstanceOf(RtbLocationExtension::class, $fresh->extension_data);
+        $this->assertSame('Berlin Hbf', $fresh->extension_data->location->name);
+
+        $dto = $this->hydrator()->modelToDto($fresh);
+        $this->assertInstanceOf(LocationPost::class, $dto);
+    }
+
     public function test_falls_back_to_base_post_when_extension_data_is_corrupted(): void
     {
         $post = $this->makePost([
             'rtbVersion' => 1,
             'postType' => 'location',
-            // 'location' key missing entirely — LocationDto::fromRemote() will be
-            // called with [] and still succeed, so make it a hard type error instead.
+            // A string instead of an object: RtbLocationExtension::fromArray() rejects
+            // this (its own 'location' is not an array), so the cast returns null and
+            // the hydrator falls back to a plain BasePost.
             'location' => 'not-an-array',
         ]);
 
