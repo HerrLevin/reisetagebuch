@@ -48,8 +48,9 @@ return [
     ],
 
     'timeapi' => [
-        'url' => env('APP_TIMEAPI_URL', 'https://timeapi.io/api/timezone/coordinate'),
-        'backfill_limit' => env('APP_TIMEAPI_BACKFILL_LIMIT', 10),
+        // self-hosted geo2tz instance, see https://github.com/noandrea/geo2tz
+        'url' => env('APP_TIMEAPI_URL', 'http://geo2tz:2004/tz'),
+        'backfill_limit' => env('APP_TIMEAPI_BACKFILL_LIMIT', 100),
     ],
 
     'registration' => env('APP_REGISTRATION', true),

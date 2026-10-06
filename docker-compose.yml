@@ -44,6 +44,7 @@ services:
         depends_on:
             - pgsql
             - redis
+            - geo2tz
         command: ['php', '/var/www/html/artisan', 'horizon']
         # at least as long as config/horizon.php's supervisor `timeout` (60s) so Docker doesn't
         # SIGKILL mid-shutdown.
@@ -123,6 +124,12 @@ services:
             - './wiremock/mappings:/home/wiremock/mappings'
         ports:
             - '8080:8080'
+        networks:
+            - sail
+    geo2tz:
+        image: 'ghcr.io/noandrea/geo2tz:latest'
+        ports:
+            - '${FORWARD_GEO2TZ_PORT:-2004}:2004'
         networks:
             - sail
 networks:

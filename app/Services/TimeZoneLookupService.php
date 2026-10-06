@@ -28,10 +28,7 @@ class TimeZoneLookupService
         try {
             $response = Http::withUserAgent($this->versionService->getUserAgent())
                 ->timeout(5)
-                ->get($this->apiUrl, [
-                    'latitude' => $latitude,
-                    'longitude' => $longitude,
-                ]);
+                ->get("{$this->apiUrl}/{$latitude}/{$longitude}");
         } catch (Throwable $e) {
             Log::warning('Timezone lookup failed', ['error' => $e->getMessage()]);
 
@@ -47,7 +44,7 @@ class TimeZoneLookupService
             return null;
         }
 
-        $timezone = $response->json('timeZone');
+        $timezone = $response->json('tz');
 
         if (! is_string($timezone) || ! in_array($timezone, DateTimeZone::listIdentifiers(), true)) {
             return null;
