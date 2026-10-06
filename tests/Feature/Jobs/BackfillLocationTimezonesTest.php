@@ -72,7 +72,7 @@ class BackfillLocationTimezonesTest extends TestCase
         $location = Location::factory()->create(['timezone' => null]);
 
         Http::fake([
-            '*' => Http::response(['timeZone' => 'Europe/Berlin']),
+            '*' => Http::response(['tz' => 'Europe/Berlin']),
         ]);
 
         (new LookupLocationTimezoneJob($location->id))->handle(app(LocationRepository::class));
@@ -98,7 +98,7 @@ class BackfillLocationTimezonesTest extends TestCase
         $location = Location::factory()->create(['timezone' => 'Europe/Berlin']);
 
         Http::fake([
-            '*' => Http::response(['timeZone' => 'Asia/Tokyo']),
+            '*' => Http::response(['tz' => 'Asia/Tokyo']),
         ]);
 
         (new LookupLocationTimezoneJob($location->id))->handle(app(LocationRepository::class));
@@ -122,7 +122,7 @@ class BackfillLocationTimezonesTest extends TestCase
         $location = Location::factory()->create(['timezone' => null]);
 
         Http::fake([
-            '*' => Http::response(['timeZone' => 'Europe/Berlin']),
+            '*' => Http::response(['tz' => 'Europe/Berlin']),
         ]);
         Bus::fake();
 

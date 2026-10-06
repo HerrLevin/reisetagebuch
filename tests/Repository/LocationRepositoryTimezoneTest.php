@@ -57,7 +57,7 @@ class LocationRepositoryTimezoneTest extends TestCase
         $location = Location::factory()->create(['timezone' => null]);
 
         Http::fake([
-            '*' => Http::response(['timeZone' => 'Europe/Berlin']),
+            '*' => Http::response(['tz' => 'Europe/Berlin']),
         ]);
 
         $updated = app(LocationRepository::class)->resolveTimezoneNow($location);
@@ -71,7 +71,7 @@ class LocationRepositoryTimezoneTest extends TestCase
         $location = Location::factory()->create(['timezone' => 'Europe/Berlin']);
 
         Http::fake([
-            '*' => Http::response(['timeZone' => 'Asia/Tokyo']),
+            '*' => Http::response(['tz' => 'Asia/Tokyo']),
         ]);
 
         $updated = app(LocationRepository::class)->resolveTimezoneNow($location);

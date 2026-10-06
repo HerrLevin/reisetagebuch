@@ -40,6 +40,8 @@ services:
                 condition: service_started
             redis:
                 condition: service_started
+            geo2tz:
+                condition: service_started
             rtb.prod:
                 # Only waits for rtb.prod's healthcheck (nginx responding), not for its
                 # migrations to finish. On first deploy, run migrations explicitly before
@@ -98,3 +100,9 @@ services:
                 - ping
             retries: 3
             timeout: 5s
+
+    # Self-hosted timezone-from-coordinates lookup, replacing the external timeapi.io
+    # dependency so we don't run into its rate limits. See https://github.com/noandrea/geo2tz
+    geo2tz:
+        restart: always
+        image: 'ghcr.io/noandrea/geo2tz:latest'
