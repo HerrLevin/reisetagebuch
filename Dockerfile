@@ -32,7 +32,11 @@ RUN apk add --no-cache \
     shadow \
     sqlite-dev \
     supervisor \
-    zlib-dev
+    zlib-dev \
+    pcre-dev $PHPIZE_DEPS
+
+RUN pecl install redis \
+    && docker-php-ext-enable redis
 
 # Install required PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
@@ -44,7 +48,6 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
         pdo_mysql \
         pdo_pgsql \
         pdo_sqlite \
-        redis \
         zip
 
 RUN groupmod --gid ${RUNTIME_GID} www-data \
