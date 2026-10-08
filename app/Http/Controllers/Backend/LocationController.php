@@ -126,27 +126,17 @@ class LocationController extends Controller
     /**
      * @throws OverpassApiOverloaded
      */
-    public function prefetch(Point $point, int $radius): void
+    public function prefetch(Point $point, int $radius, bool $isRetry = false): void
     {
-        if (! $this->locationRepository->recentNearbyRequests($point, $radius)) {
+        if ($isRetry || ! $this->locationRepository->recentNearbyRequests($point, $radius)) {
             Log::debug('Prefetching nearby locations for point '.$point.' with radius '.$radius);
             $requestLocation = $this->locationRepository->createRequestLocation($point, $radius);
+
             try {
                 $this->fetchNearbyLocations($point, $requestLocation, $radius);
-            } catch (OverpassApiOverloaded) {
-                Log::warning('Overpass API overloaded, reducing radius and retrying for point '.$point.' with radius '.$radius);
-                try {
-                    sleep(5);
-                    $radius = intdiv($radius, 4);
-                    $requestLocation->update(['radius' => $radius]);
-                    $this->fetchNearbyLocations($point, $requestLocation, $radius);
-                } catch (OverpassApiOverloaded $exception) {
-                    Log::warning('Overpass API overloaded. Failing job');
-                    $requestLocation->update([
-                        'last_requested_at' => now()->subMinutes(config('app.overpass.timeout'))->subMinute(),
-                    ]);
-                    throw $exception;
-                }
+            } catch (OverpassApiOverloaded $exception) {
+                Log::warning('Overpass API overloaded for point '.$point.' with radius '.$radius);
+                throw $exception;
             }
         }
     }

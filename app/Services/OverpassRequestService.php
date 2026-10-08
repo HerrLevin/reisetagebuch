@@ -17,7 +17,10 @@ abstract class OverpassRequestService
     public function __construct(?Client $client = null, ?VersionService $versionService = null)
     {
         $this->versionService = $versionService ?? new VersionService;
-        $this->client = $client ?? new Client;
+        $this->client = $client ?? new Client([
+            'connect_timeout' => config('app.overpass.connect_timeout'),
+            'timeout' => config('app.overpass.request_timeout'),
+        ]);
     }
 
     /**

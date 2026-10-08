@@ -47,11 +47,12 @@ class PrefetchJob implements ShouldQueue
             $this->locationController = App::make(LocationController::class);
         }
         $radius = config('app.overpass.radius');
+        $isRetry = $attempts !== null && $attempts > 1;
 
-        if ($attempts !== null && $attempts > 1) {
+        if ($isRetry) {
             $radius = intdiv($radius, 4);
         }
 
-        $this->locationController->prefetch($this->point, $radius);
+        $this->locationController->prefetch($this->point, $radius, $isRetry);
     }
 }
