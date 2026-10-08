@@ -1,12 +1,12 @@
 /**
  * Methods to be called statically: getPosition()
- * Store position in localStorage and refresh if it has been more than 5 minutes
+ * Store position in localStorage and refresh if it has been more than 30 seconds
  */
 import { api } from '@/api';
 import { Geolocation, Position } from '@capacitor/geolocation';
 
 export class LocationService {
-    private static readonly REFRESH_INTERVAL = 30; // 30 Seconds
+    private static readonly REFRESH_INTERVAL = 30 * 1000; // 30 Seconds
 
     public static async getPosition(
         isAuthenticated: boolean,

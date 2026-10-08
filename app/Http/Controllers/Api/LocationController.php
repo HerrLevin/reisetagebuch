@@ -23,6 +23,7 @@ use Carbon\Carbon;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use OpenApi\Attributes as OA;
 
 class LocationController extends Controller
@@ -96,7 +97,15 @@ class LocationController extends Controller
         if ($this->canStoreHistory($request)) {
             $this->locationController->createTimestampedUserWaypoint($request->user()->id, $point);
         }
-        PrefetchJob::dispatch($point);
+
+        // Silently drop prefetch requests beyond once per 5 minutes per user;
+        // the client polls far more often than fresh nearby data is needed.
+        RateLimiter::attempt(
+            'prefetch:'.$request->user()->id,
+            maxAttempts: 1,
+            callback: fn () => PrefetchJob::dispatch($point),
+            decaySeconds: 300,
+        );
 
         abort('204');
     }
