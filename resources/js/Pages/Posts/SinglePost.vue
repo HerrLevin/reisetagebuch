@@ -12,7 +12,7 @@ import CardBack from '@/Pages/Posts/Partials/CardBack.vue';
 import { getColorForPost } from '@/Services/DepartureTypeService';
 import { useUserStore } from '@/stores/user';
 import { isLocationPost, isTransportPost } from '@/types/PostTypes';
-import { GeometryCollection } from 'geojson';
+import { GeometryCollection, MultiPoint } from 'geojson';
 import { LngLat } from 'maplibre-gl';
 import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -43,7 +43,7 @@ const props = defineProps({
 const startPoint = ref(null as LngLat | null);
 const endPoint = ref(null as LngLat | null);
 const lineString = ref(null as GeometryCollection | null);
-const stopovers = ref(null as GeometryCollection | null);
+const stopovers = ref(null as MultiPoint | null);
 const stopoverList = ref<TransportPostStopoverDto[]>([]);
 const stopoverDetails = computed<StopoverPopupInfo[] | null>(() => {
     if (stopoverList.value.length === 0) return null;
@@ -138,7 +138,7 @@ function mapPostDetails() {
                     to: tPost.destinationStop.id,
                 })
                 .then((response) => {
-                    stopovers.value = response.data as GeometryCollection;
+                    stopovers.value = response.data as MultiPoint;
                 })
                 .catch(() => {
                     stopovers.value = null;
