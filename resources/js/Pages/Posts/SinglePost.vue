@@ -112,7 +112,7 @@ function mapPostDetails() {
 
         if (post.value.userGeometry) {
             lineString.value = post.value.userGeometry as GeometryCollection;
-        } else {
+        } else if (!tPost.sourceUrl) {
             api.map
                 .getLineStringBetween({
                     from: tPost.originStop.id,
@@ -124,28 +124,38 @@ function mapPostDetails() {
                 .catch(() => {
                     lineString.value = null;
                 });
+        } else {
+            lineString.value = null;
         }
 
-        api.map
-            .getStopsBetween({
-                from: tPost.originStop.id,
-                to: tPost.destinationStop.id,
-            })
-            .then((response) => {
-                stopovers.value = response.data as GeometryCollection;
-            })
-            .catch(() => {
-                stopovers.value = null;
-            });
+        // Federated posts only carry the structured RtbTransportExtension summary; their
+        // stop/post IDs are the remote instance's own and don't exist in our local DB, so
+        // these endpoints (which look up local stops/transport_posts rows) would 400/404.
+        if (!tPost.sourceUrl) {
+            api.map
+                .getStopsBetween({
+                    from: tPost.originStop.id,
+                    to: tPost.destinationStop.id,
+                })
+                .then((response) => {
+                    stopovers.value = response.data as GeometryCollection;
+                })
+                .catch(() => {
+                    stopovers.value = null;
+                });
 
-        api.posts
-            .getStopoversForTransportPost(tPost.id)
-            .then((response) => {
-                stopoverList.value = response.data;
-            })
-            .catch(() => {
-                stopoverList.value = [];
-            });
+            api.posts
+                .getStopoversForTransportPost(tPost.id)
+                .then((response) => {
+                    stopoverList.value = response.data;
+                })
+                .catch(() => {
+                    stopoverList.value = [];
+                });
+        } else {
+            stopovers.value = null;
+            stopoverList.value = [];
+        }
     } else {
         startPoint.value = null;
         endPoint.value = null;
