@@ -44,6 +44,7 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
         pdo_mysql \
         pdo_pgsql \
         pdo_sqlite \
+        redis \
         zip
 
 RUN groupmod --gid ${RUNTIME_GID} www-data \
