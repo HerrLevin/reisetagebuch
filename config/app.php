@@ -35,6 +35,8 @@ return [
         'radius' => env('APP_OVERPASS_RADIUS', 1000),
         'timeout' => env('APP_OVERPASS_TIMEOUT', 60 * 24 * 7),
         'url' => env('APP_OVERPASS_URL', 'https://overpass.private.coffee/api/interpreter'),
+        'connect_timeout' => env('APP_OVERPASS_CONNECT_TIMEOUT', 5),
+        'request_timeout' => env('APP_OVERPASS_REQUEST_TIMEOUT', 30),
     ],
 
     'motis' => [
