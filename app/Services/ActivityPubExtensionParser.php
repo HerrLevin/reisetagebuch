@@ -21,7 +21,14 @@ class ActivityPubExtensionParser
     public function parse(array $object): ?RtbExtension
     {
         try {
-            return RtbExtensionFactory::fromArray($object['rtbExtension'] ?? null);
+            $data = $object['rtbExtension'] ?? null;
+            $extension = RtbExtensionFactory::fromArray($data);
+
+            if (! $extension) {
+                Log::debug('No valid RTB extension found in incoming Note', ['data' => $data, 'object' => $object]);
+            }
+
+            return $extension;
         } catch (Throwable $e) {
             Log::warning('Failed to parse RTB extension, ignoring it', ['error' => $e->getMessage()]);
 
