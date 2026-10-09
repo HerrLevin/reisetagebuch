@@ -24,7 +24,7 @@ class ActivityPubExtensionParser
             $data = $object['rtbExtension'] ?? null;
             $extension = RtbExtensionFactory::fromArray($data);
 
-            if (! $extension) {
+            if (! $extension && $data !== null) {
                 Log::debug('No valid RTB extension found in incoming Note', ['data' => $data, 'object' => $object]);
             }
 
