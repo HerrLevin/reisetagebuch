@@ -26,4 +26,12 @@ enum Visibility: string
             self::ONLY_AUTHENTICATED => 4,
         };
     }
+
+    public function isMastodonPublic(): bool
+    {
+        return match ($this) {
+            self::PUBLIC, self::UNLISTED => true,
+            default => false,
+        };
+    }
 }
