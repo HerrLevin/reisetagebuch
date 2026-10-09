@@ -27,6 +27,18 @@ use OpenApi\Attributes as OA;
             type: 'string',
             example: '1.0.0',
         ),
+        new OA\Property(
+            property: 'isDebug',
+            description: 'Whether debug mode (APP_DEBUG) is enabled. Should be false in production.',
+            type: 'boolean',
+            example: false,
+        ),
+        new OA\Property(
+            property: 'environment',
+            description: 'The configured app environment (APP_ENV). Should be "production" in production.',
+            type: 'string',
+            example: 'production',
+        ),
     ],
 )]
 readonly class AppConfigurationDto
@@ -37,5 +49,7 @@ readonly class AppConfigurationDto
         public string $appName,
         public string $appVersion,
         public array $featureFlags,
+        public bool $isDebug,
+        public string $environment,
     ) {}
 }

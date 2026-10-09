@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import DebugEnvironmentBanner from '@/Components/DebugEnvironmentBanner.vue';
 import Forbidden from '@/Pages/Errors/Forbidden.vue';
 import NotFound from '@/Pages/Errors/NotFound.vue';
 import { useAuthStore } from '@/stores/auth';
@@ -29,6 +30,7 @@ if (authStore.isAuthenticated()) {
 </script>
 
 <template>
+    <DebugEnvironmentBanner />
     <Forbidden v-if="httpErrorStore.status === 403" />
     <NotFound v-else-if="httpErrorStore.status === 404" />
     <router-view v-else />

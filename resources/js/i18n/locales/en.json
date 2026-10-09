@@ -1,4 +1,8 @@
 {
+    "debug_banner": {
+        "message": "Warning: this instance is running with debug mode and/or a non-production environment ({environment}) enabled. This should not be used in production.",
+        "dismiss": "Dismiss"
+    },
     "footer": {
         "version_unknown": "Version unknown",
         "legal": {

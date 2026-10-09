@@ -1,4 +1,8 @@
 {
+    "debug_banner": {
+        "message": "Warnung: Diese Instanz läuft mit aktiviertem Debug-Modus und/oder einer Nicht-Produktionsumgebung ({environment}). Das sollte nicht in Produktion verwendet werden.",
+        "dismiss": "Schließen"
+    },
     "footer": {
         "version_unknown": "Version unbekannt",
         "legal": {

@@ -3676,6 +3676,16 @@
                         "description": "The version of the application",
                         "type": "string",
                         "example": "1.0.0"
+                    },
+                    "isDebug": {
+                        "description": "Whether debug mode (APP_DEBUG) is enabled. Should be false in production.",
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "environment": {
+                        "description": "The configured app environment (APP_ENV). Should be \"production\" in production.",
+                        "type": "string",
+                        "example": "production"
                     }
                 },
                 "type": "object"
