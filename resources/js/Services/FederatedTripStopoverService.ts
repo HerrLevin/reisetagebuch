@@ -1,6 +1,7 @@
 import { api } from '@/api';
 import { StopoverPopupInfo } from '@/Components/Map.vue';
 import { GeometryCollection, MultiPoint } from 'geojson';
+import { ref } from 'vue';
 import { StopPlaceDto, TransportPost } from '../../types/Api.gen';
 
 export interface FederatedTripGeometry {
@@ -105,11 +106,15 @@ export async function loadFederatedTripGeometry(
             (stop) => [stop.longitude, stop.latitude] as [number, number],
         );
 
+        const lineString = await getLineString(relevantStops);
+
         return {
-            lineString: {
-                type: 'LineString',
-                coordinates,
-            } as unknown as GeometryCollection,
+            lineString:
+                lineString ??
+                ({
+                    type: 'LineString',
+                    coordinates,
+                } as unknown as GeometryCollection),
             stopovers: {
                 type: 'MultiPoint',
                 coordinates,
@@ -123,4 +128,29 @@ export async function loadFederatedTripGeometry(
         // transitous backend doesn't know this foreignId.
         return null;
     }
+}
+
+async function getLineString(relevantStops: StopPlaceDto[]) {
+    const lineString = ref<GeometryCollection | null>(null);
+    const fromStopId = relevantStops.at(0)?.tripStopId;
+    const toStopId = relevantStops.at(-1)?.tripStopId;
+
+    if (!fromStopId || !toStopId) {
+        lineString.value = null;
+        return lineString.value;
+    }
+
+    await api.map
+        .getLineStringBetween({
+            from: fromStopId,
+            to: toStopId,
+        })
+        .then((response) => {
+            lineString.value = response.data as GeometryCollection;
+        })
+        .catch(() => {
+            lineString.value = null;
+        });
+
+    return lineString.value;
 }
