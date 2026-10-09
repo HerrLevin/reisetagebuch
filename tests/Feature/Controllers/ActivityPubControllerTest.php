@@ -3,13 +3,20 @@
 namespace Tests\Feature\Controllers\ActivityPub;
 
 use App\Dto\ActivityPub\Extensions\RtbLocationExtension;
+use App\Enums\PostMetaInfo\TravelReason;
+use App\Enums\Visibility;
 use App\Http\Middleware\VerifyHttpSignature;
+use App\Hydrators\ActivityPub\CreateHydrator;
+use App\Hydrators\ActivityPub\NoteHydrator;
+use App\Hydrators\ActivityPub\UpdateHydrator;
 use App\Models\ActivityPubActor;
 use App\Models\ActivityPubFollower;
 use App\Models\ActivityPubLike;
 use App\Models\ActivityPubPost;
+use App\Models\Location;
 use App\Models\Post;
 use App\Models\User;
+use App\Repositories\PostRepository;
 use App\Services\ActivityPubService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
@@ -1588,6 +1595,58 @@ class ActivityPubControllerTest extends TestCase
         $post = ActivityPubPost::where('activity_id', $noteId)->firstOrFail();
         $this->assertNull($post->extension_data);
         $this->assertStringContainsString('Hello world', $post->content);
+    }
+
+    /**
+     * End-to-end regression test for the reisetagebuch-to-reisetagebuch Create/Update
+     * activity-id collision
+     */
+    public function test_real_update_activity_from_another_rtb_instance_is_applied(): void
+    {
+        $sender = User::factory()->create();
+        $location = Location::factory()->create();
+        $senderPost = app(PostRepository::class)->storeLocation(
+            $sender,
+            $location,
+            Visibility::PUBLIC,
+            'Visited somewhere',
+            [],
+            TravelReason::LEISURE,
+            now(),
+        );
+
+        $remoteActorId = 'https://remote.example/users/bob';
+        ActivityPubActor::factory()->create(['actor_uri' => $remoteActorId]);
+
+        $actorUrl = 'https://remote.example/users/bob';
+        $followersUrl = 'https://remote.example/users/bob/followers';
+
+        $postDto = app(PostRepository::class)->getById($senderPost->id, null, false);
+        $note = new NoteHydrator()->hydrate($postDto, $actorUrl, $followersUrl);
+        $createActivity = new CreateHydrator()->hydrate($actorUrl, $note, true)->toArray();
+
+        $this->inboxPost('/ap/inbox', $createActivity)->assertStatus(202);
+
+        $storedPost = ActivityPubPost::where('activity_id', $createActivity['object']['id'])->firstOrFail();
+        $this->assertStringContainsString('Visited somewhere', $storedPost->content);
+        $this->assertStringNotContainsString('edited', $storedPost->content);
+
+        // Edit the sender's post, then build a fresh Update activity for it exactly as
+        // PushUpdateToMastodon would.
+        app(PostRepository::class)->updateBasePost(
+            $senderPost, Visibility::PUBLIC, 'Visited somewhere (edited)', [], TravelReason::BUSINESS, null, null, null
+        );
+        $updatedPostDto = app(PostRepository::class)->getById($senderPost->id, null, false);
+        $updatedNote = new NoteHydrator()->hydrate($updatedPostDto, $actorUrl, $followersUrl);
+        $updatedNote->updated = $updatedPostDto->updatedAt;
+        $updateActivity = new UpdateHydrator()->hydrate($actorUrl, $updatedNote, true)->toArray();
+
+        $this->assertNotSame($createActivity['id'], $updateActivity['id']);
+
+        $this->inboxPost('/ap/inbox', $updateActivity)->assertStatus(202);
+
+        $storedPost->refresh();
+        $this->assertStringContainsString('edited', $storedPost->content);
     }
 
     public function test_update_note_refreshes_rtb_extension_data(): void
