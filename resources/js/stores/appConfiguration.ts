@@ -41,6 +41,14 @@ export const useAppConfigurationStore = defineStore('appConfiguration', () => {
         return configuration.value?.appVersion || '0.0.0';
     };
 
+    const isMisconfiguredForProduction = () => {
+        return (
+            configuration.value?.isDebug ||
+            (!!configuration.value?.environment &&
+                configuration.value.environment !== 'production')
+        );
+    };
+
     return {
         configuration,
         fetchConfig,
@@ -48,5 +56,6 @@ export const useAppConfigurationStore = defineStore('appConfiguration', () => {
         canInvite,
         appName,
         appVersion,
+        isMisconfiguredForProduction,
     };
 });

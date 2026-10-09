@@ -15,6 +15,8 @@ class AppConfigurationBackend extends Controller
             appName: config('app.name'),
             appVersion: config('app.version'),
             featureFlags: $this->getFeatureFlags(),
+            isDebug: (bool) config('app.debug'),
+            environment: (string) config('app.env'),
         );
     }
 

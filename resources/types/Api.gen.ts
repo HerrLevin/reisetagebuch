@@ -103,6 +103,16 @@ export interface AppConfigurationDto {
    * @example "1.0.0"
    */
   appVersion?: string;
+  /**
+   * Whether debug mode (APP_DEBUG) is enabled. Should be false in production.
+   * @example false
+   */
+  isDebug?: boolean;
+  /**
+   * The configured app environment (APP_ENV). Should be "production" in production.
+   * @example "production"
+   */
+  environment?: string;
 }
 
 /**
