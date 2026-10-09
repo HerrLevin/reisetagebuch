@@ -162,6 +162,8 @@
             "required": [
                 "id",
                 "foreignId",
+                "foreignIdSourceUrl",
+                "foreignIdSourceFormat",
                 "mode",
                 "lineName",
                 "routeLongName",
@@ -174,6 +176,15 @@
             "properties": {
                 "id": { "type": "string" },
                 "foreignId": { "type": ["string", "null"] },
+                "foreignIdSourceUrl": {
+                    "type": ["string", "null"],
+                    "description": "Base URL of the routing API that foreignId can be resolved against, e.g. https://api.transitous.org/api. Null when foreignId is null."
+                },
+                "foreignIdSourceFormat": {
+                    "type": ["string", "null"],
+                    "description": "Data exchange format/protocol spoken at foreignIdSourceUrl, e.g. \"motis\". Null when foreignId is null.",
+                    "examples": ["motis"]
+                },
                 "mode": { "$ref": "#/$defs/transportMode" },
                 "lineName": { "type": ["string", "null"] },
                 "routeLongName": { "type": ["string", "null"] },

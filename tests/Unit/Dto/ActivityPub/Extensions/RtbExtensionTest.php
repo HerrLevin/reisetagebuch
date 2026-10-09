@@ -72,6 +72,8 @@ class RtbExtensionTest extends TestCase
             trip: new RtbTripData(
                 id: 'trip-1',
                 foreignId: 'foreign-1',
+                foreignIdSourceUrl: 'https://api.transitous.org/api',
+                foreignIdSourceFormat: 'motis',
                 mode: TransportMode::RAIL,
                 lineName: 'RE1',
                 routeLongName: null,
