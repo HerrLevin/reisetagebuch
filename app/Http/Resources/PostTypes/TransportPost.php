@@ -123,6 +123,7 @@ class TransportPost extends BasePost
             return $dto;
         }
 
+        $dto->body = $extension->body;
         $dto->originStop = StopDto::fromRtb($extension->originStop);
         $dto->destinationStop = StopDto::fromRtb($extension->destinationStop);
         $dto->trip = TripDto::fromRtb($extension->trip);

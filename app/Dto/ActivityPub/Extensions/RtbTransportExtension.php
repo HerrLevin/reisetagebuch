@@ -25,6 +25,7 @@ final class RtbTransportExtension implements RtbExtension
         public readonly int $distance,
         public readonly int $duration,
         public readonly ?array $userGeometry,
+        public readonly ?string $body = null,
     ) {}
 
     public function toArray(): array
@@ -32,6 +33,7 @@ final class RtbTransportExtension implements RtbExtension
         return [
             'rtbVersion' => $this->rtbVersion,
             'postType' => self::POST_TYPE,
+            'body' => $this->body,
             'transport' => [
                 'originStop' => $this->originStop->toArray(),
                 'destinationStop' => $this->destinationStop->toArray(),
@@ -59,6 +61,7 @@ final class RtbTransportExtension implements RtbExtension
             distance: $post->distance,
             duration: $post->duration,
             userGeometry: $post->userGeometry,
+            body: $post->body,
         );
     }
 
@@ -90,6 +93,7 @@ final class RtbTransportExtension implements RtbExtension
             distance: self::parseInt($transportRaw['distance'] ?? null) ?? 0,
             duration: self::parseInt($transportRaw['duration'] ?? null) ?? 0,
             userGeometry: self::parseGeometry($transportRaw['userGeometry'] ?? null),
+            body: self::parseString($data['body'] ?? null),
         );
     }
 }

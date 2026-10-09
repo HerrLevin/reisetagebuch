@@ -135,7 +135,7 @@ class NoteHydratorTest extends TestCase
 
         $repo = new PostRepository;
         $visitedAt = Carbon::parse('2026-01-01 10:00:00');
-        $created = $repo->storeLocation($user, $location, Visibility::PUBLIC, null, [], TravelReason::LEISURE, $visitedAt);
+        $created = $repo->storeLocation($user, $location, Visibility::PUBLIC, 'My own words about this stop', [], TravelReason::LEISURE, $visitedAt);
         $localDto = $repo->getById($created->id, null);
 
         $note = $this->hydrator()->hydrate($localDto, 'https://example.com/actor', 'https://example.com/actor/followers');
@@ -165,10 +165,15 @@ class NoteHydratorTest extends TestCase
         $this->assertSame($localDto->location->longitude, $remoteDto->location->longitude);
         $this->assertSame($localDto->travelReason, $remoteDto->travelReason);
         $this->assertSame($localDto->visitedAt, $remoteDto->visitedAt);
+        // The raw body travels through the rtbExtension (not the sender's flattened
+        // Mastodon HTML in Note::$content), so the reconstructed DTO has the user's
+        // original text
+        $this->assertSame('My own words about this stop', $remoteDto->body);
         // Reconstructed DTO renders its own rich emoji/location body, same as the
-        // sender did, rather than the sender's flattened HTML being blindly reused.
-        $this->assertStringContainsString('Berlin Hbf', $remoteDto->getHtmlBody());
-        $this->assertStringContainsString('Berlin', $remoteDto->getHtmlBody());
+        // sender did, rather than the sender's flattened HTML being blindly reused —
+        // so the location name must appear exactly once, not duplicated.
+        $this->assertStringContainsString('My own words about this stop', $remoteDto->getHtmlBody());
+        $this->assertSame(1, substr_count($remoteDto->getHtmlBody(), 'Berlin Hbf'));
     }
 
     public function test_transport_post_round_trips_through_parse_and_reconstruct(): void
@@ -187,7 +192,7 @@ class NoteHydratorTest extends TestCase
         ]);
 
         $repo = new PostRepository;
-        $created = $repo->storeTransport($user, $trip, $originStop, $destinationStop, Visibility::PUBLIC);
+        $created = $repo->storeTransport($user, $trip, $originStop, $destinationStop, Visibility::PUBLIC, 'My own words about this trip');
         $localDto = $repo->getById($created->id, null);
 
         $note = $this->hydrator()->hydrate($localDto, 'https://example.com/actor', 'https://example.com/actor/followers');
@@ -217,7 +222,9 @@ class NoteHydratorTest extends TestCase
         $this->assertSame($localDto->destinationStop->name, $remoteDto->destinationStop->name);
         $this->assertSame($localDto->distance, $remoteDto->distance);
         $this->assertSame($localDto->duration, $remoteDto->duration);
-        $this->assertStringContainsString('RE1', $remoteDto->getHtmlBody());
+        $this->assertSame('My own words about this trip', $remoteDto->body);
+        $this->assertStringContainsString('My own words about this trip', $remoteDto->getHtmlBody());
+        $this->assertSame(1, substr_count($remoteDto->getHtmlBody(), 'RE1'));
     }
 
     private function contextHasRtbTerm(array $context): bool

@@ -19,6 +19,7 @@ final class RtbLocationExtension implements RtbExtension
         public readonly RtbLocationData $location,
         public readonly ?TravelReason $travelReason,
         public readonly ?string $visitedAt,
+        public readonly ?string $body = null,
     ) {}
 
     public function toArray(): array
@@ -26,6 +27,7 @@ final class RtbLocationExtension implements RtbExtension
         return [
             'rtbVersion' => $this->rtbVersion,
             'postType' => self::POST_TYPE,
+            'body' => $this->body,
             // travelReason/visitedAt live alongside the location-core fields on the wire
             // (they describe the visit, not the place, but are post-level attributes with
             // nowhere else to sit in this envelope).
@@ -44,6 +46,7 @@ final class RtbLocationExtension implements RtbExtension
             location: RtbLocationData::fromDto($post->location),
             travelReason: $post->travelReason,
             visitedAt: $post->visitedAt,
+            body: $post->body,
         );
     }
 
@@ -67,6 +70,7 @@ final class RtbLocationExtension implements RtbExtension
             location: $location,
             travelReason: self::parseEnum($locationRaw['travelReason'] ?? null, TravelReason::class),
             visitedAt: self::parseString($locationRaw['visitedAt'] ?? null),
+            body: self::parseString($data['body'] ?? null),
         );
     }
 }
