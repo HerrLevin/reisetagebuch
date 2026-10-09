@@ -74,6 +74,35 @@ class ActivityPubPostHydratorTest extends TestCase
         $this->assertStringContainsString('Berlin Hbf', $dto->getHtmlBody());
     }
 
+    public function test_location_post_body_prefers_extension_body_over_mastodon_formatted_content(): void
+    {
+        $post = $this->makePost([
+            'rtbVersion' => 1,
+            'postType' => 'location',
+            'body' => 'My own words about this stop',
+            'location' => [
+                'id' => 'loc-1',
+                'name' => 'Berlin Hbf',
+                'latitude' => 52.52,
+                'longitude' => 13.405,
+                'timezone' => 'Europe/Berlin',
+                'emoji' => '🚉',
+                'tags' => [],
+                'identifiers' => [],
+                'travelReason' => 'leisure',
+                'visitedAt' => '2026-01-01T10:00:00+00:00',
+            ],
+        ]);
+
+        $dto = $this->hydrator()->modelToDto($post);
+
+        $this->assertInstanceOf(LocationPost::class, $dto);
+        $this->assertSame('My own words about this stop', $dto->body);
+        $this->assertStringContainsString('My own words about this stop', $dto->getHtmlBody());
+        $this->assertSame(1, substr_count($dto->getHtmlBody(), 'Berlin Hbf'));
+        $this->assertStringNotContainsString('Hello world', $dto->getHtmlBody());
+    }
+
     public function test_returns_transport_post_when_extension_data_is_transport(): void
     {
         $stop = [
@@ -126,6 +155,62 @@ class ActivityPubPostHydratorTest extends TestCase
         $this->assertInstanceOf(TransportPost::class, $dto);
         $this->assertSame('RE1', $dto->trip->displayName);
         $this->assertStringContainsString('RE1', $dto->getHtmlBody());
+    }
+
+    public function test_transport_post_body_prefers_extension_body_over_mastodon_formatted_content(): void
+    {
+        $stop = [
+            'id' => 'stop-1',
+            'name' => 'Berlin Hbf',
+            'location' => [
+                'id' => 'loc-1',
+                'name' => 'Berlin Hbf',
+                'latitude' => 52.52,
+                'longitude' => 13.405,
+                'timezone' => 'Europe/Berlin',
+                'emoji' => '🚉',
+                'tags' => [],
+                'identifiers' => [],
+            ],
+            'arrivalTime' => null,
+            'departureTime' => '2026-01-01T10:00:00+00:00',
+            'arrivalDelay' => null,
+            'departureDelay' => 0,
+        ];
+
+        $post = $this->makePost([
+            'rtbVersion' => 1,
+            'postType' => 'transport',
+            'body' => 'My own words about this trip',
+            'transport' => [
+                'originStop' => $stop,
+                'destinationStop' => $stop,
+                'trip' => [
+                    'id' => 'trip-1',
+                    'foreignId' => null,
+                    'mode' => 'RAIL',
+                    'lineName' => 'RE1',
+                    'routeLongName' => null,
+                    'tripShortName' => null,
+                    'displayName' => 'RE1',
+                    'routeColor' => null,
+                    'routeTextColor' => null,
+                ],
+                'manualDepartureTime' => null,
+                'manualArrivalTime' => null,
+                'travelReason' => 'commute',
+                'distance' => 12345,
+                'duration' => 600,
+                'userGeometry' => null,
+            ],
+        ]);
+
+        $dto = $this->hydrator()->modelToDto($post);
+
+        $this->assertInstanceOf(TransportPost::class, $dto);
+        $this->assertSame('My own words about this trip', $dto->body);
+        $this->assertStringContainsString('My own words about this trip', $dto->getHtmlBody());
+        $this->assertStringNotContainsString('Hello world', $dto->getHtmlBody());
     }
 
     public function test_extension_data_accepts_a_dto_instance_directly_on_write(): void

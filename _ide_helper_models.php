@@ -160,7 +160,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property string|null $in_reply_to
  * @property array<array-key, mixed>|null $mentions
- * @property \App\Dto\ActivityPub\Extensions\RtbExtension|null $extension_data
+ * @property \App\Dto\ActivityPub\Extensions\RtbExtension $extension_data
  * @property-read \App\Models\ActivityPubActor $actor
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ActivityPubPostLike> $likes
  * @property-read int|null $likes_count
@@ -173,7 +173,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPost whereActivityPubActorId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPost whereContent($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPost whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPost whereExtensionData($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPost whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPost whereInReplyTo($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubPost whereMentions($value)

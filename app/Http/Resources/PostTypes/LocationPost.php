@@ -64,6 +64,7 @@ class LocationPost extends BasePost
             return $dto;
         }
 
+        $dto->body = $extension->body;
         $dto->location = LocationDto::fromRtb($extension->location);
         $dto->travelReason = $extension->travelReason;
         $dto->visitedAt = $extension->visitedAt;

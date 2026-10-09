@@ -22,6 +22,7 @@ class ActivityPubExtensionParserTest extends TestCase
             'rtbExtension' => [
                 'rtbVersion' => 1,
                 'postType' => 'location',
+                'body' => 'My own words about this stop',
                 'location' => [
                     'id' => 'loc-1',
                     'name' => 'Berlin Hbf',

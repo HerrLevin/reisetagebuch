@@ -4,7 +4,7 @@
     "title": "Reisetagebuch ActivityPub extension envelope (v1)",
     "description": "The `rtbExtension` object attached to an ActivityPub Note by reisetagebu.ch. Mirrors the dispatch rules in App\\Dto\\ActivityPub\\Extensions\\RtbExtensionFactory: rtbVersion must be exactly 1, and postType selects which of `location`/`transport` is required.",
     "type": "object",
-    "required": ["rtbVersion", "postType"],
+    "required": ["rtbVersion", "postType", "body"],
     "additionalProperties": false,
     "properties": {
         "rtbVersion": {
@@ -12,6 +12,10 @@
         },
         "postType": {
             "enum": ["location", "transport"]
+        },
+        "body": {
+            "type": ["string", "null"],
+            "description": "The raw, unformatted post body, distinct from the enclosing Note's `content` (which is a Mastodon-oriented HTML rendering of this body plus an auto-generated location/trip summary)."
         },
         "location": {
             "$ref": "#/$defs/locationExtensionBody"
