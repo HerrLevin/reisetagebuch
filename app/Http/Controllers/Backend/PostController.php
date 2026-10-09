@@ -95,6 +95,26 @@ class PostController extends Controller
         PushUpdateToMastodon::dispatch($post->id);
     }
 
+    private function dispatchVisibilityAwareUpdate(BasePost|LocationPost|TransportPost $post, Visibility $previousVisibility): void
+    {
+        $wasPublic = $previousVisibility->isMastodonPublic();
+        $isPublic = $post->visibility->isMastodonPublic();
+
+        if ($wasPublic && ! $isPublic) {
+            PushDeleteToMastodon::dispatch($post->id, $post->user->id, $post->user->username);
+
+            return;
+        }
+
+        if (! $wasPublic && $isPublic) {
+            $this->dispatchPost($post);
+
+            return;
+        }
+
+        $this->dispatchUpdate($post);
+    }
+
     public function storeLocation(LocationBasePostRequest $request): BasePost|LocationPost|TransportPost
     {
         $location = $this->locationRepository->getLocationById($request->input('location'));
@@ -223,6 +243,8 @@ class PostController extends Controller
             throw new AuthorizationException('You do not have permission to update this post.');
         }
 
+        $previousVisibility = $post->visibility;
+
         $reason = null;
         if ($post instanceof LocationPost || $post instanceof TransportPost) {
             $reason = TravelReason::from($request->input('travelReason'));
@@ -250,7 +272,7 @@ class PostController extends Controller
             );
         }
 
-        $this->dispatchUpdate($post);
+        $this->dispatchVisibilityAwareUpdate($post, $previousVisibility);
 
         return $post;
     }
@@ -487,6 +509,10 @@ class PostController extends Controller
         $tags = $request->input('tags');
         $addTags = $request->boolean('addTags', false);
 
+        $previousVisibilities = $visibility !== null
+            ? Post::whereIn('id', $request->input('postIds'))->pluck('visibility', 'id')
+            : collect();
+
         $updated = $this->postRepository->massEdit(
             $request->user(),
             $request->input('postIds'),
@@ -497,6 +523,10 @@ class PostController extends Controller
         );
 
         foreach ($updated as $post) {
+            if ($visibility !== null && $previousVisibilities->has($post->id)) {
+                $this->dispatchVisibilityAwareUpdate($post, $previousVisibilities->get($post->id));
+            }
+
             if ($post instanceof TransportPost) {
                 TraewellingEditPostJob::dispatch($post);
                 CalculateStatsForTransportPost::dispatch($post->id);

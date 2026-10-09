@@ -2,7 +2,6 @@
 
 namespace App\Jobs\ActivityPub;
 
-use App\Enums\Visibility;
 use App\Hydrators\ActivityPub\CreateHydrator;
 use App\Hydrators\ActivityPub\NoteHydrator;
 use App\Models\ActivityPubFollower;
@@ -35,7 +34,7 @@ class PushPostToMastodon implements ShouldQueue
             return;
         }
 
-        if ($postDto->visibility !== Visibility::PUBLIC) {
+        if (! $postDto->visibility->isMastodonPublic()) {
             Log::info('PushPostToMastodon: Skipping non-public post', ['postId' => $this->postId]);
 
             return;
