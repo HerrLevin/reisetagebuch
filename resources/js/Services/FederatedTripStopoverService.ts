@@ -1,7 +1,6 @@
 import { api } from '@/api';
 import { StopoverPopupInfo } from '@/Components/Map.vue';
 import { GeometryCollection, MultiPoint } from 'geojson';
-import { ref } from 'vue';
 import { StopPlaceDto, TransportPost } from '../../types/Api.gen';
 
 export interface FederatedTripGeometry {
@@ -131,14 +130,14 @@ export async function loadFederatedTripGeometry(
 }
 
 async function getLineString(relevantStops: StopPlaceDto[]) {
-    const lineString = ref<GeometryCollection | null>(null);
     const fromStopId = relevantStops.at(0)?.tripStopId;
     const toStopId = relevantStops.at(-1)?.tripStopId;
 
     if (!fromStopId || !toStopId) {
-        lineString.value = null;
-        return lineString.value;
+        return null;
     }
+
+    let lineString: GeometryCollection | null = null;
 
     await api.map
         .getLineStringBetween({
@@ -146,11 +145,11 @@ async function getLineString(relevantStops: StopPlaceDto[]) {
             to: toStopId,
         })
         .then((response) => {
-            lineString.value = response.data as GeometryCollection;
+            lineString = response.data as GeometryCollection;
         })
         .catch(() => {
-            lineString.value = null;
+            lineString = null;
         });
 
-    return lineString.value;
+    return lineString;
 }

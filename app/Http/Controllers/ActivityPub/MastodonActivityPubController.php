@@ -41,7 +41,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Throwable;
 
 class MastodonActivityPubController extends Controller
 {
@@ -256,12 +255,7 @@ class MastodonActivityPubController extends Controller
             return response()->json('', 202);
         }
 
-        $extension = null;
-        try {
-            $extension = app(ActivityPubExtensionParser::class)->parse($object);
-        } catch (Throwable $e) {
-            Log::warning('RTB extension parsing threw unexpectedly, ignoring extension', ['error' => $e->getMessage()]);
-        }
+        $extension = app(ActivityPubExtensionParser::class)->parse($object);
 
         $post = $this->activityPubPostRepository->findOrCreateByActivityId(
             activityPubActorId: $actor->id,
@@ -846,12 +840,7 @@ class MastodonActivityPubController extends Controller
         $inReplyTo = $object['inReplyTo'] ?? null;
         $inReplyTo = is_string($inReplyTo) ? $inReplyTo : ($inReplyTo['id'] ?? null);
 
-        $extension = null;
-        try {
-            $extension = app(ActivityPubExtensionParser::class)->parse($object);
-        } catch (Throwable $e) {
-            Log::warning('RTB extension parsing threw unexpectedly, ignoring extension', ['error' => $e->getMessage()]);
-        }
+        $extension = app(ActivityPubExtensionParser::class)->parse($object);
 
         $this->activityPubPostRepository->updateByActivityId(
             activityId: $noteId,
