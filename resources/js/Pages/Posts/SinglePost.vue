@@ -24,6 +24,7 @@ import {
     TransportPostStopoverDto,
 } from '../../../types/Api.gen';
 import { getTransportProgress } from '@/Services/TimeFormattingService';
+import { loadFederatedTripGeometry } from '@/Services/FederatedTripStopoverService';
 
 const { t } = useI18n();
 const vueRouter = useRouter();
@@ -92,26 +93,25 @@ function mapPostDetails() {
 
         if (post.value.userGeometry) {
             lineString.value = post.value.userGeometry as GeometryCollection;
-        } else if (!tPost.sourceUrl) {
-            api.map
-                .getLineStringBetween({
-                    from: tPost.originStop.id,
-                    to: tPost.destinationStop.id,
-                })
-                .then((response) => {
-                    lineString.value = response.data as GeometryCollection;
-                })
-                .catch(() => {
-                    lineString.value = null;
-                });
         } else {
             lineString.value = null;
         }
 
-        // Federated posts only carry the structured RtbTransportExtension summary; their
-        // stop/post IDs are the remote instance's own and don't exist in our local DB, so
-        // these endpoints (which look up local stops/transport_posts rows) would 400/404.
         if (!tPost.sourceUrl) {
+            if (!post.value.userGeometry) {
+                api.map
+                    .getLineStringBetween({
+                        from: tPost.originStop.id,
+                        to: tPost.destinationStop.id,
+                    })
+                    .then((response) => {
+                        lineString.value = response.data as GeometryCollection;
+                    })
+                    .catch(() => {
+                        lineString.value = null;
+                    });
+            }
+
             api.map
                 .getStopsBetween({
                     from: tPost.originStop.id,
@@ -148,6 +148,18 @@ function mapPostDetails() {
         } else {
             stopovers.value = null;
             stopoverDetails.value = null;
+            postStopovers.value = null;
+
+            if (!post.value.userGeometry) {
+                loadFederatedTripGeometry(tPost).then((result) => {
+                    if (!result) {
+                        return;
+                    }
+                    lineString.value = result.lineString;
+                    stopovers.value = result.stopovers;
+                    stopoverDetails.value = result.stopoverDetails;
+                });
+            }
         }
     } else {
         startPoint.value = null;
