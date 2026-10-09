@@ -85,6 +85,8 @@ envelope for post-level attributes to live.
     "trip": {
       "id": "trip-1",
       "foreignId": "foreign-1",
+      "foreignIdSourceUrl": "https://api.transitous.org/api",
+      "foreignIdSourceFormat": "motis",
       "mode": "RAIL",
       "lineName": "RE1",
       "routeLongName": null,
@@ -102,6 +104,21 @@ envelope for post-level attributes to live.
   }
 }
 ```
+
+`foreignId` is an opaque trip identifier in whatever routing backend the sending
+instance uses — on its own it's ambiguous, since a receiving instance has no way
+to know which backend minted it. `foreignIdSourceUrl`/`foreignIdSourceFormat`
+pin that down: `foreignIdSourceUrl` is the base URL of the routing API
+`foreignId` can be resolved against (this instance's own `APP_MOTIS_API_URL`,
+e.g. `https://api.transitous.org/api`), and `foreignIdSourceFormat` names the
+protocol spoken there (currently always `"motis"`, the only backend this app
+integrates with). A receiving instance can use this to mirror the full stop
+sequence/route geometry for a federated trip from the same routing backend the
+sender used, rather than relying only on the `originStop`/`destinationStop`
+summary carried here. Both fields are `null` whenever `foreignId` is `null`.
+Adding a new `foreignIdSourceFormat` value in the future is additive (existing
+consumers can keep ignoring formats they don't recognize), so it doesn't
+require a `rtbVersion` bump.
 
 A stop (`originStop`/`destinationStop`) is a named point in time and space:
 

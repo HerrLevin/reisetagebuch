@@ -15,6 +15,8 @@ final class RtbTripData
     public function __construct(
         public readonly string $id,
         public readonly ?string $foreignId,
+        public readonly ?string $foreignIdSourceUrl,
+        public readonly ?string $foreignIdSourceFormat,
         public readonly TransportMode $mode,
         public readonly ?string $lineName,
         public readonly ?string $routeLongName,
@@ -29,6 +31,8 @@ final class RtbTripData
         return [
             'id' => $this->id,
             'foreignId' => $this->foreignId,
+            'foreignIdSourceUrl' => $this->foreignIdSourceUrl,
+            'foreignIdSourceFormat' => $this->foreignIdSourceFormat,
             'mode' => $this->mode->value,
             'lineName' => $this->lineName,
             'routeLongName' => $this->routeLongName,
@@ -41,9 +45,13 @@ final class RtbTripData
 
     public static function fromDto(TripDto $trip): self
     {
+        $hasForeignId = $trip->foreignId !== null;
+
         return new self(
             id: $trip->id,
             foreignId: $trip->foreignId,
+            foreignIdSourceUrl: $hasForeignId ? config('app.motis.api_url') : null,
+            foreignIdSourceFormat: $hasForeignId ? 'motis' : null,
             mode: $trip->mode,
             lineName: $trip->lineName,
             routeLongName: $trip->routeLongName,
@@ -63,6 +71,8 @@ final class RtbTripData
         return new self(
             id: self::parseString($data['id'] ?? null) ?? '',
             foreignId: self::parseString($data['foreignId'] ?? null),
+            foreignIdSourceUrl: self::parseString($data['foreignIdSourceUrl'] ?? null),
+            foreignIdSourceFormat: self::parseString($data['foreignIdSourceFormat'] ?? null),
             // Unlike the local TripDto constructor, remote data can plausibly be
             // missing/invalid, so fall back to OTHER rather than risk a TypeError on
             // this non-nullable field.
