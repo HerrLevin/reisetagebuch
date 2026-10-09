@@ -142,12 +142,8 @@ class MastodonActivityPubController extends Controller
         $activity = $request->json()->all();
         $type = $activity['type'] ?? null;
 
-        // Global activities: Create(Note) and Delete(Note) have no specific local user target
-        if ($type === 'Create') {
-            return $this->processGlobalActivity($activity, $request);
-        }
-
-        if ($type === 'Delete' && ! $this->isActorDelete($activity)) {
+        // Global activities: Create(Note), Update(Note/Actor) and Delete(Note) have no specific local user target
+        if ($type === 'Create' || $type === 'Update' || ($type === 'Delete' && ! $this->isActorDelete($activity))) {
             return $this->processGlobalActivity($activity, $request);
         }
 
@@ -216,6 +212,10 @@ class MastodonActivityPubController extends Controller
 
         if ($type === 'Create') {
             return $this->handleCreate($activity);
+        }
+
+        if ($type === 'Update') {
+            return $this->handleUpdate($activity);
         }
 
         if ($type === 'Delete') {
@@ -331,19 +331,33 @@ class MastodonActivityPubController extends Controller
 
     private function handleNoteDelete(array $activity): JsonResponse
     {
+        $actorId = $activity['actor'] ?? null;
         $object = $activity['object'] ?? null;
         $noteId = is_string($object) ? $object : ($object['id'] ?? null);
 
-        if (! $noteId) {
+        if (! $actorId || ! $noteId) {
             return response()->json('', 202);
         }
 
         $post = $this->activityPubPostRepository->findByActivityId($noteId);
-        $this->activityPubPostRepository->deleteByActivityId($noteId);
-
-        if ($post) {
-            $this->notificationRepository->deleteActivityPubMentionNotifications($post->id);
+        if (! $post) {
+            return response()->json('', 202);
         }
+
+        // The signed actor must be the actor that originally created this note —
+        // otherwise any followed actor could delete another actor's post.
+        $actor = ActivityPubActor::where('actor_uri', $actorId)->first();
+        if (! $actor || $post->activity_pub_actor_id !== $actor->id) {
+            Log::warning('Delete(Note): actor does not own this post, possible spoofing attempt', [
+                'noteId' => $noteId,
+                'claimedActor' => $actorId,
+            ]);
+
+            return response()->json('', 202);
+        }
+
+        $this->activityPubPostRepository->deleteByActivityId($noteId, $actor->id);
+        $this->notificationRepository->deleteActivityPubMentionNotifications($post->id);
 
         return response()->json('', 202);
     }
@@ -726,6 +740,28 @@ class MastodonActivityPubController extends Controller
 
     private function handleUpdate(array $activity): JsonResponse
     {
+        $object = $activity['object'] ?? null;
+
+        if (! is_array($object)) {
+            return response()->json('', 202);
+        }
+
+        $objectType = $object['type'] ?? null;
+        $personTypes = ['Person', 'Service', 'Organization', 'Application', 'Group'];
+
+        if ($objectType === 'Note') {
+            return $this->handleNoteUpdate($activity);
+        }
+
+        if (in_array($objectType, $personTypes)) {
+            return $this->handleActorUpdate($activity);
+        }
+
+        return response()->json('', 202);
+    }
+
+    private function handleActorUpdate(array $activity): JsonResponse
+    {
         $actorUri = $activity['actor'] ?? null;
         $object = $activity['object'] ?? null;
 
@@ -733,11 +769,9 @@ class MastodonActivityPubController extends Controller
             return response()->json('', 202);
         }
 
-        $objectType = $object['type'] ?? null;
         $objectId = $object['id'] ?? null;
-        $personTypes = ['Person', 'Service', 'Organization', 'Application', 'Group'];
 
-        if (! in_array($objectType, $personTypes) || $objectId !== $actorUri) {
+        if ($objectId !== $actorUri) {
             return response()->json('', 202);
         }
 
@@ -750,6 +784,66 @@ class MastodonActivityPubController extends Controller
 
         $this->activityPubService->resolveActor($actorUri);
         Log::info('Processed update activity for actor', ['actorUri' => $actorUri]);
+
+        return response()->json('', 202);
+    }
+
+    private function handleNoteUpdate(array $activity): JsonResponse
+    {
+        $actorId = $activity['actor'] ?? null;
+        $object = $activity['object'] ?? null;
+
+        if (! $actorId || ! is_array($object)) {
+            return response()->json('', 202);
+        }
+
+        $noteId = $object['id'] ?? null;
+
+        if (! $noteId) {
+            return response()->json('', 202);
+        }
+
+        // Only process updates for actors we already know about (i.e. someone follows them)
+        $actor = ActivityPubActor::where('actor_uri', $actorId)->first();
+        if (! $actor) {
+            Log::info('Update(Note): unknown actor, ignoring', ['actorId' => $actorId]);
+
+            return response()->json('', 202);
+        }
+
+        $existingPost = $this->activityPubPostRepository->findByActivityId($noteId);
+        if (! $existingPost) {
+            Log::info('Update(Note): post not known locally, ignoring', ['noteId' => $noteId]);
+
+            return response()->json('', 202);
+        }
+
+        // The signed actor must be the actor that originally created this note —
+        // otherwise any followed actor could overwrite another actor's post.
+        if ($existingPost->activity_pub_actor_id !== $actor->id) {
+            Log::warning('Update(Note): actor does not own this post, possible spoofing attempt', [
+                'noteId' => $noteId,
+                'claimedActor' => $actorId,
+            ]);
+
+            return response()->json('', 202);
+        }
+
+        $content = $object['content'] ?? null;
+        $objectUrl = $object['url'] ?? null;
+        $inReplyTo = $object['inReplyTo'] ?? null;
+        $inReplyTo = is_string($inReplyTo) ? $inReplyTo : ($inReplyTo['id'] ?? null);
+
+        $this->activityPubPostRepository->updateByActivityId(
+            activityId: $noteId,
+            activityPubActorId: $actor->id,
+            url: is_string($objectUrl) ? $objectUrl : null,
+            content: is_string($content) ? $this->contentSanitizer->sanitize($content) : null,
+            inReplyTo: $inReplyTo,
+            mentions: $this->extractMentionHrefs($object['tag'] ?? []),
+        );
+
+        Log::info('Updated AP post', ['noteId' => $noteId, 'actor' => $actorId]);
 
         return response()->json('', 202);
     }

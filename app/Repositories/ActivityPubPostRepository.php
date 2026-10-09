@@ -45,9 +45,32 @@ class ActivityPubPostRepository
         );
     }
 
-    public function deleteByActivityId(string $activityId): void
+    public function deleteByActivityId(string $activityId, string $activityPubActorId): void
     {
-        ActivityPubPost::where('activity_id', $activityId)->delete();
+        ActivityPubPost::where('activity_id', $activityId)
+            ->where('activity_pub_actor_id', $activityPubActorId)
+            ->delete();
+    }
+
+    /**
+     * @param  array<int, string>  $mentions
+     */
+    public function updateByActivityId(
+        string $activityId,
+        string $activityPubActorId,
+        ?string $url,
+        ?string $content,
+        ?string $inReplyTo,
+        array $mentions,
+    ): bool {
+        return ActivityPubPost::where('activity_id', $activityId)
+            ->where('activity_pub_actor_id', $activityPubActorId)
+            ->update([
+                'url' => $url,
+                'content' => $content,
+                'in_reply_to' => $inReplyTo,
+                'mentions' => $mentions,
+            ]) > 0;
     }
 
     public function findByActivityId(string $activityId): ?ActivityPubPost

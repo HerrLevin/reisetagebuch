@@ -201,6 +201,18 @@ class VerifyHttpSignature
                 $publicKey = $actor['publicKey'] ?? null;
                 $owner = $publicKey['owner'] ?? null;
                 if ($publicKey && ($publicKey['id'] === $keyId) && isset($publicKey['publicKeyPem']) && $owner) {
+                    $keyHost = strtolower((string) parse_url($keyUrl, PHP_URL_HOST));
+                    $ownerHost = strtolower((string) parse_url($owner, PHP_URL_HOST));
+                    if ($keyHost === '' || $ownerHost === '' || ! hash_equals($ownerHost, $keyHost)) {
+                        Log::warning('VerifyHttpSignature: key owner host does not match keyId host, rejecting as spoofed', [
+                            'keyId' => $keyId,
+                            'key_url' => $keyUrl,
+                            'owner' => $owner,
+                        ]);
+
+                        return null;
+                    }
+
                     $result = [$publicKey['publicKeyPem'], $owner];
                     Cache::put($cacheKey, $result, 3600);
 
