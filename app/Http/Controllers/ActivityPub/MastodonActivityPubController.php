@@ -844,6 +844,13 @@ class MastodonActivityPubController extends Controller
         $inReplyTo = $object['inReplyTo'] ?? null;
         $inReplyTo = is_string($inReplyTo) ? $inReplyTo : ($inReplyTo['id'] ?? null);
 
+        $extension = null;
+        try {
+            $extension = app(ActivityPubExtensionParser::class)->parse($object);
+        } catch (Throwable $e) {
+            Log::warning('RTB extension parsing threw unexpectedly, ignoring extension', ['error' => $e->getMessage()]);
+        }
+
         $this->activityPubPostRepository->updateByActivityId(
             activityId: $noteId,
             activityPubActorId: $actor->id,
@@ -851,6 +858,7 @@ class MastodonActivityPubController extends Controller
             content: is_string($content) ? $this->contentSanitizer->sanitize($content) : null,
             inReplyTo: $inReplyTo,
             mentions: $this->extractMentionHrefs($object['tag'] ?? []),
+            extensionData: $extension,
         );
 
         Log::info('Updated AP post', ['noteId' => $noteId, 'actor' => $actorId]);
