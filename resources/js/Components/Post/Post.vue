@@ -42,18 +42,6 @@ function onUpdatePost(newPost: BasePost | TransportPost | LocationPost) {
     emit('update:post', newPost);
 }
 
-// Federated posts carry a prose `body` summarizing the structured data for plain AP
-// clients; once we've parsed that structured data ourselves, showing both is redundant,
-// so the raw body is only rendered when there's no structured display to show instead.
-// Local posts' `body` is always a user-typed caption, never auto-generated, so it's
-// shown regardless of whether the post also has structured data.
-const hasRedundantFederatedBody = computed(() => {
-    return (
-        !!localPost.value.sourceUrl &&
-        (isLocationPost(localPost.value) || isTransportPost(localPost.value))
-    );
-});
-
 const relativeCreatedAt = computed(() => {
     if (!localPost.value?.createdAt) {
         return '';
@@ -152,22 +140,15 @@ const relativeCreatedAt = computed(() => {
                 }}
             </span>
         </div>
-        <!-- Fediverse posts have HTML content; RTB-extension posts already render their
-             structured LocationDisplay/RouteDisplay below, so the HTML content (a prose
-             summary of the same data, generated for plain AP clients) would be redundant. -->
         <!-- eslint-disable vue/no-v-html -->
         <div
-            v-if="
-                localPost.sourceUrl &&
-                localPost.body &&
-                !hasRedundantFederatedBody
-            "
+            v-if="localPost.sourceUrl && localPost.body"
             class="ap-post-content list-col-wrap my-2 ps-3 text-xs"
             v-html="localPost.body"
         />
         <!-- eslint-enable vue/no-v-html -->
         <p
-            v-else-if="localPost.body && !hasRedundantFederatedBody"
+            v-else-if="localPost.body"
             class="list-col-wrap my-2 ps-3 text-xs whitespace-pre-wrap"
         >
             {{ localPost.body }}
