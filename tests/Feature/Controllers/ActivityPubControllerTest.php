@@ -8,6 +8,7 @@ use App\Models\ActivityPubFollower;
 use App\Models\ActivityPubLike;
 use App\Models\Post;
 use App\Models\User;
+use App\Services\ActivityPubService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -1122,6 +1123,58 @@ class ActivityPubControllerTest extends TestCase
         $this->assertDatabaseCount('activity_pub_likes', 0);
     }
 
+    public function test_inbox_update_actor_resolves_known_actor_profile(): void
+    {
+        $this->createUserWithKeys(['username' => 'alice']);
+        $remoteActorId = 'https://remote.example/users/bob';
+
+        ActivityPubActor::factory()->create(['actor_uri' => $remoteActorId]);
+
+        $this->mock(ActivityPubService::class, function ($mock) use ($remoteActorId) {
+            $mock->shouldReceive('resolveActor')->once()->with($remoteActorId)->andReturn(null);
+        });
+
+        $activity = [
+            '@context' => 'https://www.w3.org/ns/activitystreams',
+            'id' => 'https://remote.example/activities/update-actor-1',
+            'type' => 'Update',
+            'actor' => $remoteActorId,
+            'object' => [
+                'id' => $remoteActorId,
+                'type' => 'Person',
+                'preferredUsername' => 'remoteuser',
+                'name' => 'Remote User',
+            ],
+        ];
+
+        $response = $this->inboxPost('/ap/users/alice/inbox', $activity);
+
+        $response->assertStatus(202);
+    }
+
+    public function test_inbox_update_for_unknown_actor_is_ignored(): void
+    {
+        $this->createUserWithKeys(['username' => 'alice']);
+        $remoteActorId = 'https://remote.example/users/bob';
+
+        $activity = [
+            '@context' => 'https://www.w3.org/ns/activitystreams',
+            'id' => 'https://remote.example/activities/update-actor-2',
+            'type' => 'Update',
+            'actor' => $remoteActorId,
+            'object' => [
+                'id' => $remoteActorId,
+                'type' => 'Person',
+                'name' => 'Remote User',
+            ],
+        ];
+
+        $response = $this->inboxPost('/ap/users/alice/inbox', $activity);
+
+        $response->assertStatus(202);
+        $this->assertDatabaseMissing('activity_pub_actors', ['actor_uri' => $remoteActorId]);
+    }
+
     // ──────────────────────────────────────────────────────────────────────────
     // POST /ap/inbox  (Shared Inbox)
     // ──────────────────────────────────────────────────────────────────────────
@@ -1242,5 +1295,214 @@ class ActivityPubControllerTest extends TestCase
         $response->assertStatus(202);
         $this->assertDatabaseMissing('activity_pub_posts', ['activity_id' => $noteId]);
         $this->assertDatabaseCount('notifications', 0);
+    }
+
+    public function test_shared_inbox_update_note_updates_stored_content(): void
+    {
+        $this->createUserWithKeys(['username' => 'alice']);
+        $remoteActorId = 'https://remote.example/users/bob';
+        ActivityPubActor::factory()->create(['actor_uri' => $remoteActorId]);
+
+        $noteId = 'https://remote.example/notes/1';
+        $createActivity = [
+            '@context' => 'https://www.w3.org/ns/activitystreams',
+            'id' => 'https://remote.example/activities/create-2',
+            'type' => 'Create',
+            'actor' => $remoteActorId,
+            'object' => [
+                'id' => $noteId,
+                'type' => 'Note',
+                'content' => 'Original content',
+            ],
+        ];
+
+        $this->inboxPost('/ap/inbox', $createActivity);
+
+        $this->assertDatabaseHas('activity_pub_posts', [
+            'activity_id' => $noteId,
+            'content' => 'Original content',
+        ]);
+
+        $updateActivity = [
+            '@context' => 'https://www.w3.org/ns/activitystreams',
+            'id' => 'https://remote.example/activities/update-note-1',
+            'type' => 'Update',
+            'actor' => $remoteActorId,
+            'object' => [
+                'id' => $noteId,
+                'type' => 'Note',
+                'content' => 'Edited content',
+                'url' => 'https://remote.example/@bob/1',
+            ],
+        ];
+
+        $response = $this->inboxPost('/ap/inbox', $updateActivity);
+
+        $response->assertStatus(202);
+        $this->assertDatabaseHas('activity_pub_posts', [
+            'activity_id' => $noteId,
+            'content' => 'Edited content',
+            'url' => 'https://remote.example/@bob/1',
+        ]);
+    }
+
+    public function test_shared_inbox_update_note_for_unknown_post_is_ignored(): void
+    {
+        $remoteActorId = 'https://remote.example/users/bob';
+        ActivityPubActor::factory()->create(['actor_uri' => $remoteActorId]);
+
+        $updateActivity = [
+            '@context' => 'https://www.w3.org/ns/activitystreams',
+            'id' => 'https://remote.example/activities/update-note-2',
+            'type' => 'Update',
+            'actor' => $remoteActorId,
+            'object' => [
+                'id' => 'https://remote.example/notes/unknown',
+                'type' => 'Note',
+                'content' => 'Edited content',
+            ],
+        ];
+
+        $response = $this->inboxPost('/ap/inbox', $updateActivity);
+
+        $response->assertStatus(202);
+        $this->assertDatabaseCount('activity_pub_posts', 0);
+    }
+
+    public function test_shared_inbox_update_note_from_different_actor_is_rejected(): void
+    {
+        $this->createUserWithKeys(['username' => 'alice']);
+        $ownerActorId = 'https://remote.example/users/bob';
+        $attackerActorId = 'https://remote.example/users/mallory';
+        ActivityPubActor::factory()->create(['actor_uri' => $ownerActorId]);
+        ActivityPubActor::factory()->create(['actor_uri' => $attackerActorId]);
+
+        $noteId = 'https://remote.example/notes/1';
+        $createActivity = [
+            '@context' => 'https://www.w3.org/ns/activitystreams',
+            'id' => 'https://remote.example/activities/create-3',
+            'type' => 'Create',
+            'actor' => $ownerActorId,
+            'object' => [
+                'id' => $noteId,
+                'type' => 'Note',
+                'content' => 'Original content',
+            ],
+        ];
+
+        $this->inboxPost('/ap/inbox', $createActivity);
+
+        // Mallory (a different, but also known/followed actor) tries to overwrite
+        // Bob's post by claiming authorship of Bob's note id.
+        $hijackActivity = [
+            '@context' => 'https://www.w3.org/ns/activitystreams',
+            'id' => 'https://remote.example/activities/update-note-hijack',
+            'type' => 'Update',
+            'actor' => $attackerActorId,
+            'object' => [
+                'id' => $noteId,
+                'type' => 'Note',
+                'content' => 'Hijacked content',
+            ],
+        ];
+
+        $response = $this->inboxPost('/ap/inbox', $hijackActivity);
+
+        $response->assertStatus(202);
+        $this->assertDatabaseHas('activity_pub_posts', [
+            'activity_id' => $noteId,
+            'content' => 'Original content',
+        ]);
+        $this->assertDatabaseMissing('activity_pub_posts', [
+            'activity_id' => $noteId,
+            'content' => 'Hijacked content',
+        ]);
+    }
+
+    public function test_shared_inbox_delete_note_from_different_actor_is_rejected(): void
+    {
+        $this->createUserWithKeys(['username' => 'alice']);
+        $ownerActorId = 'https://remote.example/users/bob';
+        $attackerActorId = 'https://remote.example/users/mallory';
+        ActivityPubActor::factory()->create(['actor_uri' => $ownerActorId]);
+        ActivityPubActor::factory()->create(['actor_uri' => $attackerActorId]);
+
+        $noteId = 'https://remote.example/notes/1';
+        $createActivity = [
+            '@context' => 'https://www.w3.org/ns/activitystreams',
+            'id' => 'https://remote.example/activities/create-4',
+            'type' => 'Create',
+            'actor' => $ownerActorId,
+            'object' => [
+                'id' => $noteId,
+                'type' => 'Note',
+                'content' => 'Original content',
+            ],
+        ];
+
+        $this->inboxPost('/ap/inbox', $createActivity);
+
+        // Mallory (a different, but also known/followed actor) tries to delete
+        // Bob's post by claiming authorship of Bob's note id.
+        $hijackActivity = [
+            '@context' => 'https://www.w3.org/ns/activitystreams',
+            'id' => 'https://remote.example/activities/delete-note-hijack',
+            'type' => 'Delete',
+            'actor' => $attackerActorId,
+            'object' => $noteId,
+        ];
+
+        $response = $this->inboxPost('/ap/inbox', $hijackActivity);
+
+        $response->assertStatus(202);
+        $this->assertDatabaseHas('activity_pub_posts', ['activity_id' => $noteId]);
+    }
+
+    /**
+     * "Key confusion" / actor-spoofing regression test: an attacker hosts their
+     * own actor + key document (fully under their control) but has it declare
+     * "owner" as a totally unrelated, real remote actor on a different host.
+     * They sign the request with their own (attacker) private key, which matches
+     * the public key they serve — so the signature itself verifies cleanly. If
+     * the server trusted the "owner" field blindly, it would treat the request
+     * as coming from the impersonated actor despite the attacker never having
+     * access to that actor's real private key. VerifyHttpSignature must reject
+     * this because the key's host doesn't match the claimed owner's host.
+     */
+    public function test_inbox_signature_with_mismatched_key_owner_host_is_rejected(): void
+    {
+        $this->createUserWithKeys(['username' => 'alice']);
+
+        [$attackerPrivKey, $attackerPubKey] = $this->generateKeyPair();
+        $attackerActorId = 'https://attacker.example/users/mallory';
+        $victimActorId = 'https://remote.example/users/bob';
+
+        Http::fake([
+            $attackerActorId.'*' => Http::response([
+                'id' => $attackerActorId,
+                'type' => 'Person',
+                'publicKey' => [
+                    'id' => "{$attackerActorId}#main-key",
+                    'owner' => $victimActorId,
+                    'publicKeyPem' => $attackerPubKey,
+                ],
+            ], 200, ['Content-Type' => 'application/activity+json']),
+            '*' => Http::response([], 404),
+        ]);
+
+        $activity = [
+            '@context' => 'https://www.w3.org/ns/activitystreams',
+            'id' => 'https://attacker.example/activities/spoof-1',
+            'type' => 'Follow',
+            'actor' => $victimActorId,
+            'object' => route('ap.actor', ['username' => 'alice']),
+        ];
+
+        $response = $this->signedPost('/ap/users/alice/inbox', $activity, $attackerActorId, $attackerPrivKey);
+
+        $response->assertStatus(401);
+        $this->assertDatabaseMissing('activity_pub_followers', [
+            'follower_actor_id' => $victimActorId,
+        ]);
     }
 }
