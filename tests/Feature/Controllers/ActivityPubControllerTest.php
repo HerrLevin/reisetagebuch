@@ -1589,4 +1589,136 @@ class ActivityPubControllerTest extends TestCase
         $this->assertNull($post->extension_data);
         $this->assertStringContainsString('Hello world', $post->content);
     }
+
+    public function test_update_note_refreshes_rtb_extension_data(): void
+    {
+        $remoteActorId = 'https://remote.example/users/bob';
+        ActivityPubActor::factory()->create(['actor_uri' => $remoteActorId]);
+
+        $noteId = 'https://remote.example/notes/rtb-3';
+        $createActivity = [
+            '@context' => 'https://www.w3.org/ns/activitystreams',
+            'id' => 'https://remote.example/activities/create-rtb-3',
+            'type' => 'Create',
+            'actor' => $remoteActorId,
+            'object' => [
+                'id' => $noteId,
+                'type' => 'Note',
+                'content' => 'Visited Berlin Hbf',
+                'rtbExtension' => [
+                    'rtbVersion' => 1,
+                    'postType' => 'location',
+                    'location' => [
+                        'id' => 'loc-1',
+                        'name' => 'Berlin Hbf',
+                        'latitude' => 52.52,
+                        'longitude' => 13.405,
+                        'timezone' => 'Europe/Berlin',
+                        'emoji' => '🚉',
+                        'tags' => [],
+                        'identifiers' => [],
+                        'travelReason' => 'leisure',
+                        'visitedAt' => '2026-01-01T10:00:00+00:00',
+                    ],
+                ],
+            ],
+        ];
+
+        $this->inboxPost('/ap/inbox', $createActivity);
+
+        $updateActivity = [
+            '@context' => 'https://www.w3.org/ns/activitystreams',
+            'id' => 'https://remote.example/activities/update-rtb-3',
+            'type' => 'Update',
+            'actor' => $remoteActorId,
+            'object' => [
+                'id' => $noteId,
+                'type' => 'Note',
+                'content' => 'Visited Berlin Hbf (edited)',
+                'rtbExtension' => [
+                    'rtbVersion' => 1,
+                    'postType' => 'location',
+                    'location' => [
+                        'id' => 'loc-1',
+                        'name' => 'Berlin Hbf',
+                        'latitude' => 52.52,
+                        'longitude' => 13.405,
+                        'timezone' => 'Europe/Berlin',
+                        'emoji' => '🚉',
+                        'tags' => [],
+                        'identifiers' => [],
+                        'travelReason' => 'business',
+                        'visitedAt' => '2026-01-02T10:00:00+00:00',
+                    ],
+                ],
+            ],
+        ];
+
+        $response = $this->inboxPost('/ap/inbox', $updateActivity);
+
+        $response->assertStatus(202);
+        $post = ActivityPubPost::where('activity_id', $noteId)->firstOrFail();
+        $this->assertInstanceOf(RtbLocationExtension::class, $post->extension_data);
+        $this->assertSame('business', $post->extension_data->travelReason->value);
+        $this->assertSame('2026-01-02T10:00:00+00:00', $post->extension_data->visitedAt);
+        $this->assertStringContainsString('edited', $post->content);
+    }
+
+    public function test_update_note_without_rtb_extension_clears_previously_stored_extension_data(): void
+    {
+        $remoteActorId = 'https://remote.example/users/bob';
+        ActivityPubActor::factory()->create(['actor_uri' => $remoteActorId]);
+
+        $noteId = 'https://remote.example/notes/rtb-4';
+        $createActivity = [
+            '@context' => 'https://www.w3.org/ns/activitystreams',
+            'id' => 'https://remote.example/activities/create-rtb-4',
+            'type' => 'Create',
+            'actor' => $remoteActorId,
+            'object' => [
+                'id' => $noteId,
+                'type' => 'Note',
+                'content' => 'Visited Berlin Hbf',
+                'rtbExtension' => [
+                    'rtbVersion' => 1,
+                    'postType' => 'location',
+                    'location' => [
+                        'id' => 'loc-1',
+                        'name' => 'Berlin Hbf',
+                        'latitude' => 52.52,
+                        'longitude' => 13.405,
+                        'timezone' => 'Europe/Berlin',
+                        'emoji' => '🚉',
+                        'tags' => [],
+                        'identifiers' => [],
+                        'travelReason' => 'leisure',
+                        'visitedAt' => '2026-01-01T10:00:00+00:00',
+                    ],
+                ],
+            ],
+        ];
+
+        $this->inboxPost('/ap/inbox', $createActivity);
+
+        // The update's object no longer carries an rtbExtension at all — an
+        // Update is a full replacement of the object, so the stored extension
+        // data must follow suit rather than keep stale information around.
+        $updateActivity = [
+            '@context' => 'https://www.w3.org/ns/activitystreams',
+            'id' => 'https://remote.example/activities/update-rtb-4',
+            'type' => 'Update',
+            'actor' => $remoteActorId,
+            'object' => [
+                'id' => $noteId,
+                'type' => 'Note',
+                'content' => 'Visited Berlin Hbf (edited)',
+            ],
+        ];
+
+        $response = $this->inboxPost('/ap/inbox', $updateActivity);
+
+        $response->assertStatus(202);
+        $post = ActivityPubPost::where('activity_id', $noteId)->firstOrFail();
+        $this->assertNull($post->extension_data);
+    }
 }

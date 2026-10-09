@@ -74,6 +74,7 @@ class ActivityPubPostRepository
         ?string $content,
         ?string $inReplyTo,
         array $mentions,
+        ?RtbExtension $extensionData = null,
     ): bool {
         return ActivityPubPost::where('activity_id', $activityId)
             ->where('activity_pub_actor_id', $activityPubActorId)
@@ -82,6 +83,7 @@ class ActivityPubPostRepository
                 'content' => $content,
                 'in_reply_to' => $inReplyTo,
                 'mentions' => $mentions,
+                'extension_data' => $extensionData?->toArray(),
             ]) > 0;
     }
 
