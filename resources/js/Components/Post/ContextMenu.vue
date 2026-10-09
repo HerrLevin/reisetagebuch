@@ -98,6 +98,7 @@ function departNow(): void {
     }
 
     const now = DateTime.now();
+    blur();
     updateDepartureTime(post, now.toISO());
 }
 
@@ -107,6 +108,7 @@ function arriveNow(): void {
         return;
     }
     const now = DateTime.now();
+    blur();
     updateArrivalTime(post, now.toISO());
 }
 
