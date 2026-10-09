@@ -194,6 +194,7 @@ class MastodonActivityPubController extends Controller
         $actorId = $activity['actor'] ?? null;
 
         $verifiedActor = $request->attributes->get('ap_verified_actor');
+        Log::debug('Incoming ActivityPub activity', ['type' => $type, 'activityId' => $activityId, 'actorId' => $actorId, 'verifiedActor' => $verifiedActor]);
         if (! $actorId || $actorId !== $verifiedActor) {
             Log::warning('ActivityPub: actor does not match signer', ['claimed' => $actorId, 'verified' => $verifiedActor]);
 
@@ -388,6 +389,7 @@ class MastodonActivityPubController extends Controller
         $actorId = $activity['actor'] ?? null;
 
         $verifiedActor = $request->attributes->get('ap_verified_actor');
+        Log::debug('Incoming ActivityPub activity', ['type' => $type, 'activityId' => $activityId, 'actorId' => $actorId, 'verifiedActor' => $verifiedActor]);
         if (! $actorId || $actorId !== $verifiedActor) {
             Log::warning('ActivityPub: actor does not match signer', ['claimed' => $actorId, 'verified' => $verifiedActor]);
 
