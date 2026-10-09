@@ -779,6 +779,69 @@ class PushActivityPubJobsTest extends TestCase
         $this->assertArrayHasKey('updated', $capturedActivity['object']);
     }
 
+    /**
+     * Regression test: the Update activity's id must never collide with the same
+     * post's Create activity id. A receiver's activity-id dedup (ActivityPubInboxItem)
+     * is keyed on activity_id + actor_id, not activity_type.
+     */
+    public function test_push_update_activity_id_does_not_collide_with_create_activity_id(): void
+    {
+        $user = $this->createUserWithKeys(['username' => 'alice']);
+        $post = Post::factory()->create([
+            'user_id' => $user->id,
+            'visibility' => Visibility::PUBLIC,
+        ]);
+
+        $this->createFollower($user, 'https://remote.example/users/bob', 'https://remote.example/users/bob/inbox');
+
+        Bus::fake();
+
+        new PushPostToMastodon($post->id)->handle();
+        new PushUpdateToMastodon($post->id)->handle();
+
+        $capturedIds = [];
+        Bus::assertDispatchedTimes(DeliverActivityPubActivity::class, 2);
+        Bus::assertDispatched(DeliverActivityPubActivity::class, function (DeliverActivityPubActivity $job) use (&$capturedIds) {
+            $capturedIds[] = $this->jobProperty($job, 'updateActivity')['id'];
+
+            return true;
+        });
+
+        $this->assertCount(2, array_unique($capturedIds));
+    }
+
+    /**
+     * Regression test: two separate edits of the same post must also produce distinct
+     * Update activity ids — otherwise only the first edit would ever be delivered, and
+     * every later edit would collide with it (same failure mode as the Create/Update
+     * collision above, but between successive updates).
+     */
+    public function test_push_update_activity_id_differs_between_successive_updates(): void
+    {
+        $user = $this->createUserWithKeys(['username' => 'alice']);
+        $post = Post::factory()->create([
+            'user_id' => $user->id,
+            'visibility' => Visibility::PUBLIC,
+        ]);
+
+        $this->createFollower($user, 'https://remote.example/users/bob', 'https://remote.example/users/bob/inbox');
+
+        Bus::fake();
+
+        new PushUpdateToMastodon($post->id)->handle();
+        $post->touch();
+        new PushUpdateToMastodon($post->id)->handle();
+
+        $capturedIds = [];
+        Bus::assertDispatched(DeliverActivityPubActivity::class, function (DeliverActivityPubActivity $job) use (&$capturedIds) {
+            $capturedIds[] = $this->jobProperty($job, 'updateActivity')['id'];
+
+            return true;
+        });
+
+        $this->assertCount(2, array_unique($capturedIds));
+    }
+
     public function test_push_update_activity_actor_matches_post_author(): void
     {
         $user = $this->createUserWithKeys(['username' => 'alice']);
