@@ -12,13 +12,19 @@ import CardBack from '@/Pages/Posts/Partials/CardBack.vue';
 import { getColorForPost } from '@/Services/DepartureTypeService';
 import { useUserStore } from '@/stores/user';
 import { isLocationPost, isTransportPost } from '@/types/PostTypes';
-import { GeometryCollection } from 'geojson';
+import { GeometryCollection, MultiPoint } from 'geojson';
 import { LngLat } from 'maplibre-gl';
 import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
-import { BasePost, LocationPost, TransportPost } from '../../../types/Api.gen';
+import {
+    BasePost,
+    LocationPost,
+    TransportPost,
+    TransportPostStopoverDto,
+} from '../../../types/Api.gen';
 import { getTransportProgress } from '@/Services/TimeFormattingService';
+import { loadFederatedTripGeometry } from '@/Services/FederatedTripStopoverService';
 
 const { t } = useI18n();
 const vueRouter = useRouter();
@@ -35,7 +41,8 @@ const props = defineProps({
 const startPoint = ref(null as LngLat | null);
 const endPoint = ref(null as LngLat | null);
 const lineString = ref(null as GeometryCollection | null);
-const stopovers = ref(null as GeometryCollection | null);
+const stopovers = ref(null as MultiPoint | null);
+const postStopovers = ref<TransportPostStopoverDto[] | null>(null);
 const stopoverDetails = ref<StopoverPopupInfo[] | null>(null);
 const heading = ref('');
 const pageTitle = ref('');
@@ -87,51 +94,73 @@ function mapPostDetails() {
         if (post.value.userGeometry) {
             lineString.value = post.value.userGeometry as GeometryCollection;
         } else {
+            lineString.value = null;
+        }
+
+        if (!tPost.sourceUrl) {
+            if (!post.value.userGeometry) {
+                api.map
+                    .getLineStringBetween({
+                        from: tPost.originStop.id,
+                        to: tPost.destinationStop.id,
+                    })
+                    .then((response) => {
+                        lineString.value = response.data as GeometryCollection;
+                    })
+                    .catch(() => {
+                        lineString.value = null;
+                    });
+            }
+
             api.map
-                .getLineStringBetween({
+                .getStopsBetween({
                     from: tPost.originStop.id,
                     to: tPost.destinationStop.id,
                 })
                 .then((response) => {
-                    lineString.value = response.data as GeometryCollection;
+                    stopovers.value = response.data as MultiPoint;
                 })
                 .catch(() => {
-                    lineString.value = null;
+                    stopovers.value = null;
                 });
+
+            api.posts
+                .getStopoversForTransportPost(tPost.id)
+                .then((response) => {
+                    postStopovers.value = response.data;
+                    stopoverDetails.value = response.data
+                        .slice(1, -1)
+                        .map((stop) => ({
+                            name: stop.location.name,
+                            longitude: stop.location.longitude,
+                            latitude: stop.location.latitude,
+                            scheduledArrivalTime: stop.scheduledArrivalTime,
+                            scheduledDepartureTime: stop.scheduledDepartureTime,
+                            arrivalDelay: stop.arrivalDelay,
+                            departureDelay: stop.departureDelay,
+                            manualArrivalTime: stop.manualArrivalTime,
+                            manualDepartureTime: stop.manualDepartureTime,
+                        }));
+                })
+                .catch(() => {
+                    stopoverDetails.value = null;
+                });
+        } else {
+            stopovers.value = null;
+            stopoverDetails.value = null;
+            postStopovers.value = null;
+
+            if (!post.value.userGeometry) {
+                loadFederatedTripGeometry(tPost).then((result) => {
+                    if (!result) {
+                        return;
+                    }
+                    lineString.value = result.lineString;
+                    stopovers.value = result.stopovers;
+                    stopoverDetails.value = result.stopoverDetails;
+                });
+            }
         }
-
-        api.map
-            .getStopsBetween({
-                from: tPost.originStop.id,
-                to: tPost.destinationStop.id,
-            })
-            .then((response) => {
-                stopovers.value = response.data as GeometryCollection;
-            })
-            .catch(() => {
-                stopovers.value = null;
-            });
-
-        api.posts
-            .getStopoversForTransportPost(tPost.id)
-            .then((response) => {
-                stopoverDetails.value = response.data
-                    .slice(1, -1)
-                    .map((stop) => ({
-                        name: stop.location.name,
-                        longitude: stop.location.longitude,
-                        latitude: stop.location.latitude,
-                        scheduledArrivalTime: stop.scheduledArrivalTime,
-                        scheduledDepartureTime: stop.scheduledDepartureTime,
-                        arrivalDelay: stop.arrivalDelay,
-                        departureDelay: stop.departureDelay,
-                        manualArrivalTime: stop.manualArrivalTime,
-                        manualDepartureTime: stop.manualDepartureTime,
-                    }));
-            })
-            .catch(() => {
-                stopoverDetails.value = null;
-            });
     } else {
         startPoint.value = null;
         endPoint.value = null;
@@ -247,7 +276,9 @@ function deleted() {
         <TransportPostStopovers
             v-if="isTransportPost(post)"
             :post="post as TransportPost"
+            :stopovers="postStopovers ?? []"
             class="mt-4"
+            @update:stopovers="postStopovers = $event"
         />
 
         <PostMetaInfo v-if="post" :meta-infos="post.metaInfos" class="mt-4" />

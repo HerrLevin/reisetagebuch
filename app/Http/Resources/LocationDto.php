@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Dto\ActivityPub\Extensions\RtbLocationData;
 use App\Models\Location;
 use App\Services\LocationEmojiService;
 use OpenApi\Attributes as OA;
@@ -57,8 +58,12 @@ class LocationDto
     #[OA\Property('emoji', description: 'Emoji representing the location based on its tags', type: 'string')]
     public string $emoji;
 
-    public function __construct(Location $location)
+    public function __construct(?Location $location = null)
     {
+        if ($location === null) {
+            return;
+        }
+
         $this->id = $location->id;
         $this->name = $location->name;
         $this->latitude = $location->location->getLatitude();
@@ -68,5 +73,26 @@ class LocationDto
         $this->tags = $location->tags->map(fn ($tag) => new LocationTagDto($tag))->toArray();
         $this->identifiers = $location->identifiers->map(fn ($identifier) => new LocationIdentifierDto($identifier))->toArray();
         $this->emoji = (new LocationEmojiService)->getEmojiFromTags($location->tags);
+    }
+
+    /**
+     * Reconstructs a LocationDto from a federated RtbLocationData DTO. distance is never
+     * present remotely — it's a viewer-relative "distance to here" value that doesn't
+     * survive federation.
+     */
+    public static function fromRtb(RtbLocationData $data): self
+    {
+        $dto = new self;
+        $dto->id = $data->id;
+        $dto->name = $data->name;
+        $dto->latitude = $data->latitude;
+        $dto->longitude = $data->longitude;
+        $dto->distance = null;
+        $dto->timezone = $data->timezone;
+        $dto->tags = array_map(fn ($tag) => LocationTagDto::fromRtb($tag), $data->tags);
+        $dto->identifiers = array_map(fn ($identifier) => LocationIdentifierDto::fromRtb($identifier), $data->identifiers);
+        $dto->emoji = $data->emoji;
+
+        return $dto;
     }
 }

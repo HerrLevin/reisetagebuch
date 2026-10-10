@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { api } from '@/api';
 import StopOverList from '@/Pages/Posts/Partials/StopOverList.vue';
 import { getTransportProgress } from '@/Services/TimeFormattingService';
 import { useUserStore } from '@/stores/user';
-import { computed, ref, watch } from 'vue';
+import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import {
     TransportPost,
@@ -15,43 +14,28 @@ const user = useUserStore();
 
 const props = defineProps<{
     post: TransportPost;
+    stopovers: TransportPostStopoverDto[];
 }>();
-
-const stopovers = ref<TransportPostStopoverDto[]>([]);
-const loading = ref(false);
 
 const isOwner = computed(() => user.user?.id === props.post.user.id);
 
 const isCompleted = computed(() => getTransportProgress(props.post) >= 100);
 
 const nextStopover = computed(() => {
-    if (isCompleted.value || stopovers.value.length === 0) {
+    if (isCompleted.value || props.stopovers.length === 0) {
         return null;
     }
 
     return (
-        stopovers.value.find(
+        props.stopovers.find(
             (stop) => !stop.manualArrivalTime && !stop.manualDepartureTime,
         ) ?? null
     );
 });
 
-function fetchStopovers() {
-    loading.value = true;
-    api.posts
-        .getStopoversForTransportPost(props.post.id)
-        .then((response) => {
-            stopovers.value = response.data;
-        })
-        .catch(() => {
-            stopovers.value = [];
-        })
-        .finally(() => {
-            loading.value = false;
-        });
-}
-
-watch(() => props.post.id, fetchStopovers, { immediate: true });
+const emits = defineEmits<{
+    (e: 'update:stopovers', stopovers: TransportPostStopoverDto[]): void;
+}>();
 </script>
 
 <template>
@@ -80,7 +64,7 @@ watch(() => props.post.id, fetchStopovers, { immediate: true });
                         :active-transport-post="post"
                         :stopovers="stopovers"
                         :editable="isOwner"
-                        @update:stopovers="stopovers = $event"
+                        @update:stopovers="emits('update:stopovers', $event)"
                     />
                 </div>
             </div>

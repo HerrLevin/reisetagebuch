@@ -21,6 +21,7 @@ use App\Models\TransportPost as TransportPostModel;
 use App\Models\TransportTrip;
 use App\Models\TransportTripStop;
 use App\Models\User;
+use App\Services\PostVisibilityPolicy;
 use Carbon\Carbon;
 use Clickbar\Magellan\Data\Geometries\LineString;
 use Illuminate\Database\Eloquent\Builder;
@@ -43,6 +44,8 @@ class PostRepository
 
     private TransportPostStopoverLogRepository $transportPostStopoverLogRepository;
 
+    private PostVisibilityPolicy $postVisibilityPolicy;
+
     public function __construct(
         ?PostHydrator $postHydrator = null,
         ?HashTagRepository $hashTagRepository = null,
@@ -50,6 +53,7 @@ class PostRepository
         ?ActivityPubPostRepository $activityPubPostRepository = null,
         ?CountryRepository $countryRepository = null,
         ?TransportPostStopoverLogRepository $transportPostStopoverLogRepository = null,
+        ?PostVisibilityPolicy $postVisibilityPolicy = null,
     ) {
         $this->postHydrator = $postHydrator ?? new PostHydrator;
         $this->hashTagRepository = $hashTagRepository ?? new HashTagRepository;
@@ -57,6 +61,7 @@ class PostRepository
         $this->activityPubPostRepository = $activityPubPostRepository ?? new ActivityPubPostRepository;
         $this->countryRepository = $countryRepository ?? new CountryRepository;
         $this->transportPostStopoverLogRepository = $transportPostStopoverLogRepository ?? new TransportPostStopoverLogRepository;
+        $this->postVisibilityPolicy = $postVisibilityPolicy ?? new PostVisibilityPolicy;
     }
 
     public function storeLocation(
@@ -352,10 +357,12 @@ class PostRepository
             ->get()
             ->map(fn (Post $post) => $this->postHydrator->modelToDto($post));
 
-        $followingPosts = $this->basePostQuery()
-            ->tap($withLikedByUser)
-            ->whereIn('user_id', $user->followings()->pluck('target_user_id'))
-            ->whereIn('visibility', [Visibility::PUBLIC->value, Visibility::ONLY_AUTHENTICATED->value])
+        $followingPosts = $this->postVisibilityPolicy->scopeListableFromFollowing(
+            $this->basePostQuery()
+                ->tap($withLikedByUser)
+                ->whereIn('user_id', $user->followings()->pluck('target_user_id')),
+            $user
+        )
             ->where('published_at', '<', $before)
             ->orderByDesc('published_at')
             ->limit($limit)
@@ -404,12 +411,18 @@ class PostRepository
         if ($user) {
             $query = $this->timelineQueryForUser($user)
                 ->orWhere(function ($query) use ($user) {
-                    $query->whereIn('user_id', $user->followings()->pluck('target_user_id'))
-                        ->whereIn('visibility', [Visibility::PUBLIC->value, Visibility::ONLY_AUTHENTICATED->value]);
+                    $this->postVisibilityPolicy->scopeListableFromFollowing(
+                        $query->whereIn('user_id', $user->followings()->pluck('target_user_id')),
+                        $user
+                    );
                 });
         }
+        // Anonymous viewers only ever see PUBLIC posts here; authenticated viewers see
+        // any user's PUBLIC/ONLY_AUTHENTICATED post regardless of a following relationship
+        // (this second, broader rule is intentional and covered by
+        // test_dashboard_sees_only_public_and_own_posts).
         $posts = $query
-            ->orWhereIn('visibility', [Visibility::PUBLIC->value, Visibility::ONLY_AUTHENTICATED->value])
+            ->orWhereIn('visibility', $this->postVisibilityPolicy->listableVisibilities($user))
             ->orderByDesc('published_at')
             ->cursorPaginate(50);
 
@@ -436,15 +449,9 @@ class PostRepository
             $posts->withExists(['likes as liked_by_user' => function ($query) use ($visitingUser) {
                 $query->where('user_id', $visitingUser->id);
             }]);
-
-            if ($visitingUser->id !== $userId) {
-                // not the owner, show only public posts
-                $posts->whereIn('visibility', [Visibility::ONLY_AUTHENTICATED, Visibility::PUBLIC]);
-            }
-        } else {
-            // not logged in, show only public posts
-            $posts->where('visibility', Visibility::PUBLIC);
         }
+
+        $this->postVisibilityPolicy->scopeListableForOwner($posts, $userId, $visitingUser);
 
         $posts = $posts
             ->orderByDesc('published_at')
@@ -531,12 +538,7 @@ class PostRepository
             ->where('id', $postId)
             ->firstOrFail();
 
-        $allowedVisibilities = [Visibility::PUBLIC, Visibility::UNLISTED];
-        if ($visitingUser !== null) {
-            $allowedVisibilities[] = Visibility::ONLY_AUTHENTICATED;
-        }
-
-        if ($visitingUser?->id !== $post->user_id && ! in_array($post->visibility, $allowedVisibilities, true)) {
+        if (! $this->postVisibilityPolicy->canViewDirect($post->visibility, $post->user_id, $visitingUser)) {
             abort(403);
         }
 

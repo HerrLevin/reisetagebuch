@@ -160,6 +160,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property string|null $in_reply_to
  * @property array<array-key, mixed>|null $mentions
+ * @property \App\Dto\ActivityPub\Extensions\RtbExtension $extension_data
  * @property-read \App\Models\ActivityPubActor $actor
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ActivityPubPostLike> $likes
  * @property-read int|null $likes_count

@@ -1,0 +1,283 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://reisetagebu.ch/schemas/activitypub/rtb-extension.v1.schema.json",
+    "title": "Reisetagebuch ActivityPub extension envelope (v1)",
+    "description": "The `rtbExtension` object attached to an ActivityPub Note by reisetagebu.ch. Mirrors the dispatch rules in App\\Dto\\ActivityPub\\Extensions\\RtbExtensionFactory: rtbVersion must be exactly 1, and postType selects which of `location`/`transport` is required.",
+    "type": "object",
+    "required": ["rtbVersion", "postType", "body"],
+    "additionalProperties": false,
+    "properties": {
+        "rtbVersion": {
+            "const": 1
+        },
+        "postType": {
+            "enum": ["location", "transport"]
+        },
+        "body": {
+            "type": ["string", "null"],
+            "description": "The raw, unformatted post body, distinct from the enclosing Note's `content` (which is a Mastodon-oriented HTML rendering of this body plus an auto-generated location/trip summary)."
+        },
+        "location": {
+            "$ref": "#/$defs/locationExtensionBody"
+        },
+        "transport": {
+            "$ref": "#/$defs/transportExtensionBody"
+        }
+    },
+    "allOf": [
+        {
+            "if": {
+                "required": ["postType"],
+                "properties": { "postType": { "const": "location" } }
+            },
+            "then": { "required": ["location"] }
+        },
+        {
+            "if": {
+                "required": ["postType"],
+                "properties": { "postType": { "const": "transport" } }
+            },
+            "then": { "required": ["transport"] }
+        }
+    ],
+    "$defs": {
+        "tag": {
+            "type": "object",
+            "required": ["key", "value"],
+            "additionalProperties": false,
+            "properties": {
+                "key": { "type": "string" },
+                "value": { "type": "string" }
+            }
+        },
+        "identifier": {
+            "type": "object",
+            "required": ["type", "origin", "identifier"],
+            "additionalProperties": false,
+            "properties": {
+                "type": { "type": "string" },
+                "origin": { "type": "string" },
+                "identifier": { "type": "string" }
+            }
+        },
+        "locationCore": {
+            "type": "object",
+            "required": [
+                "id",
+                "name",
+                "latitude",
+                "longitude",
+                "timezone",
+                "emoji",
+                "tags",
+                "identifiers"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "id": { "type": "string" },
+                "name": { "type": "string" },
+                "latitude": { "type": "number", "minimum": -90, "maximum": 90 },
+                "longitude": {
+                    "type": "number",
+                    "minimum": -180,
+                    "maximum": 180
+                },
+                "timezone": { "type": ["string", "null"] },
+                "emoji": { "type": "string" },
+                "tags": { "type": "array", "items": { "$ref": "#/$defs/tag" } },
+                "identifiers": {
+                    "type": "array",
+                    "items": { "$ref": "#/$defs/identifier" }
+                }
+            }
+        },
+        "travelReason": {
+            "enum": [
+                "commute",
+                "business",
+                "leisure",
+                "crew",
+                "errand",
+                "other"
+            ]
+        },
+        "transportMode": {
+            "enum": [
+                "WALK",
+                "BIKE",
+                "RENTAL",
+                "CAR",
+                "CAR_PARKING",
+                "CAR_DROPOFF",
+                "ODM",
+                "FLEX",
+                "TRANSIT",
+                "TRAM",
+                "SUBWAY",
+                "FERRY",
+                "AIRPLANE",
+                "SUBURBAN",
+                "BUS",
+                "COACH",
+                "RAIL",
+                "HIGHSPEED_RAIL",
+                "LONG_DISTANCE",
+                "NIGHT_RAIL",
+                "REGIONAL_FAST_RAIL",
+                "REGIONAL_RAIL",
+                "CABLE_CAR",
+                "FUNICULAR",
+                "AERIAL_LIFT",
+                "OTHER",
+                "AREAL_LIFT",
+                "METRO"
+            ]
+        },
+        "stop": {
+            "type": "object",
+            "required": [
+                "id",
+                "name",
+                "location",
+                "arrivalTime",
+                "departureTime",
+                "arrivalDelay",
+                "departureDelay"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "id": { "type": "string" },
+                "name": { "type": "string" },
+                "location": { "$ref": "#/$defs/locationCore" },
+                "arrivalTime": {
+                    "type": ["string", "null"],
+                    "format": "date-time"
+                },
+                "departureTime": {
+                    "type": ["string", "null"],
+                    "format": "date-time"
+                },
+                "arrivalDelay": { "type": ["integer", "null"] },
+                "departureDelay": { "type": ["integer", "null"] }
+            }
+        },
+        "trip": {
+            "type": "object",
+            "required": [
+                "id",
+                "foreignId",
+                "foreignIdSourceUrl",
+                "foreignIdSourceFormat",
+                "mode",
+                "lineName",
+                "routeLongName",
+                "tripShortName",
+                "displayName",
+                "routeColor",
+                "routeTextColor"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "id": { "type": "string" },
+                "foreignId": { "type": ["string", "null"] },
+                "foreignIdSourceUrl": {
+                    "type": ["string", "null"],
+                    "description": "Base URL of the routing API that foreignId can be resolved against, e.g. https://api.transitous.org/api. Null when foreignId is null."
+                },
+                "foreignIdSourceFormat": {
+                    "type": ["string", "null"],
+                    "description": "Data exchange format/protocol spoken at foreignIdSourceUrl, e.g. \"motis\". Null when foreignId is null.",
+                    "examples": ["motis"]
+                },
+                "mode": { "$ref": "#/$defs/transportMode" },
+                "lineName": { "type": ["string", "null"] },
+                "routeLongName": { "type": ["string", "null"] },
+                "tripShortName": { "type": ["string", "null"] },
+                "displayName": { "type": ["string", "null"] },
+                "routeColor": { "type": ["string", "null"] },
+                "routeTextColor": { "type": ["string", "null"] }
+            }
+        },
+        "locationExtensionBody": {
+            "type": "object",
+            "description": "RtbLocationData's fields, flattened together with the post-level travelReason/visitedAt (see RtbLocationExtension::toArray()).",
+            "required": [
+                "id",
+                "name",
+                "latitude",
+                "longitude",
+                "timezone",
+                "emoji",
+                "tags",
+                "identifiers",
+                "travelReason",
+                "visitedAt"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "id": { "type": "string" },
+                "name": { "type": "string" },
+                "latitude": { "type": "number", "minimum": -90, "maximum": 90 },
+                "longitude": {
+                    "type": "number",
+                    "minimum": -180,
+                    "maximum": 180
+                },
+                "timezone": { "type": ["string", "null"] },
+                "emoji": { "type": "string" },
+                "tags": { "type": "array", "items": { "$ref": "#/$defs/tag" } },
+                "identifiers": {
+                    "type": "array",
+                    "items": { "$ref": "#/$defs/identifier" }
+                },
+                "travelReason": {
+                    "anyOf": [
+                        { "$ref": "#/$defs/travelReason" },
+                        { "type": "null" }
+                    ]
+                },
+                "visitedAt": {
+                    "type": ["string", "null"],
+                    "format": "date-time"
+                }
+            }
+        },
+        "transportExtensionBody": {
+            "type": "object",
+            "required": [
+                "originStop",
+                "destinationStop",
+                "trip",
+                "manualDepartureTime",
+                "manualArrivalTime",
+                "travelReason",
+                "distance",
+                "duration",
+                "userGeometry"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "originStop": { "$ref": "#/$defs/stop" },
+                "destinationStop": { "$ref": "#/$defs/stop" },
+                "trip": { "$ref": "#/$defs/trip" },
+                "manualDepartureTime": {
+                    "type": ["string", "null"],
+                    "format": "date-time"
+                },
+                "manualArrivalTime": {
+                    "type": ["string", "null"],
+                    "format": "date-time"
+                },
+                "travelReason": {
+                    "anyOf": [
+                        { "$ref": "#/$defs/travelReason" },
+                        { "type": "null" }
+                    ]
+                },
+                "distance": { "type": "integer", "minimum": 0 },
+                "duration": { "type": "integer", "minimum": 0 },
+                "userGeometry": { "type": ["object", "null"] }
+            }
+        }
+    }
+}
