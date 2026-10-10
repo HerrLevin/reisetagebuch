@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Dto\ActivityPub\Extensions\Concerns;
 
+use App\Services\ActivityPubContentSanitizer;
 use BackedEnum;
 
 /**
@@ -21,6 +22,13 @@ trait ParsesUntrustedFields
         }
 
         return mb_substr($value, 0, $maxLength);
+    }
+
+    private static function parseSanitizedBody(mixed $value, int $maxLength = 500): ?string
+    {
+        $value = self::parseString($value, $maxLength);
+
+        return $value !== null ? app(ActivityPubContentSanitizer::class)->sanitize($value) : null;
     }
 
     private static function parseFloat(mixed $value): ?float

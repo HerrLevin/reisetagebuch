@@ -140,9 +140,17 @@ const relativeCreatedAt = computed(() => {
                 }}
             </span>
         </div>
+        <!-- Plain federated Notes carry HTML in `body`, rendered via v-html. Location/
+             transport posts' `body` is a plain-text caption (sanitized server-side too,
+             but still not HTML), so it always renders as text instead, never v-html. -->
         <!-- eslint-disable vue/no-v-html -->
         <div
-            v-if="localPost.sourceUrl && localPost.body"
+            v-if="
+                localPost.sourceUrl &&
+                localPost.body &&
+                !isLocationPost(localPost) &&
+                !isTransportPost(localPost)
+            "
             class="ap-post-content list-col-wrap my-2 ps-3 text-xs"
             v-html="localPost.body"
         />
