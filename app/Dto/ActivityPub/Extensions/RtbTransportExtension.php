@@ -93,7 +93,7 @@ final class RtbTransportExtension implements RtbExtension
             distance: self::parseInt($transportRaw['distance'] ?? null) ?? 0,
             duration: self::parseInt($transportRaw['duration'] ?? null) ?? 0,
             userGeometry: self::parseGeometry($transportRaw['userGeometry'] ?? null),
-            body: self::parseString($data['body'] ?? null),
+            body: self::parseSanitizedBody($data['body'] ?? null),
         );
     }
 }

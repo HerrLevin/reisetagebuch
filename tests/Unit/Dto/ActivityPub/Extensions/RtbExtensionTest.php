@@ -115,4 +115,37 @@ class RtbExtensionTest extends TestCase
         $this->assertNull(RtbExtensionFactory::fromArray('not-an-array'));
         $this->assertNull(RtbExtensionFactory::fromArray(null));
     }
+
+    public function test_location_extension_body_is_sanitized_against_script_injection(): void
+    {
+        $data = new RtbLocationExtension(1, $this->locationData(), null, null)->toArray();
+        $data['body'] = '<script>alert(1)</script>Hello <b>world</b>';
+
+        $extension = RtbLocationExtension::fromArray($data);
+
+        $this->assertStringNotContainsString('<script>', $extension->body);
+        $this->assertStringContainsString('Hello', $extension->body);
+    }
+
+    public function test_transport_extension_body_is_sanitized_against_script_injection(): void
+    {
+        $data = new RtbTransportExtension(
+            rtbVersion: 1,
+            originStop: new RtbStopData('stop-1', 'Berlin Hbf', $this->locationData(), null, null, null, null),
+            destinationStop: new RtbStopData('stop-2', 'Hamburg Hbf', $this->locationData(), null, null, null, null),
+            trip: new RtbTripData('trip-1', null, null, null, TransportMode::RAIL, 'RE1', null, null, 'RE1', null, null),
+            manualDepartureTime: null,
+            manualArrivalTime: null,
+            travelReason: null,
+            distance: 0,
+            duration: 0,
+            userGeometry: null,
+        )->toArray();
+        $data['body'] = '<img src=x onerror=alert(1)>Trip notes';
+
+        $extension = RtbTransportExtension::fromArray($data);
+
+        $this->assertStringNotContainsString('onerror', $extension->body);
+        $this->assertStringContainsString('Trip notes', $extension->body);
+    }
 }

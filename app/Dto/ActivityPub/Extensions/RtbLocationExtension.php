@@ -70,7 +70,7 @@ final class RtbLocationExtension implements RtbExtension
             location: $location,
             travelReason: self::parseEnum($locationRaw['travelReason'] ?? null, TravelReason::class),
             visitedAt: self::parseString($locationRaw['visitedAt'] ?? null),
-            body: self::parseString($data['body'] ?? null),
+            body: self::parseSanitizedBody($data['body'] ?? null),
         );
     }
 }
