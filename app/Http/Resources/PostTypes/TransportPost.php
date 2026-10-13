@@ -142,6 +142,10 @@ class TransportPost extends BasePost
             return '+'.round($delay / 60);
         }
 
+        if ($delay !== null && $delay < 0) {
+            return round($delay / 60);
+        }
+
         return $delay;
     }
 
