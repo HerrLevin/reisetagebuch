@@ -169,6 +169,7 @@ function mapPostDetails() {
                     lineString.value = result.lineString;
                     stopovers.value = result.stopovers;
                     federatedStopoverDetails.value = result.stopoverDetails;
+                    stopoverList.value = result.postStopovers;
                 });
             }
         }

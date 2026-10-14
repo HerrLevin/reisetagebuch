@@ -1,12 +1,17 @@
 import { api } from '@/api';
 import { StopoverPopupInfo } from '@/Components/Map.vue';
 import { GeometryCollection, MultiPoint } from 'geojson';
-import { StopPlaceDto, TransportPost } from '../../types/Api.gen';
+import {
+    StopPlaceDto,
+    TransportPost,
+    TransportPostStopoverDto,
+} from '../../types/Api.gen';
 
 export interface FederatedTripGeometry {
     lineString: GeometryCollection;
     stopovers: MultiPoint;
     stopoverDetails: StopoverPopupInfo[];
+    postStopovers: TransportPostStopoverDto[];
 }
 
 function diffSeconds(
@@ -34,6 +39,35 @@ export function buildStopoverPopupInfo(stop: StopPlaceDto): StopoverPopupInfo {
         manualDepartureTime: null,
         scheduledTrack: stop.scheduledTrack ?? null,
         track: stop.track ?? null,
+    };
+}
+
+// shortcut: synthetic location (no real LocationDto for a federated stop), good enough for read-only display
+export function buildTransportPostStopover(
+    stop: StopPlaceDto,
+    sequence: number,
+): TransportPostStopoverDto {
+    return {
+        id: stop.stopId ?? stop.tripStopId,
+        location: {
+            id: stop.stopId,
+            name: stop.name,
+            latitude: stop.latitude,
+            longitude: stop.longitude,
+            distance: stop.distance,
+            timezone: null,
+            identifiers: [],
+            tags: [],
+            emoji: '',
+        },
+        sequence,
+        scheduledArrivalTime: stop.scheduledArrival,
+        scheduledDepartureTime: stop.scheduledDeparture,
+        arrivalDelay: diffSeconds(stop.scheduledArrival, stop.arrival),
+        departureDelay: diffSeconds(stop.scheduledDeparture, stop.departure),
+        manualArrivalTime: null,
+        manualDepartureTime: null,
+        cancelled: stop.cancelled ?? false,
     };
 }
 
@@ -123,6 +157,7 @@ export async function loadFederatedTripGeometry(
             stopoverDetails: relevantStops
                 .slice(1, -1)
                 .map(buildStopoverPopupInfo),
+            postStopovers: relevantStops.map(buildTransportPostStopover),
         };
     } catch {
         // Trip fell out of the schedule window, or this instance's
