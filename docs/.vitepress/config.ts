@@ -3,7 +3,6 @@ import { defineConfig } from 'vitepress';
 export default defineConfig({
     title: 'Reisetagebuch',
     description: 'Dokumentation',
-    base: '/reisetagebuch/',
     themeConfig: {
         nav: [
             { text: 'Home', link: '/' },
