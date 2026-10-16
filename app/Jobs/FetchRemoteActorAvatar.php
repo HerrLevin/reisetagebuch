@@ -44,10 +44,13 @@ class FetchRemoteActorAvatar implements ShouldQueue
         }
 
         try {
-            $urlGuard->assertSafe($actor->remote_icon_url);
+            $iconIp = $urlGuard->assertSafe($actor->remote_icon_url);
 
             $response = Http::withHeaders($headers)
-                ->withOptions(['allow_redirects' => false])
+                ->withOptions([
+                    'allow_redirects' => false,
+                    'curl' => $urlGuard->pinOption($actor->remote_icon_url, $iconIp),
+                ])
                 ->timeout(15)
                 ->get($actor->remote_icon_url);
         } catch (\Exception $e) {

@@ -72,7 +72,10 @@ class PushActivityPubJobsTest extends TestCase
     {
         $this->app->bind(ActivityPubUrlGuard::class, fn () => new class extends ActivityPubUrlGuard
         {
-            public function assertSafe(string $url): void {}
+            public function assertSafe(string $url): string
+            {
+                return '203.0.113.1';
+            }
         });
     }
 

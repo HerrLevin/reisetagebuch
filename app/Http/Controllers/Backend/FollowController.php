@@ -30,14 +30,49 @@ class FollowController extends Controller
         $this->notificationRepository = $notificationRepository;
     }
 
-    public function getFollowings(string $userId): array
+    /**
+     * @throws InsufficientRightsException
+     */
+    public function getFollowings(string $userId, ?User $actingUser = null): array
     {
+        $this->assertCanViewFollowList($userId, $actingUser);
+
         return $this->followRepository->getFollowings($userId);
     }
 
-    public function getFollowers(string $userId): array
+    /**
+     * @throws InsufficientRightsException
+     */
+    public function getFollowers(string $userId, ?User $actingUser = null): array
     {
+        $this->assertCanViewFollowList($userId, $actingUser);
+
         return $this->followRepository->getFollowers($userId);
+    }
+
+    /**
+     * Follower/following lists are public for accounts anyone can follow
+     * freely. Accounts that require follow-request approval restrict the
+     * list to themselves and their own followers.
+     *
+     * @throws InsufficientRightsException
+     */
+    private function assertCanViewFollowList(string $userId, ?User $actingUser): void
+    {
+        if ($actingUser?->id === $userId) {
+            return;
+        }
+
+        $targetUser = $this->userRepository->getUserById($userId);
+        if (! $targetUser->requiresFollowRequest) {
+            return;
+        }
+
+        if ($actingUser !== null && $this->followRepository->isFollowing($actingUser->id, $userId)) {
+            return;
+        }
+
+        throw new InsufficientRightsException('You don\'t have permission to view this follow relationship');
     }
 
     /**
