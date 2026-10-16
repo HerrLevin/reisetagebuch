@@ -10,6 +10,8 @@ class TraewellingCrossCheckInJob implements ShouldQueue
 {
     use Queueable;
 
+    public $queue = 'traewelling';
+
     private string $postId;
 
     private CrossPostController $crossPostController;

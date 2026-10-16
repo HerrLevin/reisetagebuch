@@ -15,6 +15,8 @@ class PrefetchJob implements ShouldQueue
 {
     use InteractsWithQueue, Queueable;
 
+    public $queue = 'overpass-prefetch';
+
     public Point $point;
 
     private ?LocationController $locationController;

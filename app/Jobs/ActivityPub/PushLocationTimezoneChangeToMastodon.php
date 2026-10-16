@@ -10,6 +10,8 @@ class PushLocationTimezoneChangeToMastodon implements ShouldQueue
 {
     use Queueable;
 
+    public $queue = 'activitypub';
+
     public function __construct(
         private readonly string $locationId
     ) {}

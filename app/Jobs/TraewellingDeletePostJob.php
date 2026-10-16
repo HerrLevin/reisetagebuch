@@ -14,6 +14,8 @@ class TraewellingDeletePostJob implements ShouldQueue
 {
     use Queueable;
 
+    public $queue = 'traewelling';
+
     private int $traewellingPostId;
 
     private string $userId;

@@ -16,6 +16,8 @@ class SendFollowToRemoteActor implements ShouldQueue
 {
     use Queueable;
 
+    public $queue = 'activitypub';
+
     public int $tries = 3;
 
     public array $backoff = [30, 120, 600];
