@@ -2,13 +2,25 @@
 
 namespace Tests\Feature\Controllers\Api;
 
+use App\Enums\Visibility;
+use App\Models\Location;
+use App\Models\LocationPost;
+use App\Models\Post;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Passport\Passport;
 use Tests\TestCase;
 
 class UserControllerTest extends TestCase
 {
     use RefreshDatabase;
+
+    private function makeLocationPost(string $userId, Visibility $visibility): void
+    {
+        $post = Post::factory()->create(['user_id' => $userId, 'visibility' => $visibility->value]);
+        $location = Location::factory()->create();
+        LocationPost::create(['post_id' => $post->id, 'location_id' => $location->id]);
+    }
 
     // ──────────────────────────────────────────────────────────────────────────
     // GET /api/users/search
@@ -77,5 +89,55 @@ class UserControllerTest extends TestCase
         $response->assertOk()->assertJsonStructure([
             ['id', 'username', 'name', 'statistics'],
         ]);
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    // GET /api/users/{userId}/map-data
+    // ──────────────────────────────────────────────────────────────────────────
+
+    public function test_map_data_hides_non_public_locations_from_unauthenticated_visitors(): void
+    {
+        $owner = User::factory()->create();
+        $this->makeLocationPost($owner->id, Visibility::PUBLIC);
+        $this->makeLocationPost($owner->id, Visibility::PRIVATE);
+        $this->makeLocationPost($owner->id, Visibility::UNLISTED);
+        $this->makeLocationPost($owner->id, Visibility::ONLY_AUTHENTICATED);
+
+        $response = $this->getJson("/api/users/{$owner->id}/map-data");
+
+        $response->assertOk();
+        $this->assertCount(1, $response->json('geometries'));
+    }
+
+    public function test_map_data_hides_private_and_unlisted_locations_from_other_authenticated_users(): void
+    {
+        $owner = User::factory()->create();
+        Passport::actingAs(User::factory()->create());
+
+        $this->makeLocationPost($owner->id, Visibility::PUBLIC);
+        $this->makeLocationPost($owner->id, Visibility::PRIVATE);
+        $this->makeLocationPost($owner->id, Visibility::UNLISTED);
+        $this->makeLocationPost($owner->id, Visibility::ONLY_AUTHENTICATED);
+
+        $response = $this->getJson("/api/users/{$owner->id}/map-data");
+
+        $response->assertOk();
+        $this->assertCount(2, $response->json('geometries'));
+    }
+
+    public function test_map_data_shows_all_locations_to_the_owner(): void
+    {
+        $owner = User::factory()->create();
+        Passport::actingAs($owner);
+
+        $this->makeLocationPost($owner->id, Visibility::PUBLIC);
+        $this->makeLocationPost($owner->id, Visibility::PRIVATE);
+        $this->makeLocationPost($owner->id, Visibility::UNLISTED);
+        $this->makeLocationPost($owner->id, Visibility::ONLY_AUTHENTICATED);
+
+        $response = $this->getJson("/api/users/{$owner->id}/map-data");
+
+        $response->assertOk();
+        $this->assertCount(4, $response->json('geometries'));
     }
 }

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Requests\ImageUploadRequest;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Resources\UserDto;
-use App\Models\Location;
 use App\Models\User;
 use Clickbar\Magellan\Data\Geometries\GeometryCollection;
 use Clickbar\Magellan\IO\Generator\Geojson\GeojsonGenerator;
@@ -33,13 +32,9 @@ class UserController extends Controller
     )]
     public function mapData(string $userId)
     {
-        $locations = Location::join('location_posts', 'locations.id', '=', 'location_posts.location_id')
-            ->join('posts', 'location_posts.post_id', '=', 'posts.id')
-            ->where('posts.user_id', $userId)
-            ->select('locations.location')
-            ->get();
+        $locations = $this->userController->mapData($userId, $this->auth->user());
 
-        $locations = GeometryCollection::make($locations->pluck('location')->toArray());
+        $locations = GeometryCollection::make($locations->toArray());
 
         return new GeojsonGenerator()->generateGeometryCollection($locations); // todo: document response format
     }

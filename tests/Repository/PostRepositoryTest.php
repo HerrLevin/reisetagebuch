@@ -3,6 +3,8 @@
 namespace Tests\Repository;
 
 use App\Enums\Visibility;
+use App\Models\Location;
+use App\Models\LocationPost;
 use App\Models\Post;
 use App\Models\User;
 use App\Repositories\PostRepository;
@@ -214,5 +216,58 @@ class PostRepositoryTest extends TestCase
 
         $result = $repo->getById($onlyAuthPost->id, $visitor);
         $this->assertEquals($onlyAuthPost->id, $result->id);
+    }
+
+    private function makeLocationPost(string $userId, Visibility $visibility): void
+    {
+        $post = Post::factory()->create(['user_id' => $userId, 'visibility' => $visibility->value]);
+        $location = Location::factory()->create();
+        LocationPost::create(['post_id' => $post->id, 'location_id' => $location->id]);
+    }
+
+    public function test_map_data_owner_sees_all_locations()
+    {
+        $user = User::factory()->create();
+        $repo = new PostRepository;
+
+        $this->makeLocationPost($user->id, Visibility::PUBLIC);
+        $this->makeLocationPost($user->id, Visibility::PRIVATE);
+        $this->makeLocationPost($user->id, Visibility::UNLISTED);
+        $this->makeLocationPost($user->id, Visibility::ONLY_AUTHENTICATED);
+
+        $result = $repo->getMapDataForUserId($user->id, $user);
+
+        $this->assertCount(4, $result);
+    }
+
+    public function test_map_data_visiting_user_sees_only_public_and_authenticated_locations()
+    {
+        $owner = User::factory()->create();
+        $visitor = User::factory()->create();
+        $repo = new PostRepository;
+
+        $this->makeLocationPost($owner->id, Visibility::PUBLIC);
+        $this->makeLocationPost($owner->id, Visibility::PRIVATE);
+        $this->makeLocationPost($owner->id, Visibility::UNLISTED);
+        $this->makeLocationPost($owner->id, Visibility::ONLY_AUTHENTICATED);
+
+        $result = $repo->getMapDataForUserId($owner->id, $visitor);
+
+        $this->assertCount(2, $result);
+    }
+
+    public function test_map_data_unauthenticated_visitor_sees_only_public_locations()
+    {
+        $owner = User::factory()->create();
+        $repo = new PostRepository;
+
+        $this->makeLocationPost($owner->id, Visibility::PUBLIC);
+        $this->makeLocationPost($owner->id, Visibility::PRIVATE);
+        $this->makeLocationPost($owner->id, Visibility::UNLISTED);
+        $this->makeLocationPost($owner->id, Visibility::ONLY_AUTHENTICATED);
+
+        $result = $repo->getMapDataForUserId($owner->id, null);
+
+        $this->assertCount(1, $result);
     }
 }
