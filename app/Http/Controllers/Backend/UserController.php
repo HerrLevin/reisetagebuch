@@ -11,7 +11,9 @@ use App\Http\Resources\UserDto;
 use App\Jobs\ActivityPub\PushProfileUpdateToMastodon;
 use App\Models\User;
 use App\Repositories\FileRepository;
+use App\Repositories\PostRepository;
 use App\Repositories\UserRepository;
+use Illuminate\Support\Collection;
 
 class UserController extends Controller
 {
@@ -19,15 +21,26 @@ class UserController extends Controller
 
     private FileRepository $fileRepository;
 
-    public function __construct(UserRepository $userRepository, FileRepository $fileRepository)
+    private PostRepository $postRepository;
+
+    public function __construct(UserRepository $userRepository, FileRepository $fileRepository, PostRepository $postRepository)
     {
         $this->fileRepository = $fileRepository;
         $this->userRepository = $userRepository;
+        $this->postRepository = $postRepository;
     }
 
     public function show(string $username): UserDto
     {
         return $this->userRepository->getUserByUsername($username);
+    }
+
+    /**
+     * @return Collection<int, mixed> raw `locations.location` geometry values, scoped to what $visitingUser may see
+     */
+    public function mapData(string $userId, ?User $visitingUser = null): Collection
+    {
+        return $this->postRepository->getMapDataForUserId($userId, $visitingUser);
     }
 
     /**

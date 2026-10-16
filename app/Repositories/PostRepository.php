@@ -425,6 +425,28 @@ class PostRepository
         );
     }
 
+    /**
+     * @return Collection<int, mixed> raw `locations.location` geometry values
+     */
+    public function getMapDataForUserId(string $userId, ?User $visitingUser = null): Collection
+    {
+        $locations = Location::join('location_posts', 'locations.id', '=', 'location_posts.location_id')
+            ->join('posts', 'location_posts.post_id', '=', 'posts.id')
+            ->where('posts.user_id', $userId);
+
+        if ($visitingUser) {
+            if ($visitingUser->id !== $userId) {
+                // not the owner, show only public posts
+                $locations->whereIn('posts.visibility', [Visibility::ONLY_AUTHENTICATED, Visibility::PUBLIC]);
+            }
+        } else {
+            // not logged in, show only public posts
+            $locations->where('posts.visibility', Visibility::PUBLIC);
+        }
+
+        return $locations->select('locations.location')->pluck('location');
+    }
+
     public function getPostsForUserId(string $userId, ?User $visitingUser = null): PostPaginationDto
     {
         $posts = Post::with(['user', 'locationPost.location', 'locationPost.location.tags', 'transportPost', 'transportPost.origin', 'transportPost.destination', 'hashTags'])
