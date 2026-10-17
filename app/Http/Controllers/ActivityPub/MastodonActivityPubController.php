@@ -32,6 +32,7 @@ use App\Repositories\PostRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\UserStatisticsRepository;
 use App\Services\ActivityPubContentSanitizer;
+use App\Services\ActivityPubExtensionParser;
 use App\Services\ActivityPubService;
 use Carbon\Carbon;
 use Exception;
@@ -192,6 +193,7 @@ class MastodonActivityPubController extends Controller
         $actorId = $activity['actor'] ?? null;
 
         $verifiedActor = $request->attributes->get('ap_verified_actor');
+        Log::debug('Incoming ActivityPub activity', ['type' => $type, 'activityId' => $activityId, 'actorId' => $actorId, 'verifiedActor' => $verifiedActor]);
         if (! $actorId || $actorId !== $verifiedActor) {
             Log::warning('ActivityPub: actor does not match signer', ['claimed' => $actorId, 'verified' => $verifiedActor]);
 
@@ -253,6 +255,8 @@ class MastodonActivityPubController extends Controller
             return response()->json('', 202);
         }
 
+        $extension = app(ActivityPubExtensionParser::class)->parse($object);
+
         $post = $this->activityPubPostRepository->findOrCreateByActivityId(
             activityPubActorId: $actor->id,
             activityId: $noteId,
@@ -261,6 +265,7 @@ class MastodonActivityPubController extends Controller
             publishedAt: $published ? Carbon::parse($published) : Carbon::now(),
             inReplyTo: $inReplyTo,
             mentions: $this->extractMentionHrefs($object['tag'] ?? []),
+            extensionData: $extension,
         );
 
         Log::info('Stored AP post', ['noteId' => $noteId, 'actor' => $actorId]);
@@ -378,6 +383,7 @@ class MastodonActivityPubController extends Controller
         $actorId = $activity['actor'] ?? null;
 
         $verifiedActor = $request->attributes->get('ap_verified_actor');
+        Log::debug('Incoming ActivityPub activity', ['type' => $type, 'activityId' => $activityId, 'actorId' => $actorId, 'verifiedActor' => $verifiedActor]);
         if (! $actorId || $actorId !== $verifiedActor) {
             Log::warning('ActivityPub: actor does not match signer', ['claimed' => $actorId, 'verified' => $verifiedActor]);
 
@@ -834,6 +840,8 @@ class MastodonActivityPubController extends Controller
         $inReplyTo = $object['inReplyTo'] ?? null;
         $inReplyTo = is_string($inReplyTo) ? $inReplyTo : ($inReplyTo['id'] ?? null);
 
+        $extension = app(ActivityPubExtensionParser::class)->parse($object);
+
         $this->activityPubPostRepository->updateByActivityId(
             activityId: $noteId,
             activityPubActorId: $actor->id,
@@ -841,6 +849,7 @@ class MastodonActivityPubController extends Controller
             content: is_string($content) ? $this->contentSanitizer->sanitize($content) : null,
             inReplyTo: $inReplyTo,
             mentions: $this->extractMentionHrefs($object['tag'] ?? []),
+            extensionData: $extension,
         );
 
         Log::info('Updated AP post', ['noteId' => $noteId, 'actor' => $actorId]);

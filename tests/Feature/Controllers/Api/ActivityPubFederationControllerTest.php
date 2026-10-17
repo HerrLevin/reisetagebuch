@@ -7,7 +7,9 @@ use App\Jobs\ActivityPub\SendUndoFollowToRemoteActor;
 use App\Models\ActivityPubActor;
 use App\Models\ActivityPubFollower;
 use App\Models\ActivityPubRemoteFollow;
+use App\Models\Follow;
 use App\Models\User;
+use App\Models\UserSettings;
 use App\Services\ActivityPubUrlGuard;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
@@ -31,7 +33,10 @@ class ActivityPubFederationControllerTest extends TestCase
         // abgedeckt).
         $this->app->bind(ActivityPubUrlGuard::class, fn () => new class extends ActivityPubUrlGuard
         {
-            public function assertSafe(string $url): void {}
+            public function assertSafe(string $url): string
+            {
+                return '203.0.113.1';
+            }
         });
     }
 
@@ -291,14 +296,7 @@ class ActivityPubFederationControllerTest extends TestCase
     // GET /api/users/{userId}/activitypub/followers
     // ──────────────────────────────────────────────────────────────────────────
 
-    public function test_get_user_activitypub_followers_is_public(): void
-    {
-        $user = User::factory()->create();
-
-        $this->getJson("/api/users/{$user->id}/activitypub/followers")->assertOk();
-    }
-
-    public function test_get_user_activitypub_followers_returns_remote_followers_for_given_user(): void
+    public function test_get_user_activitypub_followers_is_public_for_default_account(): void
     {
         $user = User::factory()->create();
         $actor = ActivityPubActor::factory()->create();
@@ -337,16 +335,30 @@ class ActivityPubFederationControllerTest extends TestCase
         $response->assertOk()->assertExactJson([]);
     }
 
+    public function test_get_user_activitypub_followers_for_private_account_requires_ownership_or_follow(): void
+    {
+        $user = User::factory()->create();
+        UserSettings::where('user_id', $user->id)->update(['requires_follow_request' => true]);
+
+        $stranger = User::factory()->create();
+        $follower = User::factory()->create();
+        Follow::create(['origin_user_id' => $follower->id, 'target_user_id' => $user->id]);
+
+        $this->getJson("/api/users/{$user->id}/activitypub/followers")->assertForbidden();
+
+        Passport::actingAs($stranger);
+        $this->getJson("/api/users/{$user->id}/activitypub/followers")->assertForbidden();
+
+        Passport::actingAs($follower);
+        $this->getJson("/api/users/{$user->id}/activitypub/followers")->assertOk();
+
+        Passport::actingAs($user);
+        $this->getJson("/api/users/{$user->id}/activitypub/followers")->assertOk();
+    }
+
     // ──────────────────────────────────────────────────────────────────────────
     // GET /api/users/{userId}/activitypub/following
     // ──────────────────────────────────────────────────────────────────────────
-
-    public function test_get_user_activitypub_following_is_public(): void
-    {
-        $user = User::factory()->create();
-
-        $this->getJson("/api/users/{$user->id}/activitypub/following")->assertOk();
-    }
 
     public function test_get_user_activitypub_following_returns_remote_follows_for_given_user(): void
     {
@@ -385,5 +397,26 @@ class ActivityPubFederationControllerTest extends TestCase
         $response = $this->getJson("/api/users/{$user->id}/activitypub/following");
 
         $response->assertOk()->assertJsonCount(0);
+    }
+
+    public function test_get_user_activitypub_following_for_private_account_requires_ownership_or_follow(): void
+    {
+        $user = User::factory()->create();
+        UserSettings::where('user_id', $user->id)->update(['requires_follow_request' => true]);
+
+        $stranger = User::factory()->create();
+        $follower = User::factory()->create();
+        Follow::create(['origin_user_id' => $follower->id, 'target_user_id' => $user->id]);
+
+        $this->getJson("/api/users/{$user->id}/activitypub/following")->assertForbidden();
+
+        Passport::actingAs($stranger);
+        $this->getJson("/api/users/{$user->id}/activitypub/following")->assertForbidden();
+
+        Passport::actingAs($follower);
+        $this->getJson("/api/users/{$user->id}/activitypub/following")->assertOk();
+
+        Passport::actingAs($user);
+        $this->getJson("/api/users/{$user->id}/activitypub/following")->assertOk();
     }
 }

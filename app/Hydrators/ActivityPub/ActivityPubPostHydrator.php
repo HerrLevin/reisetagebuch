@@ -4,16 +4,42 @@ declare(strict_types=1);
 
 namespace App\Hydrators\ActivityPub;
 
-use App\Enums\Visibility;
+use App\Dto\ActivityPub\Extensions\RtbLocationExtension;
+use App\Dto\ActivityPub\Extensions\RtbTransportExtension;
 use App\Http\Resources\PostTypes\BasePost;
+use App\Http\Resources\PostTypes\LocationPost;
+use App\Http\Resources\PostTypes\TransportPost;
 use App\Http\Resources\UserDto;
 use App\Http\Resources\UserStatisticsDto;
 use App\Models\ActivityPubPost;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Throwable;
 
 class ActivityPubPostHydrator
 {
     public function modelToDto(ActivityPubPost $post): BasePost
+    {
+        $userDto = $this->buildUserDto($post);
+        $extension = $post->extension_data;
+
+        try {
+            return match (true) {
+                $extension instanceof RtbLocationExtension => LocationPost::fromRemote($post, $userDto, $extension),
+                $extension instanceof RtbTransportExtension => TransportPost::fromRemote($post, $userDto, $extension),
+                default => BasePost::fromRemote($post, $userDto),
+            };
+        } catch (Throwable $e) {
+            Log::warning('Failed to reconstruct DTO from stored RTB extension_data, falling back to plain post', [
+                'postId' => $post->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return BasePost::fromRemote($post, $userDto);
+        }
+    }
+
+    private function buildUserDto(ActivityPubPost $post): UserDto
     {
         $actor = $post->actor;
         $handle = $actor?->preferred_username ?? '';
@@ -30,18 +56,6 @@ class ActivityPubPostHydrator
         $userDto->createdAt = $post->created_at->toIso8601String();
         $userDto->statistics = new UserStatisticsDto(0, 0, 0, 0, 0, 0, 0, 0, 0);
 
-        $dto = new BasePost;
-        $dto->id = $post->id;
-        $dto->user = $userDto;
-        $dto->body = $post->content;
-        $dto->visibility = Visibility::PUBLIC;
-        $dto->sourceUrl = $post->url ?? $post->activity_id;
-        $dto->publishedAt = $post->published_at->toIso8601String();
-        $dto->createdAt = $post->created_at->toIso8601String();
-        $dto->updatedAt = $post->updated_at->toIso8601String();
-        $dto->likesCount = $post->likes_count ?? 0;
-        $dto->likedByUser = (bool) ($post->liked_by_user ?? false);
-
-        return $dto;
+        return $userDto;
     }
 }

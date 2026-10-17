@@ -190,11 +190,14 @@ class VerifyHttpSignature
         }
 
         try {
-            $this->urlGuard->assertSafe($keyUrl);
+            $keyIp = $this->urlGuard->assertSafe($keyUrl);
 
             $response = Http::withHeaders([
                 'Accept' => 'application/activity+json',
-            ])->withOptions(['allow_redirects' => false])->timeout(10)->get($keyUrl);
+            ])->withOptions([
+                'allow_redirects' => false,
+                'curl' => $this->urlGuard->pinOption($keyUrl, $keyIp),
+            ])->timeout(10)->get($keyUrl);
 
             if ($response->successful()) {
                 $actor = $response->json();

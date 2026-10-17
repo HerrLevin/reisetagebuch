@@ -20,7 +20,9 @@ class DeliverActivityPubActivity implements ShouldQueue
         private readonly string $followerActorId,
         private readonly ?string $inbox,
         private readonly array $updateActivity
-    ) {}
+    ) {
+        $this->queue = 'activitypub';
+    }
 
     public function handle(ActivityPubService $activityPub): void
     {

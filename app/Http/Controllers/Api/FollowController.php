@@ -39,7 +39,11 @@ class FollowController extends Controller
     )]
     public function getFollowers(string $userId): array
     {
-        return $this->backend->getFollowers($userId);
+        try {
+            return $this->backend->getFollowers($userId, $this->auth->user());
+        } catch (InsufficientRightsException $e) {
+            abort(403, $e->getMessage());
+        }
     }
 
     #[OA\Get(
@@ -62,7 +66,11 @@ class FollowController extends Controller
     )]
     public function getFollowings(string $userId): array
     {
-        return $this->backend->getFollowings($userId);
+        try {
+            return $this->backend->getFollowings($userId, $this->auth->user());
+        } catch (InsufficientRightsException $e) {
+            abort(403, $e->getMessage());
+        }
     }
 
     #[OA\Post(

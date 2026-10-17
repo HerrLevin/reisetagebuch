@@ -19,6 +19,7 @@ use App\Models\User;
 use App\Repositories\ActivityPubFollowerRepository;
 use App\Repositories\ActivityPubFollowRequestRepository;
 use App\Repositories\ActivityPubRemoteFollowRepository;
+use App\Repositories\FollowRepository;
 use App\Repositories\NotificationRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\UserStatisticsRepository;
@@ -36,6 +37,7 @@ class ActivityPubFederationBackend extends Controller
         private readonly ActivityPubFollowerRepository $followerRepository,
         private readonly ActivityPubFollowRequestRepository $followRequestRepository,
         private readonly UserRepository $userRepository,
+        private readonly FollowRepository $followRepository,
         private readonly UserStatisticsRepository $userStatisticsRepository,
         private readonly NotificationRepository $notificationRepository,
         private readonly ActivityPubContentSanitizer $contentSanitizer,
@@ -65,9 +67,13 @@ class ActivityPubFederationBackend extends Controller
 
     /**
      * @return RemoteFollowDto[]
+     *
+     * @throws InsufficientRightsException
      */
-    public function listFollowing(string $userId): array
+    public function listFollowing(string $userId, ?User $actingUser = null): array
     {
+        $this->assertCanViewFollowList($userId, $actingUser);
+
         return $this->remoteFollowRepository->listForUser($userId)
             ->map(fn ($follow) => new RemoteFollowDto(
                 actorId: $follow->remote_actor_id,
@@ -84,9 +90,13 @@ class ActivityPubFederationBackend extends Controller
 
     /**
      * @return RemoteFollowerDto[]
+     *
+     * @throws InsufficientRightsException
      */
-    public function listFollowers(string $userId): array
+    public function listFollowers(string $userId, ?User $actingUser = null): array
     {
+        $this->assertCanViewFollowList($userId, $actingUser);
+
         return $this->followerRepository->listForUser($userId)
             ->map(fn ($follower) => new RemoteFollowerDto(
                 actorId: $follower->follower_actor_id,
@@ -98,6 +108,27 @@ class ActivityPubFederationBackend extends Controller
             ))
             ->values()
             ->all();
+    }
+
+    /**
+     * @throws InsufficientRightsException
+     */
+    private function assertCanViewFollowList(string $userId, ?User $actingUser): void
+    {
+        if ($actingUser?->id === $userId) {
+            return;
+        }
+
+        $targetUser = $this->userRepository->getUserById($userId);
+        if (! $targetUser->requiresFollowRequest) {
+            return;
+        }
+
+        if ($actingUser !== null && $this->followRepository->isFollowing($actingUser->id, $userId)) {
+            return;
+        }
+
+        throw new InsufficientRightsException('You don\'t have permission to view this follow relationship');
     }
 
     public function follow(string $userId, string $actorId): void
