@@ -43,8 +43,56 @@ You can start the application with:
 docker-compose up -d
 ```
 
-::: warning
-You'll still need some kind of reverse proxy (like Nginx or Traefik) to handle HTTPS and route traffic to the `rtb.prod` service.
+## Reverse Proxy
+
+The `rtb.prod` container does not publish any ports and does not terminate TLS itself, so it isn't reachable from
+outside Docker by default. You need a reverse proxy (Traefik, Nginx, Caddy, etc.) in front of it to:
+
+- Terminate HTTPS. ActivityPub federation (HTTP Signatures, WebFinger) requires your instance to be reachable over
+  valid HTTPS, not plain HTTP.
+- Forward traffic to `rtb.prod` on port 80.
+
+Set `APP_URL` in your `.env` to the public `https://` URL the proxy serves before starting the stack.
+
+::: details Traefik example
+Put `rtb.prod` on the same Docker network as Traefik and add labels:
+
+```yaml
+services:
+    rtb.prod:
+        networks:
+            - traefik
+        labels:
+            - traefik.enable=true
+            - traefik.http.routers.rtb.rule=Host(`your-domain.tld`)
+            - traefik.http.routers.rtb.entrypoints=websecure
+            - traefik.http.routers.rtb.tls.certresolver=letsencrypt
+            - traefik.http.services.rtb.loadbalancer.server.port=80
+
+networks:
+    traefik:
+        external: true
+```
+:::
+
+::: details Nginx example
+```nginx
+server {
+    listen 443 ssl;
+    server_name your-domain.tld;
+
+    ssl_certificate     /etc/letsencrypt/live/your-domain.tld/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/your-domain.tld/privkey.pem;
+
+    location / {
+        proxy_pass http://rtb.prod:80;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
 :::
 
 ## Next Steps
