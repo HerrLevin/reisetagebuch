@@ -80,21 +80,32 @@ function formatStopTime(
     return null;
 }
 
+export function getTransportEffectiveTimes(
+    post: BasePost | TransportPost | LocationPost | null,
+): { departureTime: string | null; arrivalTime: string | null } {
+    if (!isTransportPost(post))
+        return { departureTime: null, arrivalTime: null };
+
+    const transportPost = post as TransportPost;
+    const departureDelay = getDepartureDelay(transportPost) || 0;
+    const departureTime =
+        getDepartureTime(transportPost.originStop)
+            ?.plus({ minutes: departureDelay })
+            .toISO() ?? null;
+    const arrivalDelay = getArrivalDelay(transportPost) || 0;
+    const arrivalTime =
+        getArrivalTime(transportPost.destinationStop)
+            ?.plus({ minutes: arrivalDelay })
+            .toISO() ?? null;
+
+    return { departureTime, arrivalTime };
+}
+
 export function getTransportProgress(
     post: BasePost | TransportPost | LocationPost | null,
     now: number = Date.now(),
 ) {
-    if (!isTransportPost(post)) return 0;
-
-    const transportPost = post as TransportPost;
-    const departureDelay = getDepartureDelay(transportPost) || 0;
-    const departureTime = getDepartureTime(transportPost.originStop)
-        ?.plus({ minutes: departureDelay })
-        .toISO();
-    const arrivalDelay = getArrivalDelay(transportPost) || 0;
-    const arrivalTime = getArrivalTime(transportPost.destinationStop)
-        ?.plus({ minutes: arrivalDelay })
-        .toISO();
+    const { departureTime, arrivalTime } = getTransportEffectiveTimes(post);
 
     if (!departureTime || !arrivalTime) return 0;
 

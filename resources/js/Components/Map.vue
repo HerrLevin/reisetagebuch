@@ -86,6 +86,21 @@ const props = defineProps({
         required: false,
         validator: (value: number) => value >= 0 && value <= 100,
     },
+    originTime: {
+        type: String as PropType<string | null>,
+        default: null,
+        required: false,
+    },
+    destinationTime: {
+        type: String as PropType<string | null>,
+        default: null,
+        required: false,
+    },
+    now: {
+        type: Number,
+        default: 0,
+        required: false,
+    },
 });
 
 const zoom = 14;
@@ -131,25 +146,26 @@ if (props.endPoint) {
     );
 }
 
+function computeDistances(coordinates: number[][]): number[] {
+    const distances: number[] = [0];
+
+    for (let i = 1; i < coordinates.length; i++) {
+        const [lng1, lat1] = coordinates[i - 1];
+        const [lng2, lat2] = coordinates[i];
+        distances.push(distances[i - 1] + Math.hypot(lng2 - lng1, lat2 - lat1));
+    }
+
+    return distances;
+}
+
 function interpolatePointOnLine(
     coordinates: number[][],
     percentage: number,
 ): [number, number] | null {
     if (!coordinates || coordinates.length < 2) return null;
 
-    let totalDistance = 0;
-    const distances: number[] = [0];
-
-    for (let i = 1; i < coordinates.length; i++) {
-        const [lng1, lat1] = coordinates[i - 1];
-        const [lng2, lat2] = coordinates[i];
-        const distance = Math.sqrt(
-            Math.pow(lng2 - lng1, 2) + Math.pow(lat2 - lat1, 2),
-        );
-        totalDistance += distance;
-        distances.push(totalDistance);
-    }
-
+    const distances = computeDistances(coordinates);
+    const totalDistance = distances[distances.length - 1];
     const targetDistance = (percentage / 100) * totalDistance;
 
     for (let i = 1; i < coordinates.length; i++) {
@@ -169,6 +185,134 @@ function interpolatePointOnLine(
     }
 
     return coordinates[coordinates.length - 1] as [number, number];
+}
+
+interface TimedWaypoint {
+    time: number;
+    lng: number;
+    lat: number;
+}
+
+function effectiveStopTime(
+    scheduled: string | null,
+    manual: string | null,
+    delaySeconds: number | null,
+): DateTime | null {
+    if (manual) {
+        return DateTime.fromISO(manual);
+    }
+    if (!scheduled) return null;
+
+    const delayMinutes =
+        delaySeconds !== null ? Math.floor(delaySeconds / 60) : 0;
+    return DateTime.fromISO(scheduled).plus({ minutes: delayMinutes });
+}
+
+// Ordered list of real (delay/manual-adjusted) times and coordinates the
+// vehicle passes through: origin, every stopover (arrival and, if it
+// differs, departure, to represent dwell time) and the destination.
+function buildTimedWaypoints(): TimedWaypoint[] | null {
+    if (
+        !props.originTime ||
+        !props.destinationTime ||
+        !props.startPoint ||
+        !props.endPoint
+    ) {
+        return null;
+    }
+
+    const waypoints: TimedWaypoint[] = [
+        {
+            time: DateTime.fromISO(props.originTime).toMillis(),
+            lng: props.startPoint.lng,
+            lat: props.startPoint.lat,
+        },
+    ];
+
+    for (const stop of props.stopoverDetails ?? []) {
+        const arrival = effectiveStopTime(
+            stop.scheduledArrivalTime,
+            stop.manualArrivalTime,
+            stop.arrivalDelay,
+        );
+        const departure = effectiveStopTime(
+            stop.scheduledDepartureTime,
+            stop.manualDepartureTime,
+            stop.departureDelay,
+        );
+
+        if (arrival) {
+            waypoints.push({
+                time: arrival.toMillis(),
+                lng: stop.longitude,
+                lat: stop.latitude,
+            });
+        }
+        if (departure && (!arrival || !departure.equals(arrival))) {
+            waypoints.push({
+                time: departure.toMillis(),
+                lng: stop.longitude,
+                lat: stop.latitude,
+            });
+        }
+    }
+
+    waypoints.push({
+        time: DateTime.fromISO(props.destinationTime).toMillis(),
+        lng: props.endPoint.lng,
+        lat: props.endPoint.lat,
+    });
+
+    waypoints.sort((a, b) => a.time - b.time);
+
+    return waypoints;
+}
+
+// shortcut: anchors each waypoint to the nearest line vertex rather than
+// projecting onto the nearest segment; upgrade if sparse polylines make the
+// live marker visibly snap away from a stopover.
+function closestDistanceOnLine(
+    coordinates: number[][],
+    distances: number[],
+    lng: number,
+    lat: number,
+): number {
+    let bestIndex = 0;
+    let bestDistance = Infinity;
+
+    for (let i = 0; i < coordinates.length; i++) {
+        const [clng, clat] = coordinates[i];
+        const distance = Math.hypot(clng - lng, clat - lat);
+        if (distance < bestDistance) {
+            bestDistance = distance;
+            bestIndex = i;
+        }
+    }
+
+    return distances[bestIndex];
+}
+
+function distanceForTime(
+    anchors: { time: number; distance: number }[],
+    now: number,
+): number {
+    if (now <= anchors[0].time) return anchors[0].distance;
+
+    const last = anchors[anchors.length - 1];
+    if (now >= last.time) return last.distance;
+
+    for (let i = 1; i < anchors.length; i++) {
+        if (now <= anchors[i].time) {
+            const prev = anchors[i - 1];
+            const curr = anchors[i];
+            if (curr.time === prev.time) return curr.distance;
+
+            const fraction = (now - prev.time) / (curr.time - prev.time);
+            return prev.distance + (curr.distance - prev.distance) * fraction;
+        }
+    }
+
+    return last.distance;
 }
 
 function fallbackLinestring() {
@@ -347,11 +491,7 @@ function hideStopoverPopup() {
 }
 
 const animatedPointSource = computed(() => {
-    if (
-        !geoJsonSource.value ||
-        !geoJsonSource.value.features.length ||
-        props.progress >= 100
-    ) {
+    if (!geoJsonSource.value || !geoJsonSource.value.features.length) {
         return null;
     }
 
@@ -369,7 +509,36 @@ const animatedPointSource = computed(() => {
         }
     }
 
-    const point = interpolatePointOnLine(coordinates, props.progress);
+    if (coordinates.length < 2) return null;
+
+    const waypoints = buildTimedWaypoints();
+    let point: [number, number] | null;
+
+    if (waypoints && waypoints.length >= 2) {
+        if (props.now >= waypoints[waypoints.length - 1].time) return null;
+
+        const distances = computeDistances(coordinates);
+        const totalDistance = distances[distances.length - 1];
+        const anchors = waypoints.map((waypoint) => ({
+            time: waypoint.time,
+            distance: closestDistanceOnLine(
+                coordinates,
+                distances,
+                waypoint.lng,
+                waypoint.lat,
+            ),
+        }));
+        const distance = distanceForTime(anchors, props.now);
+        const percentage =
+            totalDistance > 0 ? (distance / totalDistance) * 100 : 0;
+
+        point = interpolatePointOnLine(coordinates, percentage);
+    } else {
+        if (props.progress >= 100) return null;
+
+        point = interpolatePointOnLine(coordinates, props.progress);
+    }
+
     if (!point) return null;
 
     return {

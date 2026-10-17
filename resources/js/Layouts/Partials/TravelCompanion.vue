@@ -87,9 +87,9 @@ onMounted(() => {
         </div>
         <div
             v-if="nextStopover"
-            class="line-clamp1 flex w-full justify-between overflow-ellipsis"
+            class="line-clamp-1 flex w-full justify-between overflow-ellipsis"
         >
-            <p>
+            <p class="line-clamp-1">
                 <CircleChevronRight class="inline-block size-3" />
                 {{ nextStopover.location.name }}
             </p>
@@ -108,7 +108,13 @@ onMounted(() => {
     >
         <div class="modal-box max-w-5xl md:w-11/12">
             <div class="mb-8 flex w-full justify-between">
-                <div class="line-clamp-1 font-bold overflow-ellipsis">
+                <RouterLink
+                    class="line-clamp-1 font-bold overflow-ellipsis"
+                    :to="{
+                        name: 'posts.show',
+                        params: { postId: activePost.activeTransportPost.id },
+                    }"
+                >
                     <div
                         v-show="activePost.activeTransportPost.trip.lineName"
                         class="badge badge-sm"
@@ -121,7 +127,7 @@ onMounted(() => {
                         {{ getPostLineName(activePost.activeTransportPost) }}
                     </div>
                     {{ activePost.activeTransportPost.destinationStop.name }}
-                </div>
+                </RouterLink>
                 <form method="dialog">
                     <button
                         class="btn btn-sm btn-circle btn-ghost absolute top-4 right-2"

@@ -17,8 +17,16 @@ import { LngLat } from 'maplibre-gl';
 import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
-import { BasePost, LocationPost, TransportPost } from '../../../types/Api.gen';
-import { getTransportProgress } from '@/Services/TimeFormattingService';
+import {
+    BasePost,
+    LocationPost,
+    TransportPost,
+    TransportPostStopoverDto,
+} from '../../../types/Api.gen';
+import {
+    getTransportEffectiveTimes,
+    getTransportProgress,
+} from '@/Services/TimeFormattingService';
 
 const { t } = useI18n();
 const vueRouter = useRouter();
@@ -36,7 +44,25 @@ const startPoint = ref(null as LngLat | null);
 const endPoint = ref(null as LngLat | null);
 const lineString = ref(null as GeometryCollection | null);
 const stopovers = ref(null as GeometryCollection | null);
-const stopoverDetails = ref<StopoverPopupInfo[] | null>(null);
+const stopoverList = ref<TransportPostStopoverDto[]>([]);
+const stopoverDetails = computed<StopoverPopupInfo[] | null>(() => {
+    if (stopoverList.value.length === 0) return null;
+
+    return stopoverList.value.slice(1, -1).map((stop) => ({
+        name: stop.location.name,
+        longitude: stop.location.longitude,
+        latitude: stop.location.latitude,
+        scheduledArrivalTime: stop.scheduledArrivalTime,
+        scheduledDepartureTime: stop.scheduledDepartureTime,
+        arrivalDelay: stop.arrivalDelay,
+        departureDelay: stop.departureDelay,
+        manualArrivalTime: stop.manualArrivalTime,
+        manualDepartureTime: stop.manualDepartureTime,
+        scheduledTrack: stop.scheduledTrack ?? null,
+        track: stop.track ?? null,
+        cancelled: stop.cancelled,
+    }));
+});
 const heading = ref('');
 const pageTitle = ref('');
 const loading = ref(false);
@@ -115,25 +141,10 @@ function mapPostDetails() {
         api.posts
             .getStopoversForTransportPost(tPost.id)
             .then((response) => {
-                stopoverDetails.value = response.data
-                    .slice(1, -1)
-                    .map((stop) => ({
-                        name: stop.location.name,
-                        longitude: stop.location.longitude,
-                        latitude: stop.location.latitude,
-                        scheduledArrivalTime: stop.scheduledArrivalTime,
-                        scheduledDepartureTime: stop.scheduledDepartureTime,
-                        arrivalDelay: stop.arrivalDelay,
-                        departureDelay: stop.departureDelay,
-                        manualArrivalTime: stop.manualArrivalTime,
-                        manualDepartureTime: stop.manualDepartureTime,
-                        scheduledTrack: stop.scheduledTrack,
-                        track: stop.track,
-                        cancelled: stop.cancelled,
-                    }));
+                stopoverList.value = response.data;
             })
             .catch(() => {
-                stopoverDetails.value = null;
+                stopoverList.value = [];
             });
     } else {
         startPoint.value = null;
@@ -188,6 +199,23 @@ const progress = computed(() => {
     return getTransportProgress(post.value, currentTime.value);
 });
 
+const effectiveTimes = computed(() => {
+    const times = getTransportEffectiveTimes(post.value);
+    if (stopoverList.value.length === 0) {
+        return times;
+    }
+
+    // A logged "depart now"/"arrive now" at the origin/destination stopover
+    // takes precedence over the (legacy) whole-post manual override.
+    const origin = stopoverList.value[0];
+    const destination = stopoverList.value[stopoverList.value.length - 1];
+
+    return {
+        departureTime: origin.manualDepartureTime ?? times.departureTime,
+        arrivalTime: destination.manualArrivalTime ?? times.arrivalTime,
+    };
+});
+
 watchEffect(() => {
     if (pageTitle.value) {
         useTitle(pageTitle.value);
@@ -221,6 +249,9 @@ function deleted() {
                     isTransportPost(post) ? getColorForPost(post) : undefined
                 "
                 :progress="progress"
+                :origin-time="effectiveTimes.departureTime"
+                :destination-time="effectiveTimes.arrivalTime"
+                :now="currentTime"
             ></Map>
             <div v-if="loading" class="skeleton h-110 w-full" />
             <div class="w-full p-4">
@@ -250,7 +281,9 @@ function deleted() {
         <TransportPostStopovers
             v-if="isTransportPost(post)"
             :post="post as TransportPost"
+            :stopovers="stopoverList"
             class="mt-4"
+            @update:stopovers="stopoverList = $event"
         />
 
         <PostMetaInfo v-if="post" :meta-infos="post.metaInfos" class="mt-4" />
