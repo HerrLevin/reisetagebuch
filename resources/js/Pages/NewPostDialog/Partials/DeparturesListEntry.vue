@@ -85,45 +85,10 @@ function getRouteColor(stopTime: StopTimeDto) {
         }"
     >
         <li
-            class="list-row hover:bg-base-200 cursor-pointer grid-cols-11 items-center"
+            class="list-row hover:bg-base-200 cursor-pointer grid-cols-13 items-center gap-0 py-2 md:px-8"
             @click="navigate"
         >
-            <div class="col text-center text-2xl">
-                {{ emoji }}
-            </div>
-            <div class="col col-span-2 text-center">
-                <div
-                    class="badge min-w-[3em] px-[0.5]"
-                    :style="`background-color: ${getRouteColor(stopTime)}; color: ${getRouteTextColor(stopTime)}`"
-                >
-                    {{ getDepartureLineName(stopTime) }}
-                </div>
-                <div class="mt-0.5 text-xs font-medium">
-                    {{ getDepartureTripNumber(stopTime) }}
-                </div>
-            </div>
-            <div class="col col-span-6">
-                <div
-                    :class="{
-                        'text-error line-through': stopTime.place.cancelled,
-                    }"
-                >
-                    {{ stopTime.headSign }}
-                    <span
-                        v-if="stopTime.place.cancelled"
-                        class="badge badge-error badge-xs ml-1 no-underline"
-                    >
-                        {{ t('common.cancelled') }}
-                    </span>
-                </div>
-                <div
-                    v-if="stopTime.place.name !== stop.name"
-                    class="overflow-x-hidden text-xs uppercase opacity-60"
-                >
-                    {{ stopTime.place.name }}
-                </div>
-            </div>
-            <div class="col col-span-2 text-right">
+            <div class="col col-span-2 text-left md:col-span-1">
                 <TimeDisplay
                     :planned-time="plannedTime"
                     :time="time"
@@ -132,6 +97,70 @@ function getRouteColor(stopTime: StopTimeDto) {
                     :cancelled="!!props.stopTime.place.cancelled"
                 />
             </div>
+            <div class="col col-span-9 md:col-span-10">
+                <div
+                    :class="{
+                        'text-error line-through': stopTime.place.cancelled,
+                    }"
+                >
+                    <div class="flex flex-row">
+                        <div class="badge badge-transparent badge-xs">
+                            {{ emoji }}
+                        </div>
+                        <div
+                            class="badge badge-xs min-w-[3em] px-[0.5] whitespace-nowrap"
+                            :style="`background-color: ${getRouteColor(stopTime)}; color: ${getRouteTextColor(stopTime)}`"
+                        >
+                            {{ getDepartureLineName(stopTime) }}
+                        </div>
+                        <div
+                            class="badge badge-transparent badge-xs text-xs font-medium opacity-65"
+                        >
+                            {{ getDepartureTripNumber(stopTime) }}
+                        </div>
+                        <span
+                            v-if="stopTime.place.cancelled"
+                            class="badge badge-error badge-xs ml-1 no-underline"
+                        >
+                            {{ t('common.cancelled') }}
+                        </span>
+                    </div>
+                    <span class="line-clamp-1">
+                        {{ stopTime.headSign }}
+                    </span>
+                </div>
+                <div
+                    v-if="stopTime.place.name !== stop.name"
+                    class="line-clamp-1 overflow-x-hidden text-xs opacity-60"
+                >
+                    {{
+                        t('common.departs_from', {
+                            location: stopTime.place.name,
+                        })
+                    }}
+                </div>
+            </div>
+            <div class="col col-span-2 text-right">
+                <div
+                    v-if="
+                        stopTime.place.track !== stopTime.place.scheduledTrack
+                    "
+                    class="text-error line-through"
+                >
+                    {{
+                        t('common.platform_short', {
+                            platform: stopTime.place.scheduledTrack,
+                        })
+                    }}
+                </div>
+                <div v-if="stopTime.place.track">
+                    {{
+                        t('common.platform_short', {
+                            platform: stopTime.place.track,
+                        })
+                    }}
+                </div>
+            </div>
         </li>
     </RouterLink>
 </template>
@@ -139,5 +168,10 @@ function getRouteColor(stopTime: StopTimeDto) {
 <style scoped>
 .badge {
     height: auto;
+}
+.badge-transparent {
+    background-color: transparent;
+    color: inherit;
+    border-width: 0;
 }
 </style>

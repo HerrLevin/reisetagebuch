@@ -23,7 +23,9 @@ class DbTripHydrator
             ->setArrival($stop->arrival_delay ? $stop->arrival_time?->addSeconds($stop->arrival_delay) : $stop->arrival_time)
             ->setDeparture($stop->departure_delay ? $stop->departure_time?->addSeconds($stop->departure_delay) : $stop->departure_time)
             ->setScheduledArrival($stop->arrival_time)
-            ->setScheduledDeparture($stop->departure_time);
+            ->setScheduledDeparture($stop->departure_time)
+            ->setScheduledTrack($stop->scheduled_track)
+            ->setTrack($stop->track);
     }
 
     /**

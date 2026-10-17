@@ -881,6 +881,8 @@ namespace App\Models{
  * @property string|null $route_segment_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null $track
+ * @property string|null $scheduled_track
  * @property-read \App\Models\Location $location
  * @property-read \App\Models\RouteSegment|null $routeSegment
  * @property-read \App\Models\TransportTrip $transportTrip
@@ -897,7 +899,9 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTripStop whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTripStop whereLocationId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTripStop whereRouteSegmentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTripStop whereScheduledTrack($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTripStop whereStopSequence($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTripStop whereTrack($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTripStop whereTransportTripId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTripStop whereUpdatedAt($value)
  */

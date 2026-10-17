@@ -21,6 +21,8 @@ class TransportTripStop extends Model
         'stop_sequence',
         'cancelled',
         'route_segment_id',
+        'scheduled_track',
+        'track',
     ];
 
     protected $casts = [

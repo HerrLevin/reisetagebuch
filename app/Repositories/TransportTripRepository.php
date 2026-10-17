@@ -138,7 +138,9 @@ class TransportTripRepository
         ?int $arrivalDelay = null,
         ?int $departureDelay = null,
         bool $cancelled = false,
-        ?RouteSegment $routeSegment = null
+        ?RouteSegment $routeSegment = null,
+        ?string $scheduledTrack = null,
+        ?string $track = null
     ): TransportTripStop {
         $stop = new TransportTripStop;
         $stop->transport_trip_id = $trip->id;
@@ -150,6 +152,8 @@ class TransportTripRepository
         $stop->stop_sequence = $stopSequence;
         $stop->cancelled = $cancelled;
         $stop->route_segment_id = $routeSegment?->id;
+        $stop->scheduled_track = $scheduledTrack;
+        $stop->track = $track;
 
         $stop->save();
 
@@ -162,13 +166,17 @@ class TransportTripRepository
         ?Carbon $departureTime = null,
         ?int $arrivalDelay = null,
         ?int $departureDelay = null,
-        bool $cancelled = false
+        bool $cancelled = false,
+        ?string $scheduledTrack = null,
+        ?string $track = null
     ): void {
         $stop->arrival_time = $arrivalTime;
         $stop->departure_time = $departureTime;
         $stop->arrival_delay = $arrivalDelay;
         $stop->departure_delay = $departureDelay;
         $stop->cancelled = $cancelled;
+        $stop->scheduled_track = $scheduledTrack;
+        $stop->track = $track;
 
         $stop->save();
     }

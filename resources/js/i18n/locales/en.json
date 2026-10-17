@@ -378,7 +378,10 @@
         "cancel": "Cancel",
         "cancelled": "Cancelled",
         "saving": "Saving...",
-        "load_more": "Load More"
+        "load_more": "Load More",
+        "departs_from": "from {location}",
+        "platform": "Platform {platform}",
+        "platform_short": "Pl. {platform}"
     },
     "verbs": {
         "share": "Share",
