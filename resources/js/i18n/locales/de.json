@@ -376,7 +376,10 @@
         "cancel": "Abbrechen",
         "cancelled": "Ausgefallen",
         "saving": "Speichern...",
-        "load_more": "Mehr laden"
+        "load_more": "Mehr laden",
+        "departs_from": "von {location}",
+        "platform": "Gleis {platform}",
+        "platform_short": "Gl. {platform}"
     },
     "verbs": {
         "share": "Teilen",

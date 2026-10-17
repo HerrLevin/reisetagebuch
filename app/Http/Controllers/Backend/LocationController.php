@@ -351,7 +351,9 @@ class LocationController extends Controller
                     $stopover->scheduledDeparture,
                     $stopover->scheduledArrival?->diffInSeconds($stopover->arrival) ?? $stop->arrival_delay,
                     $stopover->scheduledDeparture?->diffInSeconds($stopover->departure) ?? $stop->departure_delay,
-                    $stopover->cancelled ?? false
+                    $stopover->cancelled ?? false,
+                    $stopover->scheduledTrack,
+                    $stopover->track,
                 );
             }
             $order++;
@@ -456,7 +458,9 @@ class LocationController extends Controller
                 $realTime ? $stopover->scheduledArrival?->diffInSeconds($stopover->arrival) : null,
                 $realTime ? $stopover->scheduledDeparture?->diffInSeconds($stopover->departure) : null,
                 $stopover->cancelled ?? false,
-                null // todo: get route segment between stops
+                null, // todo: get route segment between stops
+                $stopover->scheduledTrack,
+                $stopover->track
             );
 
             $stop->setRelation('location', $location);

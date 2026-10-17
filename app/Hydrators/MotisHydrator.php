@@ -45,6 +45,8 @@ class MotisHydrator
             ->setTripShortName($data['tripShortName'] ?? null)
             ->setRouteColor($data['routeColor'] ?? null)
             ->setRouteTextColor($data['routeTextColor'] ?? null)
+            ->setScheduledTrack($data['from']['scheduledTrack'] ?? null)
+            ->setTrack($data['from']['track'] ?? null)
             ->setSource($data['source']);
 
     }
@@ -56,11 +58,13 @@ class MotisHydrator
             ->setStopId($data['stopId'])
             ->setLatitude((float) $data['lat'])
             ->setLongitude((float) $data['lon'])
-            ->setArrival(! empty($data['arrival']) ? Carbon::parse($data['arrival'])->utc() : null)
             ->setCancelled(! empty($data['cancelled']) ? (bool) $data['cancelled'] : null)
+            ->setArrival(! empty($data['arrival']) ? Carbon::parse($data['arrival'])->utc() : null)
             ->setDeparture(! empty($data['departure']) ? Carbon::parse($data['departure'])->utc() : null)
             ->setScheduledArrival(! empty($data['scheduledArrival']) ? Carbon::parse($data['scheduledArrival'])->utc() : null)
-            ->setScheduledDeparture(! empty($data['scheduledDeparture']) ? Carbon::parse($data['scheduledDeparture'])->utc() : null);
+            ->setScheduledDeparture(! empty($data['scheduledDeparture']) ? Carbon::parse($data['scheduledDeparture'])->utc() : null)
+            ->setScheduledTrack($data['scheduledTrack'] ?? null)
+            ->setTrack($data['track'] ?? null);
     }
 
     public function hydrateTrip(array $data): TripDto

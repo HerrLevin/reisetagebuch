@@ -127,6 +127,9 @@ function mapPostDetails() {
                         departureDelay: stop.departureDelay,
                         manualArrivalTime: stop.manualArrivalTime,
                         manualDepartureTime: stop.manualDepartureTime,
+                        scheduledTrack: stop.scheduledTrack,
+                        track: stop.track,
+                        cancelled: stop.cancelled,
                     }));
             })
             .catch(() => {

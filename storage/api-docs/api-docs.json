@@ -4303,6 +4303,16 @@
                                 "description": "Indicates if the stop place is cancelled",
                                 "type": "boolean",
                                 "nullable": true
+                            },
+                            "scheduledTrack": {
+                                "description": "Scheduled track for the stop place, if available",
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "track": {
+                                "description": "Actual track for the stop place, if available",
+                                "type": "string",
+                                "nullable": true
                             }
                         },
                         "type": "object"
@@ -4388,6 +4398,16 @@
                     "source": {
                         "description": "Source of the stop time information",
                         "type": "string"
+                    },
+                    "scheduledTrack": {
+                        "description": "Scheduled track for the stop time, if available",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "track": {
+                        "description": "Actual track for the stop time, if available",
+                        "type": "string",
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -6217,6 +6237,16 @@
                     "cancelled": {
                         "description": "Whether this stopover is cancelled, per real-time data",
                         "type": "boolean"
+                    },
+                    "scheduledTrack": {
+                        "description": "Scheduled track/platform for the stopover, if available",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "track": {
+                        "description": "actual track/platform for the stopover, if available",
+                        "type": "string",
+                        "nullable": true
                     }
                 },
                 "type": "object"

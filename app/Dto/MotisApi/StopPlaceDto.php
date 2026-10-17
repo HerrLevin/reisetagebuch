@@ -57,6 +57,36 @@ class StopPlaceDto extends StopDto
     )]
     public ?bool $cancelled = null;
 
+    #[OA\Property(
+        property: 'scheduledTrack',
+        description: 'Scheduled track for the stop place, if available',
+        type: 'string',
+        nullable: true
+    )]
+    public ?string $scheduledTrack = null;
+
+    #[OA\Property(
+        property: 'track',
+        description: 'Actual track for the stop place, if available',
+        type: 'string',
+        nullable: true
+    )]
+    public ?string $track = null;
+
+    public function setScheduledTrack(?string $scheduledTrack = null): StopPlaceDto
+    {
+        $this->scheduledTrack = $scheduledTrack;
+
+        return $this;
+    }
+
+    public function setTrack(?string $track = null): StopPlaceDto
+    {
+        $this->track = $track;
+
+        return $this;
+    }
+
     public function setCancelled(?bool $cancelled = null): StopPlaceDto
     {
         $this->cancelled = $cancelled;

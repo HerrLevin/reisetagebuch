@@ -209,6 +209,9 @@ function clearDeparture() {
                 :class="{ 'text-error line-through': stop.cancelled }"
             >
                 {{ stop.location.name }}
+                <span v-if="stop.track" class="opacity-65">
+                    ({{ t('common.platform', { platform: stop.track }) }})
+                </span>
                 <span
                     v-if="stop.cancelled"
                     class="badge badge-error badge-xs ml-1 no-underline"

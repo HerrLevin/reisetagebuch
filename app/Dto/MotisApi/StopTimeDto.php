@@ -119,6 +119,36 @@ class StopTimeDto
     )]
     public string $source;
 
+    #[OA\Property(
+        property: 'scheduledTrack',
+        description: 'Scheduled track for the stop time, if available',
+        type: 'string',
+        nullable: true
+    )]
+    public ?string $scheduledTrack = null;
+
+    #[OA\Property(
+        property: 'track',
+        description: 'Actual track for the stop time, if available',
+        type: 'string',
+        nullable: true
+    )]
+    public ?string $track = null;
+
+    public function setScheduledTrack(?string $scheduledTrack): StopTimeDto
+    {
+        $this->scheduledTrack = $scheduledTrack;
+
+        return $this;
+    }
+
+    public function setTrack(?string $track): StopTimeDto
+    {
+        $this->track = $track;
+
+        return $this;
+    }
+
     public function setRouteColor(?string $routeColor): StopTimeDto
     {
         $this->routeColor = $routeColor;

@@ -408,6 +408,10 @@ export type StopPlaceDto = MotisStopDto & {
   scheduledDeparture: string | null;
   /** Indicates if the stop place is cancelled */
   cancelled: boolean | null;
+  /** Scheduled track for the stop place, if available */
+  scheduledTrack?: string | null;
+  /** Actual track for the stop place, if available */
+  track?: string | null;
 };
 
 /** Data Transfer Object for a Stop Time in the Motis API */
@@ -440,6 +444,10 @@ export interface StopTimeDto {
   displayName: string | null;
   /** Source of the stop time information */
   source: string;
+  /** Scheduled track for the stop time, if available */
+  scheduledTrack?: string | null;
+  /** Actual track for the stop time, if available */
+  track?: string | null;
 }
 
 /** Data Transfer Object for a Trip in the Motis API */
@@ -1396,6 +1404,10 @@ export interface TransportPostStopoverDto {
   manualDepartureTime: string | null;
   /** Whether this stopover is cancelled, per real-time data */
   cancelled: boolean;
+  /** Scheduled track/platform for the stopover, if available */
+  scheduledTrack?: string | null;
+  /** actual track/platform for the stopover, if available */
+  track?: string | null;
 }
 
 /** Data Transfer Object for a Transport Trip */

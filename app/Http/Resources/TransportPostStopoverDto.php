@@ -95,6 +95,22 @@ class TransportPostStopoverDto
     )]
     public bool $cancelled;
 
+    #[OA\Property(
+        property: 'scheduledTrack',
+        description: 'Scheduled track/platform for the stopover, if available',
+        type: 'string',
+        nullable: true
+    )]
+    public ?string $scheduledTrack = null;
+
+    #[OA\Property(
+        property: 'track',
+        description: 'actual track/platform for the stopover, if available',
+        type: 'string',
+        nullable: true
+    )]
+    public ?string $track = null;
+
     public function __construct(TransportTripStop $stop, ?TransportPostStopoverLog $log = null)
     {
         $this->id = $stop->id;
@@ -107,5 +123,7 @@ class TransportPostStopoverDto
         $this->manualArrivalTime = $log?->manual_arrival?->toIso8601String();
         $this->manualDepartureTime = $log?->manual_departure?->toIso8601String();
         $this->cancelled = $stop->cancelled;
+        $this->track = $stop->track;
+        $this->scheduledTrack = $stop->scheduled_track;
     }
 }

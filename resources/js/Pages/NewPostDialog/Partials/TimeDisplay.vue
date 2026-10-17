@@ -25,6 +25,7 @@ defineProps({
 
 <template>
     <div
+        class="line-clamp-1"
         :class="{
             'text-warning': !cancelled && delay < 4 && delay >= 2,
             'text-success': !cancelled && delay < 2 && delay >= 0 && realTime,

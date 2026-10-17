@@ -40,6 +40,8 @@ export interface StopoverPopupInfo {
     departureDelay: number | null;
     manualArrivalTime: string | null;
     manualDepartureTime: string | null;
+    scheduledTrack: string | null;
+    track: string | null;
 }
 
 const props = defineProps({
@@ -291,6 +293,8 @@ const stopoverDetailSource = computed<FeatureCollection | null>(() => {
                 departureDelay: stop.departureDelay,
                 manualArrivalTime: stop.manualArrivalTime,
                 manualDepartureTime: stop.manualDepartureTime,
+                scheduledTrack: stop.scheduledTrack,
+                track: stop.track,
             },
             geometry: {
                 type: 'Point',
@@ -467,6 +471,32 @@ const animatedPointSource = computed(() => {
             <div class="min-w-40 p-1 text-xs">
                 <div class="mb-1 text-sm font-semibold">
                     {{ activeStopover.name }}
+                </div>
+                <div
+                    v-if="activeStopover.scheduledTrack || activeStopover.track"
+                    class="mb-1"
+                >
+                    <span
+                        v-if="
+                            activeStopover.track &&
+                            activeStopover.track !==
+                                activeStopover.scheduledTrack
+                        "
+                        class="text-error mr-1 line-through"
+                    >
+                        {{
+                            t('common.platform', {
+                                platform: activeStopover.scheduledTrack,
+                            })
+                        }}
+                    </span>
+                    <span v-if="activeStopover.track">
+                        {{
+                            t('common.platform', {
+                                platform: activeStopover.track,
+                            })
+                        }}
+                    </span>
                 </div>
                 <div
                     v-if="activeStopover.scheduledArrivalTime"
