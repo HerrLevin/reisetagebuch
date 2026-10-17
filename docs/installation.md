@@ -52,7 +52,10 @@ outside Docker by default. You need a reverse proxy (Traefik, Nginx, Caddy, etc.
   valid HTTPS, not plain HTTP.
 - Forward traffic to `rtb.prod` on port 80.
 
-Set `APP_URL` in your `.env` to the public `https://` URL the proxy serves before starting the stack.
+Set `APP_URL` in your `.env` to the public `https://` URL the proxy serves before starting the stack. Also set
+`TRUSTED_PROXIES=*` so Laravel trusts the `X-Forwarded-*` headers from your proxy and sees the real client IP and
+scheme instead of the proxy's &mdash; this is safe since `rtb.prod` publishes no ports and is only reachable through
+the proxy.
 
 ::: details Traefik example
 Put `rtb.prod` on the same Docker network as Traefik and add labels:
