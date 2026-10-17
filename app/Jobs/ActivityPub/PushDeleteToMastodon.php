@@ -15,8 +15,6 @@ class PushDeleteToMastodon implements ShouldQueue
 {
     use Queueable;
 
-    public $queue = 'activitypub';
-
     public int $tries = 3;
 
     public array $backoff = [30, 120, 600];
@@ -25,7 +23,9 @@ class PushDeleteToMastodon implements ShouldQueue
         private readonly string $postId,
         private readonly string $userId,
         private readonly string $username
-    ) {}
+    ) {
+        $this->queue = 'activitypub';
+    }
 
     public function handle(): void
     {

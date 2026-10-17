@@ -15,15 +15,15 @@ class PushProfileUpdateToMastodon implements ShouldQueue
 {
     use Queueable;
 
-    public $queue = 'activitypub';
-
     public int $tries = 3;
 
     public array $backoff = [30, 120, 600];
 
     public function __construct(
         private readonly string $userId
-    ) {}
+    ) {
+        $this->queue = 'activitypub';
+    }
 
     public function handle(UserRepository $userRepository): void
     {

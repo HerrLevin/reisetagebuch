@@ -10,8 +10,6 @@ class TraewellingCrossCheckInJob implements ShouldQueue
 {
     use Queueable;
 
-    public $queue = 'traewelling';
-
     private string $postId;
 
     private CrossPostController $crossPostController;
@@ -20,6 +18,7 @@ class TraewellingCrossCheckInJob implements ShouldQueue
     {
         $this->postId = $postId;
         $this->crossPostController = $crossPostController ?? app(CrossPostController::class);
+        $this->queue = 'traewelling';
     }
 
     public function handle(): void

@@ -15,14 +15,14 @@ class DeliverActivityPubActivity implements ShouldQueue
 
     use Queueable;
 
-    public $queue = 'activitypub';
-
     public function __construct(
         private readonly UserDto $userDto,
         private readonly string $followerActorId,
         private readonly ?string $inbox,
         private readonly array $updateActivity
-    ) {}
+    ) {
+        $this->queue = 'activitypub';
+    }
 
     public function handle(ActivityPubService $activityPub): void
     {

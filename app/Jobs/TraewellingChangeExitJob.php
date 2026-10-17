@@ -11,8 +11,6 @@ class TraewellingChangeExitJob implements ShouldQueue
 {
     use Queueable;
 
-    public $queue = 'traewelling';
-
     private string $postId;
 
     private CrossPostController $crossPostController;
@@ -21,6 +19,7 @@ class TraewellingChangeExitJob implements ShouldQueue
     {
         $this->postId = $post->id;
         $this->crossPostController = $crossPostController ?? app(CrossPostController::class);
+        $this->queue = 'traewelling';
     }
 
     public function handle(): void

@@ -14,8 +14,6 @@ class FetchRemoteActorAvatar implements ShouldQueue
 {
     use Queueable;
 
-    public $queue = 'activitypub';
-
     public int $tries = 3;
 
     public array $backoff = [30, 120, 600];
@@ -31,7 +29,9 @@ class FetchRemoteActorAvatar implements ShouldQueue
 
     public function __construct(
         private readonly string $actorId
-    ) {}
+    ) {
+        $this->queue = 'activitypub';
+    }
 
     public function handle(ActivityPubUrlGuard $urlGuard): void
     {

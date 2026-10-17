@@ -16,15 +16,15 @@ class PushPostToMastodon implements ShouldQueue
 {
     use Queueable;
 
-    public $queue = 'activitypub';
-
     public int $tries = 3;
 
     public array $backoff = [30, 120, 600];
 
     public function __construct(
         private readonly string $postId
-    ) {}
+    ) {
+        $this->queue = 'activitypub';
+    }
 
     public function handle(): void
     {

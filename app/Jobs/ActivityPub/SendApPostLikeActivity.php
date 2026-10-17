@@ -15,8 +15,6 @@ class SendApPostLikeActivity implements ShouldQueue
 {
     use Queueable;
 
-    public $queue = 'activitypub';
-
     public int $tries = 3;
 
     public array $backoff = [30, 120, 600];
@@ -25,7 +23,9 @@ class SendApPostLikeActivity implements ShouldQueue
         private readonly string $userId,
         private readonly string $apPostId,
         private readonly string $likeActivityId,
-    ) {}
+    ) {
+        $this->queue = 'activitypub';
+    }
 
     public function handle(
         UserRepository $userRepository,
