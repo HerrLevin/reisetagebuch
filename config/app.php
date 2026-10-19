@@ -39,6 +39,12 @@ return [
         'request_timeout' => env('APP_OVERPASS_REQUEST_TIMEOUT', 30),
     ],
 
+    'osm' => [
+        'geofabrik_extracts' => array_filter(explode(',', env('APP_OSM_GEOFABRIK_EXTRACTS', ''))),
+        'geofabrik_import_schedule' => env('APP_OSM_GEOFABRIK_IMPORT_SCHEDULE', '0 3 * * 0'),
+        'osmium_pool_threads' => env('APP_OSMIUM_POOL_THREADS', 1),
+    ],
+
     'motis' => [
         'radius' => env('APP_MOTIS_RADIUS', 500),
         'single_location_radius' => env('APP_MOTIS_SINGLE_LOCATION_RADIUS', 100),

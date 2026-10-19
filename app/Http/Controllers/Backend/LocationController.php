@@ -128,6 +128,19 @@ class LocationController extends Controller
      */
     public function prefetch(Point $point, int $radius, bool $isRetry = false): void
     {
+        // Overpass has never run here, but there's already data (e.g. a Geofabrik
+        // import covering this area) — skip, rather than duplicating it. Areas
+        // Overpass HAS already fetched keep going through the normal recentNearbyRequests
+        // debounce below, so they still get periodically refreshed as before.
+        if (! $isRetry
+            && ! $this->locationRepository->hasEverRequestedNearby($point, $radius)
+            && $this->locationRepository->hasNearbyLocations($point, $radius)
+        ) {
+            Log::debug('Skipping prefetch for point '.$point.': already has local data within radius '.$radius);
+
+            return;
+        }
+
         if ($isRetry || ! $this->locationRepository->recentNearbyRequests($point, $radius)) {
             Log::debug('Prefetching nearby locations for point '.$point.' with radius '.$radius);
             $requestLocation = $this->locationRepository->createRequestLocation($point, $radius);

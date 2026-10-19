@@ -262,6 +262,22 @@ return [
             'timeout' => 60,
             'nice' => 0,
         ],
+        // runs alone, isolated from the other queues: a weekly/rare, long-running
+        // (hours) import that shouldn't block or get crowded out by the
+        // short-lived jobs above, and doesn't need more than one worker.
+        'supervisor-data-import' => [
+            'connection' => 'redis',
+            'queue' => ['data-import'],
+            'balance' => 'auto',
+            'autoScalingStrategy' => 'time',
+            'maxProcesses' => 1,
+            'maxTime' => 0,
+            'maxJobs' => 0,
+            'memory' => 256,
+            'tries' => 1,
+            'timeout' => 60 * 60 * 6,
+            'nice' => 0,
+        ],
     ],
 
     'environments' => [
@@ -286,6 +302,11 @@ return [
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
             ],
+            'supervisor-data-import' => [
+                'maxProcesses' => 1,
+                'balanceMaxShift' => 1,
+                'balanceCooldown' => 3,
+            ],
         ],
 
         'local' => [
@@ -300,6 +321,9 @@ return [
             ],
             'supervisor-overpass-prefetch' => [
                 'maxProcesses' => 3,
+            ],
+            'supervisor-data-import' => [
+                'maxProcesses' => 1,
             ],
         ],
     ],

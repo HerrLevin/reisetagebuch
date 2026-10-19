@@ -10,6 +10,7 @@ use App\Jobs\BackfillLocationTimezones;
 use App\Jobs\DeleteOldNearbyRequests;
 use App\Jobs\DispatchRefreshJobForActiveTrips;
 use App\Jobs\HideExpiredPosts;
+use App\Jobs\ImportOsmExtractsJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -57,5 +58,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->job(DeleteOldNearbyRequests::class)->daily();
         $schedule->job(HideExpiredPosts::class)->everyFifteenMinutes();
         $schedule->job(BackfillLocationTimezones::class)->everyFifteenMinutes();
+        $schedule->job(ImportOsmExtractsJob::class)->cron(config('app.osm.geofabrik_import_schedule'));
     })
     ->create();

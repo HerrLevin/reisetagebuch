@@ -77,7 +77,7 @@ class LocationRepository
             ->get();
     }
 
-    public function updateOrCreateOsmLocation($location): void
+    public function updateOrCreateOsmLocation($location, bool $fetchTimezone = false): void
     {
         $name = $this->osmNameService->getName($location);
         if ($name === null) {
@@ -104,6 +104,10 @@ class LocationRepository
             $location->osmType,
             'osm'
         );
+
+        if ($fetchTimezone) {
+            $this->resolveTimezoneNow($dbLocation);
+        }
 
         foreach ($location->tags as $key => $value) {
             $dbLocation->tags()->updateOrCreate([
@@ -137,6 +141,8 @@ class LocationRepository
             'airport',
             $airport->provider
         );
+
+        $this->resolveTimezoneNow($dbLocation);
 
         if ($airport->iataCode) {
             $dbLocation->identifiers()->updateOrCreate(
@@ -234,6 +240,28 @@ class LocationRepository
         $locations = $this->recentRequestLocationQuery($position, $radius);
 
         return $locations->count() > 0;
+    }
+
+    /**
+     * Whether this area has ever been queried via Overpass before, regardless
+     * of how long ago (unlike recentNearbyRequests(), which only looks within
+     * the debounce window). Used to tell "never fetched, but already covered
+     * by a Geofabrik import" apart from "fetched before, due for a refresh".
+     */
+    public function hasEverRequestedNearby(Point $position, int $radius): bool
+    {
+        return RequestLocation::where(ST::distanceSphere($position, 'location'), '<=', $radius)->exists();
+    }
+
+    /**
+     * Whether Locations already exist within radius (e.g. from a Geofabrik
+     * import), making a live Overpass fetch for that area unnecessary.
+     */
+    public function hasNearbyLocations(Point $position, int $radius): bool
+    {
+        return Location::where(ST::distanceSphere($position, 'location'), '<=', $radius)
+            ->where('name', '!=', '')
+            ->exists();
     }
 
     public function deleteOldNearbyRequests(): void

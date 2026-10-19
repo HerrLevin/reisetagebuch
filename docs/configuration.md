@@ -86,6 +86,49 @@ The application uses standard Laravel configuration files in `config/`:
 - `mail.php` - Email configuration
 - `services.php` - Third-party services
 
+## OSM Location Data (Geofabrik Import)
+
+Reisetagebuch resolves nearby points of interest (shops, stations, landmarks, ...) through the
+[Overpass API](https://wiki.openstreetmap.org/wiki/Overpass_API) by default, which can be slow or time out under
+load. As an alternative, you can bulk-import the same kind of data from a [Geofabrik](https://download.geofabrik.de/)
+`.osm.pbf` extract directly into the database, ahead of time, so most lookups never need to hit Overpass at all.
+Overpass stays in place as a fallback for anything outside the extracts you import.
+If a full Europe import fails, you can import every country comma separated.  
+
+| Variable                           | Description                                                                              | Default        |
+|-------------------------------------|-------------------------------------------------------------------------------------------|----------------|
+| `APP_OSM_GEOFABRIK_EXTRACTS`        | Comma-separated list of Geofabrik `.osm.pbf` download URLs (or local file paths) to import | *(none)*       |
+| `APP_OSM_GEOFABRIK_IMPORT_SCHEDULE` | Crontab expression for how often the configured extracts are re-imported                  | `0 3 * * 0` (weekly, Sunday 03:00) |
+
+Pick extracts from the [Geofabrik download server](https://download.geofabrik.de/) (country- or region-sized, e.g.
+`https://download.geofabrik.de/europe/germany-latest.osm.pbf`), for example:
+
+```
+APP_OSM_GEOFABRIK_EXTRACTS=https://download.geofabrik.de/europe/germany-latest.osm.pbf,https://download.geofabrik.de/europe/austria-latest.osm.pbf
+```
+
+With extracts configured, the import runs automatically:
+- once, the first time the app starts (so the data isn't empty until the first scheduled run), and
+- on the recurring schedule above, to pick up OSM updates.
+
+Both happen as a queued job (`App\Jobs\ImportOsmExtractsJob`) on its own `data-import` queue, so this long-running,
+infrequent import doesn't compete with or block the app's other (short-lived, frequent) queued jobs. It's processed
+by the `horizon` service like everything else. You can also queue an import manually, e.g. for a one-off extract not
+in your configured list:
+
+```bash
+php artisan app:import-osm-extracts [extract-url-or-path ...]
+```
+
+This only queues `ImportOsmExtractsJob`; the actual import happens asynchronously once a Horizon worker on the
+`data-import` queue picks it up. Run without arguments, it imports whatever is configured in
+`APP_OSM_GEOFABRIK_EXTRACTS`.
+
+::: tip
+This requires the [`osmium`](https://osmcode.org/osmium-tool/) CLI. It's already included in the published Docker
+image; for a bare-metal or Sail setup, install `osmium-tool` yourself.
+:::
+
 ## Träwelling Cross-Posting Configuration
 To enable cross-posting to Träwelling, you'll need a Träwelling Application Key.
 
