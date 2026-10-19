@@ -107,13 +107,31 @@ Sail service (`horizon`) whenever you run `sail up -d`. The scheduler (`schedule
 service (`scheduler`), so cron-based jobs run without any extra setup.
 
 You can monitor queues, throughput and failed jobs on the Horizon dashboard at
-[http://localhost/horizon](http://localhost/horizon) (requires an admin user).
+[http://localhost/horizon](http://localhost/horizon) (requires an admin user — there's no CLI command for this yet,
+so set `is_admin` to `true` on your user's row in the `users` table).
 
 If you need to restart the workers after changing job or queue code, run:
 
 ```bash
 ./vendor/bin/sail artisan horizon:terminate
 ```
+
+## Mobile Apps (Capacitor)
+
+The iOS and Android apps are built with [Capacitor](https://capacitorjs.com/), wrapping a standalone build of the
+SPA (separate from the Laravel-served web build, via `vite.capacitor.config.mts`). To build and sync the native
+projects:
+
+```bash
+npm ci
+npm run build:capacitor
+npx cap sync
+```
+
+`npm run build:capacitor` builds `resources/capacitor` into `dist-capacitor`, which is the `webDir` the native
+shells load. `npm run cap:sync` runs both the build and sync steps together.
+
+After syncing, open the native projects with `npm run cap:ios` or `npm run cap:android`.
 
 ## Next Steps
 

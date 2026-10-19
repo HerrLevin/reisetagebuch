@@ -8,7 +8,7 @@ data (coordinates, stop times, trip metadata, …) that the post's rendered
 `content` only summarizes in prose.
 
 This is **not** part of the app's public REST API (that one is documented via
-OpenAPI — see [`/api/documentation`](/../api/documentation)). It's a
+OpenAPI — see [REST API documentation](https://redocly.github.io/redoc?url=https%3A%2F%2Fraw.githubusercontent.com%2FHerrLevin%2Freisetagebuch%2Frefs%2Fheads%2Fmain%2Fstorage%2Fapi-docs%2Fapi-docs.json). It's a
 federation-only, JSON-LD vocabulary extension: an optional, additively-typed
 envelope attached to the AP object graph itself.
 

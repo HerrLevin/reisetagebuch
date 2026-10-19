@@ -4,6 +4,7 @@ export default defineConfig({
     title: 'Reisetagebuch',
     description: 'Dokumentation',
     themeConfig: {
+        externalLinkIcon: true,
         nav: [
             { text: 'Home', link: '/' },
             { text: 'Getting Started', link: '/getting-started' },
