@@ -29,7 +29,6 @@ RUN apk add --no-cache \
     nodejs \
     npm \
     oniguruma-dev \
-    osmium-tool \
     shadow \
     sqlite-dev \
     supervisor \
@@ -53,6 +52,23 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
 
 RUN groupmod --gid ${RUNTIME_GID} www-data \
     && usermod --uid ${RUNTIME_UID} --gid ${RUNTIME_GID} www-data
+
+# Alpine has no osmium-tool package (only the libosmium headers), so build the
+# `osmium` CLI from source. Runtime shared libs are installed as regular (not
+# --virtual) packages so `apk del` below only removes the compiler toolchain
+# and headers, not the libraries osmium needs to actually run.
+RUN apk add --no-cache libstdc++ libgcc boost-program_options libbz2 expat zlib \
+  && apk add --no-cache --virtual .osmium-build-deps \
+    build-base cmake git \
+    libosmium-dev protozero-dev expat-dev bzip2-dev zlib-dev boost-dev \
+  && git clone --depth 1 --branch v1.16.0 https://github.com/osmcode/osmium-tool.git /tmp/osmium-tool \
+  && cmake -S /tmp/osmium-tool -B /tmp/osmium-tool/build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF \
+    -DCMAKE_CXX_FLAGS=-Wno-template-body \
+  && cmake --build /tmp/osmium-tool/build -j"$(nproc)" --target osmium \
+  && install -m 755 /tmp/osmium-tool/build/src/osmium /usr/local/bin/osmium \
+  && rm -rf /tmp/osmium-tool \
+  && apk del .osmium-build-deps \
+  && osmium --version
 
 # Set working directory
 WORKDIR /var/www/html

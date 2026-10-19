@@ -46,7 +46,18 @@ readonly class OsmGeofabrikImportService
             Log::info("OsmGeofabrikImportService: {$message}", ['extract' => $extract]);
         };
 
-        $workDir = storage_path('app/osm-import/'.uniqid());
+        // A `finally` block can't run if the process is hard-killed mid-import
+        // (e.g. OOM) — that leaves its working directory (which can be several
+        // GB) behind. The osm-import queue only ever runs one import at a time,
+        // so anything already here on the next run must be exactly that kind of
+        // orphaned debris; sweep it before starting.
+        $baseDir = storage_path('app/osm-import');
+        File::ensureDirectoryExists($baseDir);
+        foreach (File::directories($baseDir) as $staleDir) {
+            File::deleteDirectory($staleDir);
+        }
+
+        $workDir = $baseDir.'/'.uniqid();
         File::ensureDirectoryExists($workDir);
 
         try {
