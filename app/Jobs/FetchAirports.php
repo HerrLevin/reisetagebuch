@@ -13,6 +13,14 @@ class FetchAirports implements ShouldQueue
 {
     use Queueable;
 
+    public int $timeout = 60 * 60;
+
+    // must stay >= $timeout: Redis's queue 'retry_after' (config/queue.php,
+    // default 90s) otherwise requeues this still-running job as "lost" long
+    // before it's actually done, so the next pickup fails immediately with
+    // MaxAttemptsExceededException (tries: 1 in config/horizon.php).
+    public int $retryAfter = 60 * 60 + 60;
+
     private const string AIRPORTS = 'https://davidmegginson.github.io/ourairports-data/airports.csv';
 
     private LocationRepository $locationRepository;
@@ -20,6 +28,7 @@ class FetchAirports implements ShouldQueue
     public function __construct(?LocationRepository $locationRepository = null)
     {
         $this->locationRepository = $locationRepository ?? app(LocationRepository::class);
+        $this->queue = 'data-import';
     }
 
     public function handle(): void

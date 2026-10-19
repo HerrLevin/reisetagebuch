@@ -133,6 +133,17 @@ shells load. `npm run cap:sync` runs both the build and sync steps together.
 
 After syncing, open the native projects with `npm run cap:ios` or `npm run cap:android`.
 
+## OSM Import (Geofabrik)
+
+If you want to test [the Geofabrik import](./configuration.md#osm-location-data-geofabrik-import) locally, Sail's
+default PHP image doesn't include the `osmium` CLI it depends on. Install it once per container via:
+
+```bash
+docker exec -it reisetagebuch-horizon-1 bash
+# inside the container:
+apt-get update && apt-get install -y osmium-tool
+```
+
 ## Next Steps
 
 - [Configure the application](./configuration.md)

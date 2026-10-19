@@ -29,6 +29,7 @@ RUN apk add --no-cache \
     nodejs \
     npm \
     oniguruma-dev \
+    osmium-tool \
     shadow \
     sqlite-dev \
     supervisor \

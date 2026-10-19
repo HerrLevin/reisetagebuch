@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Dto\OverpassLocation;
 use App\Exceptions\OverpassApiOverloaded;
+use App\Services\Osm\OsmTagFilter;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Generator;
 use Illuminate\Support\Facades\Log;
@@ -14,56 +15,11 @@ class OverpassRadiusRequestService extends OverpassRequestService
 
     private int $radius;
 
-    private const array EXCLUDE = [
-        'amenity' => [
-            'waste_basket',
-            'bicycle_parking',
-            'bench',
-            'lounger',
-            'trolley_bay',
-            'vending_machine',
-            'clock',
-            'telephone',
-            'parking_entrance',
-            'loading_dock',
-            'recycling',
-            'parking_space',
-        ],
-    ];
+    private const array EXCLUDE = OsmTagFilter::EXCLUDE;
 
-    private const array FILTERS_FORCE_NAME = [
-        'leisure',
-        'natural',
-        'bridge',
-        'building' => [
-            'office',
-        ],
-        'parking',
-        'admin_level' => ['2', '4', '8', '9', '10', '11'],
-    ];
+    private const array FILTERS_FORCE_NAME = OsmTagFilter::FILTERS_FORCE_NAME;
 
-    private const array FILTERS = [
-        'amenity',
-        'place' => ['village'],
-        'historic',
-        'tourism',
-        'office',
-        'shop',
-        'landuse' => [
-            'events',
-        ],
-        'railway' => [
-            'station',
-            'tram_stop',
-        ],
-        'public_transport' => [
-            'platform',
-            'stop_area',
-        ],
-        'highway' => [
-            'bus_stop',
-        ],
-    ];
+    private const array FILTERS = OsmTagFilter::FILTERS;
 
     public function setRadius(int $radius): void
     {
