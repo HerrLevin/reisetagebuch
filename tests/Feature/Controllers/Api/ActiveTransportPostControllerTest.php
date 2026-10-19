@@ -26,24 +26,28 @@ class ActiveTransportPostControllerTest extends TestCase
             'stop_sequence' => 0,
             'arrival_time' => null,
             'departure_time' => now()->subHours(2),
+            'cancelled' => false,
         ]);
         $stops[1] = TransportTripStop::factory()->create([
             'transport_trip_id' => $trip->id,
             'stop_sequence' => 1,
             'arrival_time' => now()->subMinutes(90),
             'departure_time' => now()->subMinutes(80),
+            'cancelled' => false,
         ]);
         $stops[2] = TransportTripStop::factory()->create([
             'transport_trip_id' => $trip->id,
             'stop_sequence' => 2,
             'arrival_time' => now()->subMinutes(30),
             'departure_time' => now()->subMinutes(20),
+            'cancelled' => false,
         ]);
         $stops[3] = TransportTripStop::factory()->create([
             'transport_trip_id' => $trip->id,
             'stop_sequence' => 3,
             'arrival_time' => now()->addHours(2),
             'departure_time' => null,
+            'cancelled' => false,
         ]);
 
         $post = Post::factory()->create(['user_id' => $user->id]);
