@@ -206,8 +206,9 @@ readonly class OsmGeofabrikImportService
             'osmium', 'export', $filteredPath, '-f', 'jsonseq',
             // osmium's default location index sizes itself off OSM's global node-ID
             // range, not this extract's actual size, and can get OOM-killed even on
-            // a regional extract; sparse_mem_array scales with the extract instead.
-            '--index-type=sparse_mem_array',
+            // a regional extract; sparse_file_array scales with the extract and is
+            // backed by a temp file on disk instead of process memory.
+            '--index-type=sparse_file_array',
             '-o', $ndjsonPath, '--overwrite', '-c', $configPath,
         ]);
         if ($result->failed()) {
