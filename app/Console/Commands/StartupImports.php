@@ -16,15 +16,14 @@ class StartupImports extends Command
 {
     public function handle(): void
     {
-        FetchAirports::dispatch();
         StartupImportCountriesJob::dispatch();
 
-        // The Geofabrik import (unlike the imports above) is too expensive to
-        // redo on every container restart, so it's dispatched only the first
-        // time the app ever starts; after that it only runs on the schedule
-        // configured in bootstrap/app.php (app.osm.geofabrik_import_schedule).
         if (! empty(config('app.osm.geofabrik_extracts')) && Cache::add('app:osm-geofabrik-import:first-run-dispatched', true)) {
             ImportOsmExtractsJob::dispatch();
+        }
+
+        if (Cache::add('app:startup-imports:fetch-airports-dispatched', true)) {
+            FetchAirports::dispatch();
         }
     }
 }
