@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Dto\AirportDto;
+use App\Dto\OverpassLocation;
 use App\Jobs\LookupLocationTimezoneJob;
 use App\Models\Country;
 use App\Models\Location;
@@ -16,9 +17,14 @@ use App\Services\TimeZoneLookupService;
 use Carbon\Carbon;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Clickbar\Magellan\Database\PostgisFunctions\ST;
+use Clickbar\Magellan\Facades\WKBGenerator;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Throwable;
 
 class LocationRepository
 {
@@ -115,6 +121,176 @@ class LocationRepository
                 'value' => $value,
             ]);
         }
+    }
+
+    /**
+     * Batched equivalent of calling updateOrCreateOsmLocation() once per item in $locations:
+     * one lookup query plus one upsert per table (locations, location_identifiers,
+     * location_tags) for the whole chunk, instead of several round-trips per location.
+     * Country-code resolution and (if $fetchTimezone) the geo2tz lookup still happen once
+     * per location, synchronously, exactly as in updateOrCreateOsmLocation().
+     *
+     * @param  OverpassLocation[]  $locations
+     *
+     * @throws Throwable
+     */
+    public function bulkUpsertOsmLocations(array $locations, bool $fetchTimezone = true): void
+    {
+        $byKey = [];
+        foreach ($locations as $location) {
+            $name = $this->osmNameService->getName($location);
+            if ($name === null) {
+                continue;
+            }
+
+            // A single upsert() call can't affect the same ON CONFLICT row twice, so
+            // de-dupe defensively even though readFeatures() shouldn't produce repeats.
+            $byKey[$location->osmType.'|'.$location->osmId] = [$location, $name];
+        }
+
+        if ($byKey === []) {
+            return;
+        }
+
+        $existing = $this->lookupExistingOsmLocations(array_column($byKey, 0));
+
+        $now = now();
+        $locationRows = [];
+        $identifierRows = [];
+        $tagRows = [];
+
+        foreach ($byKey as $key => [$location, $name]) {
+            $existingRow = $existing->get($key);
+            $locationId = $existingRow->location_id ?? (string) Str::uuid7();
+            $point = Point::makeGeodetic($location->latitude, $location->longitude);
+
+            $timezone = $existingRow->timezone ?? null;
+            if ($fetchTimezone && $timezone === null) {
+                $timezone = $this->timeZoneLookupService->lookup($location->latitude, $location->longitude);
+            }
+
+            $locationRows[] = [
+                'id' => $locationId,
+                'name' => $name,
+                'location' => WKBGenerator::generate($point),
+                'country_code' => $this->resolveCountryCode($point),
+                'timezone' => $timezone,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ];
+
+            $identifierRows[] = [
+                'id' => (string) Str::uuid7(),
+                'location_id' => $locationId,
+                'type' => $location->osmType,
+                'identifier' => $location->osmId,
+                'origin' => 'osm',
+                'name' => $name,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ];
+
+            foreach ($location->tags as $tagKey => $tagValue) {
+                $tagRows[] = [
+                    'id' => (string) Str::uuid7(),
+                    'location_id' => $locationId,
+                    'key' => $tagKey,
+                    'value' => $tagValue,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
+            }
+        }
+
+        DB::transaction(function () use ($locationRows, $identifierRows, $tagRows) {
+            DB::table('locations')->upsert(
+                $locationRows,
+                ['id'],
+                [
+                    'name' => DB::raw('excluded.name'),
+                    'location' => DB::raw('excluded.location'),
+                    'country_code' => DB::raw('excluded.country_code'),
+                    // never clobber an already-known timezone with a skipped/failed lookup's null
+                    'timezone' => DB::raw('coalesce(excluded.timezone, locations.timezone)'),
+                    'updated_at' => DB::raw('excluded.updated_at'),
+                ]
+            );
+
+            $this->upsertOsmLocationIdentifiers($identifierRows);
+
+            if ($tagRows !== []) {
+                DB::table('location_tags')->upsert(
+                    $tagRows,
+                    ['location_id', 'key'],
+                    [
+                        'value' => DB::raw('excluded.value'),
+                        'updated_at' => DB::raw('excluded.updated_at'),
+                    ]
+                );
+            }
+        });
+    }
+
+    /**
+     * @param  OverpassLocation[]  $locations
+     * @return SupportCollection<string, object{type: string, identifier: string, location_id: string, timezone: ?string}>
+     */
+    private function lookupExistingOsmLocations(array $locations): SupportCollection
+    {
+        $tuples = [];
+        $bindings = [];
+        foreach ($locations as $location) {
+            $tuples[] = '(?, ?, ?)';
+            $bindings[] = $location->osmType;
+            $bindings[] = 'osm';
+            $bindings[] = $location->osmId;
+        }
+
+        return DB::table('location_identifiers')
+            ->join('locations', 'locations.id', '=', 'location_identifiers.location_id')
+            ->whereRaw(
+                '(location_identifiers.type, location_identifiers.origin, location_identifiers.identifier) in ('.implode(',', $tuples).')',
+                $bindings
+            )
+            ->select('location_identifiers.type', 'location_identifiers.identifier', 'location_identifiers.location_id', 'locations.timezone')
+            ->get()
+            ->keyBy(fn ($row) => $row->type.'|'.$row->identifier);
+    }
+
+    /**
+     * location_identifiers has no table-wide unique constraint on (type, origin,
+     * identifier) — only a partial one scoped to origin = 'osm' (other origins,
+     * e.g. Träwelling cross-posting, legitimately key by (origin, type,
+     * location_id) instead and can share an identifier across locations).
+     * Builder::upsert() can't express a WHERE-qualified ON CONFLICT target, so
+     * this writes the insert/on-conflict SQL directly, matching that partial index.
+     *
+     * @param  array<int, array{id: string, location_id: string, type: string, identifier: string, origin: string, name: string, created_at: \Illuminate\Support\Carbon, updated_at: \Illuminate\Support\Carbon}>  $rows
+     */
+    private function upsertOsmLocationIdentifiers(array $rows): void
+    {
+        if ($rows === []) {
+            return;
+        }
+
+        $columns = ['id', 'location_id', 'type', 'identifier', 'origin', 'name', 'created_at', 'updated_at'];
+        $placeholders = [];
+        $bindings = [];
+        foreach ($rows as $row) {
+            $placeholders[] = '('.implode(',', array_fill(0, count($columns), '?')).')';
+            foreach ($columns as $column) {
+                $bindings[] = $row[$column] instanceof DateTimeInterface ? $row[$column]->toDateTimeString() : $row[$column];
+            }
+        }
+
+        DB::statement(
+            'insert into location_identifiers ('.implode(',', $columns).') values '.implode(',', $placeholders).
+            " on conflict (type, identifier) where origin = 'osm' do update set
+                location_id = excluded.location_id,
+                name = excluded.name,
+                updated_at = excluded.updated_at",
+            $bindings
+        );
     }
 
     public function updateOrCreateAirport(AirportDto $airport): void

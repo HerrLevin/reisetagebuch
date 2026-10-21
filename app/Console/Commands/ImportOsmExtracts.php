@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Jobs\ImportOsmExtractsJob;
+use App\Jobs\ImportOsmExtractJob;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Command\Command as CommandAlias;
 
@@ -14,16 +14,18 @@ class ImportOsmExtracts extends Command
 
     public function handle(): int
     {
-        $extracts = $this->argument('extracts') ?: null;
+        $extracts = $this->argument('extracts') ?: config('app.osm.geofabrik_extracts');
 
-        if ($extracts === null && empty(config('app.osm.geofabrik_extracts'))) {
+        if (empty($extracts)) {
             $this->error('No extracts given and none configured in app.osm.geofabrik_extracts.');
 
             return CommandAlias::FAILURE;
         }
 
-        ImportOsmExtractsJob::dispatch($extracts);
-        $this->info('Queued ImportOsmExtractsJob on the data-import queue.');
+        foreach ($extracts as $extract) {
+            ImportOsmExtractJob::dispatch($extract);
+        }
+        $this->info(sprintf('Queued %d ImportOsmExtractJob(s) on the data-import queue.', count($extracts)));
 
         return CommandAlias::SUCCESS;
     }

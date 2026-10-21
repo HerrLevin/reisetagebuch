@@ -93,7 +93,8 @@ Reisetagebuch resolves nearby points of interest (shops, stations, landmarks, ..
 load. As an alternative, you can bulk-import the same kind of data from a [Geofabrik](https://download.geofabrik.de/)
 `.osm.pbf` extract directly into the database, ahead of time, so most lookups never need to hit Overpass at all.
 Overpass stays in place as a fallback for anything outside the extracts you import.
-If a full Europe import fails, you can import every country comma separated.  
+Each extract is imported by its own queued job, so if one country fails (e.g. a large extract
+running out of memory) it can be retried on its own in Horizon without re-importing the rest.
 
 | Variable                           | Description                                                                              | Default        |
 |-------------------------------------|-------------------------------------------------------------------------------------------|----------------|
@@ -107,21 +108,36 @@ Pick extracts from the [Geofabrik download server](https://download.geofabrik.de
 APP_OSM_GEOFABRIK_EXTRACTS=https://download.geofabrik.de/europe/germany-latest.osm.pbf,https://download.geofabrik.de/europe/austria-latest.osm.pbf
 ```
 
+To cover all of Europe, every country listed on Geofabrik's
+[Europe download page](https://download.geofabrik.de/europe.html) is below — Germany, Austria and Switzerland
+first, then the rest of Germany's neighbours, then every other European country alphabetically. Since each extract
+now gets its own job, importing this whole list is safe to retry country-by-country if one of them fails:
+
+```
+APP_OSM_GEOFABRIK_EXTRACTS=https://download.geofabrik.de/europe/germany-latest.osm.pbf,https://download.geofabrik.de/europe/austria-latest.osm.pbf,https://download.geofabrik.de/europe/switzerland-latest.osm.pbf,https://download.geofabrik.de/europe/denmark-latest.osm.pbf,https://download.geofabrik.de/europe/netherlands-latest.osm.pbf,https://download.geofabrik.de/europe/belgium-latest.osm.pbf,https://download.geofabrik.de/europe/luxembourg-latest.osm.pbf,https://download.geofabrik.de/europe/france-latest.osm.pbf,https://download.geofabrik.de/europe/czech-republic-latest.osm.pbf,https://download.geofabrik.de/europe/poland-latest.osm.pbf,https://download.geofabrik.de/europe/albania-latest.osm.pbf,https://download.geofabrik.de/europe/andorra-latest.osm.pbf,https://download.geofabrik.de/europe/azores-latest.osm.pbf,https://download.geofabrik.de/europe/belarus-latest.osm.pbf,https://download.geofabrik.de/europe/bosnia-herzegovina-latest.osm.pbf,https://download.geofabrik.de/europe/bulgaria-latest.osm.pbf,https://download.geofabrik.de/europe/croatia-latest.osm.pbf,https://download.geofabrik.de/europe/cyprus-latest.osm.pbf,https://download.geofabrik.de/europe/estonia-latest.osm.pbf,https://download.geofabrik.de/europe/faroe-islands-latest.osm.pbf,https://download.geofabrik.de/europe/finland-latest.osm.pbf,https://download.geofabrik.de/europe/georgia-latest.osm.pbf,https://download.geofabrik.de/europe/greece-latest.osm.pbf,https://download.geofabrik.de/europe/guernsey-jersey-latest.osm.pbf,https://download.geofabrik.de/europe/hungary-latest.osm.pbf,https://download.geofabrik.de/europe/iceland-latest.osm.pbf,https://download.geofabrik.de/europe/ireland-and-northern-ireland-latest.osm.pbf,https://download.geofabrik.de/europe/isle-of-man-latest.osm.pbf,https://download.geofabrik.de/europe/italy-latest.osm.pbf,https://download.geofabrik.de/europe/kosovo-latest.osm.pbf,https://download.geofabrik.de/europe/latvia-latest.osm.pbf,https://download.geofabrik.de/europe/liechtenstein-latest.osm.pbf,https://download.geofabrik.de/europe/lithuania-latest.osm.pbf,https://download.geofabrik.de/europe/macedonia-latest.osm.pbf,https://download.geofabrik.de/europe/malta-latest.osm.pbf,https://download.geofabrik.de/europe/moldova-latest.osm.pbf,https://download.geofabrik.de/europe/monaco-latest.osm.pbf,https://download.geofabrik.de/europe/montenegro-latest.osm.pbf,https://download.geofabrik.de/europe/norway-latest.osm.pbf,https://download.geofabrik.de/europe/portugal-latest.osm.pbf,https://download.geofabrik.de/europe/romania-latest.osm.pbf,https://download.geofabrik.de/russia-latest.osm.pbf,https://download.geofabrik.de/europe/serbia-latest.osm.pbf,https://download.geofabrik.de/europe/slovakia-latest.osm.pbf,https://download.geofabrik.de/europe/slovenia-latest.osm.pbf,https://download.geofabrik.de/europe/spain-latest.osm.pbf,https://download.geofabrik.de/europe/sweden-latest.osm.pbf,https://download.geofabrik.de/europe/turkey-latest.osm.pbf,https://download.geofabrik.de/europe/ukraine-latest.osm.pbf,https://download.geofabrik.de/europe/united-kingdom-latest.osm.pbf
+```
+
+::: warning
+The `russia` extract alone is tens of GB and covers all of Russia's territory, not just its European part. Drop it
+from the list above if you don't need that coverage.
+:::
+
 With extracts configured, the import runs automatically:
 - once, the first time the app starts (so the data isn't empty until the first scheduled run), and
 - on the recurring schedule above, to pick up OSM updates.
 
-Both happen as a queued job (`App\Jobs\ImportOsmExtractsJob`) on its own `data-import` queue, so this long-running,
-infrequent import doesn't compete with or block the app's other (short-lived, frequent) queued jobs. It's processed
-by the `horizon` service like everything else. You can also queue an import manually, e.g. for a one-off extract not
-in your configured list:
+Both happen by running `php artisan app:import-osm-extracts`, which fans the configured extracts out into one
+`App\Jobs\ImportOsmExtractJob` per extract. Each runs on its own `data-import` queue, so this long-running,
+infrequent import doesn't compete with or block the app's other (short-lived, frequent) queued jobs, and a single
+country failing only fails (and can be retried for) that one job in Horizon. It's processed by the `horizon` service
+like everything else. You can also run it manually, e.g. for a one-off extract not in your configured list:
 
 ```bash
 php artisan app:import-osm-extracts [extract-url-or-path ...]
 ```
 
-This only queues `ImportOsmExtractsJob`; the actual import happens asynchronously once a Horizon worker on the
-`data-import` queue picks it up. Run without arguments, it imports whatever is configured in
+This only queues one `ImportOsmExtractJob` per extract; the actual import happens asynchronously once a Horizon
+worker on the `data-import` queue picks each one up. Run without arguments, it imports whatever is configured in
 `APP_OSM_GEOFABRIK_EXTRACTS`.
 
 ::: tip
