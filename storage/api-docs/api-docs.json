@@ -5795,8 +5795,7 @@
                     "distance",
                     "tags",
                     "identifiers",
-                    "emoji",
-                    "timezone"
+                    "emoji"
                 ],
                 "properties": {
                     "id": {
@@ -5821,11 +5820,6 @@
                     "distance": {
                         "description": "Distance to the location in meters",
                         "type": "integer",
-                        "nullable": true
-                    },
-                    "timezone": {
-                        "description": "IANA timezone identifier of the location, if known",
-                        "type": "string",
                         "nullable": true
                     },
                     "identifiers": {

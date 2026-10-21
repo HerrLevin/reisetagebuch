@@ -10,6 +10,7 @@ use App\Http\Resources\TripDto;
 use App\Http\Resources\UserDto;
 use App\Models\ActivityPubPost;
 use App\Models\Post;
+use App\Services\TimeZoneLookupService;
 use Carbon\Carbon;
 use Clickbar\Magellan\IO\Generator\Geojson\GeojsonGenerator;
 use OpenApi\Attributes as OA;
@@ -159,6 +160,14 @@ class TransportPost extends BasePost
         return Carbon::parse($timeString)->setTimezone($timezone ?? 'UTC');
     }
 
+    private function timezoneFor(StopDto $stop): ?string
+    {
+        return app(TimeZoneLookupService::class)->lookup(
+            $stop->location->latitude,
+            $stop->location->longitude
+        );
+    }
+
     private function getDelay(?string $manualTime, ?Carbon $actualTime, ?int $defaultDelay): ?string
     {
         $delay = $defaultDelay;
@@ -203,11 +212,11 @@ class TransportPost extends BasePost
         $duration = round($this->duration / 60);
         $distance = round($this->distance / 1000, 1);
 
-        $departureTime = $this->parseTime($this->originStop->departureTime ?? $this->originStop->arrivalTime, $this->originStop->location->timezone ?? 'UTC');
+        $departureTime = $this->parseTime($this->originStop->departureTime ?? $this->originStop->arrivalTime, $this->timezoneFor($this->originStop));
         $departureDelay = $this->getDelay($this->manualDepartureTime, $departureTime, $this->originStop->departureDelay);
         $departure = $this->formatTime($departureTime, $departureDelay);
 
-        $arrivalTime = $this->parseTime($this->destinationStop->arrivalTime ?? $this->destinationStop->departureTime, $this->destinationStop->location->timezone ?? 'UTC');
+        $arrivalTime = $this->parseTime($this->destinationStop->arrivalTime ?? $this->destinationStop->departureTime, $this->timezoneFor($this->destinationStop));
         $arrivalDelay = $this->getDelay($this->manualArrivalTime, $arrivalTime, $this->destinationStop->arrivalDelay);
         $arrival = $this->formatTime($arrivalTime, $arrivalDelay);
 

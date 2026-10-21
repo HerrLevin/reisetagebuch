@@ -2,67 +2,32 @@
 
 namespace Tests\Unit\Services;
 
+use App\Models\TimezoneBoundary;
 use App\Services\TimeZoneLookupService;
-use Illuminate\Http\Client\ConnectionException;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class TimeZoneLookupServiceTest extends TestCase
 {
-    public function test_returns_the_timezone_from_a_successful_response(): void
+    use RefreshDatabase;
+
+    public function test_returns_the_tzid_of_the_boundary_containing_the_point(): void
     {
-        Http::fake([
-            '*' => Http::response(['tz' => 'Europe/Berlin'], 200),
+        TimezoneBoundary::factory()->create([
+            'tzid' => 'Europe/Berlin',
+            'geometry' => TimezoneBoundary::factory()->squareAround(52.52, 13.405, 1),
         ]);
 
-        $service = new TimeZoneLookupService;
-
-        $this->assertSame('Europe/Berlin', $service->lookup(52.52, 13.405));
+        $this->assertSame('Europe/Berlin', (new TimeZoneLookupService)->lookup(52.52, 13.405));
     }
 
-    public function test_returns_null_when_the_request_fails(): void
+    public function test_returns_null_when_no_boundary_contains_the_point(): void
     {
-        Http::fake([
-            '*' => Http::response(null, 500),
+        TimezoneBoundary::factory()->create([
+            'tzid' => 'Europe/Berlin',
+            'geometry' => TimezoneBoundary::factory()->squareAround(52.52, 13.405, 1),
         ]);
 
-        $service = new TimeZoneLookupService;
-
-        $this->assertNull($service->lookup(52.52, 13.405));
-    }
-
-    public function test_returns_null_when_the_connection_throws(): void
-    {
-        Http::fake(function () {
-            throw new ConnectionException('timed out');
-        });
-
-        $service = new TimeZoneLookupService;
-
-        $this->assertNull($service->lookup(52.52, 13.405));
-    }
-
-    public function test_returns_null_for_an_unrecognised_timezone_identifier(): void
-    {
-        Http::fake([
-            '*' => Http::response(['tz' => 'Not/ARealZone'], 200),
-        ]);
-
-        $service = new TimeZoneLookupService;
-
-        $this->assertNull($service->lookup(52.52, 13.405));
-    }
-
-    public function test_sends_the_coordinate_in_the_request_path(): void
-    {
-        Http::fake([
-            '*' => Http::response(['tz' => 'Europe/Berlin'], 200),
-        ]);
-
-        (new TimeZoneLookupService)->lookup(52.52, 13.405);
-
-        Http::assertSent(function ($request) {
-            return str_ends_with($request->url(), '/52.52/13.405');
-        });
+        $this->assertNull((new TimeZoneLookupService)->lookup(-33.86, 151.21));
     }
 }

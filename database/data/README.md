@@ -1,5 +1,33 @@
 # Vendored geo data
 
+## Timezone boundaries
+
+`timezones.geojson` — polygons for every IANA timezone (including ocean zones,
+so every coordinate on Earth resolves to one), consumed by
+`php artisan app:import-timezones` to populate the `timezone_boundaries` table
+(PostGIS polygons + tzid) for point-in-polygon timezone lookups
+(`App\Services\TimeZoneLookupService`).
+
+Source: [`evansiroky/timezone-boundary-builder`](https://github.com/evansiroky/timezone-boundary-builder),
+release asset `timezones-with-oceans.geojson.zip` (same dataset the
+previously-used geo2tz service was built on). The upstream file is ~185 MB
+unzipped, so it's simplified before vendoring:
+
+```bash
+curl -sL -o /tmp/tz.zip https://github.com/evansiroky/timezone-boundary-builder/releases/latest/download/timezones-with-oceans.geojson.zip
+unzip -o /tmp/tz.zip -d /tmp
+npx --yes mapshaper -i /tmp/combined-with-oceans.json -simplify 3% keep-shapes \
+  -o database/data/timezones.geojson format=geojson precision=0.0001
+```
+
+Re-import with `php artisan app:import-timezones` (idempotent, upserts by `tzid`).
+
+<!-- shortcut: 3% simplification can shift a boundary by up to a few hundred
+meters near complex coastlines/borders; upgrade the simplify %% if a reported
+timezone turns out wrong near a border. -->
+
+## Country boundaries
+
 Two files are derived from the same upstream source:
 
 - `ne_50m_admin_0_countries.geojson` (this directory) — the vendored source of

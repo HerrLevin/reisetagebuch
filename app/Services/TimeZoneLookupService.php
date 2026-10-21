@@ -2,54 +2,41 @@
 
 namespace App\Services;
 
+use App\Models\TimezoneBoundary;
+use Clickbar\Magellan\Data\Geometries\Point;
+use Clickbar\Magellan\Database\PostgisFunctions\ST;
 use DateTimeZone;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
-use Throwable;
+use Exception;
 
 class TimeZoneLookupService
 {
-    private string $apiUrl;
-
-    private VersionService $versionService;
-
-    public function __construct(?VersionService $versionService = null)
-    {
-        $this->versionService = $versionService ?? new VersionService;
-        $this->apiUrl = config('app.timeapi.url');
-    }
-
     /**
-     * Resolve the IANA timezone identifier for a coordinate.
-     * Never throws — returns null if the lookup fails or is unavailable.
+     * Resolve the IANA timezone identifier for a coordinate via the vendored
+     * timezone-boundary-builder polygons (see database/data/README.md). Returns
+     * null only if the coordinate falls outside all boundaries, which shouldn't
+     * happen since the oceans-included dataset covers the whole globe.
      */
     public function lookup(float $latitude, float $longitude): ?string
     {
+        $point = Point::makeGeodetic($latitude, $longitude);
+
+        $tzid = TimezoneBoundary::query()
+            ->where(ST::covers('geometry', $point), '=', true)
+            ->value('tzid');
+
+        if (! is_string($tzid)) {
+            return null;
+        }
+
         try {
-            $response = Http::withUserAgent($this->versionService->getUserAgent())
-                ->timeout(5)
-                ->get("{$this->apiUrl}/{$latitude}/{$longitude}");
-        } catch (Throwable $e) {
-            Log::warning('Timezone lookup failed', ['error' => $e->getMessage()]);
-
+            // DateTimeZone::listIdentifiers() excludes Etc/GMT±N, which the oceans
+            // boundaries legitimately return for open water, so construct-and-catch
+            // instead of checking membership in that list.
+            new DateTimeZone($tzid);
+        } catch (Exception) {
             return null;
         }
 
-        if (! $response->ok()) {
-            Log::warning('Unknown response (timezone lookup)', [
-                'status' => $response->status(),
-                'body' => $response->body(),
-            ]);
-
-            return null;
-        }
-
-        $timezone = $response->json('tz');
-
-        if (! is_string($timezone) || ! in_array($timezone, DateTimeZone::listIdentifiers(), true)) {
-            return null;
-        }
-
-        return $timezone;
+        return $tzid;
     }
 }

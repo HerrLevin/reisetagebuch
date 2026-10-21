@@ -61,10 +61,6 @@ class TripController extends Controller
             );
         }
 
-        // Locations are shared across trips, so a station's timezone may still be
-        // unknown even though the location itself already exists.
-        $this->locationRepository->ensureTimezone($origin);
-
         return $this->transportTripRepository->addStopToTrip(
             $trip,
             $origin,

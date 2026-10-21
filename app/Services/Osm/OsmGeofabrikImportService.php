@@ -86,7 +86,7 @@ readonly class OsmGeofabrikImportService
                 $imported++;
                 $chunk[] = $location;
                 if (count($chunk) >= self::IMPORT_CHUNK_SIZE) {
-                    $this->locationRepository->bulkUpsertOsmLocations($chunk, true);
+                    $this->locationRepository->bulkUpsertOsmLocations($chunk);
                     $chunk = [];
                 }
                 if ($imported % 5000 === 0) {
@@ -94,7 +94,7 @@ readonly class OsmGeofabrikImportService
                 }
             }
             if ($chunk !== []) {
-                $this->locationRepository->bulkUpsertOsmLocations($chunk, true);
+                $this->locationRepository->bulkUpsertOsmLocations($chunk);
             }
 
             $report("Done: {$imported} locations imported, {$skipped} elements skipped (filtered out or unusable).");

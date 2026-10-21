@@ -9,6 +9,7 @@ use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
 use App\Http\Resources\StopDto;
 use App\Http\Resources\TripDto;
+use App\Services\TimeZoneLookupService;
 use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionClass;
 use Tests\TestCase;
@@ -62,6 +63,10 @@ class BasePostTest extends TestCase
 
     public function test_transport_post_html_body_escapes_but_does_not_double_escape(): void
     {
+        $this->mock(TimeZoneLookupService::class, function ($mock) {
+            $mock->shouldReceive('lookup')->andReturn(null);
+        });
+
         $post = $this->makeTransportPost('5 < 10');
 
         $html = $post->getHtmlBody();
@@ -72,11 +77,13 @@ class BasePostTest extends TestCase
 
     public function test_transport_post_html_body_formats_times_in_the_stops_local_timezone(): void
     {
+        $this->mock(TimeZoneLookupService::class, function ($mock) {
+            $mock->shouldReceive('lookup')->andReturn('Asia/Tokyo', 'America/New_York');
+        });
+
         $post = $this->makeTransportPost('');
         $post->originStop->departureTime = '2026-01-15T10:00:00+00:00';
-        $post->originStop->location->timezone = 'Asia/Tokyo';
         $post->destinationStop->arrivalTime = '2026-01-15T12:00:00+00:00';
-        $post->destinationStop->location->timezone = 'America/New_York';
 
         $html = $post->getHtmlBody();
 
@@ -88,6 +95,10 @@ class BasePostTest extends TestCase
 
     public function test_transport_post_html_body_falls_back_to_utc_when_timezone_is_unknown(): void
     {
+        $this->mock(TimeZoneLookupService::class, function ($mock) {
+            $mock->shouldReceive('lookup')->andReturn(null);
+        });
+
         $post = $this->makeTransportPost('');
         $post->originStop->departureTime = '2026-01-15T10:00:00+00:00';
 
@@ -122,11 +133,15 @@ class BasePostTest extends TestCase
         $originStop = new ReflectionClass(StopDto::class)->newInstanceWithoutConstructor();
         $originStop->name = 'Origin';
         $originStop->location = new ReflectionClass(LocationDto::class)->newInstanceWithoutConstructor();
+        $originStop->location->latitude = 35.6762;
+        $originStop->location->longitude = 139.6503;
         $post->originStop = $originStop;
 
         $destinationStop = new ReflectionClass(StopDto::class)->newInstanceWithoutConstructor();
         $destinationStop->name = 'Destination';
         $destinationStop->location = new ReflectionClass(LocationDto::class)->newInstanceWithoutConstructor();
+        $destinationStop->location->latitude = 40.7128;
+        $destinationStop->location->longitude = -74.006;
         $post->destinationStop = $destinationStop;
 
         $trip = new ReflectionClass(TripDto::class)->newInstanceWithoutConstructor();
