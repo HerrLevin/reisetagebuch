@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Jobs\FetchAirports;
-use App\Jobs\ImportOsmExtractsJob;
 use App\Jobs\StartupImportCountriesJob;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
@@ -19,7 +18,7 @@ class StartupImports extends Command
         StartupImportCountriesJob::dispatch();
 
         if (! empty(config('app.osm.geofabrik_extracts')) && Cache::add('app:osm-geofabrik-import:first-run-dispatched', true)) {
-            ImportOsmExtractsJob::dispatch();
+            $this->call(ImportOsmExtracts::class);
         }
 
         if (Cache::add('app:startup-imports:fetch-airports-dispatched', true)) {

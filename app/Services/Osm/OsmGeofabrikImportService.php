@@ -24,6 +24,10 @@ use RuntimeException;
  */
 readonly class OsmGeofabrikImportService
 {
+    // number of features batched into one LocationRepository::bulkUpsertOsmLocations()
+    // call, trading a bit of per-chunk memory for far fewer DB round-trips.
+    private const int IMPORT_CHUNK_SIZE = 500;
+
     // osmium decompresses PBF blocks on a thread pool sized to the CPU count by
     // default, each thread buffering its own decompressed block; capping it to 1
     // trades speed for a much smaller peak memory footprint on constrained hosts.
@@ -70,6 +74,7 @@ readonly class OsmGeofabrikImportService
             $report('Reading exported features and upserting Locations...');
             $imported = 0;
             $skipped = 0;
+            $chunk = [];
             foreach ($this->readFeatures($ndjsonPath) as $feature) {
                 $location = $this->toOverpassLocation($feature);
                 if ($location === null) {
@@ -79,10 +84,17 @@ readonly class OsmGeofabrikImportService
                 }
 
                 $imported++;
-                $this->locationRepository->updateOrCreateOsmLocation($location, true);
+                $chunk[] = $location;
+                if (count($chunk) >= self::IMPORT_CHUNK_SIZE) {
+                    $this->locationRepository->bulkUpsertOsmLocations($chunk, true);
+                    $chunk = [];
+                }
                 if ($imported % 5000 === 0) {
                     $report("...{$imported} locations imported so far");
                 }
+            }
+            if ($chunk !== []) {
+                $this->locationRepository->bulkUpsertOsmLocations($chunk, true);
             }
 
             $report("Done: {$imported} locations imported, {$skipped} elements skipped (filtered out or unusable).");

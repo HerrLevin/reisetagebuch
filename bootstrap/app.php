@@ -1,6 +1,7 @@
 <?php
 
 use App\Console\Commands\FetchAirports;
+use App\Console\Commands\ImportOsmExtracts;
 use App\Exceptions\ApiExceptionRenderer;
 use App\Http\Middleware\ApiMiddleware;
 use App\Http\Middleware\EnsurePrivacyPolicyAccepted;
@@ -10,7 +11,6 @@ use App\Jobs\BackfillLocationTimezones;
 use App\Jobs\DeleteOldNearbyRequests;
 use App\Jobs\DispatchRefreshJobForActiveTrips;
 use App\Jobs\HideExpiredPosts;
-use App\Jobs\ImportOsmExtractsJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -58,6 +58,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->job(DeleteOldNearbyRequests::class)->daily();
         $schedule->job(HideExpiredPosts::class)->everyFifteenMinutes();
         $schedule->job(BackfillLocationTimezones::class)->everyFifteenMinutes();
-        $schedule->job(ImportOsmExtractsJob::class)->cron(config('app.osm.geofabrik_import_schedule'));
+        $schedule->command(ImportOsmExtracts::class)->cron(config('app.osm.geofabrik_import_schedule'));
     })
     ->create();
