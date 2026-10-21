@@ -55,12 +55,6 @@ return [
         'radius' => env('APP_NEARBY_RADIUS', 500),
     ],
 
-    'timeapi' => [
-        // self-hosted geo2tz instance, see https://github.com/noandrea/geo2tz
-        'url' => env('APP_TIMEAPI_URL', 'http://geo2tz:2004/tz'),
-        'backfill_limit' => env('APP_TIMEAPI_BACKFILL_LIMIT', 100),
-    ],
-
     'registration' => env('APP_REGISTRATION', true),
 
     'invite' => [
@@ -82,6 +76,5 @@ return [
     'active_post' => [
         'grace_start' => env('APP_ACTIVE_POST_GRACE_START', 15),
         'grace_end' => env('APP_ACTIVE_POST_GRACE_END', 60),
-        'repush_days' => env('APP_ACTIVE_POST_REPUSH_DAYS', 7),
     ],
 ];

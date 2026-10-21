@@ -57,7 +57,6 @@ Location check-ins and transport check-ins are resolved against external geo/rou
 | `APP_MOTIS_RADIUS`                   | Search radius (meters) for nearby stops/vehicles                             | `500`                                        |
 | `APP_MOTIS_SINGLE_LOCATION_RADIUS`   | Search radius (meters) used when resolving a single stop                     | `100`                                        |
 | `APP_NEARBY_RADIUS`                  | Search radius (meters) for the generic "nearby" lookup                       | `500`                                        |
-| `APP_TIMEAPI_URL`                    | Self-hosted [geo2tz](https://github.com/noandrea/geo2tz) instance, used to resolve a location's timezone | `http://geo2tz:2004/tz` |
 | `APP_TRANSIT_REFRESH_INTERVAL`       | Polling interval (seconds) for refreshing live trip data                     | `5`                                          |
 
 ### Active Trip Tracking
@@ -66,7 +65,6 @@ Location check-ins and transport check-ins are resolved against external geo/rou
 |----------------------------------|---------------------------------------------------------------------------|---------|
 | `APP_ACTIVE_POST_GRACE_START`    | Minutes before a trip's departure it already counts as the active post    | `15`    |
 | `APP_ACTIVE_POST_GRACE_END`      | Minutes after a trip's arrival it still counts as the active post         | `60`    |
-| `APP_ACTIVE_POST_REPUSH_DAYS`    | Days after which a stale active-post push notification is resent          | `7`     |
 
 ### Dashboards & Testing
 

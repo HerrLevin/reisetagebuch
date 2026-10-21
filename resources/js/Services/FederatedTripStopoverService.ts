@@ -55,7 +55,6 @@ export function buildTransportPostStopover(
             latitude: stop.latitude,
             longitude: stop.longitude,
             distance: stop.distance,
-            timezone: null,
             identifiers: [],
             tags: [],
             emoji: '',

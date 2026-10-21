@@ -399,7 +399,6 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Clickbar\Magellan\Data\Geometries\Point $location
- * @property string|null $timezone IANA timezone identifier, e.g. Europe/Berlin
  * @property string|null $country_code
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\LocationIdentifier> $identifiers
  * @property-read int|null $identifiers_count
@@ -414,7 +413,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Location whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Location whereLocation($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Location whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Location whereTimezone($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Location whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Location whereUpdatedAt($value)
  */
@@ -754,6 +752,26 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TimestampedUserWaypoint whereUserId($value)
  */
 	class TimestampedUserWaypoint extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
+ * @property string $tzid
+ * @property \Clickbar\Magellan\Data\Geometries\MultiPolygon $geometry
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Database\Factories\TimezoneBoundaryFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimezoneBoundary newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimezoneBoundary newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimezoneBoundary query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimezoneBoundary whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimezoneBoundary whereGeometry($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimezoneBoundary whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimezoneBoundary whereTzid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TimezoneBoundary whereUpdatedAt($value)
+ */
+	class TimezoneBoundary extends \Eloquent {}
 }
 
 namespace App\Models{

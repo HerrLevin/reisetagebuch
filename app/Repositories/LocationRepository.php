@@ -4,7 +4,6 @@ namespace App\Repositories;
 
 use App\Dto\AirportDto;
 use App\Dto\OverpassLocation;
-use App\Jobs\LookupLocationTimezoneJob;
 use App\Models\Country;
 use App\Models\Location;
 use App\Models\LocationIdentifier;
@@ -13,7 +12,6 @@ use App\Models\RequestLocation;
 use App\Models\TimestampedUserWaypoint;
 use App\Models\TransportPost;
 use App\Services\OsmNameService;
-use App\Services\TimeZoneLookupService;
 use Carbon\Carbon;
 use Clickbar\Magellan\Data\Geometries\Point;
 use Clickbar\Magellan\Database\PostgisFunctions\ST;
@@ -30,12 +28,9 @@ class LocationRepository
 {
     private OsmNameService $osmNameService;
 
-    private TimeZoneLookupService $timeZoneLookupService;
-
-    public function __construct(OsmNameService $osmNameService, TimeZoneLookupService $timeZoneLookupService)
+    public function __construct(OsmNameService $osmNameService)
     {
         $this->osmNameService = $osmNameService;
-        $this->timeZoneLookupService = $timeZoneLookupService;
     }
 
     public function getLocationsForUser(string $userId, Carbon $fromDate, Carbon $untilDate): Collection
@@ -83,7 +78,7 @@ class LocationRepository
             ->get();
     }
 
-    public function updateOrCreateOsmLocation($location, bool $fetchTimezone = false): void
+    public function updateOrCreateOsmLocation($location): void
     {
         $name = $this->osmNameService->getName($location);
         if ($name === null) {
@@ -111,10 +106,6 @@ class LocationRepository
             'osm'
         );
 
-        if ($fetchTimezone) {
-            $this->resolveTimezoneNow($dbLocation);
-        }
-
         foreach ($location->tags as $key => $value) {
             $dbLocation->tags()->updateOrCreate([
                 'key' => $key,
@@ -127,14 +118,14 @@ class LocationRepository
      * Batched equivalent of calling updateOrCreateOsmLocation() once per item in $locations:
      * one lookup query plus one upsert per table (locations, location_identifiers,
      * location_tags) for the whole chunk, instead of several round-trips per location.
-     * Country-code resolution and (if $fetchTimezone) the geo2tz lookup still happen once
-     * per location, synchronously, exactly as in updateOrCreateOsmLocation().
+     * Country-code resolution happens once per location, synchronously, exactly as in
+     * updateOrCreateOsmLocation().
      *
      * @param  OverpassLocation[]  $locations
      *
      * @throws Throwable
      */
-    public function bulkUpsertOsmLocations(array $locations, bool $fetchTimezone = true): void
+    public function bulkUpsertOsmLocations(array $locations): void
     {
         $byKey = [];
         foreach ($locations as $location) {
@@ -164,17 +155,11 @@ class LocationRepository
             $locationId = $existingRow->location_id ?? (string) Str::uuid7();
             $point = Point::makeGeodetic($location->latitude, $location->longitude);
 
-            $timezone = $existingRow->timezone ?? null;
-            if ($fetchTimezone && $timezone === null) {
-                $timezone = $this->timeZoneLookupService->lookup($location->latitude, $location->longitude);
-            }
-
             $locationRows[] = [
                 'id' => $locationId,
                 'name' => $name,
                 'location' => WKBGenerator::generate($point),
                 'country_code' => $this->resolveCountryCode($point),
-                'timezone' => $timezone,
                 'created_at' => $now,
                 'updated_at' => $now,
             ];
@@ -210,8 +195,6 @@ class LocationRepository
                     'name' => DB::raw('excluded.name'),
                     'location' => DB::raw('excluded.location'),
                     'country_code' => DB::raw('excluded.country_code'),
-                    // never clobber an already-known timezone with a skipped/failed lookup's null
-                    'timezone' => DB::raw('coalesce(excluded.timezone, locations.timezone)'),
                     'updated_at' => DB::raw('excluded.updated_at'),
                 ]
             );
@@ -233,7 +216,7 @@ class LocationRepository
 
     /**
      * @param  OverpassLocation[]  $locations
-     * @return SupportCollection<string, object{type: string, identifier: string, location_id: string, timezone: ?string}>
+     * @return SupportCollection<string, object{type: string, identifier: string, location_id: string}>
      */
     private function lookupExistingOsmLocations(array $locations): SupportCollection
     {
@@ -252,7 +235,7 @@ class LocationRepository
                 '(location_identifiers.type, location_identifiers.origin, location_identifiers.identifier) in ('.implode(',', $tuples).')',
                 $bindings
             )
-            ->select('location_identifiers.type', 'location_identifiers.identifier', 'location_identifiers.location_id', 'locations.timezone')
+            ->select('location_identifiers.type', 'location_identifiers.identifier', 'location_identifiers.location_id')
             ->get()
             ->keyBy(fn ($row) => $row->type.'|'.$row->identifier);
     }
@@ -317,8 +300,6 @@ class LocationRepository
             'airport',
             $airport->provider
         );
-
-        $this->resolveTimezoneNow($dbLocation);
 
         if ($airport->iataCode) {
             $dbLocation->identifiers()->updateOrCreate(
@@ -450,21 +431,6 @@ class LocationRepository
             ->delete();
     }
 
-    /**
-     * Locations missing a timezone, prioritizing ones originating from transitous
-     * (motis) since those are the stops actually rendered in transport posts.
-     */
-    public function getLocationsWithMissingTimezone(int $limit): Collection
-    {
-        return Location::whereNull('timezone')
-            ->withExists(['identifiers as has_transitous_origin' => function (Builder $query) {
-                $query->where('origin', 'motis');
-            }])
-            ->orderByDesc('has_transitous_origin')
-            ->limit($limit)
-            ->get();
-    }
-
     public function getNearbyLocations(Point $position): Collection|SupportCollection
     {
         return Location::select()
@@ -529,51 +495,12 @@ class LocationRepository
         $location->country_code = $this->resolveCountryCode($location->location);
         $location->save();
 
-        $this->ensureTimezone($location);
-
         $location->identifiers()->updateOrCreate(
             ['identifier' => $identifier, 'type' => $identifierType, 'origin' => $origin],
             ['name' => $name]
         );
 
         $location->save();
-    }
-
-    public function ensureTimezone(Location $location): void
-    {
-        if ($location->timezone !== null) {
-            return;
-        }
-
-        LookupLocationTimezoneJob::dispatch($location->id);
-    }
-
-    /**
-     * Synchronously resolves and persists the location's timezone via an external lookup.
-     * Intended to be called only from within a queued job (see LookupLocationTimezoneJob) —
-     * use ensureTimezone() from request-handling code instead.
-     *
-     * @return bool true if the timezone was newly resolved and saved.
-     */
-    public function resolveTimezoneNow(Location $location): bool
-    {
-        if ($location->timezone !== null) {
-            return false;
-        }
-
-        $timezone = $this->timeZoneLookupService->lookup(
-            $location->location->getLatitude(),
-            $location->location->getLongitude(),
-        );
-
-        if ($timezone === null) {
-            return false;
-        }
-
-        $location->timezone = $timezone;
-        $location->save();
-
-        return true;
     }
 
     /**

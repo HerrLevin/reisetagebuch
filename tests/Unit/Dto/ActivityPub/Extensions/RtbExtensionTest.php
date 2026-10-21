@@ -23,7 +23,6 @@ class RtbExtensionTest extends TestCase
             name: 'Berlin Hbf',
             latitude: 52.52,
             longitude: 13.405,
-            timezone: 'Europe/Berlin',
             emoji: '🚉',
             tags: [new RtbTagData('addr:city', 'Berlin')],
             identifiers: [new RtbIdentifierData('stop', 'motis', 'de:11000:900003201')],

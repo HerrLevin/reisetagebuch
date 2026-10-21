@@ -12,7 +12,7 @@ class Location extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $fillable = ['name', 'location', 'type', 'country_code', 'timezone'];
+    protected $fillable = ['name', 'location', 'type', 'country_code'];
 
     protected $relations = ['identifiers'];
 

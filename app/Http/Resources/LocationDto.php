@@ -10,7 +10,7 @@ use OpenApi\Attributes as OA;
 #[OA\Schema(
     schema: 'LocationDto',
     description: 'Location Data Object',
-    required: ['id', 'name', 'latitude', 'longitude', 'distance', 'tags', 'identifiers', 'emoji', 'timezone'],
+    required: ['id', 'name', 'latitude', 'longitude', 'distance', 'tags', 'identifiers', 'emoji'],
     type: 'object'
 )]
 class LocationDto
@@ -29,9 +29,6 @@ class LocationDto
 
     #[OA\Property('distance', description: 'Distance to the location in meters', type: 'integer', nullable: true)]
     public ?int $distance;
-
-    #[OA\Property('timezone', description: 'IANA timezone identifier of the location, if known', type: 'string', nullable: true)]
-    public ?string $timezone;
 
     #[OA\Property(
         property: 'identifiers',
@@ -69,7 +66,6 @@ class LocationDto
         $this->latitude = $location->location->getLatitude();
         $this->longitude = $location->location->getLongitude();
         $this->distance = $location->distance ? round($location->distance) : null;
-        $this->timezone = $location->timezone;
         $this->tags = $location->tags->map(fn ($tag) => new LocationTagDto($tag))->toArray();
         $this->identifiers = $location->identifiers->map(fn ($identifier) => new LocationIdentifierDto($identifier))->toArray();
         $this->emoji = (new LocationEmojiService)->getEmojiFromTags($location->tags);
@@ -88,7 +84,6 @@ class LocationDto
         $dto->latitude = $data->latitude;
         $dto->longitude = $data->longitude;
         $dto->distance = null;
-        $dto->timezone = $data->timezone;
         $dto->tags = array_map(fn ($tag) => LocationTagDto::fromRtb($tag), $data->tags);
         $dto->identifiers = array_map(fn ($identifier) => LocationIdentifierDto::fromRtb($identifier), $data->identifiers);
         $dto->emoji = $data->emoji;
