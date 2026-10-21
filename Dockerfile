@@ -5,7 +5,7 @@ COPY . .
 RUN composer install --no-dev --optimize-autoloader --ignore-platform-req=ext-gd --ignore-platform-req=ext-pcntl
 
 # Stage 2: Build PHP application
-FROM php:8.5-fpm-alpine
+FROM php:8.5-fpm
 
 # Set environment variables for runtime user and group IDs
 ARG RUNTIME_UID=33
@@ -15,11 +15,11 @@ ARG NGINX_LOG_DIR="/var/log/nginx"
 ARG NGINX_LIB_DIR="/var/lib/nginx"
 
 # Install required system dependencies
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     bash \
-    freetype-dev \
-    icu-dev \
-    libjpeg-turbo-dev \
+    libfreetype6-dev \
+    libicu-dev \
+    libjpeg62-turbo-dev \
     libpng-dev \
     libpq-dev \
     libwebp-dev \
@@ -28,12 +28,13 @@ RUN apk add --no-cache \
     nginx \
     nodejs \
     npm \
-    oniguruma-dev \
-    shadow \
-    sqlite-dev \
+    libonig-dev \
+    libsqlite3-dev \
     supervisor \
-    zlib-dev \
-    pcre-dev $PHPIZE_DEPS
+    zlib1g-dev \
+    libpcre2-dev $PHPIZE_DEPS \
+    osmium-tool \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN pecl install redis \
     && docker-php-ext-enable redis
@@ -52,23 +53,6 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
 
 RUN groupmod --gid ${RUNTIME_GID} www-data \
     && usermod --uid ${RUNTIME_UID} --gid ${RUNTIME_GID} www-data
-
-# Alpine has no osmium-tool package (only the libosmium headers), so build the
-# `osmium` CLI from source. Runtime shared libs are installed as regular (not
-# --virtual) packages so `apk del` below only removes the compiler toolchain
-# and headers, not the libraries osmium needs to actually run.
-RUN apk add --no-cache libstdc++ libgcc boost-program_options libbz2 expat zlib \
-  && apk add --no-cache --virtual .osmium-build-deps \
-    build-base cmake git \
-    libosmium-dev protozero-dev expat-dev bzip2-dev zlib-dev boost-dev \
-  && git clone --depth 1 --branch v1.16.0 https://github.com/osmcode/osmium-tool.git /tmp/osmium-tool \
-  && cmake -S /tmp/osmium-tool -B /tmp/osmium-tool/build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF \
-    -DCMAKE_CXX_FLAGS=-Wno-template-body \
-  && cmake --build /tmp/osmium-tool/build -j"$(nproc)" --target osmium \
-  && install -m 755 /tmp/osmium-tool/build/src/osmium /usr/local/bin/osmium \
-  && rm -rf /tmp/osmium-tool \
-  && apk del .osmium-build-deps \
-  && osmium --version
 
 # Set working directory
 WORKDIR /var/www/html
