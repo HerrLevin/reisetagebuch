@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repositories;
 
 use App\Enums\RouteSegmentSource;
+use App\Models\License;
 use App\Models\Location;
 use App\Models\RouteSegment;
 use App\Models\TransportPost;
@@ -104,6 +105,7 @@ class TransportTripRepository
         ?string $routeTextColor = null,
         ?User $user = null,
         ?string $nextTripId = null,
+        ?string $motisSource = null,
     ): TransportTrip {
         $trip = $this->getTripByIdentifier($foreignId, $provider);
 
@@ -115,6 +117,8 @@ class TransportTripRepository
         $trip->mode = $mode;
         $trip->foreign_trip_id = $foreignId;
         $trip->provider = $provider;
+        $trip->motis_source = $motisSource;
+        $trip->license_id = $motisSource ? $this->findLicenseForMotisSource($motisSource)?->id : null;
         $trip->line_name = $lineName;
         $trip->route_long_name = $routeLongName;
         $trip->trip_short_name = $tripShortName;
@@ -127,6 +131,23 @@ class TransportTripRepository
         $trip->save();
 
         return $trip->load('continuesAs');
+    }
+
+    /**
+     * Resolves the known license for a Motis leg's raw `source` string, e.g.
+     * "de_db.gtfs.zip/123" -> the license registered for feed "de_db.gtfs.zip".
+     */
+    public function findLicenseForMotisSource(string $motisSource): ?License
+    {
+        if (! preg_match('/^(?<name>(?<country>[a-zA-Z]+(?:-[a-zA-Z0-9]+)*)_.*?\.gtfs)(?:\.zip)?(?:\/.*)?$/', $motisSource, $matches)) {
+            return null;
+        }
+
+        return License::where([
+            'provider' => 'transitous',
+            'country' => strtolower($matches['country']),
+            'name' => $matches['name'].'.zip',
+        ])->where('active', true)->first();
     }
 
     public function addStopToTrip(

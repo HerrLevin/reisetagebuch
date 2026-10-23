@@ -356,6 +356,14 @@ export interface LegDto {
   routeTextColor: string | null;
   /** Source of the leg information (e.g., "motis", "gtfs") */
   source: string;
+  /** rtb extension: Name of the license covering this leg's source data, if known */
+  xLicenseName: string | null;
+  /** rtb extension: Name of the organization that issued this leg's source data, if known */
+  xLicenseHumanName: string | null;
+  /** rtb extension: URL with more information about the license, if known */
+  xLicenseUrl: string | null;
+  /** rtb extension: Attribution text to display for this leg's source data, if required */
+  xLicenseAttribution: string | null;
   /** List of intermediate stops for the leg, if available */
   intermediateStops: StopPlaceDto[];
   /** The trip id of the next leg if this leg continues as another leg without a transfer, if available */
@@ -1431,6 +1439,14 @@ export interface TripDto {
   routeColor: string | null;
   /** Text color of the route in HEX format */
   routeTextColor: string | null;
+  /** Name of the license covering this trip's source data, if known */
+  licenseName: string | null;
+  /** Name of the organization that issued this trip's source data, if known */
+  licenseHumanName: string | null;
+  /** URL with more information about the license, if known */
+  licenseUrl: string | null;
+  /** Attribution text to display for this trip's source data, if required */
+  licenseAttribution: string | null;
 }
 
 /** Trip History Entry Data Transfer Object */

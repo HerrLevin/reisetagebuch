@@ -172,7 +172,11 @@
                 "tripShortName",
                 "displayName",
                 "routeColor",
-                "routeTextColor"
+                "routeTextColor",
+                "licenseName",
+                "licenseHumanName",
+                "licenseUrl",
+                "licenseAttribution"
             ],
             "additionalProperties": false,
             "properties": {
@@ -193,7 +197,23 @@
                 "tripShortName": { "type": ["string", "null"] },
                 "displayName": { "type": ["string", "null"] },
                 "routeColor": { "type": ["string", "null"] },
-                "routeTextColor": { "type": ["string", "null"] }
+                "routeTextColor": { "type": ["string", "null"] },
+                "licenseName": {
+                    "type": ["string", "null"],
+                    "description": "Name of the license covering this trip's source data, if known."
+                },
+                "licenseHumanName": {
+                    "type": ["string", "null"],
+                    "description": "Name of the organization that issued this trip's source data, if known."
+                },
+                "licenseUrl": {
+                    "type": ["string", "null"],
+                    "description": "URL with more information about the license, if known."
+                },
+                "licenseAttribution": {
+                    "type": ["string", "null"],
+                    "description": "Attribution text to display for this trip's source data, if required."
+                }
             }
         },
         "locationExtensionBody": {

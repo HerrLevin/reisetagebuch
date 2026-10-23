@@ -47,7 +47,7 @@ onMounted(() => {
 <template>
     <li
         ref="row"
-        class="list-row hover:bg-base-200 cursor-pointer grid-cols-13 gap-0 py-2 md:px-8"
+        class="list-row hover:bg-base-200 cursor-pointer grid-cols-13 gap-0 py-2 last-of-type:pb-4 md:px-8"
         :class="{
             'bg-base-300': selected,
             'text-error line-through': stop.cancelled,

@@ -16,6 +16,8 @@ class TransportTrip extends Model
     protected $fillable = [
         'foreign_trip_id',
         'provider',
+        'motis_source',
+        'license_id',
         'mode',
         'line_name',
         'route_long_name',
@@ -59,5 +61,10 @@ class TransportTrip extends Model
     public function continuesAs(): HasOne
     {
         return $this->hasOne(TransportTrip::class, 'id', 'continues_as_trip_id');
+    }
+
+    public function license(): BelongsTo
+    {
+        return $this->belongsTo(License::class);
     }
 }

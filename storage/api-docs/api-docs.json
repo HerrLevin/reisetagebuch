@@ -4099,7 +4099,11 @@
                     "routeTextColor",
                     "source",
                     "intermediateStops",
-                    "continuesAs"
+                    "continuesAs",
+                    "xLicenseName",
+                    "xLicenseHumanName",
+                    "xLicenseUrl",
+                    "xLicenseAttribution"
                 ],
                 "properties": {
                     "mode": {
@@ -4193,6 +4197,26 @@
                     "source": {
                         "description": "Source of the leg information (e.g., \"motis\", \"gtfs\")",
                         "type": "string"
+                    },
+                    "xLicenseName": {
+                        "description": "rtb extension: Name of the license covering this leg's source data, if known",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "xLicenseHumanName": {
+                        "description": "rtb extension: Name of the organization that issued this leg's source data, if known",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "xLicenseUrl": {
+                        "description": "rtb extension: URL with more information about the license, if known",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "xLicenseAttribution": {
+                        "description": "rtb extension: Attribution text to display for this leg's source data, if required",
+                        "type": "string",
+                        "nullable": true
                     },
                     "intermediateStops": {
                         "description": "List of intermediate stops for the leg, if available",
@@ -6256,7 +6280,11 @@
                     "tripShortName",
                     "displayName",
                     "routeColor",
-                    "routeTextColor"
+                    "routeTextColor",
+                    "licenseName",
+                    "licenseHumanName",
+                    "licenseUrl",
+                    "licenseAttribution"
                 ],
                 "properties": {
                     "id": {
@@ -6299,6 +6327,26 @@
                     },
                     "routeTextColor": {
                         "description": "Text color of the route in HEX format",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "licenseName": {
+                        "description": "Name of the license covering this trip's source data, if known",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "licenseHumanName": {
+                        "description": "Name of the organization that issued this trip's source data, if known",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "licenseUrl": {
+                        "description": "URL with more information about the license, if known",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "licenseAttribution": {
+                        "description": "Attribution text to display for this trip's source data, if required",
                         "type": "string",
                         "nullable": true
                     }

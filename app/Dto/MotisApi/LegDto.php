@@ -13,7 +13,8 @@ use OpenApi\Attributes as OA;
     description: 'Data Transfer Object for a Leg of a Trip in the Motis API',
     required: ['mode', 'from', 'to', 'duration', 'startTime', 'endTime', 'scheduledStartTime',
         'scheduledEndTime', 'realTime', 'headSign', 'agencyName', 'agencyId', 'tripId', 'routeShortName',
-        'routeLongName', 'tripShortName', 'displayName', 'routeColor', 'routeTextColor', 'source', 'intermediateStops', 'continuesAs'],
+        'routeLongName', 'tripShortName', 'displayName', 'routeColor', 'routeTextColor', 'source', 'intermediateStops', 'continuesAs',
+        'xLicenseName', 'xLicenseHumanName', 'xLicenseUrl', 'xLicenseAttribution'],
     type: 'object'
 )]
 class LegDto
@@ -173,6 +174,38 @@ class LegDto
         type: 'string'
     )]
     public string $source;
+
+    #[OA\Property(
+        property: 'xLicenseName',
+        description: 'rtb extension: Name of the license covering this leg\'s source data, if known',
+        type: 'string',
+        nullable: true
+    )]
+    public ?string $xLicenseName = null;
+
+    #[OA\Property(
+        property: 'xLicenseHumanName',
+        description: 'rtb extension: Name of the organization that issued this leg\'s source data, if known',
+        type: 'string',
+        nullable: true
+    )]
+    public ?string $xLicenseHumanName = null;
+
+    #[OA\Property(
+        property: 'xLicenseUrl',
+        description: 'rtb extension: URL with more information about the license, if known',
+        type: 'string',
+        nullable: true
+    )]
+    public ?string $xLicenseUrl = null;
+
+    #[OA\Property(
+        property: 'xLicenseAttribution',
+        description: 'rtb extension: Attribution text to display for this leg\'s source data, if required',
+        type: 'string',
+        nullable: true
+    )]
+    public ?string $xLicenseAttribution = null;
 
     #[OA\Property(
         property: 'intermediateStops',
@@ -352,6 +385,34 @@ class LegDto
     public function setContinuesAs(?string $continuesAs): LegDto
     {
         $this->continuesAs = $continuesAs;
+
+        return $this;
+    }
+
+    public function setXLicenseName(?string $xLicenseName): LegDto
+    {
+        $this->xLicenseName = $xLicenseName;
+
+        return $this;
+    }
+
+    public function setXLicenseHumanName(?string $xLicenseHumanName): LegDto
+    {
+        $this->xLicenseHumanName = $xLicenseHumanName;
+
+        return $this;
+    }
+
+    public function setXLicenseUrl(?string $xLicenseUrl): LegDto
+    {
+        $this->xLicenseUrl = $xLicenseUrl;
+
+        return $this;
+    }
+
+    public function setXLicenseAttribution(?string $xLicenseAttribution): LegDto
+    {
+        $this->xLicenseAttribution = $xLicenseAttribution;
 
         return $this;
     }

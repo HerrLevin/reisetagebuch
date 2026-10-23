@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { api } from '@/api';
 import Loading from '@/Components/Loading.vue';
+import LicenseAttribution from '@/Components/Post/LicenseAttribution.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import StopoversListEntry from '@/Pages/NewPostDialog/Partials/StopoversListEntry.vue';
 import router from '@/router';
@@ -199,5 +200,11 @@ function getTitle() {
                 </li>
             </ul>
         </div>
+        <LicenseAttribution
+            v-if="!loading"
+            :license-attribution="trip?.legs[0]?.xLicenseAttribution"
+            :license-url="trip?.legs[0]?.xLicenseUrl"
+            class="mt-2"
+        />
     </AuthenticatedLayout>
 </template>

@@ -24,6 +24,10 @@ final class RtbTripData
         public readonly ?string $displayName,
         public readonly ?string $routeColor,
         public readonly ?string $routeTextColor,
+        public readonly ?string $licenseName,
+        public readonly ?string $licenseHumanName,
+        public readonly ?string $licenseUrl,
+        public readonly ?string $licenseAttribution,
     ) {}
 
     public function toArray(): array
@@ -40,6 +44,10 @@ final class RtbTripData
             'displayName' => $this->displayName,
             'routeColor' => $this->routeColor,
             'routeTextColor' => $this->routeTextColor,
+            'licenseName' => $this->licenseName,
+            'licenseHumanName' => $this->licenseHumanName,
+            'licenseUrl' => $this->licenseUrl,
+            'licenseAttribution' => $this->licenseAttribution,
         ];
     }
 
@@ -59,6 +67,10 @@ final class RtbTripData
             displayName: $trip->displayName,
             routeColor: $trip->routeColor,
             routeTextColor: $trip->routeTextColor,
+            licenseName: $trip->licenseName,
+            licenseHumanName: $trip->licenseHumanName,
+            licenseUrl: $trip->licenseUrl,
+            licenseAttribution: $trip->licenseAttribution,
         );
     }
 
@@ -83,6 +95,10 @@ final class RtbTripData
             displayName: self::parseString($data['displayName'] ?? null),
             routeColor: self::parseString($data['routeColor'] ?? null),
             routeTextColor: self::parseString($data['routeTextColor'] ?? null),
+            licenseName: self::parseString($data['licenseName'] ?? null),
+            licenseHumanName: self::parseString($data['licenseHumanName'] ?? null),
+            licenseUrl: self::parseString($data['licenseUrl'] ?? null),
+            licenseAttribution: self::parseString($data['licenseAttribution'] ?? null, 1000),
         );
     }
 }
