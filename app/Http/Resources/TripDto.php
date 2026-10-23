@@ -10,7 +10,7 @@ use OpenApi\Attributes as OA;
 #[OA\Schema(
     schema: 'TripDto',
     description: 'Data Transfer Object for a Transport Trip',
-    required: ['id', 'foreignId', 'mode', 'lineName', 'routeLongName', 'tripShortName', 'displayName', 'routeColor', 'routeTextColor'],
+    required: ['id', 'foreignId', 'mode', 'lineName', 'routeLongName', 'tripShortName', 'displayName', 'routeColor', 'routeTextColor', 'licenseName', 'licenseHumanName', 'licenseUrl', 'licenseAttribution'],
     type: 'object'
 )]
 class TripDto
@@ -86,6 +86,38 @@ class TripDto
     )]
     public ?string $routeTextColor = null;
 
+    #[OA\Property(
+        property: 'licenseName',
+        description: 'Name of the license covering this trip\'s source data, if known',
+        type: 'string',
+        nullable: true
+    )]
+    public ?string $licenseName = null;
+
+    #[OA\Property(
+        property: 'licenseHumanName',
+        description: 'Name of the organization that issued this trip\'s source data, if known',
+        type: 'string',
+        nullable: true
+    )]
+    public ?string $licenseHumanName = null;
+
+    #[OA\Property(
+        property: 'licenseUrl',
+        description: 'URL with more information about the license, if known',
+        type: 'string',
+        nullable: true
+    )]
+    public ?string $licenseUrl = null;
+
+    #[OA\Property(
+        property: 'licenseAttribution',
+        description: 'Attribution text to display for this trip\'s source data, if required',
+        type: 'string',
+        nullable: true
+    )]
+    public ?string $licenseAttribution = null;
+
     public function __construct(?TransportTrip $trip = null)
     {
         if ($trip === null) {
@@ -101,6 +133,13 @@ class TripDto
         $this->displayName = $trip->display_name;
         $this->routeColor = $trip->route_color;
         $this->routeTextColor = $trip->route_text_color;
+
+        if ($trip->license) {
+            $this->licenseName = $trip->license->getDisplayName();
+            $this->licenseHumanName = $trip->license->human_name;
+            $this->licenseUrl = $trip->license->getDisplayUrl();
+            $this->licenseAttribution = $trip->license->getAttributionText();
+        }
     }
 
     public static function fromRtb(RtbTripData $data): self
@@ -115,6 +154,10 @@ class TripDto
         $dto->displayName = $data->displayName;
         $dto->routeColor = $data->routeColor;
         $dto->routeTextColor = $data->routeTextColor;
+        $dto->licenseName = $data->licenseName;
+        $dto->licenseHumanName = $data->licenseHumanName;
+        $dto->licenseUrl = $data->licenseUrl;
+        $dto->licenseAttribution = $data->licenseAttribution;
 
         return $dto;
     }

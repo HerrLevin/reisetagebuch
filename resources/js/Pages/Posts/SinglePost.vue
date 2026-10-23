@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { api } from '@/api';
 import Map, { StopoverPopupInfo } from '@/Components/Map.vue';
+import LicenseAttribution from '@/Components/Post/LicenseAttribution.vue';
 import Post from '@/Components/Post/Post.vue';
 import PostMetaInfo from '@/Components/Post/PostMetaInfo.vue';
 import PostSkeleton from '@/Components/Post/PostSkeleton.vue';
@@ -295,6 +296,14 @@ function deleted() {
                 </ul>
             </div>
         </div>
+        <LicenseAttribution
+            v-if="isTransportPost(post)"
+            :license-attribution="
+                (post as TransportPost).trip.licenseAttribution
+            "
+            :license-url="(post as TransportPost).trip.licenseUrl"
+            class="mt-2"
+        />
 
         <div v-if="loading" class="skeleton my-5 h-20 w-full" />
         <div v-if="loading" class="skeleton my-5 h-20 w-full" />

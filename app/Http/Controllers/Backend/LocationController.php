@@ -382,7 +382,7 @@ class LocationController extends Controller
         $trip = $this->transportTripRepository->getTripByIdentifier(
             $tripId,
             null,
-            ['stops', 'stops.location.identifiers', 'continuesAs']
+            ['stops', 'stops.location.identifiers', 'continuesAs', 'license']
         );
 
         $hydrator = new DbTripHydrator;
@@ -426,6 +426,7 @@ class LocationController extends Controller
             $legDto->routeTextColor,
             null,
             $previousTrip?->id ?? null,
+            $legDto->source ?? null,
         );
 
         [$stops, $stopModels] = $this->createStopovers($legDto, $trip);

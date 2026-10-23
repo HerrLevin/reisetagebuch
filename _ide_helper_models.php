@@ -373,6 +373,41 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property string $id
+ * @property string $provider Data provider the license applies to, e.g. "transitous"
+ * @property string $country Country/region prefix of the GTFS feed, e.g. "de"
+ * @property string $name GTFS feed filename this license applies to, e.g. "de_db.gtfs.zip"
+ * @property string|null $human_name Human-readable name of the data publisher
+ * @property string|null $spdx SPDX license identifier, e.g. "CC-BY-4.0"
+ * @property string|null $license_url
+ * @property string|null $source_url
+ * @property string|null $attribution_text
+ * @property bool $active Whether the license is known and safe to display attribution for
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\TransportTrip> $transportTrips
+ * @property-read int|null $transport_trips_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|License newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|License newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|License query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|License whereActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|License whereAttributionText($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|License whereCountry($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|License whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|License whereHumanName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|License whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|License whereLicenseUrl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|License whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|License whereProvider($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|License whereSourceUrl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|License whereSpdx($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|License whereUpdatedAt($value)
+ */
+	class License extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property string $id
  * @property string $user_id
  * @property string $post_id
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -858,7 +893,10 @@ namespace App\Models{
  * @property string|null $route_text_color
  * @property \Illuminate\Support\Carbon|null $last_refreshed_at
  * @property string|null $continues_as_trip_id
+ * @property string|null $motis_source Raw GTFS feed source string returned by Motis for this trip
+ * @property string|null $license_id
  * @property-read TransportTrip|null $continuesAs
+ * @property-read \App\Models\License|null $license
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\TransportTripStop> $stops
  * @property-read int|null $stops_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\TransportPost> $transportPosts
@@ -874,8 +912,10 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereForeignTripId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereLastRefreshedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereLicenseId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereLineName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereMode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereMotisSource($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereProvider($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereRouteColor($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TransportTrip whereRouteLongName($value)

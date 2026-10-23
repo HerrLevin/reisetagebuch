@@ -86,7 +86,10 @@ class DbTripHydrator
             ->setRouteTextColor($trip->route_text_color)
             ->setSource($trip->provider)
             ->setIntermediateStops($stops)
-            ->setContinuesAs($trip->continuesAs?->foreign_trip_id);
-
+            ->setContinuesAs($trip->continuesAs?->foreign_trip_id)
+            ->setXLicenseName($trip->license?->getDisplayName())
+            ->setXLicenseHumanName($trip->license?->human_name)
+            ->setXLicenseUrl($trip->license?->getDisplayUrl())
+            ->setXLicenseAttribution($trip->license?->getAttributionText());
     }
 }
