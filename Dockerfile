@@ -24,6 +24,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     libwebp-dev \
     libzip-dev \
+    libnginx-mod-http-headers-more-filter \
     logrotate \
     nginx \
     nodejs \
