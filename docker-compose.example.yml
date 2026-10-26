@@ -11,7 +11,7 @@ services:
             - pgsql
             - redis
         healthcheck:
-            test: ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://localhost/up']
+            test: ['CMD', 'curl', '-fsS', '-o', '/dev/null', 'http://localhost/up']
             interval: 30s
             timeout: 5s
             start_period: 10s
