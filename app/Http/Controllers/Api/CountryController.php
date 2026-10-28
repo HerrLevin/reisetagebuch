@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\Scopes\ReadScope;
 use App\Http\Resources\CountriesDto;
 use OpenApi\Attributes as OA;
 
@@ -20,6 +21,7 @@ class CountryController extends Controller
         operationId: 'getCountriesForUser',
         description: 'Return the ISO A2 codes of countries a user has visited or merely travelled through',
         summary: 'User country insights',
+        security: [['passport' => [ReadScope::Statistics->value]]],
         tags: ['Statistics'],
         responses: [new OA\Response(response: 200, description: Controller::OA_DESC_SUCCESS, content: new OA\JsonContent(ref: CountriesDto::class))]
     )]

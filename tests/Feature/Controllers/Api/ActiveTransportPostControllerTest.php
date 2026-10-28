@@ -68,7 +68,7 @@ class ActiveTransportPostControllerTest extends TestCase
         $user = User::factory()->create();
         [$post] = $this->createActiveJourney($user);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->getJson(route('posts.transport.active'));
 
         $response->assertOk();
@@ -80,7 +80,7 @@ class ActiveTransportPostControllerTest extends TestCase
         $user = User::factory()->create();
         [$post, , $stops] = $this->createActiveJourney($user);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->getJson(route('posts.transport.stopovers.list', ['postId' => $post->id]));
 
         $response->assertOk();
@@ -95,7 +95,7 @@ class ActiveTransportPostControllerTest extends TestCase
         [$post, , $stops] = $this->createActiveJourney($user);
         $stops[2]->update(['cancelled' => true]);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->getJson(route('posts.transport.stopovers.list', ['postId' => $post->id]));
 
         $response->assertOk();
@@ -135,7 +135,7 @@ class ActiveTransportPostControllerTest extends TestCase
             'manual_arrival' => null,
         ]);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->getJson(route('posts.transport.active'));
 
         $response->assertOk();
@@ -175,7 +175,7 @@ class ActiveTransportPostControllerTest extends TestCase
             'manual_arrival' => null,
         ]);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->getJson(route('posts.transport.active'));
 
         $response->assertOk();
@@ -186,7 +186,7 @@ class ActiveTransportPostControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->getJson(route('posts.transport.active'));
 
         $response->assertOk();
@@ -229,7 +229,7 @@ class ActiveTransportPostControllerTest extends TestCase
             ['arrival_time' => now()->addHours(1), 'departure_time' => null, 'arrival_delay' => 0],
         );
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->getJson(route('posts.transport.active'));
 
         $response->assertOk();
@@ -246,7 +246,7 @@ class ActiveTransportPostControllerTest extends TestCase
             ['arrival_time' => now()->addHours(1), 'departure_time' => null, 'arrival_delay' => 0],
         );
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->getJson(route('posts.transport.active'));
 
         $response->assertOk();
@@ -264,7 +264,7 @@ class ActiveTransportPostControllerTest extends TestCase
             ['arrival_time' => now()->subMinutes(10), 'departure_time' => null, 'arrival_delay' => 0],
         );
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->getJson(route('posts.transport.active'));
 
         $response->assertOk();
@@ -282,7 +282,7 @@ class ActiveTransportPostControllerTest extends TestCase
             ['arrival_time' => now()->subMinutes(45), 'departure_time' => null, 'arrival_delay' => null, 'departure_delay' => null],
         );
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->getJson(route('posts.transport.active'));
 
         $response->assertOk();
@@ -300,7 +300,7 @@ class ActiveTransportPostControllerTest extends TestCase
             ['arrival_time' => now()->subMinutes(70), 'departure_time' => null, 'arrival_delay' => null, 'departure_delay' => null],
         );
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->getJson(route('posts.transport.active'));
 
         $response->assertOk();
@@ -320,7 +320,7 @@ class ActiveTransportPostControllerTest extends TestCase
             ['manual_arrival' => now()->subMinutes(5)],
         );
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->getJson(route('posts.transport.active'));
 
         $response->assertOk();
@@ -332,7 +332,7 @@ class ActiveTransportPostControllerTest extends TestCase
         $user = User::factory()->create();
         [$post, , $stops] = $this->createActiveJourney($user);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
 
         $arrivalTimestamp = now()->subMinutes(5)->toIso8601String();
         $response = $this->postJson(route('posts.transport.stopovers.arrival', [
@@ -362,7 +362,7 @@ class ActiveTransportPostControllerTest extends TestCase
         $user = User::factory()->create();
         [$post, , $stops] = $this->createActiveJourney($user);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
 
         $timestamp = now()->subMinutes(90)->toIso8601String();
         $response = $this->postJson(route('posts.transport.stopovers.departure', [
@@ -382,7 +382,7 @@ class ActiveTransportPostControllerTest extends TestCase
         $user = User::factory()->create();
         [$post, , $stops] = $this->createActiveJourney($user);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
 
         $timestamp = now()->addHours(2)->toIso8601String();
         $response = $this->postJson(route('posts.transport.stopovers.arrival', [
@@ -402,7 +402,7 @@ class ActiveTransportPostControllerTest extends TestCase
         $user = User::factory()->create();
         [$post, , $stops] = $this->createActiveJourney($user);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
 
         $this->postJson(route('posts.transport.stopovers.arrival', [
             'postId' => $post->id,
@@ -425,7 +425,7 @@ class ActiveTransportPostControllerTest extends TestCase
         $user = User::factory()->create();
         [$post, , $stops] = $this->createActiveJourney($user);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
 
         $this->postJson(route('posts.transport.stopovers.arrival', [
             'postId' => $post->id,
@@ -460,7 +460,7 @@ class ActiveTransportPostControllerTest extends TestCase
         $user = User::factory()->create();
         [$post, , $stops] = $this->createActiveJourney($user);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
 
         $response = $this->deleteJson(route('posts.transport.stopovers.arrival.clear', [
             'postId' => $post->id,
@@ -476,7 +476,7 @@ class ActiveTransportPostControllerTest extends TestCase
         $user = User::factory()->create();
         [$post, , $stops] = $this->createActiveJourney($user);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
 
         $this->postJson(route('posts.transport.stopovers.departure', [
             'postId' => $post->id,
@@ -498,7 +498,7 @@ class ActiveTransportPostControllerTest extends TestCase
         $user = User::factory()->create();
         [$post, , $stops] = $this->createActiveJourney($user);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
 
         $this->postJson(route('posts.transport.stopovers.arrival', [
             'postId' => $post->id,
@@ -520,7 +520,7 @@ class ActiveTransportPostControllerTest extends TestCase
         $user = User::factory()->create();
         [$post, , $stops] = $this->createActiveJourney($user);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
 
         $departureTimestamp = now()->subHours(2)->toIso8601String();
         $arrivalTimestamp = now()->addHours(2)->toIso8601String();
@@ -551,7 +551,7 @@ class ActiveTransportPostControllerTest extends TestCase
         $user = User::factory()->create();
         [$post, , $stops] = $this->createActiveJourney($user);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
 
         $this->postJson(route('posts.transport.stopovers.departure', [
             'postId' => $post->id,
@@ -583,7 +583,7 @@ class ActiveTransportPostControllerTest extends TestCase
         $user = User::factory()->create();
         [$post, , $stops] = $this->createActiveJourney($user);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
 
         // 12:00 in +02:00 is 10:00 UTC
         $response = $this->postJson(route('posts.transport.stopovers.arrival', [
@@ -601,7 +601,7 @@ class ActiveTransportPostControllerTest extends TestCase
         $user = User::factory()->create();
         [$post, , $stops] = $this->createActiveJourney($user);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
 
         // 12:00 in +02:00 is 10:00 UTC, 22:00 in +02:00 is 20:00 UTC
         $this->postJson(route('posts.transport.stopovers.departure', [
@@ -632,7 +632,7 @@ class ActiveTransportPostControllerTest extends TestCase
         $otherUser = User::factory()->create();
         [$post, , $stops] = $this->createActiveJourney($owner);
 
-        Passport::actingAs($otherUser);
+        Passport::actingAs($otherUser, ['*']);
         $response = $this->deleteJson(route('posts.transport.stopovers.arrival.clear', [
             'postId' => $post->id,
             'stopId' => $stops[1]->id,
@@ -647,7 +647,7 @@ class ActiveTransportPostControllerTest extends TestCase
         $otherUser = User::factory()->create();
         [$post, , $stops] = $this->createActiveJourney($owner);
 
-        Passport::actingAs($otherUser);
+        Passport::actingAs($otherUser, ['*']);
         $response = $this->postJson(route('posts.transport.stopovers.arrival', [
             'postId' => $post->id,
             'stopId' => $stops[1]->id,

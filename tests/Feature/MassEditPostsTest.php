@@ -22,7 +22,7 @@ class MassEditPostsTest extends TestCase
             'visibility' => Visibility::PRIVATE,
         ]);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->postJson(route('api.posts.mass-edit'), [
             'postIds' => $posts->pluck('id')->toArray(),
             'visibility' => Visibility::PUBLIC->value,
@@ -43,7 +43,7 @@ class MassEditPostsTest extends TestCase
             'user_id' => $user->id,
         ]);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->postJson(route('api.posts.mass-edit'), [
             'postIds' => $posts->pluck('id')->toArray(),
             'travelReason' => TravelReason::BUSINESS->value,
@@ -60,7 +60,7 @@ class MassEditPostsTest extends TestCase
             'user_id' => $user->id,
         ]);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->postJson(route('api.posts.mass-edit'), [
             'postIds' => $posts->pluck('id')->toArray(),
             'tags' => ['vacation', 'summer'],
@@ -86,7 +86,7 @@ class MassEditPostsTest extends TestCase
             'visibility' => Visibility::PRIVATE,
         ]);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->postJson(route('api.posts.mass-edit'), [
             'postIds' => $posts->pluck('id')->toArray(),
             'visibility' => Visibility::PUBLIC->value,
@@ -103,7 +103,7 @@ class MassEditPostsTest extends TestCase
     {
         $user = User::factory()->create();
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->postJson(route('api.posts.mass-edit'), [
             'visibility' => Visibility::PUBLIC->value,
         ]);
@@ -116,7 +116,7 @@ class MassEditPostsTest extends TestCase
     {
         $user = User::factory()->create();
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->postJson(route('api.posts.mass-edit'), [
             'postIds' => ['00000000-0000-0000-0000-000000000000'],
             'visibility' => Visibility::PUBLIC->value,

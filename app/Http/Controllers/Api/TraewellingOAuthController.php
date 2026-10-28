@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Dto\ErrorDto;
+use App\Enums\Scopes\WriteScope;
 use App\Http\Controllers\Controller;
 use App\Models\SocialAccount;
 use Illuminate\Http\JsonResponse;
@@ -17,7 +18,7 @@ class TraewellingOAuthController extends Controller
         path: '/socialite/traewelling/connect',
         operationId: 'connectTraewelling',
         summary: 'Redirects the user to Traewelling for OAuth authentication',
-        security: [['passport' => []]],
+        security: [['passport' => [WriteScope::Security->value]]],
         tags: ['Socialite'],
         responses: [
             new OA\Response(
@@ -53,7 +54,7 @@ class TraewellingOAuthController extends Controller
         path: '/socialite/traewelling/callback',
         operationId: 'handleTraewellingCallback',
         summary: 'Handles the callback from Traewelling after OAuth authentication',
-        security: [['passport' => []]],
+        security: [['passport' => [WriteScope::Security->value]]],
         tags: ['Socialite'],
         parameters: [
             new OA\Parameter(

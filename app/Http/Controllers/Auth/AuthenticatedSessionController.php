@@ -5,16 +5,15 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Laravel\Passport\Passport;
 
 /**
- * The app itself authenticates purely via Passport bearer tokens (see
- * App\Http\Controllers\Api\AuthController) — there is no cookie/session login for
- * regular use. This controller exists only so admins can reach browser-only tools
- * (Horizon, Telescope) that a bearer token can't be attached to on a plain page
- * navigation. Login is restricted to admins; everyone else gets a generic failure.
+ * Session login for the web SPA (API access via Passport's laravel_token cookie)
+ * and for the native app's OAuth flow (/oauth/authorize).
  */
 class AuthenticatedSessionController extends Controller
 {
@@ -33,9 +32,7 @@ class AuthenticatedSessionController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        if (! Auth::guard('web')->attempt($credentials) || ! Auth::guard('web')->user()->isAdmin()) {
-            Auth::guard('web')->logout();
-
+        if (! Auth::guard('web')->attempt($credentials, $request->boolean('remember'))) {
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
             ]);
@@ -43,16 +40,20 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended('/horizon');
+        // Back to /oauth/authorize when the native app's login prompted it.
+        return redirect()->intended('/home');
     }
 
-    public function destroy(Request $request): RedirectResponse
+    /**
+     * Called by the SPA via XHR.
+     */
+    public function destroy(Request $request): Response
     {
         Auth::guard('web')->logout();
-
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('admin.login');
+        // The laravel_token JWT is checked without the session, so it must go too.
+        return response()->noContent()->withoutCookie(Passport::cookie());
     }
 }

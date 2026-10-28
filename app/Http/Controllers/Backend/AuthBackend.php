@@ -10,10 +10,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Invite;
 use App\Models\User;
 use App\Repositories\PrivacyPolicyRepository;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Routing\UrlGenerator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Laravel\Passport\Guards\TokenGuard;
+use Throwable;
 
 class AuthBackend extends Controller
 {
@@ -39,6 +43,36 @@ class AuthBackend extends Controller
             isAdmin: $user->isAdmin(),
             hasAcceptedCurrentPrivacyPolicy: $this->hasAcceptedCurrentPrivacyPolicy($user),
         );
+    }
+
+    /**
+     * @param  array{name: string, username: string, email: string, password: string}  $data
+     *
+     * @throws Throwable
+     */
+    public function registerUser(array $data, ?Invite $invite = null): User
+    {
+        $user = DB::transaction(function () use ($data, $invite) {
+            $user = User::create([
+                'name' => $data['name'],
+                'username' => $data['username'],
+                'email' => $data['email'],
+                'password' => Hash::make($data['password']),
+            ]);
+            $user->profile()->create();
+            $user->settings()->create();
+            $user->statistics()->create();
+            $invite?->update([
+                'used_by' => $user->id,
+                'used_at' => now(),
+            ]);
+
+            return $user;
+        });
+
+        event(new Registered($user));
+
+        return $user;
     }
 
     private function hasAcceptedCurrentPrivacyPolicy(User $user): bool

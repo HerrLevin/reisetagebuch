@@ -112,7 +112,7 @@ class UserControllerTest extends TestCase
     public function test_map_data_hides_private_and_unlisted_locations_from_other_authenticated_users(): void
     {
         $owner = User::factory()->create();
-        Passport::actingAs(User::factory()->create());
+        Passport::actingAs(User::factory()->create(), ['*']);
 
         $this->makeLocationPost($owner->id, Visibility::PUBLIC);
         $this->makeLocationPost($owner->id, Visibility::PRIVATE);
@@ -128,7 +128,7 @@ class UserControllerTest extends TestCase
     public function test_map_data_shows_all_locations_to_the_owner(): void
     {
         $owner = User::factory()->create();
-        Passport::actingAs($owner);
+        Passport::actingAs($owner, ['*']);
 
         $this->makeLocationPost($owner->id, Visibility::PUBLIC);
         $this->makeLocationPost($owner->id, Visibility::PRIVATE);

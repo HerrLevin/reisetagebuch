@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\Scopes\ReadScope;
+use App\Enums\Scopes\WriteScope;
 use App\Http\Controllers\Backend\NotificationController as Backend;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
@@ -21,6 +23,7 @@ class NotificationController extends Controller
         operationId: 'listNotifications',
         description: 'List notifications for authenticated user',
         summary: 'List notifications',
+        security: [['passport' => [ReadScope::Notifications->value]]],
         tags: ['Notifications'],
         responses: [new OA\Response(
             response: 200,
@@ -44,6 +47,7 @@ class NotificationController extends Controller
         operationId: 'unreadNotificationCount',
         description: 'Get unread notifications count',
         summary: 'Unread count',
+        security: [['passport' => [ReadScope::Notifications->value]]],
         tags: ['Notifications'],
         responses: [
             new OA\Response(
@@ -78,6 +82,7 @@ class NotificationController extends Controller
         operationId: 'markNotificationAsRead',
         description: 'Mark a notification as read',
         summary: 'Mark as read',
+        security: [['passport' => [WriteScope::Notifications->value]]],
         tags: ['Notifications'],
         parameters: [new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'string'))],
         responses: [new OA\Response(response: 204, description: Controller::OA_DESC_NO_CONTENT)]
@@ -94,6 +99,7 @@ class NotificationController extends Controller
         operationId: 'markAllNotificationsAsRead',
         description: 'Mark all notifications as read',
         summary: 'Mark all as read',
+        security: [['passport' => [WriteScope::Notifications->value]]],
         tags: ['Notifications'],
         responses: [new OA\Response(response: 204, description: Controller::OA_DESC_NO_CONTENT)]
     )]

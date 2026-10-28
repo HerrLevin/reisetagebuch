@@ -6,6 +6,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Dto\RemoteFollowDto;
 use App\Dto\RemoteFollowerDto;
+use App\Enums\Scopes\ReadScope;
+use App\Enums\Scopes\WriteScope;
 use App\Exceptions\InsufficientRightsException;
 use App\Http\Controllers\Backend\ActivityPubFederationBackend;
 use Illuminate\Http\JsonResponse;
@@ -59,6 +61,7 @@ class ActivityPubFederationController extends Controller
         operationId: 'getUserActivityPubFollowers',
         description: 'Return the remote (ActivityPub) actors that follow a user',
         summary: 'Get remote followers',
+        security: [[], ['passport' => [ReadScope::Follows->value]]],
         tags: ['Follows'],
         parameters: [new OA\Parameter(name: 'userId', in: 'path', required: true, schema: new OA\Schema(type: 'string'))],
         responses: [
@@ -83,6 +86,7 @@ class ActivityPubFederationController extends Controller
         operationId: 'getUserActivityPubFollowing',
         description: 'Return the remote (ActivityPub) actors a user follows',
         summary: 'Get remote following',
+        security: [[], ['passport' => [ReadScope::Follows->value]]],
         tags: ['Follows'],
         parameters: [new OA\Parameter(name: 'userId', in: 'path', required: true, schema: new OA\Schema(type: 'string'))],
         responses: [
@@ -125,6 +129,7 @@ class ActivityPubFederationController extends Controller
         operationId: 'approveActivityPubFollowRequest',
         description: 'Approve a pending ActivityPub follow request from a remote actor',
         summary: 'Approve remote follow request',
+        security: [[], ['passport' => [WriteScope::Follows->value]]],
         tags: ['Follows'],
         parameters: [
             new OA\Parameter(name: 'userId', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
@@ -152,6 +157,7 @@ class ActivityPubFederationController extends Controller
         operationId: 'rejectActivityPubFollowRequest',
         description: 'Reject a pending ActivityPub follow request from a remote actor',
         summary: 'Reject remote follow request',
+        security: [[], ['passport' => [WriteScope::Follows->value]]],
         tags: ['Follows'],
         parameters: [
             new OA\Parameter(name: 'userId', in: 'path', required: true, schema: new OA\Schema(type: 'string')),

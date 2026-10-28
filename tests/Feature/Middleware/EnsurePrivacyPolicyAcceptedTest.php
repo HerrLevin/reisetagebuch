@@ -16,7 +16,7 @@ class EnsurePrivacyPolicyAcceptedTest extends TestCase
     {
         $user = User::factory()->create();
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->getJson(route('posts.timeline'));
 
         $response->assertOk();
@@ -27,7 +27,7 @@ class EnsurePrivacyPolicyAcceptedTest extends TestCase
         $user = User::factory()->create();
         PrivacyPolicy::query()->create(['content' => 'Current version', 'valid_from' => now()->subDay()]);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->getJson(route('posts.timeline'));
 
         $response->assertForbidden();
@@ -39,7 +39,7 @@ class EnsurePrivacyPolicyAcceptedTest extends TestCase
         $user = User::factory()->create();
         $policy = PrivacyPolicy::query()->create(['content' => 'Current version', 'valid_from' => now()->subDay()]);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $this->postJson(route('privacy-policy.accept', ['privacyPolicy' => $policy->id]))->assertOk();
 
         $response = $this->getJson(route('posts.timeline'));
@@ -52,7 +52,7 @@ class EnsurePrivacyPolicyAcceptedTest extends TestCase
         $user = User::factory()->create();
         PrivacyPolicy::query()->create(['content' => 'Current version', 'valid_from' => now()->subDay()]);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
 
         $this->getJson(route('auth.user'))->assertOk();
         $this->getJson(route('account.show'))->assertOk();

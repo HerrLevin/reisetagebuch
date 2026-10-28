@@ -15,7 +15,7 @@ class AccountControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
 
         $response = $this
             ->patchJson('/api/account', [
@@ -37,7 +37,7 @@ class AccountControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this
             ->patchJson('/api/account', [
                 'name' => 'Test User',
@@ -54,7 +54,7 @@ class AccountControllerTest extends TestCase
     public function test_user_can_delete_their_account(): void
     {
         $user = User::factory()->create();
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
 
         $response = $this
             ->deleteJson('/api/account', [
@@ -70,7 +70,7 @@ class AccountControllerTest extends TestCase
     public function test_correct_password_must_be_provided_to_delete_account(): void
     {
         $user = User::factory()->create();
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
 
         $response = $this
             ->deleteJson('/api/account', [

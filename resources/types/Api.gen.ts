@@ -2298,13 +2298,11 @@ export class Api<
      * @name GetAppConfiguration
      * @summary Get application configuration
      * @request GET:/app/configuration
-     * @secure
      */
     getAppConfiguration: (params: RequestParams = {}) =>
       this.request<AppConfigurationDto, any>({
         path: `/app/configuration`,
         method: "GET",
-        secure: true,
         format: "json",
         ...params,
       }),
@@ -2316,13 +2314,11 @@ export class Api<
      * @name GetImprint
      * @summary Get the instance imprint
      * @request GET:/app/imprint
-     * @secure
      */
     getImprint: (params: RequestParams = {}) =>
       this.request<ImprintDto, any>({
         path: `/app/imprint`,
         method: "GET",
-        secure: true,
         format: "json",
         ...params,
       }),
@@ -2354,13 +2350,11 @@ export class Api<
      * @name GetPrivacyPolicy
      * @summary Get the privacy policy currently in effect
      * @request GET:/app/privacy-policy
-     * @secure
      */
     getPrivacyPolicy: (params: RequestParams = {}) =>
       this.request<PrivacyPolicyDto, void>({
         path: `/app/privacy-policy`,
         method: "GET",
-        secure: true,
         format: "json",
         ...params,
       }),
@@ -2395,13 +2389,11 @@ export class Api<
      * @name GetUpcomingPrivacyPolicy
      * @summary Get the next privacy policy version, if one has been published for the future
      * @request GET:/app/privacy-policy/upcoming
-     * @secure
      */
     getUpcomingPrivacyPolicy: (params: RequestParams = {}) =>
       this.request<PrivacyPolicyDto, void>({
         path: `/app/privacy-policy/upcoming`,
         method: "GET",
-        secure: true,
         format: "json",
         ...params,
       }),
@@ -2444,88 +2436,6 @@ export class Api<
       }),
 
     /**
-     * @description Authenticate a user and return an access token
-     *
-     * @tags Authentication
-     * @name Login
-     * @summary User login
-     * @request POST:/auth/login
-     * @secure
-     */
-    login: (
-      data: {
-        /**
-         * @format email
-         * @example "mail@example.com"
-         */
-        email: string;
-        /**
-         * @format password
-         * @example "secret"
-         */
-        password: string;
-      },
-      params: RequestParams = {},
-    ) =>
-      this.request<TokenResponseDto, void>({
-        path: `/auth/login`,
-        method: "POST",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Register a new user and return an access token
-     *
-     * @tags Authentication
-     * @name Register
-     * @summary User registration
-     * @request POST:/auth/register
-     * @secure
-     */
-    register: (
-      data: {
-        /** @example "John Doe" */
-        name: string;
-        /** @example "john_doe" */
-        username: string;
-        /**
-         * @format email
-         * @example "mail@example.com"
-         */
-        email: string;
-        /**
-         * @format password
-         * @example "secret"
-         */
-        password: string;
-        /**
-         * @format password
-         * @example "secret"
-         */
-        password_confirmation: string;
-        /**
-         * Optional invite code required if open registration is disabled
-         * @example "INVITE_CODE_123"
-         */
-        invite?: string;
-      },
-      params: RequestParams = {},
-    ) =>
-      this.request<TokenResponseDto, void>({
-        path: `/auth/register`,
-        method: "POST",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
      * @description Logout the authenticated user by revoking their access token
      *
      * @tags Authentication
@@ -2549,7 +2459,6 @@ export class Api<
      * @name ForgotPassword
      * @summary Forgot password
      * @request POST:/auth/forgot-password
-     * @secure
      */
     forgotPassword: (
       data: {
@@ -2565,7 +2474,6 @@ export class Api<
         path: `/auth/forgot-password`,
         method: "POST",
         body: data,
-        secure: true,
         type: ContentType.Json,
         ...params,
       }),
@@ -2577,7 +2485,6 @@ export class Api<
      * @name ResetPassword
      * @summary Reset password
      * @request POST:/auth/reset-password
-     * @secure
      */
     resetPassword: (
       data: {
@@ -2605,7 +2512,6 @@ export class Api<
         path: `/auth/reset-password`,
         method: "POST",
         body: data,
-        secure: true,
         type: ContentType.Json,
         ...params,
       }),
@@ -2689,7 +2595,6 @@ export class Api<
      * @name ValidateInvite
      * @summary Validate invite code
      * @request GET:/auth/invite/{code}
-     * @secure
      */
     validateInvite: (code: string, params: RequestParams = {}) =>
       this.request<
@@ -2703,7 +2608,6 @@ export class Api<
       >({
         path: `/auth/invite/${code}`,
         method: "GET",
-        secure: true,
         format: "json",
         ...params,
       }),
@@ -3465,7 +3369,6 @@ export class Api<
      * @name GetLineStringBetween
      * @summary Get linestring
      * @request GET:/map/linestring
-     * @secure
      */
     getLineStringBetween: (
       query: {
@@ -3478,7 +3381,6 @@ export class Api<
         path: `/map/linestring`,
         method: "GET",
         query: query,
-        secure: true,
         format: "json",
         ...params,
       }),
@@ -3490,7 +3392,6 @@ export class Api<
      * @name GetStopsBetween
      * @summary Get stopovers
      * @request GET:/map/stopovers
-     * @secure
      */
     getStopsBetween: (
       query: {
@@ -3503,7 +3404,6 @@ export class Api<
         path: `/map/stopovers`,
         method: "GET",
         query: query,
-        secure: true,
         format: "json",
         ...params,
       }),

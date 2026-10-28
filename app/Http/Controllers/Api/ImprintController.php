@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Dto\ImprintDto;
+use App\Enums\Scopes\AdminWriteScope;
 use App\Http\Controllers\Backend\ImprintBackend;
 use App\Http\Requests\ImprintUpdateRequest;
 use OpenApi\Attributes as OA;
@@ -40,7 +41,7 @@ class ImprintController extends Controller
         operationId: 'updateImprint',
         description: 'Update the instance imprint. Requires admin privileges.',
         summary: 'Update the instance imprint',
-        security: [['passport' => []]],
+        security: [['passport' => [AdminWriteScope::Settings->value]]],
         requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(ref: ImprintUpdateRequest::class)),
         tags: ['App'],
         responses: [

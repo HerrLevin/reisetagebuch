@@ -177,24 +177,21 @@ return [
             'securitySchemes' => [
                 'passport' => [ // Unique name of security
                     'type' => 'oauth2', // The type of the security scheme. Valid values are "basic", "apiKey" or "oauth2".
-                    'description' => 'Laravel passport oauth2 security.',
-                    'in' => 'header',
-                    'scheme' => 'https',
+                    'description' => 'OAuth 2.0 authorization code flow with PKCE. Clients register via '
+                        .'Dynamic Client Registration (RFC 7591), see /.well-known/oauth-authorization-server. '
+                        .'A high-level scope (e.g. "read") grants all its granular scopes (e.g. "read:statuses").',
                     'flows' => [
-                        'password' => [
+                        'authorizationCode' => [
                             'authorizationUrl' => config('app.url').'/oauth/authorize',
                             'tokenUrl' => config('app.url').'/oauth/token',
-                            'refreshUrl' => config('app.url').'/token/refresh',
+                            'refreshUrl' => config('app.url').'/oauth/token',
+                            // Filled from App\Enums\Scopes\Scope in AppServiceProvider.
                             'scopes' => [],
                         ],
                     ],
                 ],
             ],
-            'security' => [
-                [
-                    'passport' => [],
-                ],
-            ],
+            // Each operation declares its own security; public ones have none.
         ],
 
         /*

@@ -55,7 +55,7 @@ class PrivacyPolicyControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->postJson(route('privacy-policy.store'), [
             'content' => 'New policy',
             'validFrom' => now()->addDay()->toIso8601String(),
@@ -80,7 +80,7 @@ class PrivacyPolicyControllerTest extends TestCase
         $admin = User::factory()->create();
         $admin->forceFill(['is_admin' => true])->save();
 
-        Passport::actingAs($admin);
+        Passport::actingAs($admin, ['*']);
         $response = $this->postJson(route('privacy-policy.store'), [
             'content' => 'Backdated policy',
             'validFrom' => now()->subDay()->toIso8601String(),
@@ -96,7 +96,7 @@ class PrivacyPolicyControllerTest extends TestCase
         $admin->forceFill(['is_admin' => true])->save();
         $existing = PrivacyPolicy::query()->create(['content' => 'Existing version', 'valid_from' => now()->subDay()]);
 
-        Passport::actingAs($admin);
+        Passport::actingAs($admin, ['*']);
         $response = $this->postJson(route('privacy-policy.store'), [
             'content' => 'Brand new version',
             'validFrom' => now()->addDay()->toIso8601String(),
@@ -123,7 +123,7 @@ class PrivacyPolicyControllerTest extends TestCase
         $user = User::factory()->create();
         $policy = PrivacyPolicy::query()->create(['content' => 'Current version', 'valid_from' => now()->subDay()]);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->postJson(route('privacy-policy.accept', ['privacyPolicy' => $policy->id]));
 
         $response->assertOk();
@@ -140,7 +140,7 @@ class PrivacyPolicyControllerTest extends TestCase
         $user = User::factory()->create();
         $policy = PrivacyPolicy::query()->create(['content' => 'Current version', 'valid_from' => now()->subDay()]);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $this->postJson(route('privacy-policy.accept', ['privacyPolicy' => $policy->id]))->assertOk();
         $this->postJson(route('privacy-policy.accept', ['privacyPolicy' => $policy->id]))->assertOk();
 
@@ -153,7 +153,7 @@ class PrivacyPolicyControllerTest extends TestCase
         PrivacyPolicy::query()->create(['content' => 'Current version', 'valid_from' => now()->subDay()]);
         $upcoming = PrivacyPolicy::query()->create(['content' => 'Upcoming version', 'valid_from' => now()->addDay()]);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->postJson(route('privacy-policy.accept', ['privacyPolicy' => $upcoming->id]));
 
         $response->assertOk();
@@ -169,7 +169,7 @@ class PrivacyPolicyControllerTest extends TestCase
         $old = PrivacyPolicy::query()->create(['content' => 'Old version', 'valid_from' => now()->subWeek()]);
         PrivacyPolicy::query()->create(['content' => 'Current version', 'valid_from' => now()->subDay()]);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->postJson(route('privacy-policy.accept', ['privacyPolicy' => $old->id]));
 
         $response->assertUnprocessable();

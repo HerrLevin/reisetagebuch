@@ -34,7 +34,7 @@ const submit = async () => {
         // a browser fetch would take.
         await axios.get(`${normalized}/nodeinfo/2.0`, { timeout: 30000 });
         await initApi();
-        router.push({ name: 'login' });
+        router.push({ name: 'login', query: { start: 'true' } });
     } catch (err) {
         console.error(err);
         error.value = t('connect_server.not_found');

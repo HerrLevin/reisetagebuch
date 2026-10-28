@@ -6,6 +6,8 @@ use App\Dto\FilteredPostPaginationDto;
 use App\Dto\PaginationDto;
 use App\Dto\PostPaginationDto;
 use App\Enums\PostMetaInfo\TravelReason;
+use App\Enums\Scopes\ReadScope;
+use App\Enums\Scopes\WriteScope;
 use App\Enums\Visibility;
 use App\Exceptions\NegativePeriodException;
 use App\Http\Requests\BasePostRequest;
@@ -42,11 +44,7 @@ class PostController extends Controller
         operationId: 'timeline',
         description: 'Returns paginated posts for the authenticated user timeline',
         summary: 'Get timeline posts',
-        security: [
-            [
-                'passport' => [],
-            ],
-        ],
+        security: [['passport' => [ReadScope::Statuses->value]]],
         tags: ['Posts'],
         parameters: [
             new OA\Parameter(
@@ -77,6 +75,7 @@ class PostController extends Controller
         operationId: 'getGlobalTimeline',
         description: 'Returns paginated posts for the authenticated user / global public timeline',
         summary: 'Get timeline posts',
+        security: [['passport' => [ReadScope::Statuses->value]]],
         tags: ['Posts'],
         parameters: [
             new OA\Parameter(
@@ -107,11 +106,7 @@ class PostController extends Controller
         operationId: 'postsForUser',
         description: 'Returns paginated posts for a specific user',
         summary: 'Get posts for a specific user',
-        security: [
-            [
-                'passport' => [],
-            ],
-        ],
+        security: [[], ['passport' => [ReadScope::Statuses->value]]],
         tags: ['Posts'],
         parameters: [
             new OA\Parameter(
@@ -149,11 +144,7 @@ class PostController extends Controller
         operationId: 'showPost',
         description: 'Returns post data',
         summary: 'Get post by ID',
-        security: [
-            [
-                'passport' => [],
-            ],
-        ],
+        security: [[], ['passport' => [ReadScope::Statuses->value]]],
         tags: ['Posts'],
         parameters: [
             new OA\Parameter(
@@ -190,11 +181,7 @@ class PostController extends Controller
         operationId: 'filterPosts',
         description: 'Returns filtered posts',
         summary: 'Filter posts',
-        security: [
-            [
-                'passport' => [],
-            ],
-        ],
+        security: [['passport' => [ReadScope::Statuses->value]]],
         tags: ['Posts'],
         parameters: [
             new OA\Parameter(
@@ -269,11 +256,7 @@ class PostController extends Controller
         operationId: 'massEditPosts',
         description: 'Mass edit multiple posts',
         summary: 'Mass edit posts',
-        security: [
-            [
-                'passport' => [],
-            ],
-        ],
+        security: [['passport' => [WriteScope::Statuses->value]]],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(ref: MassEditPostRequest::class)
@@ -295,11 +278,7 @@ class PostController extends Controller
         operationId: 'deletePost',
         description: 'Delete a post by id',
         summary: 'Delete post',
-        security: [
-            [
-                'passport' => [],
-            ],
-        ],
+        security: [['passport' => [WriteScope::Statuses->value]]],
         tags: ['Posts'],
         parameters: [
             new OA\Parameter(
@@ -329,11 +308,7 @@ class PostController extends Controller
         operationId: 'storeTransportPost',
         description: 'Create a transport post',
         summary: 'Create transport post',
-        security: [
-            [
-                'passport' => [],
-            ],
-        ],
+        security: [['passport' => [WriteScope::Statuses->value]]],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(ref: TransportBasePostCreateRequest::class)
@@ -355,11 +330,7 @@ class PostController extends Controller
         operationId: 'storeTextPost',
         description: 'Create a text post',
         summary: 'Create text post',
-        security: [
-            [
-                'passport' => [],
-            ],
-        ],
+        security: [['passport' => [WriteScope::Statuses->value]]],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(ref: BasePostRequest::class)
@@ -381,11 +352,7 @@ class PostController extends Controller
         operationId: 'storeLocationPost',
         description: 'Create a location post',
         summary: 'Create location post',
-        security: [
-            [
-                'passport' => [],
-            ],
-        ],
+        security: [['passport' => [WriteScope::Statuses->value]]],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(ref: LocationBasePostRequest::class)
@@ -410,11 +377,7 @@ class PostController extends Controller
         operationId: 'updatePost',
         description: 'Update a post (text, transport or location)',
         summary: 'Update post',
-        security: [
-            [
-                'passport' => [],
-            ],
-        ],
+        security: [['passport' => [WriteScope::Statuses->value]]],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(oneOf: [
@@ -460,11 +423,7 @@ class PostController extends Controller
         operationId: 'getActiveTransportPost',
         description: "Get the authenticated user's currently active transport post (a journey currently in progress). Returns null if the user has no active transport post.",
         summary: 'Get active transport post',
-        security: [
-            [
-                'passport' => [],
-            ],
-        ],
+        security: [['passport' => [ReadScope::Statuses->value]]],
         tags: ['Posts', 'TransportPosts'],
         responses: [
             new OA\Response(response: 200, description: 'successful operation', content: new OA\JsonContent(ref: TransportPost::class)),
@@ -484,11 +443,7 @@ class PostController extends Controller
         operationId: 'getStopoversForTransportPost',
         description: 'Get all stopovers of a transport post journey, from origin to destination, in sequence order, including any user-logged actual arrival/departure times',
         summary: 'Get transport post stopovers',
-        security: [
-            [
-                'passport' => [],
-            ],
-        ],
+        security: [[], ['passport' => [ReadScope::Statuses->value]]],
         tags: ['Posts', 'TransportPosts'],
         parameters: [
             new OA\Parameter(
@@ -523,11 +478,7 @@ class PostController extends Controller
         operationId: 'logStopoverArrival',
         description: 'Log the actual arrival time at a stopover for the given transport post',
         summary: 'Log stopover arrival',
-        security: [
-            [
-                'passport' => [],
-            ],
-        ],
+        security: [['passport' => [WriteScope::Statuses->value]]],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(ref: StopoverLogRequest::class)
@@ -578,11 +529,7 @@ class PostController extends Controller
         operationId: 'logStopoverDeparture',
         description: 'Log the actual departure time from a stopover for the given transport post',
         summary: 'Log stopover departure',
-        security: [
-            [
-                'passport' => [],
-            ],
-        ],
+        security: [['passport' => [WriteScope::Statuses->value]]],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(ref: StopoverLogRequest::class)
@@ -633,11 +580,7 @@ class PostController extends Controller
         operationId: 'clearStopoverArrival',
         description: 'Clear a previously logged actual arrival time at a stopover for the given transport post',
         summary: 'Clear stopover arrival',
-        security: [
-            [
-                'passport' => [],
-            ],
-        ],
+        security: [['passport' => [WriteScope::Statuses->value]]],
         tags: ['Posts', 'TransportPosts'],
         parameters: [
             new OA\Parameter(
@@ -679,11 +622,7 @@ class PostController extends Controller
         operationId: 'clearStopoverDeparture',
         description: 'Clear a previously logged actual departure time from a stopover for the given transport post',
         summary: 'Clear stopover departure',
-        security: [
-            [
-                'passport' => [],
-            ],
-        ],
+        security: [['passport' => [WriteScope::Statuses->value]]],
         tags: ['Posts', 'TransportPosts'],
         parameters: [
             new OA\Parameter(
@@ -725,11 +664,7 @@ class PostController extends Controller
         operationId: 'updateTransportPostExit',
         description: 'Update transport-specific fields of a post',
         summary: 'Update transport post',
-        security: [
-            [
-                'passport' => [],
-            ],
-        ],
+        security: [['passport' => [WriteScope::Statuses->value]]],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(ref: TransportPostExitUpdateRequest::class)
@@ -764,11 +699,7 @@ class PostController extends Controller
         operationId: 'uploadTransportTrack',
         description: 'Upload a GPX or GeoJSON track file for a transport post',
         summary: 'Upload transport track',
-        security: [
-            [
-                'passport' => [],
-            ],
-        ],
+        security: [['passport' => [WriteScope::Statuses->value]]],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\MediaType(
@@ -807,11 +738,7 @@ class PostController extends Controller
         operationId: 'deleteTransportTrack',
         description: 'Remove the uploaded track from a transport post',
         summary: 'Delete transport track',
-        security: [
-            [
-                'passport' => [],
-            ],
-        ],
+        security: [['passport' => [WriteScope::Statuses->value]]],
         tags: ['Posts', 'TransportPosts'],
         parameters: [
             new OA\Parameter(
@@ -842,7 +769,7 @@ class PostController extends Controller
         operationId: 'retryTraewellingCrosspost',
         description: 'Retry a failed Traewelling crosspost. Dispatches an edit job if a Traewelling ID already exists, otherwise dispatches a new check-in job. Deletes the failure notification.',
         summary: 'Retry Traewelling crosspost',
-        security: [['passport' => []]],
+        security: [['passport' => [WriteScope::Statuses->value]]],
         tags: ['Posts'],
         parameters: [
             new OA\Parameter(

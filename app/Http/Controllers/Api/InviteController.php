@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\Scopes\ReadScope;
+use App\Enums\Scopes\WriteScope;
 use App\Http\Controllers\Backend\InviteController as Backend;
 use App\Http\Requests\StoreInviteCodeRequest;
 use App\Http\Resources\InviteDto;
@@ -24,11 +26,7 @@ class InviteController extends Controller
         operationId: 'listInvites',
         description: 'List invite codes for the authenticated user',
         summary: 'List invites',
-        security: [
-            [
-                'passport' => [],
-            ],
-        ],
+        security: [['passport' => [ReadScope::Invites->value]]],
         tags: ['Invites'],
         responses: [
             new OA\Response(response: 200, description: Controller::OA_DESC_SUCCESS, content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: InviteDto::class))),
@@ -50,11 +48,7 @@ class InviteController extends Controller
         operationId: 'createInvite',
         description: 'Create a new invite code',
         summary: 'Create invite',
-        security: [
-            [
-                'passport' => [],
-            ],
-        ],
+        security: [['passport' => [WriteScope::Invites->value]]],
         requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(ref: StoreInviteCodeRequest::class)),
         tags: ['Invites'],
         responses: [
@@ -79,11 +73,7 @@ class InviteController extends Controller
         operationId: 'deleteInvite',
         description: 'Delete an invite code',
         summary: 'Delete invite',
-        security: [
-            [
-                'passport' => [],
-            ],
-        ],
+        security: [['passport' => [WriteScope::Invites->value]]],
         tags: ['Invites'],
         parameters: [
             new OA\Parameter(name: 'inviteCode', in: 'path', required: true, schema: new OA\Schema(type: 'string')),

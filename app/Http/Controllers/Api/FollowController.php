@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\Scopes\ReadScope;
+use App\Enums\Scopes\WriteScope;
 use App\Exceptions\ConflictException;
 use App\Exceptions\InsufficientRightsException;
 use App\Http\Resources\UserDto;
@@ -24,6 +26,7 @@ class FollowController extends Controller
         operationId: 'getFollowers',
         description: 'Return the users, that follow a user',
         summary: 'Get followers data',
+        security: [[], ['passport' => [ReadScope::Follows->value]]],
         tags: ['Follows'],
         parameters: [new OA\Parameter(name: 'userId', in: 'path', required: true, schema: new OA\Schema(type: 'string'))],
         responses: [
@@ -51,6 +54,7 @@ class FollowController extends Controller
         operationId: 'getFollowings',
         description: 'Return the users, that a user follows',
         summary: 'Get followings data',
+        security: [[], ['passport' => [ReadScope::Follows->value]]],
         tags: ['Follows'],
         parameters: [new OA\Parameter(name: 'userId', in: 'path', required: true, schema: new OA\Schema(type: 'string'))],
         responses: [
@@ -78,6 +82,7 @@ class FollowController extends Controller
         operationId: 'createFollow',
         description: 'Create a follow relationship between two users',
         summary: 'Create follow relationship',
+        security: [[], ['passport' => [WriteScope::Follows->value]]],
         tags: ['Follows'],
         parameters: [
             new OA\Parameter(name: 'userId', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
@@ -120,6 +125,7 @@ class FollowController extends Controller
         operationId: 'deleteFollow',
         description: 'Delete a follow relationship between two users',
         summary: 'Delete follow relationship',
+        security: [[], ['passport' => [WriteScope::Follows->value]]],
         tags: ['Follows'],
         parameters: [
             new OA\Parameter(name: 'userId', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
@@ -165,6 +171,7 @@ class FollowController extends Controller
         operationId: 'createFollowRequest',
         description: 'Create a follow request between two users',
         summary: 'Create follow request',
+        security: [[], ['passport' => [WriteScope::Follows->value]]],
         tags: ['Follows'],
         parameters: [
             new OA\Parameter(name: 'userId', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
@@ -207,6 +214,7 @@ class FollowController extends Controller
         operationId: 'deleteFollowRequest',
         description: 'Delete a follow request between two users',
         summary: 'Delete follow relationship',
+        security: [[], ['passport' => [WriteScope::Follows->value]]],
         tags: ['Follows'],
         parameters: [
             new OA\Parameter(name: 'userId', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
@@ -243,6 +251,7 @@ class FollowController extends Controller
         operationId: 'approveFollowRequest',
         description: 'Approve a follow request between two users',
         summary: 'Approve follow request',
+        security: [[], ['passport' => [WriteScope::Follows->value]]],
         tags: ['Follows'],
         parameters: [
             new OA\Parameter(name: 'userId', in: 'path', required: true, schema: new OA\Schema(type: 'string')),

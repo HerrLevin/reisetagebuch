@@ -4,12 +4,14 @@ use App\Console\Commands\FetchAirports;
 use App\Console\Commands\ImportOsmExtracts;
 use App\Exceptions\ApiExceptionRenderer;
 use App\Http\Middleware\ApiMiddleware;
+use App\Http\Middleware\CheckScopes;
 use App\Http\Middleware\EnsurePrivacyPolicyAccepted;
 use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Http\Middleware\RequestLogger;
 use App\Jobs\DeleteOldNearbyRequests;
 use App\Jobs\DispatchRefreshJobForActiveTrips;
 use App\Jobs\HideExpiredPosts;
+use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -29,6 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->web(append: [
+            // Gives the logged-in web SPA its API token as the laravel_token cookie.
             CreateFreshApiToken::class,
             RequestLogger::class,
         ]);
@@ -36,14 +39,18 @@ return Application::configure(basePath: dirname(__DIR__))
             ApiMiddleware::class,
             RequestLogger::class,
         ]);
+        // ApiMiddleware turns the web token cookie into a bearer header, so it must run before auth:api.
+        $middleware->prependToPriorityList(Authenticate::class, ApiMiddleware::class);
         $middleware->encryptCookies(except: [
             'rtb_allow_history',
         ]);
         $middleware->alias([
             'admin' => EnsureUserIsAdmin::class,
             'privacy-policy' => EnsurePrivacyPolicyAccepted::class,
+            'scopes' => CheckScopes::class,
         ]);
         $middleware->redirectGuestsTo('/login');
+        $middleware->redirectUsersTo('/home');
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (Throwable $e, Request $request) {

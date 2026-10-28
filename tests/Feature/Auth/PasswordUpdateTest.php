@@ -15,7 +15,7 @@ class PasswordUpdateTest extends TestCase
     public function test_password_can_be_updated(): void
     {
         $user = User::factory()->create();
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
 
         $response = $this->putJson('/api/auth/password', [
             'current_password' => 'password',
@@ -30,7 +30,7 @@ class PasswordUpdateTest extends TestCase
     public function test_correct_password_must_be_provided_to_update_password(): void
     {
         $user = User::factory()->create();
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
 
         $response = $this->putJson('/api/auth/password', [
             'current_password' => 'wrong-password',

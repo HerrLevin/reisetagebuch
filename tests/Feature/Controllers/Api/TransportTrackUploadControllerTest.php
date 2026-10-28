@@ -41,7 +41,7 @@ class TransportTrackUploadControllerTest extends TestCase
         $user = User::factory()->create();
         $post = $this->makeTransportPost($user);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $file = UploadedFile::fake()->createWithContent('track.gpx', 'this is not xml at all <<<');
 
         $response = $this->postJson(route('posts.upload.transport-track', ['postId' => $post->id]), [
@@ -57,7 +57,7 @@ class TransportTrackUploadControllerTest extends TestCase
         $user = User::factory()->create();
         $post = $this->makeTransportPost($user);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $file = UploadedFile::fake()->createWithContent('track.geojson', 'not valid json {{{');
 
         $response = $this->postJson(route('posts.upload.transport-track', ['postId' => $post->id]), [

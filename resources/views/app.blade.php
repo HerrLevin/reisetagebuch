@@ -17,6 +17,7 @@
     <link rel="shortcut icon" sizes="192x192" href="{{ asset('/favicon/web-app-manifest-192x192.png') }}">
     <link rel="manifest" href="{{ asset('/build/manifest.webmanifest') }}" />
     <meta name="name" content="{{ config('app.name', 'Reisetagebuch') }}">
+    <meta name="rtb-authenticated" content="{{ auth()->check() ? '1' : '0' }}">
 
     <title>{{ config('app.name', 'Reisetagebuch') }}</title>
 

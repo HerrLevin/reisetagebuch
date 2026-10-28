@@ -35,7 +35,7 @@ class LikeControllerTest extends TestCase
             'activity_id' => 'https://remote.example/activities/like-1',
         ]);
 
-        Passport::actingAs($author);
+        Passport::actingAs($author, ['*']);
         $response = $this->getJson(route('posts.likes', ['post' => $post->id]));
 
         $response->assertOk();
@@ -55,7 +55,7 @@ class LikeControllerTest extends TestCase
             'activity_id' => 'https://remote.example/activities/like-2',
         ]);
 
-        Passport::actingAs($author);
+        Passport::actingAs($author, ['*']);
         $response = $this->getJson(route('posts.likes', ['post' => $post->id]));
 
         $response->assertOk();
@@ -77,7 +77,7 @@ class LikeControllerTest extends TestCase
             'activity_id' => 'https://remote.example/activities/like-1',
         ]);
 
-        Passport::actingAs($author);
+        Passport::actingAs($author, ['*']);
         $response = $this->getJson(route('api.posts.show', ['post' => $post->id]));
 
         $response->assertOk();
@@ -90,7 +90,7 @@ class LikeControllerTest extends TestCase
         $post = Post::factory()->create(['user_id' => $author->id, 'visibility' => Visibility::ONLY_AUTHENTICATED]);
 
         $liker = User::factory()->create();
-        Passport::actingAs($liker);
+        Passport::actingAs($liker, ['*']);
 
         $response = $this->postJson(route('posts.like', ['postId' => $post->id]));
 
@@ -106,7 +106,7 @@ class LikeControllerTest extends TestCase
         $liker = User::factory()->create();
         Like::create(['user_id' => $liker->id, 'post_id' => $post->id]);
 
-        Passport::actingAs($liker);
+        Passport::actingAs($liker, ['*']);
         $response = $this->deleteJson(route('posts.unlike', ['postId' => $post->id]));
 
         $response->assertOk();
@@ -122,7 +122,7 @@ class LikeControllerTest extends TestCase
         Like::create(['user_id' => $liker->id, 'post_id' => $post->id]);
 
         $viewer = User::factory()->create();
-        Passport::actingAs($viewer);
+        Passport::actingAs($viewer, ['*']);
         $response = $this->getJson(route('posts.likes', ['post' => $post->id]));
 
         $response->assertOk();

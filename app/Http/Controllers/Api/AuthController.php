@@ -2,18 +2,15 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Dto\TokenResponseDto;
+use App\Enums\Scopes\ReadScope;
+use App\Enums\Scopes\WriteScope;
 use App\Http\Controllers\Backend\AuthBackend;
 use App\Models\User;
 use App\Repositories\InviteRepository;
-use Carbon\Carbon;
 use Illuminate\Auth\Events\PasswordReset;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
@@ -40,7 +37,7 @@ class AuthController extends Controller
         operationId: 'getAuthenticatedUser',
         description: 'Get the currently authenticated user',
         summary: 'Get authenticated user',
-        security: [['passport' => []]],
+        security: [['passport' => [ReadScope::Accounts->value]]],
         tags: ['Authentication'],
         responses: [new OA\Response(response: 200, description: Controller::OA_DESC_SUCCESS, content: new OA\JsonContent(ref: '#/components/schemas/AuthenticatedUserDto'))]
     )]
@@ -49,137 +46,6 @@ class AuthController extends Controller
         $user = $this->backend->getAuthenticatedUser($this->auth);
 
         return response()->json($user);
-    }
-
-    #[OA\Post(
-        path: '/auth/login',
-        operationId: 'login',
-        description: 'Authenticate a user and return an access token',
-        summary: 'User login',
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ['email', 'password'],
-                properties: [
-                    new OA\Property(property: 'email', type: 'string', format: 'email', example: 'mail@example.com'),
-                    new OA\Property(property: 'password', type: 'string', format: 'password', example: 'secret'),
-                ]
-            )
-        ),
-        tags: ['Authentication'],
-        responses: [
-            new OA\Response(response: 200, description: Controller::OA_DESC_SUCCESS, content: new OA\JsonContent(ref: '#/components/schemas/TokenResponseDto')),
-            new OA\Response(response: 422, description: Controller::OA_DESC_VALIDATION_ERROR),
-        ]
-    )]
-    public function login(Request $request): TokenResponseDto
-    {
-        $request->validate([
-            'email' => ['required', 'string', 'email'],
-            'password' => ['required', 'string'],
-        ]);
-
-        if (! Auth::once($request->only('email', 'password'))) {
-            throw ValidationException::withMessages([
-                'email' => [trans('auth.failed')],
-            ]);
-        }
-
-        /** @var User $user */
-        $user = Auth::user();
-        $token = $user->createToken('spa');
-
-        return new TokenResponseDto(
-            token: $token->accessToken,
-            user: $this->backend->getAuthenticatedUser($user),
-            expiresAt: Carbon::now()->addSeconds($token->expiresIn)
-        );
-    }
-
-    #[OA\Post(
-        path: '/auth/register',
-        operationId: 'register',
-        description: 'Register a new user and return an access token',
-        summary: 'User registration',
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ['name', 'username', 'email', 'password', 'password_confirmation'],
-                properties: [
-                    new OA\Property(property: 'name', type: 'string', example: 'John Doe'),
-                    new OA\Property(property: 'username', type: 'string', example: 'john_doe'),
-                    new OA\Property(property: 'email', type: 'string', format: 'email', example: 'mail@example.com'),
-                    new OA\Property(property: 'password', type: 'string', format: 'password', example: 'secret'),
-                    new OA\Property(property: 'password_confirmation', type: 'string', format: 'password', example: 'secret'),
-                    new OA\Property(property: 'invite', description: 'Optional invite code required if open registration is disabled', type: 'string', example: 'INVITE_CODE_123'),
-                ]
-            )
-        ),
-        tags: ['Authentication'],
-        responses: [
-            new OA\Response(response: 201, description: Controller::OA_DESC_SUCCESS, content: new OA\JsonContent(ref: '#/components/schemas/TokenResponseDto')),
-            new OA\Response(response: 403, description: 'Registration disabled'),
-            new OA\Response(response: 422, description: Controller::OA_DESC_VALIDATION_ERROR),
-        ]
-    )]
-    public function register(Request $request): JsonResponse
-    {
-        if (! config('app.registration') && ! config('app.invite.enabled')) {
-            return response()->json(['message' => 'Registration is disabled.'], 403);
-        }
-
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'username' => 'required|string|alpha_dash|max:30|unique:'.User::class,
-            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'invite' => 'nullable|string|exists:invites,id',
-        ]);
-
-        $invite = null;
-        if (! config('app.registration') && config('app.invite.enabled')) {
-            $invite = $this->inviteRepository->getInviteById($request->invite);
-
-            if (! $invite || $invite->used_at) {
-                throw ValidationException::withMessages([
-                    'invite' => __('Invite code already used.'),
-                ]);
-            }
-            if ($invite->expires_at && $invite->expires_at < now()) {
-                throw ValidationException::withMessages([
-                    'invite' => __('Invite code expired.'),
-                ]);
-            }
-        }
-
-        DB::beginTransaction();
-        $user = User::create([
-            'name' => $request->name,
-            'username' => $request->username,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-        $user->profile()->create();
-        $user->settings()->create();
-        $user->statistics()->create();
-        $invite?->update([
-            'used_by' => $user->id,
-            'used_at' => now(),
-        ]);
-        DB::commit();
-
-        event(new Registered($user));
-
-        $token = $user->createToken('spa');
-
-        return response()->json(
-            new TokenResponseDto(
-                token: $token->accessToken,
-                user: $this->backend->getAuthenticatedUser($user),
-                expiresAt: Carbon::now()->addSeconds($token->expiresIn)
-            ),
-            201
-        );
     }
 
     #[OA\Post(
@@ -296,7 +162,7 @@ class AuthController extends Controller
         operationId: 'updatePassword',
         description: 'Update the authenticated user\'s password by providing the current password and a new password',
         summary: 'Update password',
-        security: [['passport' => []]],
+        security: [['passport' => [WriteScope::Security->value]]],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
@@ -333,6 +199,7 @@ class AuthController extends Controller
         operationId: 'verifyEmail',
         description: 'Verify the user\'s email address using the provided verification link parameters',
         summary: 'Verify email',
+        security: [['passport' => []]],
         tags: ['Authentication'],
         responses: [
             new OA\Response(response: 200, description: Controller::OA_DESC_SUCCESS),

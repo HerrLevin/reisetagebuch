@@ -1,12 +1,22 @@
 import { api, setupApiAuth } from '@/api';
+import { isNative } from '@/Services/ServerConfig';
+import axios from 'axios';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
 export const useAuthStore = defineStore(
     'auth',
     () => {
+        // Native app only (and Cypress); the web SPA authenticates via the
+        // session + Passport's laravel_token cookie.
         const token = ref<string | null>(null);
         const expiresAt = ref<string | null>(null);
+        // Not persisted: re-read from the server-rendered page on every load.
+        const webSession = ref(
+            document.querySelector<HTMLMetaElement>(
+                'meta[name="rtb-authenticated"]',
+            )?.content === '1',
+        );
 
         function setToken(
             newToken: string | null,
@@ -15,6 +25,9 @@ export const useAuthStore = defineStore(
             token.value = newToken;
             expiresAt.value = newExpiresAt;
             setupApiAuth(newToken);
+            if (!newToken) {
+                webSession.value = false;
+            }
         }
 
         function initializeAuth() {
@@ -23,51 +36,34 @@ export const useAuthStore = defineStore(
             }
         }
 
-        async function login(email: string, password: string) {
-            const response = await api.auth.login({
-                email,
-                password,
-            });
-            setToken(response.data.token, response.data.expiresAt);
-            return response.data;
-        }
-
-        async function register(data: {
-            name: string;
-            username: string;
-            email: string;
-            password: string;
-            password_confirmation: string;
-            invite?: string;
-        }) {
-            const response = await api.auth.register(data);
-            setToken(response.data.token, response.data.expiresAt);
-            return response.data;
-        }
-
         async function logout() {
             try {
-                await api.auth.logout();
+                if (isNative()) {
+                    await api.auth.logout();
+                } else {
+                    // Ends the session and clears the laravel_token cookie.
+                    await axios.post('/logout');
+                }
             } catch {
                 // ignore errors on logout
             }
             setToken(null);
         }
 
-        const isAuthenticated = () => !!token.value;
+        const isAuthenticated = () => !!token.value || webSession.value;
 
         return {
             token,
             expiresAt,
             setToken,
             initializeAuth,
-            login,
-            register,
             logout,
             isAuthenticated,
         };
     },
     {
-        persist: true,
+        persist: {
+            pick: ['token', 'expiresAt'],
+        },
     },
 );

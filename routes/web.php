@@ -4,22 +4,28 @@ use App\Http\Controllers\ActivityPub\MastodonActivityPubController;
 use App\Http\Controllers\ActivityPub\NodeInfoController;
 use App\Http\Controllers\ActivityPub\WellKnownController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\ClientRegistrationController;
+use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Middleware\VerifyHttpSignature;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
-// Session login for admins only, used to reach browser-only tools (Horizon,
-// Telescope) that the SPA's bearer-token auth can't attach to a page navigation.
-// Not used by the app itself.
+// Session login. The web SPA reaches the API via Passport's laravel_token cookie
+// (CreateFreshApiToken); the native app logs in here through /oauth/authorize.
 Route::middleware('guest')->group(function () {
-    Route::get('admin/login', [AuthenticatedSessionController::class, 'create'])->name('admin.login');
-    Route::post('admin/login', [AuthenticatedSessionController::class, 'store'])
-        ->middleware('throttle:5,1');
+    Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');
+    Route::post('login', [AuthenticatedSessionController::class, 'store'])->middleware('throttle:5,1');
+    Route::get('register', [RegisteredUserController::class, 'create'])->name('register');
+    Route::post('register', [RegisteredUserController::class, 'store'])->middleware('throttle:5,1');
 });
-Route::post('admin/logout', [AuthenticatedSessionController::class, 'destroy'])
-    ->middleware('auth')
-    ->name('admin.logout');
+Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+
+// Dynamic Client Registration (RFC 7591) for the companion app and third-party apps
+Route::post('oauth/register', [ClientRegistrationController::class, 'store'])
+    ->withoutMiddleware([PreventRequestForgery::class])
+    ->middleware('throttle:10,1')
+    ->name('oauth.register');
 
 // File serving route
 Route::middleware('cache.headers:public;max_age=2628000;etag')->get('/files/{path}', function ($path) {
@@ -34,6 +40,7 @@ Route::middleware('cache.headers:public;max_age=2628000;etag')->get('/files/{pat
 Route::prefix('.well-known')->name('well-known.')->group(function () {
     Route::get('nodeinfo', [WellKnownController::class, 'nodeInfo']);
     Route::get('webfinger', [WellKnownController::class, 'webfinger']);
+    Route::get('oauth-authorization-server', [WellKnownController::class, 'oauthAuthorizationServer']);
 });
 
 Route::get('nodeinfo/2.0', [NodeInfoController::class, 'nodeInfo20']);

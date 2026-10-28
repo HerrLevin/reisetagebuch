@@ -57,13 +57,13 @@ class FollowControllerTest extends TestCase
 
         $this->getJson("/api/users/{$user->id}/followers")->assertForbidden();
 
-        Passport::actingAs($stranger);
+        Passport::actingAs($stranger, ['*']);
         $this->getJson("/api/users/{$user->id}/followers")->assertForbidden();
 
-        Passport::actingAs($follower);
+        Passport::actingAs($follower, ['*']);
         $this->getJson("/api/users/{$user->id}/followers")->assertOk();
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $this->getJson("/api/users/{$user->id}/followers")->assertOk();
     }
 
@@ -78,13 +78,13 @@ class FollowControllerTest extends TestCase
 
         $this->getJson("/api/users/{$user->id}/followings")->assertForbidden();
 
-        Passport::actingAs($stranger);
+        Passport::actingAs($stranger, ['*']);
         $this->getJson("/api/users/{$user->id}/followings")->assertForbidden();
 
-        Passport::actingAs($follower);
+        Passport::actingAs($follower, ['*']);
         $this->getJson("/api/users/{$user->id}/followings")->assertOk();
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $this->getJson("/api/users/{$user->id}/followings")->assertOk();
     }
 }
