@@ -4,7 +4,6 @@ import ConfirmPassword from '@/Pages/Auth/ConfirmPassword.vue';
 import ConnectServer from '@/Pages/Auth/ConnectServer.vue';
 import ForgotPassword from '@/Pages/Auth/ForgotPassword.vue';
 import Login from '@/Pages/Auth/Login.vue';
-import Register from '@/Pages/Auth/Register.vue';
 import ResetPassword from '@/Pages/Auth/ResetPassword.vue';
 import VerifyEmail from '@/Pages/Auth/VerifyEmail.vue';
 import EditPost from '@/Pages/EditPost.vue';
@@ -59,7 +58,7 @@ const routes: RouteRecordRaw[] = [
     {
         path: '/register',
         name: 'register',
-        component: Register,
+        component: Login,
         meta: { guest: true },
     },
     {

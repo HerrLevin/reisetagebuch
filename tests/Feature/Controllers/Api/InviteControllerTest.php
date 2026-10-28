@@ -25,7 +25,7 @@ class InviteControllerTest extends TestCase
         Invite::factory()->count(3)->create(['user_id' => $user->id]);
         Invite::factory()->count(2)->create();
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->getJson(route('api.invites.index'));
 
         $response->assertOk();
@@ -36,7 +36,7 @@ class InviteControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->postJson(route('api.invites.store'));
 
         $response->assertOk();
@@ -50,7 +50,7 @@ class InviteControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->postJson(route('api.invites.store'), [
             'expires_at' => '2025-12-31',
         ]);
@@ -66,7 +66,7 @@ class InviteControllerTest extends TestCase
         $user = User::factory()->create();
         $invite = Invite::factory()->create(['user_id' => $user->id]);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->deleteJson(route('api.invites.destroy', $invite->id));
 
         $response->assertOk();
@@ -81,7 +81,7 @@ class InviteControllerTest extends TestCase
         $otherUser = User::factory()->create();
         $invite = Invite::factory()->create(['user_id' => $otherUser->id]);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->deleteJson(route('api.invites.destroy', $invite->id));
 
         $response->assertForbidden();
@@ -101,7 +101,7 @@ class InviteControllerTest extends TestCase
 
         $user = User::factory()->create();
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->postJson(route('api.invites.store'));
 
         $response->assertForbidden();
@@ -113,7 +113,7 @@ class InviteControllerTest extends TestCase
         $otherUser = User::factory()->create();
         config(['app.invite.whitelist' => [$otherUser->id]]);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->postJson(route('api.invites.store'));
 
         $response->assertForbidden();

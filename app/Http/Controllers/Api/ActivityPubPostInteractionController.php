@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\Scopes\WriteScope;
 use App\Http\Controllers\Backend\ActivityPubPostInteractionBackend;
 use Illuminate\Http\JsonResponse;
 use OpenApi\Attributes as OA;
@@ -20,7 +21,7 @@ class ActivityPubPostInteractionController extends Controller
         path: '/activitypub/posts/{postId}/likes',
         operationId: 'likeApPost',
         summary: 'Like an ActivityPub post',
-        security: [['passport' => []]],
+        security: [['passport' => [WriteScope::Favourites->value]]],
         tags: ['ActivityPub'],
         parameters: [
             new OA\Parameter(name: 'postId', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid')),
@@ -41,7 +42,7 @@ class ActivityPubPostInteractionController extends Controller
         path: '/activitypub/posts/{postId}/likes',
         operationId: 'unlikeApPost',
         summary: 'Unlike an ActivityPub post',
-        security: [['passport' => []]],
+        security: [['passport' => [WriteScope::Favourites->value]]],
         tags: ['ActivityPub'],
         parameters: [
             new OA\Parameter(name: 'postId', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid')),

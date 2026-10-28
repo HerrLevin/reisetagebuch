@@ -8,6 +8,8 @@ use App\Dto\LocationHistoryDto;
 use App\Dto\MotisApi\GeocodeResponseEntry;
 use App\Dto\RequestLocationDto;
 use App\Dto\StopoversResponseDto;
+use App\Enums\Scopes\ReadScope;
+use App\Enums\Scopes\WriteScope;
 use App\Enums\TransportMode;
 use App\Http\Controllers\Backend\LocationController as BackendLocationController;
 use App\Http\Requests\DeparturesRequest;
@@ -53,6 +55,7 @@ class LocationController extends Controller
         operationId: 'createHistoryLocation',
         description: 'Store the current location in user history if allowed by user preferences',
         summary: 'Store location for history',
+        security: [['passport' => [WriteScope::LocationHistory->value]]],
         tags: ['Location'],
         parameters: [
             new OA\Parameter(name: 'latitude', in: 'query', required: true, schema: new OA\Schema(type: 'number', format: 'float')),
@@ -80,6 +83,7 @@ class LocationController extends Controller
         operationId: 'prefetchLocation',
         description: 'Prefetch location data and optionally store user history',
         summary: 'Prefetch location',
+        security: [['passport' => [WriteScope::Statuses->value]]],
         tags: ['Location'],
         parameters: [
             new OA\Parameter(name: 'latitude', in: 'query', required: true, schema: new OA\Schema(type: 'number', format: 'float')),
@@ -115,6 +119,7 @@ class LocationController extends Controller
         operationId: 'getRecentRequestLocation',
         description: 'Return a recent location matching the requested coordinates',
         summary: 'Get recent request location',
+        security: [['passport' => [ReadScope::LocationHistory->value]]],
         tags: ['Location'],
         parameters: [
             new OA\Parameter(name: 'latitude', in: 'query', required: true, schema: new OA\Schema(type: 'number', format: 'float')),
@@ -142,6 +147,7 @@ class LocationController extends Controller
         operationId: 'searchLocations',
         description: 'Search for locations near a point or by query',
         summary: 'Search locations',
+        security: [['passport' => [ReadScope::Search->value]]],
         tags: ['Location'],
         parameters: [
             new OA\Parameter(name: 'latitude', in: 'query', required: true, schema: new OA\Schema(type: 'number', format: 'float')),
@@ -172,6 +178,7 @@ class LocationController extends Controller
         operationId: 'geocode',
         description: 'Geocode a query using configured providers',
         summary: 'Geocode',
+        security: [['passport' => [ReadScope::Search->value]]],
         tags: ['Location'],
         parameters: [
             new OA\Parameter(name: 'query', in: 'query', required: true, schema: new OA\Schema(type: 'string')),
@@ -221,6 +228,7 @@ class LocationController extends Controller
         operationId: 'locationHistory',
         description: 'Return location history for the authenticated user for a given day',
         summary: 'Location history',
+        security: [['passport' => [ReadScope::LocationHistory->value]]],
         tags: ['Location'],
         parameters: [
             new OA\Parameter(name: 'when', in: 'query', required: false, schema: new OA\Schema(type: 'string', format: 'date')),
@@ -243,6 +251,7 @@ class LocationController extends Controller
         operationId: 'departures',
         description: 'Return departures for a given point or station identifier',
         summary: 'Departures',
+        security: [['passport' => [ReadScope::Search->value]]],
         tags: ['Location'],
         parameters: [
             new OA\Parameter(name: 'latitude', in: 'query', required: false, schema: new OA\Schema(type: 'number', format: 'float')),
@@ -284,6 +293,7 @@ class LocationController extends Controller
         operationId: 'stopovers',
         description: 'Return stopovers for a given trip start',
         summary: 'Stopovers',
+        security: [['passport' => [ReadScope::Search->value]]],
         tags: ['Location'],
         parameters: [
             new OA\Parameter(name: 'tripId', in: 'query', required: true, schema: new OA\Schema(type: 'string')),

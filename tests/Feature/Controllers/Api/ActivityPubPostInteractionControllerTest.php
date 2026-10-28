@@ -55,14 +55,14 @@ class ActivityPubPostInteractionControllerTest extends TestCase
 
     public function test_like_returns_404_for_unknown_post(): void
     {
-        Passport::actingAs(User::factory()->create());
+        Passport::actingAs(User::factory()->create(), ['*']);
 
         $this->postJson('/api/activitypub/posts/'.Str::uuid().'/likes')->assertStatus(404);
     }
 
     public function test_unlike_returns_404_for_unknown_post(): void
     {
-        Passport::actingAs(User::factory()->create());
+        Passport::actingAs(User::factory()->create(), ['*']);
 
         $this->deleteJson('/api/activitypub/posts/'.Str::uuid().'/likes')->assertStatus(404);
     }
@@ -75,7 +75,7 @@ class ActivityPubPostInteractionControllerTest extends TestCase
     {
         Bus::fake();
         $user = User::factory()->create();
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $post = $this->makePost();
 
         $response = $this->postJson("/api/activitypub/posts/{$post->id}/likes");
@@ -91,7 +91,7 @@ class ActivityPubPostInteractionControllerTest extends TestCase
     public function test_like_is_idempotent_and_does_not_create_duplicate(): void
     {
         Bus::fake();
-        Passport::actingAs(User::factory()->create());
+        Passport::actingAs(User::factory()->create(), ['*']);
         $post = $this->makePost();
 
         $this->postJson("/api/activitypub/posts/{$post->id}/likes")->assertOk();
@@ -110,7 +110,7 @@ class ActivityPubPostInteractionControllerTest extends TestCase
     {
         Bus::fake();
         $user = User::factory()->create();
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $post = $this->makePost();
 
         ActivityPubPostLike::create([
@@ -132,7 +132,7 @@ class ActivityPubPostInteractionControllerTest extends TestCase
     public function test_unlike_when_not_liked_is_a_graceful_noop(): void
     {
         Bus::fake();
-        Passport::actingAs(User::factory()->create());
+        Passport::actingAs(User::factory()->create(), ['*']);
         $post = $this->makePost();
 
         $response = $this->deleteJson("/api/activitypub/posts/{$post->id}/likes");

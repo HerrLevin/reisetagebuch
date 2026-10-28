@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\Scopes\ReadScope;
+use App\Enums\Scopes\WriteScope;
 use App\Http\Requests\ImageUploadRequest;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Resources\UserDto;
@@ -26,6 +28,7 @@ class UserController extends Controller
         operationId: 'getProfileMapData',
         description: 'Return GeoJSON map data for a user',
         summary: 'Profile map data',
+        security: [[], ['passport' => [ReadScope::Statuses->value]]],
         tags: ['Profile'],
         parameters: [new OA\Parameter(name: 'userId', in: 'path', required: true, schema: new OA\Schema(type: 'string'))],
         responses: [new OA\Response(response: 200, description: Controller::OA_DESC_SUCCESS, content: new OA\JsonContent(type: 'object'))]
@@ -44,6 +47,7 @@ class UserController extends Controller
         operationId: 'searchUsers',
         description: 'Search local users by username or display name (case-insensitive, partial match, public endpoint)',
         summary: 'Search users',
+        security: [[], ['passport' => [ReadScope::Search->value]]],
         tags: ['Profile'],
         parameters: [new OA\Parameter(name: 'q', in: 'query', required: true, schema: new OA\Schema(type: 'string'))],
         responses: [
@@ -66,6 +70,7 @@ class UserController extends Controller
         operationId: 'getProfile',
         description: 'Return profile data for a user',
         summary: 'Get profile',
+        security: [[], ['passport' => [ReadScope::Accounts->value]]],
         tags: ['Profile'],
         parameters: [new OA\Parameter(name: 'username', in: 'path', required: true, schema: new OA\Schema(type: 'string'))],
         responses: [new OA\Response(response: 200, description: Controller::OA_DESC_SUCCESS, content: new OA\JsonContent(ref: UserDto::class))]
@@ -80,6 +85,7 @@ class UserController extends Controller
         operationId: 'updateProfile',
         description: 'Update profile for authenticated user',
         summary: 'Update profile',
+        security: [['passport' => [WriteScope::Accounts->value]]],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\MediaType(
@@ -103,6 +109,7 @@ class UserController extends Controller
         operationId: 'updateAvatar',
         description: 'Update avatar for authenticated user',
         summary: 'Update avatar',
+        security: [['passport' => [WriteScope::Accounts->value]]],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\MediaType(
@@ -126,6 +133,7 @@ class UserController extends Controller
         operationId: 'deleteAvatar',
         description: 'Delete avatar for authenticated user',
         summary: 'Delete avatar',
+        security: [['passport' => [WriteScope::Accounts->value]]],
         tags: ['Profile'],
         responses: [new OA\Response(response: 204, description: Controller::OA_DESC_SUCCESS)],
     )]
@@ -142,6 +150,7 @@ class UserController extends Controller
         operationId: 'updateHeader',
         description: 'Update header for authenticated user',
         summary: 'Update header',
+        security: [['passport' => [WriteScope::Accounts->value]]],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\MediaType(
@@ -165,6 +174,7 @@ class UserController extends Controller
         operationId: 'deleteHeader',
         description: 'Delete header for authenticated user',
         summary: 'Delete header',
+        security: [['passport' => [WriteScope::Accounts->value]]],
         tags: ['Profile'],
         responses: [
             new OA\Response(response: 204, description: Controller::OA_DESC_SUCCESS),

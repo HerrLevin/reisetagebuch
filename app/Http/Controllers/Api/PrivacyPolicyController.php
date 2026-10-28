@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Dto\PrivacyPolicyDto;
+use App\Enums\Scopes\AdminWriteScope;
 use App\Http\Controllers\Backend\PrivacyPolicyBackend;
 use App\Http\Requests\PrivacyPolicyStoreRequest;
 use App\Models\PrivacyPolicy;
@@ -62,7 +63,7 @@ class PrivacyPolicyController extends Controller
         operationId: 'createPrivacyPolicy',
         description: 'Publish a new privacy policy version. Requires admin privileges.',
         summary: 'Publish a new privacy policy version',
-        security: [['passport' => []]],
+        security: [['passport' => [AdminWriteScope::Settings->value]]],
         requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(ref: PrivacyPolicyStoreRequest::class)),
         tags: ['App'],
         responses: [

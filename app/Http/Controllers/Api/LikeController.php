@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Dto\LikeDto;
+use App\Enums\Scopes\ReadScope;
+use App\Enums\Scopes\WriteScope;
 use App\Http\Controllers\Backend\LikeController as Backend;
 use App\Http\Resources\UserDto;
 use Illuminate\Http\Request;
@@ -23,6 +25,7 @@ class LikeController extends Controller
         operationId: 'getPostLikes',
         description: 'Get users who liked a post',
         summary: 'Get post likes',
+        security: [[], ['passport' => [ReadScope::Favourites->value]]],
         tags: ['Posts'],
         parameters: [
             new OA\Parameter(name: 'postId', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
@@ -42,6 +45,7 @@ class LikeController extends Controller
         operationId: 'likePost',
         description: 'Like a post',
         summary: 'Like post',
+        security: [['passport' => [WriteScope::Favourites->value]]],
         tags: ['Posts'],
         parameters: [
             new OA\Parameter(name: 'postId', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
@@ -61,6 +65,7 @@ class LikeController extends Controller
         operationId: 'unlikePost',
         description: 'Remove like from a post',
         summary: 'Unlike post',
+        security: [['passport' => [WriteScope::Favourites->value]]],
         tags: ['Posts'],
         parameters: [
             new OA\Parameter(name: 'postId', in: 'path', required: true, schema: new OA\Schema(type: 'string')),

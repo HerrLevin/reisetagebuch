@@ -34,7 +34,7 @@ class ImprintControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->patchJson(route('imprint.update'), [
             'content' => 'New imprint',
         ]);
@@ -57,7 +57,7 @@ class ImprintControllerTest extends TestCase
         $admin = User::factory()->create();
         $admin->forceFill(['is_admin' => true])->save();
 
-        Passport::actingAs($admin);
+        Passport::actingAs($admin, ['*']);
         $response = $this->patchJson(route('imprint.update'), [
             'content' => 'Admin imprint text',
         ]);
@@ -74,7 +74,7 @@ class ImprintControllerTest extends TestCase
         $admin = User::factory()->create();
         $admin->forceFill(['is_admin' => true])->save();
 
-        Passport::actingAs($admin);
+        Passport::actingAs($admin, ['*']);
         $this->patchJson(route('imprint.update'), [
             'content' => 'Persisted imprint',
         ])->assertOk();

@@ -32,20 +32,10 @@ describe('Login', () => {
     });
 
     it('redirects authenticated users away from login', () => {
-        cy.apiRegister().then((auth) => {
-            cy.visit('/login', {
-                onBeforeLoad(win) {
-                    win.localStorage.setItem(
-                        'auth',
-                        JSON.stringify({
-                            token: auth.token,
-                            expiresAt: auth.expiresAt,
-                        }),
-                    );
-                },
-            });
-        });
+        cy.apiRegister();
+        cy.login();
 
+        cy.visit('/login');
         cy.url().should('include', '/home');
     });
 

@@ -16,7 +16,7 @@ class EmailVerificationTest extends TestCase
     public function test_email_can_be_verified(): void
     {
         $user = User::factory()->unverified()->create();
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
 
         Event::fake();
 
@@ -30,7 +30,7 @@ class EmailVerificationTest extends TestCase
     public function test_email_is_not_verified_with_invalid_hash(): void
     {
         $user = User::factory()->unverified()->create();
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
 
         $response = $this->postJson('/api/auth/email/verify/'.$user->id.'/'.sha1('wrong-email'));
 

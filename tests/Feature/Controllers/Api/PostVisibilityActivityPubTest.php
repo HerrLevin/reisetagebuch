@@ -38,7 +38,7 @@ class PostVisibilityActivityPubTest extends TestCase
             'visibility' => $startVisibility,
         ]);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->patchJson(route('posts.update', ['postId' => $post->id]), [
             'visibility' => $endVisibility->value,
             'id' => $post->id,
@@ -67,7 +67,7 @@ class PostVisibilityActivityPubTest extends TestCase
             'visibility' => $startVisibility,
         ]);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->patchJson(route('posts.update', ['postId' => $post->id]), [
             'visibility' => $endVisibility->value,
             'id' => $post->id,
@@ -96,7 +96,7 @@ class PostVisibilityActivityPubTest extends TestCase
             'body' => 'old body',
         ]);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->patchJson(route('posts.update', ['postId' => $post->id]), [
             'id' => $post->id,
             'visibility' => $visibility->value,
@@ -126,7 +126,7 @@ class PostVisibilityActivityPubTest extends TestCase
             'body' => 'old body',
         ]);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->patchJson(route('posts.update', ['postId' => $post->id]), [
             'id' => $post->id,
             'visibility' => $visibility->value,
@@ -149,7 +149,7 @@ class PostVisibilityActivityPubTest extends TestCase
             'visibility' => Visibility::PUBLIC,
         ]);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->postJson(route('api.posts.mass-edit'), [
             'postIds' => $posts->pluck('id')->toArray(),
             'visibility' => Visibility::PRIVATE->value,
@@ -176,7 +176,7 @@ class PostVisibilityActivityPubTest extends TestCase
             'visibility' => Visibility::PRIVATE,
         ]);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->postJson(route('api.posts.mass-edit'), [
             'postIds' => $posts->pluck('id')->toArray(),
             'visibility' => Visibility::PUBLIC->value,

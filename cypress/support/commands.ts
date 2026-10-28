@@ -18,10 +18,6 @@ declare global {
     namespace Cypress {
         interface Chainable {
             apiRegister(user?: Partial<TestUser>): Chainable<AuthResponse>;
-            apiLogin(
-                email?: string,
-                password?: string,
-            ): Chainable<AuthResponse>;
             setAuthState(token: string, expiresAt: string): Chainable<void>;
             clearAuthState(): Chainable<void>;
             logout(): Chainable<void>;
@@ -59,24 +55,14 @@ Cypress.Commands.add('apiRegister', (user?: Partial<TestUser>) => {
     return cy
         .request({
             method: 'POST',
-            url: '/api/auth/register',
+            url: '/api/cypress/register',
+            headers: {
+                'X-Cypress-Token': Cypress.env('CYPRESS_TOKEN') || 'testing',
+            },
             body: userData,
         })
         .then((response) => response.body as AuthResponse);
 });
-
-Cypress.Commands.add(
-    'apiLogin',
-    (email = defaultUser.email, password = defaultUser.password) => {
-        return cy
-            .request({
-                method: 'POST',
-                url: '/api/auth/login',
-                body: { email, password },
-            })
-            .then((response) => response.body as AuthResponse);
-    },
-);
 
 Cypress.Commands.add('setAuthState', (token: string, expiresAt: string) => {
     cy.window().then((win) => {
@@ -113,6 +99,7 @@ function register(user?: Partial<TestUser>) {
 }
 
 Cypress.Commands.add('logout', () => {
+    cy.clearCookies();
     cy.window().then((win) => {
         win.localStorage.removeItem('auth');
         win.localStorage.removeItem('user');

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Enums\Scopes\Scope;
 use App\Http\Resources\PostTypes\BasePost;
 use App\Models\Invite;
 use App\Policies\InvitePolicy;
@@ -22,6 +23,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Passport::loadKeysFrom(__DIR__.'/../../storage/oauth-keys');
+        Passport::authorizationView('auth.authorize');
+        // The web SPA (laravel_token cookie) gets a TransientToken, which has every scope.
+        Passport::tokensCan(Scope::all());
+        config(['l5-swagger.defaults.securityDefinitions.securitySchemes.passport.flows.authorizationCode.scopes' => Scope::all()]);
         JsonResource::withoutWrapping();
         Vite::prefetch(concurrency: 3);
 

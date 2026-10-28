@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\Scopes\ReadScope;
+use App\Enums\Scopes\WriteScope;
 use App\Http\Controllers\Backend\AccountBackend;
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\User;
@@ -25,7 +27,7 @@ class AccountController extends Controller
         operationId: 'getAccount',
         description: 'Get account details',
         summary: 'Get account',
-        security: [['passport' => []]],
+        security: [['passport' => [ReadScope::Accounts->value]]],
         tags: ['Account'],
         responses: [new OA\Response(response: 200, description: 'Account details retrieved successfully', content: new OA\JsonContent(
             properties: [
@@ -50,7 +52,7 @@ class AccountController extends Controller
         operationId: 'updateAccount',
         description: 'Update account details',
         summary: 'Update account',
-        security: [['passport' => []]],
+        security: [['passport' => [WriteScope::Security->value]]],
         requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(ref: ProfileUpdateRequest::class)),
         tags: ['Account'],
         responses: [new OA\Response(response: 204, description: Controller::OA_DESC_NO_CONTENT)]
@@ -67,7 +69,7 @@ class AccountController extends Controller
         operationId: 'deleteAccount',
         description: 'Delete the authenticated account',
         summary: 'Delete account',
-        security: [['passport' => []]],
+        security: [['passport' => [WriteScope::Security->value]]],
         requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(
             properties: [
                 new OA\Property(property: 'password', description: 'Current password of the account', type: 'string', example: 'your-current-password'),
@@ -90,7 +92,7 @@ class AccountController extends Controller
         operationId: 'disconnectTraewelling',
         description: 'Disconnect Traewelling from account',
         summary: 'Disconnect Traewelling',
-        security: [['passport' => []]],
+        security: [['passport' => [WriteScope::Security->value]]],
         tags: ['Account'],
         responses: [new OA\Response(response: 204, description: Controller::OA_DESC_NO_CONTENT), new OA\Response(response: 405, description: 'Disconnection failed')]
     )]

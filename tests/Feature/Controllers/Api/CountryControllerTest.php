@@ -17,7 +17,7 @@ class CountryControllerTest extends TestCase
     public function test_returns_visited_and_transited_only_countries_for_the_authenticated_user(): void
     {
         $user = User::factory()->create();
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
 
         $location = Location::factory()->create(['country_code' => 'DE']);
         $post = Post::factory()->create(['user_id' => $user->id]);

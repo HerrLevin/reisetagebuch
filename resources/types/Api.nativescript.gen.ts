@@ -78,6 +78,10 @@ export enum NotificationType {
   UserFollowedNotification = "UserFollowedNotification",
   TraewellingCrosspostFailedNotification = "TraewellingCrosspostFailedNotification",
   UserRequestedFollowNotification = "UserRequestedFollowNotification",
+  ActivityPubUserFollowedNotification = "ActivityPubUserFollowedNotification",
+  ActivityPubUserRequestedFollowNotification = "ActivityPubUserRequestedFollowNotification",
+  ActivityPubPostLikedNotification = "ActivityPubPostLikedNotification",
+  ActivityPubMentionNotification = "ActivityPubMentionNotification",
 }
 
 export enum MotisLocationType {
@@ -99,6 +103,16 @@ export interface AppConfigurationDto {
    * @example "1.0.0"
    */
   appVersion?: string;
+  /**
+   * Whether debug mode (APP_DEBUG) is enabled. Should be false in production.
+   * @example false
+   */
+  isDebug?: boolean;
+  /**
+   * The configured app environment (APP_ENV). Should be "production" in production.
+   * @example "production"
+   */
+  environment?: string;
 }
 
 /**
@@ -155,6 +169,11 @@ export interface AuthenticatedUserDto {
    * @example false
    */
   isAdmin: boolean;
+  /**
+   * Indicates whether the user has accepted the privacy policy currently in effect (true when no policy has been published)
+   * @example true
+   */
+  hasAcceptedCurrentPrivacyPolicy: boolean;
 }
 
 /** Data Transfer Object for Departures at a Stop */
@@ -337,8 +356,18 @@ export interface LegDto {
   routeTextColor: string | null;
   /** Source of the leg information (e.g., "motis", "gtfs") */
   source: string;
+  /** rtb extension: Name of the license covering this leg's source data, if known */
+  xLicenseName: string | null;
+  /** rtb extension: Name of the organization that issued this leg's source data, if known */
+  xLicenseHumanName: string | null;
+  /** rtb extension: URL with more information about the license, if known */
+  xLicenseUrl: string | null;
+  /** rtb extension: Attribution text to display for this leg's source data, if required */
+  xLicenseAttribution: string | null;
   /** List of intermediate stops for the leg, if available */
   intermediateStops: StopPlaceDto[];
+  /** The trip id of the next leg if this leg continues as another leg without a transfer, if available */
+  continuesAs: string | null;
 }
 
 /** Data Transfer Object for a Stop */
@@ -387,6 +416,10 @@ export type StopPlaceDto = MotisStopDto & {
   scheduledDeparture: string | null;
   /** Indicates if the stop place is cancelled */
   cancelled: boolean | null;
+  /** Scheduled track for the stop place, if available */
+  scheduledTrack?: string | null;
+  /** Actual track for the stop place, if available */
+  track?: string | null;
 };
 
 /** Data Transfer Object for a Stop Time in the Motis API */
@@ -419,6 +452,10 @@ export interface StopTimeDto {
   displayName: string | null;
   /** Source of the stop time information */
   source: string;
+  /** Scheduled track for the stop time, if available */
+  scheduledTrack?: string | null;
+  /** Actual track for the stop time, if available */
+  track?: string | null;
 }
 
 /** Data Transfer Object for a Trip in the Motis API */
@@ -439,6 +476,140 @@ export interface MotisTripDto {
   transfers: number;
   /** List of legs that make up the trip */
   legs: LegDto[];
+}
+
+/** Data for an ActivityPub mention notification */
+export interface ActivityPubMentionData {
+  /**
+   * ActivityPub actor ID (URI) of the remote user who mentioned the local user
+   * @format uri
+   */
+  actorId: string;
+  /**
+   * Preferred username of the remote user
+   * @example "johndoe"
+   */
+  preferredUsername: string;
+  /**
+   * Display name of the remote user
+   * @example "John Doe"
+   */
+  displayName?: string | null;
+  /**
+   * Avatar URL of the remote user
+   * @format uri
+   */
+  iconUrl?: string | null;
+  /**
+   * Profile URL of the remote user
+   * @format uri
+   */
+  profileUrl?: string | null;
+  /**
+   * Local ID of the AP post containing the mention
+   * @format uuid
+   */
+  postId: string;
+  /** Truncated body of the post containing the mention */
+  postBody?: string | null;
+}
+
+/** Data for an ActivityPub post liked notification */
+export interface ActivityPubPostLikedData {
+  /**
+   * ActivityPub actor ID (URI) of the remote user who liked the post
+   * @format uri
+   */
+  actorId: string;
+  /**
+   * Preferred username of the remote user
+   * @example "johndoe"
+   */
+  preferredUsername: string;
+  /**
+   * Display name of the remote user
+   * @example "John Doe"
+   */
+  displayName?: string | null;
+  /**
+   * Avatar URL of the remote user
+   * @format uri
+   */
+  iconUrl?: string | null;
+  /**
+   * Profile URL of the remote user
+   * @format uri
+   */
+  profileUrl?: string | null;
+  /**
+   * ID of the liked post
+   * @format uuid
+   */
+  postId: string;
+  /** Body content of the liked post */
+  postBody?: string | null;
+  /** Summary of the liked post */
+  postSummary?: string | null;
+}
+
+/** Data for an ActivityPub user followed notification */
+export interface ActivityPubUserFollowedData {
+  /**
+   * ActivityPub actor ID (URI) of the remote follower
+   * @format uri
+   */
+  followerActorId: string;
+  /**
+   * Preferred username of the remote follower
+   * @example "johndoe"
+   */
+  followerPreferredUsername: string;
+  /**
+   * Display name of the remote follower
+   * @example "John Doe"
+   */
+  followerDisplayName?: string | null;
+  /**
+   * Avatar URL of the remote follower
+   * @format uri
+   */
+  followerIconUrl?: string | null;
+  /**
+   * Profile URL of the remote follower
+   * @format uri
+   */
+  followerProfileUrl?: string | null;
+}
+
+/** Data for an ActivityPub follow request notification */
+export interface ActivityPubUserRequestedFollowData {
+  /** ID of the pending ActivityPub follow request */
+  followRequestId: string;
+  /**
+   * ActivityPub actor ID (URI) of the remote follower
+   * @format uri
+   */
+  followerActorId: string;
+  /**
+   * Preferred username of the remote follower
+   * @example "johndoe"
+   */
+  followerPreferredUsername: string;
+  /**
+   * Display name of the remote follower
+   * @example "John Doe"
+   */
+  followerDisplayName?: string | null;
+  /**
+   * Avatar URL of the remote follower
+   * @format uri
+   */
+  followerIconUrl?: string | null;
+  /**
+   * Profile URL of the remote follower
+   * @format uri
+   */
+  followerProfileUrl?: string | null;
 }
 
 /** A wrapper for notification data */
@@ -466,7 +637,12 @@ export interface NotificationWrapper {
    */
   readAt: string | null;
   /** Additional data associated with the notification */
-  data: PostLikedData | UserFollowedData | null;
+  data:
+    | PostLikedData
+    | UserFollowedData
+    | ActivityPubUserFollowedData
+    | ActivityPubPostLikedData
+    | null;
 }
 
 /** Data for a post liked notification */
@@ -583,6 +759,85 @@ export type PostPaginationDto = PaginationDto & {
   items: (LocationPost | BasePost | TransportPost)[];
 };
 
+/**
+ * Privacy Policy DTO
+ * Data Transfer Object representing a versioned privacy policy
+ */
+export interface PrivacyPolicyDto {
+  /**
+   * The unique identifier of this privacy policy version
+   * @format uuid
+   */
+  id: string;
+  /** The privacy policy content, rendered as free-form text */
+  content: string;
+  /**
+   * The point in time from which this version is (or will be) in effect
+   * @format date-time
+   */
+  validFrom: string;
+  /**
+   * When the requesting user accepted this version, if authenticated and accepted
+   * @format date-time
+   */
+  acceptedAt?: string | null;
+}
+
+export interface RemoteActorProfileDto {
+  /** The remote actor's ActivityPub id */
+  actorId: string;
+  /** The remote actor's display name */
+  displayName: string | null;
+  /** The remote actor's preferred username */
+  preferredUsername: string | null;
+  /** The remote actor's sanitized profile summary */
+  summary: string | null;
+  /** The remote actor's avatar URL */
+  iconUrl: string | null;
+  /** The remote actor's public profile URL */
+  profileUrl: string | null;
+  /** The current follow state for this actor, if any */
+  followState: string | null;
+}
+
+export interface RemoteFollowDto {
+  /** The remote actor's ActivityPub id */
+  actorId: string;
+  /** The state of the follow request */
+  state: string;
+  /**
+   * When the follow request was created
+   * @format date-time
+   */
+  createdAt: string | null;
+  /** The remote actor's display name */
+  displayName: string | null;
+  /** The remote actor's preferred username */
+  preferredUsername: string | null;
+  /** The remote actor's avatar URL */
+  iconUrl: string | null;
+  /** The remote actor's public profile URL */
+  profileUrl: string | null;
+}
+
+export interface RemoteFollowerDto {
+  /** The remote actor's ActivityPub id */
+  actorId: string;
+  /**
+   * When the follow was received
+   * @format date-time
+   */
+  createdAt: string | null;
+  /** The remote actor's display name */
+  displayName: string | null;
+  /** The remote actor's preferred username */
+  preferredUsername: string | null;
+  /** The remote actor's avatar URL */
+  iconUrl: string | null;
+  /** The remote actor's public profile URL */
+  profileUrl: string | null;
+}
+
 /** Data Transfer Object for Request Location */
 export interface RequestLocationDto {
   /** Number of locations fetched */
@@ -670,6 +925,11 @@ export interface UserSettingsDto {
    * @example true
    */
   requiresFollowRequest: boolean;
+  /**
+   * Hide posts after x days
+   * @example 0.25
+   */
+  hidePostsAfter: number | null;
 }
 
 export interface BasePostRequest {
@@ -709,6 +969,17 @@ export type LocationPostRequest = BasePostRequest & {
   visitedAt: string | null;
 };
 
+/** Request to publish a new privacy policy version */
+export interface PrivacyPolicyStoreRequest {
+  /** The privacy policy content */
+  content: string;
+  /**
+   * The point in time from which this version takes effect. Must not be in the past.
+   * @format date-time
+   */
+  validFrom: string;
+}
+
 /**
  * Profile Update Request
  * Request schema for updating user profile information
@@ -720,12 +991,6 @@ export interface ProfileUpdateRequest {
    * @example "John Doe"
    */
   name: string;
-  /**
-   * The unique username for the user (lowercase, alphanumeric, dashes, and underscores only)
-   * @maxLength 30
-   * @example "john_doe"
-   */
-  username: string;
   /**
    * The email address of the user (lowercase)
    * @format email
@@ -744,6 +1009,17 @@ export interface SettingsUpdateRequest {
   motisRadius?: 50 | 100 | 200 | 300 | 400 | 500 | null;
   /** Requires following request */
   requiresFollowRequest?: boolean | null;
+  /** Hide posts after x days */
+  hidePostsAfter?: 0.25 | 0.5 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 14 | 30 | null;
+}
+
+export interface StopoverLogRequest {
+  /**
+   * The client-observed time at which the arrival/departure occurred, in ISO 8601 format. Using the time observed on the device (rather than the time the request reaches the server) keeps the logged time accurate under poor network reception.
+   * @format date-time
+   * @example "2024-08-01T10:00:00Z"
+   */
+  timestamp: string;
 }
 
 export interface StoreInviteCodeRequest {
@@ -812,14 +1088,16 @@ export interface StoreTripRequest {
    */
   arrivalTime: string;
   /** An array of stops for the trip. */
-  stops?: {
-    /** The identifier of the stop. */
-    identifier?: string;
-    /** The type of identifier used for the stop (id or identifier). */
-    identifierType?: string | null;
-    /** The order of the stop in the trip sequence. */
-    order?: number;
-  }[];
+  stops?:
+    | {
+        /** The identifier of the stop. */
+        identifier?: string;
+        /** The type of identifier used for the stop (id or identifier). */
+        identifierType?: string | null;
+        /** The order of the stop in the trip sequence. */
+        order?: number;
+      }[]
+    | null;
 }
 
 export type TransportPostRequest = BasePostRequest & {
@@ -887,6 +1165,14 @@ export interface UpdateProfileRequest {
   website?: string | null;
 }
 
+/** Countries a user has visited or merely travelled through */
+export interface CountriesDto {
+  /** ISO A2 codes of countries the user has visited (location post, or a transport post origin/destination) */
+  visited: string[];
+  /** ISO A2 codes of countries the user has only travelled through (crossed by a non-flight transport post route, without a stop) */
+  transitedOnly: string[];
+}
+
 export interface InviteDto {
   /** The unique identifier of the invite code */
   id: string;
@@ -932,6 +1218,8 @@ export interface LocationDto {
   identifiers: LocationIdentifierDto[];
   /** List of location tags */
   tags: LocationTagDto[];
+  /** Emoji representing the location based on its tags */
+  emoji: string;
 }
 
 /** Location History Entry Data Transfer Object */
@@ -1016,6 +1304,8 @@ export interface BasePost {
   likedByUser: boolean;
   /** Additional meta information associated with the post */
   metaInfos: Record<string, string | string[]>;
+  /** Original URL for posts from the fediverse */
+  sourceUrl?: string | null;
 }
 
 /** Location Post Resource */
@@ -1077,10 +1367,53 @@ export interface StopDto {
    * @format date-time
    */
   departureTime: string | null;
-  /** Arrival delay in minutes */
+  /** Arrival delay in seconds */
   arrivalDelay: number | null;
-  /** Departure delay in minutes */
+  /** Departure delay in seconds */
   departureDelay: number | null;
+}
+
+/** A single stopover of a transport post journey, including the user-logged actual arrival/departure */
+export interface TransportPostStopoverDto {
+  /**
+   * Unique identifier for the stop
+   * @format uuid
+   */
+  id: string;
+  /** Location Data Object */
+  location: LocationDto;
+  /** Sequence number of the stop within the trip */
+  sequence: number;
+  /**
+   * Scheduled arrival time in ISO 8601 format
+   * @format date-time
+   */
+  scheduledArrivalTime: string | null;
+  /**
+   * Scheduled departure time in ISO 8601 format
+   * @format date-time
+   */
+  scheduledDepartureTime: string | null;
+  /** Arrival delay in seconds */
+  arrivalDelay: number | null;
+  /** Departure delay in seconds */
+  departureDelay: number | null;
+  /**
+   * User-logged actual arrival time in ISO 8601 format
+   * @format date-time
+   */
+  manualArrivalTime: string | null;
+  /**
+   * User-logged actual departure time in ISO 8601 format
+   * @format date-time
+   */
+  manualDepartureTime: string | null;
+  /** Whether this stopover is cancelled, per real-time data */
+  cancelled: boolean;
+  /** Scheduled track/platform for the stopover, if available */
+  scheduledTrack?: string | null;
+  /** actual track/platform for the stopover, if available */
+  track?: string | null;
 }
 
 /** Data Transfer Object for a Transport Trip */
@@ -1106,6 +1439,14 @@ export interface TripDto {
   routeColor: string | null;
   /** Text color of the route in HEX format */
   routeTextColor: string | null;
+  /** Name of the license covering this trip's source data, if known */
+  licenseName: string | null;
+  /** Name of the organization that issued this trip's source data, if known */
+  licenseHumanName: string | null;
+  /** URL with more information about the license, if known */
+  licenseUrl: string | null;
+  /** Attribution text to display for this trip's source data, if required */
+  licenseAttribution: string | null;
 }
 
 /** Trip History Entry Data Transfer Object */
@@ -1138,10 +1479,20 @@ export interface UserDto {
    */
   avatar: string | null;
   /**
+   * MimeType of the user header image
+   * @format uri
+   */
+  avatarMimeType?: string | null;
+  /**
    * URL of the user header image
    * @format uri
    */
   header: string | null;
+  /**
+   * MimeType of the user header image
+   * @format uri
+   */
+  headerMimeType?: string | null;
   /** Biography of the user */
   bio: string | null;
   /**
@@ -1157,11 +1508,18 @@ export interface UserDto {
   requiresFollowRequest?: boolean;
   /** User Statistics Data Object */
   statistics: UserStatisticsDto;
+  /** Public Key PEM */
+  publicKeyPem?: string;
   /**
    * Account creation timestamp
    * @format date-time
    */
   createdAt: string;
+  /**
+   * External profile URL for federated actors; null for local users
+   * @format uri
+   */
+  profileUrl?: string | null;
 }
 
 /** User Statistics Data Object */
@@ -1689,348 +2047,85 @@ export class Api<
         ...params,
       }),
   };
-  app = {
-    /**
-     * No description
-     *
-     * @tags App Configuration
-     * @name GetAppConfiguration
-     * @summary Get application configuration
-     * @request GET:/app/configuration
-     * @secure
-     */
-    getAppConfiguration: (params: RequestParams = {}) =>
-      this.request<AppConfigurationDto, any>({
-        path: `/app/configuration`,
-        method: "GET",
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags App
-     * @name GetImprint
-     * @summary Get the instance imprint
-     * @request GET:/app/imprint
-     * @secure
-     */
-    getImprint: (params: RequestParams = {}) =>
-      this.request<ImprintDto, any>({
-        path: `/app/imprint`,
-        method: "GET",
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Update the instance imprint. Requires admin privileges.
-     *
-     * @tags App
-     * @name UpdateImprint
-     * @summary Update the instance imprint
-     * @request PATCH:/app/imprint
-     * @secure
-     */
-    updateImprint: (data: ImprintUpdateRequest, params: RequestParams = {}) =>
-      this.request<ImprintDto, void>({
-        path: `/app/imprint`,
-        method: "PATCH",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-  };
-  auth = {
-    /**
-     * @description Get the currently authenticated user
-     *
-     * @tags Authentication
-     * @name GetAuthenticatedUser
-     * @summary Get authenticated user
-     * @request GET:/auth/user
-     * @secure
-     */
-    getAuthenticatedUser: (params: RequestParams = {}) =>
-      this.request<AuthenticatedUserDto, any>({
-        path: `/auth/user`,
-        method: "GET",
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Authenticate a user and return an access token
-     *
-     * @tags Authentication
-     * @name Login
-     * @summary User login
-     * @request POST:/auth/login
-     * @secure
-     */
-    login: (
-      data: {
-        /**
-         * @format email
-         * @example "mail@example.com"
-         */
-        email: string;
-        /**
-         * @format password
-         * @example "secret"
-         */
-        password: string;
-      },
-      params: RequestParams = {},
-    ) =>
-      this.request<TokenResponseDto, void>({
-        path: `/auth/login`,
-        method: "POST",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Register a new user and return an access token
-     *
-     * @tags Authentication
-     * @name Register
-     * @summary User registration
-     * @request POST:/auth/register
-     * @secure
-     */
-    register: (
-      data: {
-        /** @example "John Doe" */
-        name: string;
-        /** @example "john_doe" */
-        username: string;
-        /**
-         * @format email
-         * @example "mail@example.com"
-         */
-        email: string;
-        /**
-         * @format password
-         * @example "secret"
-         */
-        password: string;
-        /**
-         * @format password
-         * @example "secret"
-         */
-        password_confirmation: string;
-        /**
-         * Optional invite code required if open registration is disabled
-         * @example "INVITE_CODE_123"
-         */
-        invite?: string;
-      },
-      params: RequestParams = {},
-    ) =>
-      this.request<TokenResponseDto, void>({
-        path: `/auth/register`,
-        method: "POST",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Logout the authenticated user by revoking their access token
-     *
-     * @tags Authentication
-     * @name Logout
-     * @summary User logout
-     * @request POST:/auth/logout
-     * @secure
-     */
-    logout: (params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/auth/logout`,
-        method: "POST",
-        secure: true,
-        ...params,
-      }),
-
-    /**
-     * @description Send a password reset link to the user's email address
-     *
-     * @tags Authentication
-     * @name ForgotPassword
-     * @summary Forgot password
-     * @request POST:/auth/forgot-password
-     * @secure
-     */
-    forgotPassword: (
-      data: {
-        /**
-         * @format email
-         * @example "mail@example.com"
-         */
-        email: string;
-      },
-      params: RequestParams = {},
-    ) =>
-      this.request<void, void>({
-        path: `/auth/forgot-password`,
-        method: "POST",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * @description Reset the user's password using the provided token and new password
-     *
-     * @tags Authentication
-     * @name ResetPassword
-     * @summary Reset password
-     * @request POST:/auth/reset-password
-     * @secure
-     */
-    resetPassword: (
-      data: {
-        /** @example "RESET_TOKEN_123" */
-        token: string;
-        /**
-         * @format email
-         * @example "mail@example.com"
-         */
-        email: string;
-        /**
-         * @format password
-         * @example "new_secret"
-         */
-        password: string;
-        /**
-         * @format password
-         * @example "new_secret"
-         */
-        password_confirmation: string;
-      },
-      params: RequestParams = {},
-    ) =>
-      this.request<void, void>({
-        path: `/auth/reset-password`,
-        method: "POST",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * @description Update the authenticated user's password by providing the current password and a new password
-     *
-     * @tags Authentication
-     * @name UpdatePassword
-     * @summary Update password
-     * @request PUT:/auth/password
-     * @secure
-     */
-    updatePassword: (
-      data: {
-        /**
-         * @format password
-         * @example "current_secret"
-         */
-        current_password: string;
-        /**
-         * @format password
-         * @example "new_secret"
-         */
-        password: string;
-        /**
-         * @format password
-         * @example "new_secret"
-         */
-        password_confirmation: string;
-      },
-      params: RequestParams = {},
-    ) =>
-      this.request<void, void>({
-        path: `/auth/password`,
-        method: "PUT",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * @description Verify the user's email address using the provided verification link parameters
-     *
-     * @tags Authentication
-     * @name VerifyEmail
-     * @summary Verify email
-     * @request POST:/auth/email/verify/{id}/{hash}
-     * @secure
-     */
-    verifyEmail: (id: string, hash: string, params: RequestParams = {}) =>
-      this.request<void, void>({
-        path: `/auth/email/verify/${id}/${hash}`,
-        method: "POST",
-        secure: true,
-        ...params,
-      }),
-
-    /**
-     * @description Resend the email verification link to the authenticated user if their email address is not yet verified
-     *
-     * @tags Authentication
-     * @name ResendVerificationEmail
-     * @summary Resend email verification
-     * @request POST:/auth/email/resend
-     * @secure
-     */
-    resendVerificationEmail: (params: RequestParams = {}) =>
-      this.request<void, void>({
-        path: `/auth/email/resend`,
-        method: "POST",
-        secure: true,
-        ...params,
-      }),
-
-    /**
-     * @description Validate an invite code and return information about the invite if it is valid
-     *
-     * @tags Authentication
-     * @name ValidateInvite
-     * @summary Validate invite code
-     * @request GET:/auth/invite/{code}
-     * @secure
-     */
-    validateInvite: (code: string, params: RequestParams = {}) =>
-      this.request<
-        {
-          /** Indicates whether the invite code is valid */
-          valid?: boolean;
-          /** The name of the user who created the invite, or null if the inviter user no longer exists */
-          invitedBy?: string | null;
-        },
-        any
-      >({
-        path: `/auth/invite/${code}`,
-        method: "GET",
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-  };
   users = {
+    /**
+     * @description Return the remote (ActivityPub) actors that follow a user
+     *
+     * @tags Follows
+     * @name GetUserActivityPubFollowers
+     * @summary Get remote followers
+     * @request GET:/users/{userId}/activitypub/followers
+     * @secure
+     */
+    getUserActivityPubFollowers: (userId: string, params: RequestParams = {}) =>
+      this.request<RemoteFollowerDto[], any>({
+        path: `/users/${userId}/activitypub/followers`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Return the remote (ActivityPub) actors a user follows
+     *
+     * @tags Follows
+     * @name GetUserActivityPubFollowing
+     * @summary Get remote following
+     * @request GET:/users/{userId}/activitypub/following
+     * @secure
+     */
+    getUserActivityPubFollowing: (userId: string, params: RequestParams = {}) =>
+      this.request<RemoteFollowDto[], any>({
+        path: `/users/${userId}/activitypub/following`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Approve a pending ActivityPub follow request from a remote actor
+     *
+     * @tags Follows
+     * @name ApproveActivityPubFollowRequest
+     * @summary Approve remote follow request
+     * @request PUT:/users/{userId}/activitypub/follow-requests/{requestId}
+     * @secure
+     */
+    approveActivityPubFollowRequest: (
+      userId: string,
+      requestId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, void>({
+        path: `/users/${userId}/activitypub/follow-requests/${requestId}`,
+        method: "PUT",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Reject a pending ActivityPub follow request from a remote actor
+     *
+     * @tags Follows
+     * @name RejectActivityPubFollowRequest
+     * @summary Reject remote follow request
+     * @request DELETE:/users/{userId}/activitypub/follow-requests/{requestId}
+     * @secure
+     */
+    rejectActivityPubFollowRequest: (
+      userId: string,
+      requestId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, void>({
+        path: `/users/${userId}/activitypub/follow-requests/${requestId}`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+
     /**
      * @description Return the users, that follow a user
      *
@@ -2210,6 +2305,406 @@ export class Api<
     getProfileMapData: (userId: string, params: RequestParams = {}) =>
       this.request<object, any>({
         path: `/users/${userId}/map-data`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Search local users by username or display name (case-insensitive, partial match, public endpoint)
+     *
+     * @tags Profile
+     * @name SearchUsers
+     * @summary Search users
+     * @request GET:/users/search
+     * @secure
+     */
+    searchUsers: (
+      query: {
+        q: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<UserDto[], any>({
+        path: `/users/search`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  activitypub = {
+    /**
+     * No description
+     *
+     * @tags ActivityPub
+     * @name LikeApPost
+     * @summary Like an ActivityPub post
+     * @request POST:/activitypub/posts/{postId}/likes
+     * @secure
+     */
+    likeApPost: (postId: string, params: RequestParams = {}) =>
+      this.request<void, void>({
+        path: `/activitypub/posts/${postId}/likes`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags ActivityPub
+     * @name UnlikeApPost
+     * @summary Unlike an ActivityPub post
+     * @request DELETE:/activitypub/posts/{postId}/likes
+     * @secure
+     */
+    unlikeApPost: (postId: string, params: RequestParams = {}) =>
+      this.request<void, void>({
+        path: `/activitypub/posts/${postId}/likes`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+  };
+  app = {
+    /**
+     * No description
+     *
+     * @tags App Configuration
+     * @name GetAppConfiguration
+     * @summary Get application configuration
+     * @request GET:/app/configuration
+     */
+    getAppConfiguration: (params: RequestParams = {}) =>
+      this.request<AppConfigurationDto, any>({
+        path: `/app/configuration`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags App
+     * @name GetImprint
+     * @summary Get the instance imprint
+     * @request GET:/app/imprint
+     */
+    getImprint: (params: RequestParams = {}) =>
+      this.request<ImprintDto, any>({
+        path: `/app/imprint`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Update the instance imprint. Requires admin privileges.
+     *
+     * @tags App
+     * @name UpdateImprint
+     * @summary Update the instance imprint
+     * @request PATCH:/app/imprint
+     * @secure
+     */
+    updateImprint: (data: ImprintUpdateRequest, params: RequestParams = {}) =>
+      this.request<ImprintDto, void>({
+        path: `/app/imprint`,
+        method: "PATCH",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags App
+     * @name GetPrivacyPolicy
+     * @summary Get the privacy policy currently in effect
+     * @request GET:/app/privacy-policy
+     */
+    getPrivacyPolicy: (params: RequestParams = {}) =>
+      this.request<PrivacyPolicyDto, void>({
+        path: `/app/privacy-policy`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Publish a new privacy policy version. Requires admin privileges.
+     *
+     * @tags App
+     * @name CreatePrivacyPolicy
+     * @summary Publish a new privacy policy version
+     * @request POST:/app/privacy-policy
+     * @secure
+     */
+    createPrivacyPolicy: (
+      data: PrivacyPolicyStoreRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<PrivacyPolicyDto, void>({
+        path: `/app/privacy-policy`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags App
+     * @name GetUpcomingPrivacyPolicy
+     * @summary Get the next privacy policy version, if one has been published for the future
+     * @request GET:/app/privacy-policy/upcoming
+     */
+    getUpcomingPrivacyPolicy: (params: RequestParams = {}) =>
+      this.request<PrivacyPolicyDto, void>({
+        path: `/app/privacy-policy/upcoming`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Accept the current or upcoming privacy policy version on behalf of the authenticated user
+     *
+     * @tags App
+     * @name AcceptPrivacyPolicy
+     * @summary Accept a privacy policy version
+     * @request POST:/app/privacy-policy/{privacyPolicy}/accept
+     * @secure
+     */
+    acceptPrivacyPolicy: (privacyPolicy: string, params: RequestParams = {}) =>
+      this.request<PrivacyPolicyDto, void>({
+        path: `/app/privacy-policy/${privacyPolicy}/accept`,
+        method: "POST",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  auth = {
+    /**
+     * @description Get the currently authenticated user
+     *
+     * @tags Authentication
+     * @name GetAuthenticatedUser
+     * @summary Get authenticated user
+     * @request GET:/auth/user
+     * @secure
+     */
+    getAuthenticatedUser: (params: RequestParams = {}) =>
+      this.request<AuthenticatedUserDto, any>({
+        path: `/auth/user`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Logout the authenticated user by revoking their access token
+     *
+     * @tags Authentication
+     * @name Logout
+     * @summary User logout
+     * @request POST:/auth/logout
+     * @secure
+     */
+    logout: (params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/auth/logout`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Send a password reset link to the user's email address
+     *
+     * @tags Authentication
+     * @name ForgotPassword
+     * @summary Forgot password
+     * @request POST:/auth/forgot-password
+     */
+    forgotPassword: (
+      data: {
+        /**
+         * @format email
+         * @example "mail@example.com"
+         */
+        email: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<void, void>({
+        path: `/auth/forgot-password`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description Reset the user's password using the provided token and new password
+     *
+     * @tags Authentication
+     * @name ResetPassword
+     * @summary Reset password
+     * @request POST:/auth/reset-password
+     */
+    resetPassword: (
+      data: {
+        /** @example "RESET_TOKEN_123" */
+        token: string;
+        /**
+         * @format email
+         * @example "mail@example.com"
+         */
+        email: string;
+        /**
+         * @format password
+         * @example "new_secret"
+         */
+        password: string;
+        /**
+         * @format password
+         * @example "new_secret"
+         */
+        password_confirmation: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<void, void>({
+        path: `/auth/reset-password`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description Update the authenticated user's password by providing the current password and a new password
+     *
+     * @tags Authentication
+     * @name UpdatePassword
+     * @summary Update password
+     * @request PUT:/auth/password
+     * @secure
+     */
+    updatePassword: (
+      data: {
+        /**
+         * @format password
+         * @example "current_secret"
+         */
+        current_password: string;
+        /**
+         * @format password
+         * @example "new_secret"
+         */
+        password: string;
+        /**
+         * @format password
+         * @example "new_secret"
+         */
+        password_confirmation: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<void, void>({
+        path: `/auth/password`,
+        method: "PUT",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description Verify the user's email address using the provided verification link parameters
+     *
+     * @tags Authentication
+     * @name VerifyEmail
+     * @summary Verify email
+     * @request POST:/auth/email/verify/{id}/{hash}
+     * @secure
+     */
+    verifyEmail: (id: string, hash: string, params: RequestParams = {}) =>
+      this.request<void, void>({
+        path: `/auth/email/verify/${id}/${hash}`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Resend the email verification link to the authenticated user if their email address is not yet verified
+     *
+     * @tags Authentication
+     * @name ResendVerificationEmail
+     * @summary Resend email verification
+     * @request POST:/auth/email/resend
+     * @secure
+     */
+    resendVerificationEmail: (params: RequestParams = {}) =>
+      this.request<void, void>({
+        path: `/auth/email/resend`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Validate an invite code and return information about the invite if it is valid
+     *
+     * @tags Authentication
+     * @name ValidateInvite
+     * @summary Validate invite code
+     * @request GET:/auth/invite/{code}
+     */
+    validateInvite: (code: string, params: RequestParams = {}) =>
+      this.request<
+        {
+          /** Indicates whether the invite code is valid */
+          valid?: boolean;
+          /** The name of the user who created the invite, or null if the inviter user no longer exists */
+          invitedBy?: string | null;
+        },
+        any
+      >({
+        path: `/auth/invite/${code}`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+  };
+  statistics = {
+    /**
+     * @description Return the ISO A2 codes of countries a user has visited or merely travelled through
+     *
+     * @tags Statistics
+     * @name GetCountriesForUser
+     * @summary User country insights
+     * @request GET:/statistics/countries
+     * @secure
+     */
+    getCountriesForUser: (params: RequestParams = {}) =>
+      this.request<CountriesDto, any>({
+        path: `/statistics/countries`,
         method: "GET",
         secure: true,
         format: "json",
@@ -2513,6 +3008,136 @@ export class Api<
       }),
 
     /**
+     * @description Get the authenticated user's currently active transport post (a journey currently in progress). Returns null if the user has no active transport post.
+     *
+     * @tags Posts, TransportPosts
+     * @name GetActiveTransportPost
+     * @summary Get active transport post
+     * @request GET:/posts/transport/active
+     * @secure
+     */
+    getActiveTransportPost: (params: RequestParams = {}) =>
+      this.request<TransportPost, any>({
+        path: `/posts/transport/active`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Get all stopovers of a transport post journey, from origin to destination, in sequence order, including any user-logged actual arrival/departure times
+     *
+     * @tags Posts, TransportPosts
+     * @name GetStopoversForTransportPost
+     * @summary Get transport post stopovers
+     * @request GET:/posts/{id}/transport/stopovers
+     * @secure
+     */
+    getStopoversForTransportPost: (id: string, params: RequestParams = {}) =>
+      this.request<TransportPostStopoverDto[], void>({
+        path: `/posts/${id}/transport/stopovers`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Log the actual arrival time at a stopover for the given transport post
+     *
+     * @tags Posts, TransportPosts
+     * @name LogStopoverArrival
+     * @summary Log stopover arrival
+     * @request POST:/posts/{id}/transport/stopovers/{stopId}/arrival
+     * @secure
+     */
+    logStopoverArrival: (
+      id: string,
+      stopId: string,
+      data: StopoverLogRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<TransportPostStopoverDto[], void>({
+        path: `/posts/${id}/transport/stopovers/${stopId}/arrival`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Clear a previously logged actual arrival time at a stopover for the given transport post
+     *
+     * @tags Posts, TransportPosts
+     * @name ClearStopoverArrival
+     * @summary Clear stopover arrival
+     * @request DELETE:/posts/{id}/transport/stopovers/{stopId}/arrival
+     * @secure
+     */
+    clearStopoverArrival: (
+      id: string,
+      stopId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<TransportPostStopoverDto[], void>({
+        path: `/posts/${id}/transport/stopovers/${stopId}/arrival`,
+        method: "DELETE",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Log the actual departure time from a stopover for the given transport post
+     *
+     * @tags Posts, TransportPosts
+     * @name LogStopoverDeparture
+     * @summary Log stopover departure
+     * @request POST:/posts/{id}/transport/stopovers/{stopId}/departure
+     * @secure
+     */
+    logStopoverDeparture: (
+      id: string,
+      stopId: string,
+      data: StopoverLogRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<TransportPostStopoverDto[], void>({
+        path: `/posts/${id}/transport/stopovers/${stopId}/departure`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Clear a previously logged actual departure time from a stopover for the given transport post
+     *
+     * @tags Posts, TransportPosts
+     * @name ClearStopoverDeparture
+     * @summary Clear stopover departure
+     * @request DELETE:/posts/{id}/transport/stopovers/{stopId}/departure
+     * @secure
+     */
+    clearStopoverDeparture: (
+      id: string,
+      stopId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<TransportPostStopoverDto[], void>({
+        path: `/posts/${id}/transport/stopovers/${stopId}/departure`,
+        method: "DELETE",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
      * @description Update transport-specific fields of a post
      *
      * @tags Posts, TransportPosts
@@ -2528,30 +3153,6 @@ export class Api<
     ) =>
       this.request<TransportPost, void>({
         path: `/posts/${id}/transport/exit`,
-        method: "PUT",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Update transport times for a transport post
-     *
-     * @tags Posts, TransportPosts
-     * @name UpdateTransportTimes
-     * @summary Update transport times
-     * @request PUT:/posts/{id}/transport/times
-     * @secure
-     */
-    updateTransportTimes: (
-      id: string,
-      data: TransportTimesUpdateRequest,
-      params: RequestParams = {},
-    ) =>
-      this.request<TransportPost, void>({
-        path: `/posts/${id}/transport/times`,
         method: "PUT",
         body: data,
         secure: true,
@@ -2599,6 +3200,23 @@ export class Api<
         method: "DELETE",
         secure: true,
         format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Retry a failed Traewelling crosspost. Dispatches an edit job if a Traewelling ID already exists, otherwise dispatches a new check-in job. Deletes the failure notification.
+     *
+     * @tags Posts
+     * @name RetryTraewellingCrosspost
+     * @summary Retry Traewelling crosspost
+     * @request POST:/posts/{id}/traewelling/retry
+     * @secure
+     */
+    retryTraewellingCrosspost: (id: string, params: RequestParams = {}) =>
+      this.request<void, void>({
+        path: `/posts/${id}/traewelling/retry`,
+        method: "POST",
+        secure: true,
         ...params,
       }),
   };
@@ -2831,7 +3449,6 @@ export class Api<
      * @name GetLineStringBetween
      * @summary Get linestring
      * @request GET:/map/linestring
-     * @secure
      */
     getLineStringBetween: (
       query: {
@@ -2844,7 +3461,6 @@ export class Api<
         path: `/map/linestring`,
         method: "GET",
         query: query,
-        secure: true,
         format: "json",
         ...params,
       }),
@@ -2856,7 +3472,6 @@ export class Api<
      * @name GetStopsBetween
      * @summary Get stopovers
      * @request GET:/map/stopovers
-     * @secure
      */
     getStopsBetween: (
       query: {
@@ -2869,7 +3484,6 @@ export class Api<
         path: `/map/stopovers`,
         method: "GET",
         query: query,
-        secure: true,
         format: "json",
         ...params,
       }),

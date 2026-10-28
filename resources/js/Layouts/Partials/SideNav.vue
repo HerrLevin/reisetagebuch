@@ -32,7 +32,8 @@ defineProps({
     },
 });
 
-const links = [
+// Computed so the links update once the user has loaded after login.
+const links = computed(() => [
     {
         link: {
             name: 'posts.transport.active',
@@ -98,10 +99,10 @@ const links = [
         icon: null,
         condition: !user.user && appConfig.canRegister(),
     },
-];
+]);
 
 const filteredLinks = computed(() => {
-    return links.filter((link) => {
+    return links.value.filter((link) => {
         return link.condition;
     });
 });

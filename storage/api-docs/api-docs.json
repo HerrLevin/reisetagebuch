@@ -56,7 +56,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "read:accounts"
+                        ]
                     }
                 ]
             },
@@ -94,7 +96,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "write:security"
+                        ]
                     }
                 ]
             },
@@ -122,7 +126,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "write:security"
+                        ]
                     }
                 ]
             }
@@ -145,7 +151,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "write:security"
+                        ]
                     }
                 ]
             }
@@ -182,7 +190,15 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {},
+                    {
+                        "passport": [
+                            "read:follows"
+                        ]
+                    }
+                ]
             }
         },
         "/users/{userId}/activitypub/following": {
@@ -217,7 +233,15 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {},
+                    {
+                        "passport": [
+                            "read:follows"
+                        ]
+                    }
+                ]
             }
         },
         "/users/{userId}/activitypub/follow-requests/{requestId}": {
@@ -256,7 +280,15 @@
                     "404": {
                         "description": "Not found, e.g. when the follow request does not exist"
                     }
-                }
+                },
+                "security": [
+                    {},
+                    {
+                        "passport": [
+                            "write:follows"
+                        ]
+                    }
+                ]
             },
             "delete": {
                 "tags": [
@@ -293,7 +325,15 @@
                     "404": {
                         "description": "Not found, e.g. when the follow request does not exist"
                     }
-                }
+                },
+                "security": [
+                    {},
+                    {
+                        "passport": [
+                            "write:follows"
+                        ]
+                    }
+                ]
             }
         },
         "/activitypub/posts/{postId}/likes": {
@@ -324,7 +364,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "write:favourites"
+                        ]
                     }
                 ]
             },
@@ -355,7 +397,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "write:favourites"
+                        ]
                     }
                 ]
             }
@@ -403,135 +447,11 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "read:accounts"
+                        ]
                     }
                 ]
-            }
-        },
-        "/auth/login": {
-            "post": {
-                "tags": [
-                    "Authentication"
-                ],
-                "summary": "User login",
-                "description": "Authenticate a user and return an access token",
-                "operationId": "login",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "email",
-                                    "password"
-                                ],
-                                "properties": {
-                                    "email": {
-                                        "type": "string",
-                                        "format": "email",
-                                        "example": "mail@example.com"
-                                    },
-                                    "password": {
-                                        "type": "string",
-                                        "format": "password",
-                                        "example": "secret"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/TokenResponseDto"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "validation error"
-                    }
-                }
-            }
-        },
-        "/auth/register": {
-            "post": {
-                "tags": [
-                    "Authentication"
-                ],
-                "summary": "User registration",
-                "description": "Register a new user and return an access token",
-                "operationId": "register",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "name",
-                                    "username",
-                                    "email",
-                                    "password",
-                                    "password_confirmation"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "type": "string",
-                                        "example": "John Doe"
-                                    },
-                                    "username": {
-                                        "type": "string",
-                                        "example": "john_doe"
-                                    },
-                                    "email": {
-                                        "type": "string",
-                                        "format": "email",
-                                        "example": "mail@example.com"
-                                    },
-                                    "password": {
-                                        "type": "string",
-                                        "format": "password",
-                                        "example": "secret"
-                                    },
-                                    "password_confirmation": {
-                                        "type": "string",
-                                        "format": "password",
-                                        "example": "secret"
-                                    },
-                                    "invite": {
-                                        "description": "Optional invite code required if open registration is disabled",
-                                        "type": "string",
-                                        "example": "INVITE_CODE_123"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/TokenResponseDto"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Registration disabled"
-                    },
-                    "422": {
-                        "description": "validation error"
-                    }
-                }
             }
         },
         "/auth/logout": {
@@ -697,7 +617,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "write:security"
+                        ]
                     }
                 ]
             }
@@ -720,7 +642,12 @@
                     "422": {
                         "description": "validation error"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
             }
         },
         "/auth/email/resend": {
@@ -798,7 +725,14 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "passport": [
+                            "read:statistics"
+                        ]
+                    }
+                ]
             }
         },
         "/users/{userId}/followers": {
@@ -833,7 +767,15 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {},
+                    {
+                        "passport": [
+                            "read:follows"
+                        ]
+                    }
+                ]
             }
         },
         "/users/{userId}/followings": {
@@ -868,7 +810,15 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {},
+                    {
+                        "passport": [
+                            "read:follows"
+                        ]
+                    }
+                ]
             }
         },
         "/users/{userId}/followers/{targetId}": {
@@ -910,7 +860,15 @@
                     "404": {
                         "description": "Not found, e.g. when the user or target user does not exist"
                     }
-                }
+                },
+                "security": [
+                    {},
+                    {
+                        "passport": [
+                            "write:follows"
+                        ]
+                    }
+                ]
             },
             "delete": {
                 "tags": [
@@ -947,7 +905,15 @@
                     "404": {
                         "description": "Not found, e.g. when the user or target user does not exist"
                     }
-                }
+                },
+                "security": [
+                    {},
+                    {
+                        "passport": [
+                            "write:follows"
+                        ]
+                    }
+                ]
             }
         },
         "/users/{userId}/follow-requests/{targetId}": {
@@ -989,7 +955,15 @@
                     "404": {
                         "description": "Not found, e.g. when the user or target user does not exist"
                     }
-                }
+                },
+                "security": [
+                    {},
+                    {
+                        "passport": [
+                            "write:follows"
+                        ]
+                    }
+                ]
             },
             "post": {
                 "tags": [
@@ -1029,7 +1003,15 @@
                     "404": {
                         "description": "Not found, e.g. when the user or target user does not exist"
                     }
-                }
+                },
+                "security": [
+                    {},
+                    {
+                        "passport": [
+                            "write:follows"
+                        ]
+                    }
+                ]
             },
             "delete": {
                 "tags": [
@@ -1066,7 +1048,15 @@
                     "404": {
                         "description": "Not found, e.g. when the user or target user does not exist"
                     }
-                }
+                },
+                "security": [
+                    {},
+                    {
+                        "passport": [
+                            "write:follows"
+                        ]
+                    }
+                ]
             }
         },
         "/app/imprint": {
@@ -1123,7 +1113,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "admin:write:settings"
+                        ]
                     }
                 ]
             }
@@ -1156,7 +1148,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "read:invites"
+                        ]
                     }
                 ]
             },
@@ -1187,7 +1181,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "write:invites"
+                        ]
                     }
                 ]
             }
@@ -1220,7 +1216,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "write:invites"
+                        ]
                     }
                 ]
             }
@@ -1260,7 +1258,15 @@
                     "404": {
                         "description": "Post not found"
                     }
-                }
+                },
+                "security": [
+                    {},
+                    {
+                        "passport": [
+                            "read:favourites"
+                        ]
+                    }
+                ]
             },
             "post": {
                 "tags": [
@@ -1293,7 +1299,14 @@
                     "404": {
                         "description": "Post not found"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "passport": [
+                            "write:favourites"
+                        ]
+                    }
+                ]
             },
             "delete": {
                 "tags": [
@@ -1326,7 +1339,14 @@
                     "404": {
                         "description": "Post not found"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "passport": [
+                            "write:favourites"
+                        ]
+                    }
+                ]
             }
         },
         "/locations/history": {
@@ -1359,7 +1379,14 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "passport": [
+                            "read:location-history"
+                        ]
+                    }
+                ]
             },
             "post": {
                 "tags": [
@@ -1428,7 +1455,14 @@
                     "204": {
                         "description": "No Content"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "passport": [
+                            "write:location-history"
+                        ]
+                    }
+                ]
             }
         },
         "/location/prefetch": {
@@ -1499,7 +1533,14 @@
                     "204": {
                         "description": "No Content"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "passport": [
+                            "write:statuses"
+                        ]
+                    }
+                ]
             }
         },
         "/location/request-location": {
@@ -1551,7 +1592,14 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "passport": [
+                            "read:location-history"
+                        ]
+                    }
+                ]
             }
         },
         "/locations/nearby": {
@@ -1604,7 +1652,14 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "passport": [
+                            "read:search"
+                        ]
+                    }
+                ]
             }
         },
         "/geocode": {
@@ -1701,7 +1756,14 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "passport": [
+                            "read:search"
+                        ]
+                    }
+                ]
             }
         },
         "/locations/departures": {
@@ -1771,7 +1833,14 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "passport": [
+                            "read:search"
+                        ]
+                    }
+                ]
             }
         },
         "/locations/stopovers": {
@@ -1819,7 +1888,14 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "passport": [
+                            "read:search"
+                        ]
+                    }
+                ]
             }
         },
         "/map/linestring": {
@@ -1934,7 +2010,14 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "passport": [
+                            "read:notifications"
+                        ]
+                    }
+                ]
             }
         },
         "/notifications/unread-count": {
@@ -1965,7 +2048,14 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "passport": [
+                            "read:notifications"
+                        ]
+                    }
+                ]
             }
         },
         "/notifications/{id}/read": {
@@ -1990,7 +2080,14 @@
                     "204": {
                         "description": "No Content"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "passport": [
+                            "write:notifications"
+                        ]
+                    }
+                ]
             }
         },
         "/notifications/read-all": {
@@ -2005,7 +2102,14 @@
                     "204": {
                         "description": "No Content"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "passport": [
+                            "write:notifications"
+                        ]
+                    }
+                ]
             }
         },
         "/timeline": {
@@ -2047,7 +2151,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "read:statuses"
+                        ]
                     }
                 ]
             }
@@ -2088,7 +2194,14 @@
                     "404": {
                         "description": "Resource Not Found"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "passport": [
+                            "read:statuses"
+                        ]
+                    }
+                ]
             }
         },
         "/users/{userId}/posts": {
@@ -2139,8 +2252,11 @@
                     }
                 },
                 "security": [
+                    {},
                     {
-                        "passport": []
+                        "passport": [
+                            "read:statuses"
+                        ]
                     }
                 ]
             }
@@ -2194,8 +2310,11 @@
                     }
                 },
                 "security": [
+                    {},
                     {
-                        "passport": []
+                        "passport": [
+                            "read:statuses"
+                        ]
                     }
                 ]
             },
@@ -2234,7 +2353,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "write:statuses"
+                        ]
                     }
                 ]
             },
@@ -2310,7 +2431,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "write:statuses"
+                        ]
                     }
                 ]
             }
@@ -2410,7 +2533,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "read:statuses"
+                        ]
                     }
                 ]
             }
@@ -2456,7 +2581,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "write:statuses"
+                        ]
                     }
                 ]
             }
@@ -2499,7 +2626,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "write:statuses"
+                        ]
                     }
                 ]
             }
@@ -2542,7 +2671,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "write:statuses"
+                        ]
                     }
                 ]
             }
@@ -2585,7 +2716,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "write:statuses"
+                        ]
                     }
                 ]
             }
@@ -2613,7 +2746,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "read:statuses"
+                        ]
                     }
                 ]
             }
@@ -2664,8 +2799,11 @@
                     }
                 },
                 "security": [
+                    {},
                     {
-                        "passport": []
+                        "passport": [
+                            "read:statuses"
+                        ]
                     }
                 ]
             }
@@ -2740,7 +2878,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "write:statuses"
+                        ]
                     }
                 ]
             },
@@ -2800,7 +2940,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "write:statuses"
+                        ]
                     }
                 ]
             }
@@ -2875,7 +3017,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "write:statuses"
+                        ]
                     }
                 ]
             },
@@ -2935,7 +3079,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "write:statuses"
+                        ]
                     }
                 ]
             }
@@ -2994,7 +3140,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "write:statuses"
+                        ]
                     }
                 ]
             }
@@ -3056,7 +3204,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "write:statuses"
+                        ]
                     }
                 ]
             },
@@ -3103,7 +3253,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "write:statuses"
+                        ]
                     }
                 ]
             }
@@ -3144,7 +3296,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "write:statuses"
+                        ]
                     }
                 ]
             }
@@ -3206,7 +3360,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "admin:write:settings"
+                        ]
                     }
                 ]
             }
@@ -3313,7 +3469,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "write:security"
+                        ]
                     }
                 ]
             }
@@ -3355,7 +3513,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "write:security"
+                        ]
                     }
                 ]
             }
@@ -3395,7 +3555,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "write:statuses"
+                        ]
                     }
                 ]
             }
@@ -3429,7 +3591,15 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {},
+                    {
+                        "passport": [
+                            "read:statuses"
+                        ]
+                    }
+                ]
             }
         },
         "/users/search": {
@@ -3464,7 +3634,15 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {},
+                    {
+                        "passport": [
+                            "read:search"
+                        ]
+                    }
+                ]
             }
         },
         "/profile/{username}": {
@@ -3496,7 +3674,15 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {},
+                    {
+                        "passport": [
+                            "read:accounts"
+                        ]
+                    }
+                ]
             }
         },
         "/account/profile": {
@@ -3528,7 +3714,14 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "passport": [
+                            "write:accounts"
+                        ]
+                    }
+                ]
             }
         },
         "/account/profile/avatar": {
@@ -3560,7 +3753,14 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "passport": [
+                            "write:accounts"
+                        ]
+                    }
+                ]
             },
             "delete": {
                 "tags": [
@@ -3573,7 +3773,14 @@
                     "204": {
                         "description": "successful operation"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "passport": [
+                            "write:accounts"
+                        ]
+                    }
+                ]
             }
         },
         "/account/profile/header": {
@@ -3605,7 +3812,14 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "passport": [
+                            "write:accounts"
+                        ]
+                    }
+                ]
             },
             "delete": {
                 "tags": [
@@ -3618,7 +3832,14 @@
                     "204": {
                         "description": "successful operation"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "passport": [
+                            "write:accounts"
+                        ]
+                    }
+                ]
             }
         },
         "/account/settings": {
@@ -3646,7 +3867,9 @@
                 },
                 "security": [
                     {
-                        "passport": []
+                        "passport": [
+                            "write:accounts"
+                        ]
                     }
                 ]
             }
@@ -6538,15 +6761,41 @@
         "securitySchemes": {
             "passport": {
                 "type": "oauth2",
-                "description": "Laravel passport oauth2 security.",
-                "in": "header",
-                "scheme": "https",
+                "description": "OAuth 2.0 authorization code flow with PKCE. Clients register via Dynamic Client Registration (RFC 7591), see /.well-known/oauth-authorization-server. A high-level scope (e.g. \"read\") grants all its granular scopes (e.g. \"read:statuses\").",
                 "flows": {
-                    "password": {
+                    "authorizationCode": {
                         "authorizationUrl": "http://localhost/oauth/authorize",
                         "tokenUrl": "http://localhost/oauth/token",
-                        "refreshUrl": "http://localhost/token/refresh",
-                        "scopes": []
+                        "refreshUrl": "http://localhost/oauth/token",
+                        "scopes": {
+                            "read": "Read all your account data",
+                            "read:accounts": "See your account information and profiles",
+                            "read:statuses": "See posts, timelines and trips",
+                            "read:favourites": "See likes",
+                            "read:follows": "See followers, followings and follow requests",
+                            "read:notifications": "See your notifications",
+                            "read:search": "Search for users, places and departures",
+                            "read:invites": "See your invites",
+                            "read:location-history": "See your location history",
+                            "read:statistics": "See your travel statistics",
+                            "write": "Change all your account data",
+                            "write:accounts": "Change your profile and settings",
+                            "write:statuses": "Create, edit and delete posts and trips",
+                            "write:favourites": "Like and unlike posts",
+                            "write:follows": "Follow and unfollow people and manage follow requests",
+                            "write:notifications": "Mark your notifications as read",
+                            "write:invites": "Create and delete invites",
+                            "write:location-history": "Add to your location history",
+                            "write:security": "Change your password and account details, connect services and delete your account",
+                            "admin:read": "Read all administrative data on this server",
+                            "admin:read:accounts": "See all accounts on this server",
+                            "admin:read:invites": "See all invites on this server",
+                            "admin:read:settings": "See the server settings",
+                            "admin:write": "Perform all administrative actions on this server",
+                            "admin:write:accounts": "Manage all accounts on this server",
+                            "admin:write:invites": "Manage all invites on this server",
+                            "admin:write:settings": "Change the server settings, privacy policy and imprint"
+                        }
                     }
                 }
             }
@@ -6616,11 +6865,6 @@
         {
             "name": "Profile",
             "description": "Profile"
-        }
-    ],
-    "security": [
-        {
-            "passport": []
         }
     ]
 }

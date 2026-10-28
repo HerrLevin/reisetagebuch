@@ -7,6 +7,7 @@ use App\Repositories\UserRepository;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Laravel\Passport\Passport;
 
 class WellKnownController extends Controller
 {
@@ -19,6 +20,24 @@ class WellKnownController extends Controller
         $links = ['links' => [['rel' => 'http://nodeinfo.diaspora.software/ns/schema/2.0', 'href' => url('/nodeinfo/2.0')]]];
 
         return response()->json($links);
+    }
+
+    /**
+     * OAuth 2.0 Authorization Server Metadata (RFC 8414), so apps can discover endpoints.
+     */
+    public function oauthAuthorizationServer(): JsonResponse
+    {
+        return response()->json([
+            'issuer' => url('/'),
+            'authorization_endpoint' => route('passport.authorizations.authorize'),
+            'token_endpoint' => route('passport.token'),
+            'registration_endpoint' => route('oauth.register'),
+            'scopes_supported' => Passport::scopeIds(),
+            'response_types_supported' => ['code'],
+            'grant_types_supported' => ['authorization_code', 'refresh_token'],
+            'code_challenge_methods_supported' => ['S256'],
+            'token_endpoint_auth_methods_supported' => ['none'],
+        ]);
     }
 
     public function webfinger(Request $request): JsonResponse

@@ -15,7 +15,7 @@ class PasswordConfirmationTest extends TestCase
     public function test_password_can_be_confirmed_via_update(): void
     {
         $user = User::factory()->create();
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
 
         $response = $this->putJson('/api/auth/password', [
             'current_password' => 'password',
@@ -30,7 +30,7 @@ class PasswordConfirmationTest extends TestCase
     public function test_password_is_not_confirmed_with_invalid_password(): void
     {
         $user = User::factory()->create();
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
 
         $response = $this->putJson('/api/auth/password', [
             'current_password' => 'wrong-password',

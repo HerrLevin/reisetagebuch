@@ -104,7 +104,7 @@ class ActivityPubFederationControllerTest extends TestCase
 
     public function test_resolve_returns_actor_profile_for_valid_handle(): void
     {
-        Passport::actingAs(User::factory()->create());
+        Passport::actingAs(User::factory()->create(), ['*']);
 
         $actorId = 'https://remote.example/users/bob';
         $this->fakeRemoteActor($actorId, 'bob@remote.example');
@@ -121,14 +121,14 @@ class ActivityPubFederationControllerTest extends TestCase
 
     public function test_resolve_rejects_handle_without_domain(): void
     {
-        Passport::actingAs(User::factory()->create());
+        Passport::actingAs(User::factory()->create(), ['*']);
 
         $this->getJson('/api/activitypub/resolve?handle=bob')->assertStatus(422);
     }
 
     public function test_resolve_returns_404_when_webfinger_cannot_resolve(): void
     {
-        Passport::actingAs(User::factory()->create());
+        Passport::actingAs(User::factory()->create(), ['*']);
 
         $resource = urlencode('acct:ghost@remote.example');
         Http::fake([
@@ -140,7 +140,7 @@ class ActivityPubFederationControllerTest extends TestCase
 
     public function test_resolve_strips_script_tag_from_summary(): void
     {
-        Passport::actingAs(User::factory()->create());
+        Passport::actingAs(User::factory()->create(), ['*']);
 
         $actorId = 'https://remote.example/users/mallory';
         $this->fakeRemoteActor($actorId, 'mallory@remote.example', [
@@ -159,7 +159,7 @@ class ActivityPubFederationControllerTest extends TestCase
 
     public function test_follow_requires_a_valid_url_actor_id(): void
     {
-        Passport::actingAs(User::factory()->create());
+        Passport::actingAs(User::factory()->create(), ['*']);
 
         $this->postJson('/api/activitypub/follow', ['actor_id' => 'not-a-url'])->assertStatus(422);
         $this->postJson('/api/activitypub/follow', [])->assertStatus(422);
@@ -169,7 +169,7 @@ class ActivityPubFederationControllerTest extends TestCase
     {
         Bus::fake();
         $user = User::factory()->create();
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
 
         $actorId = 'https://remote.example/users/bob';
         $this->fakeRemoteActor($actorId, 'bob@remote.example');
@@ -190,7 +190,7 @@ class ActivityPubFederationControllerTest extends TestCase
     public function test_follow_is_idempotent(): void
     {
         Bus::fake();
-        Passport::actingAs(User::factory()->create());
+        Passport::actingAs(User::factory()->create(), ['*']);
 
         $actorId = 'https://remote.example/users/bob';
         $this->fakeRemoteActor($actorId, 'bob@remote.example');
@@ -203,7 +203,7 @@ class ActivityPubFederationControllerTest extends TestCase
 
     public function test_follow_returns_422_when_remote_actor_unreachable(): void
     {
-        Passport::actingAs(User::factory()->create());
+        Passport::actingAs(User::factory()->create(), ['*']);
 
         $actorId = 'https://remote.example/users/ghost';
         Http::fake([$actorId => Http::response([], 500)]);
@@ -221,7 +221,7 @@ class ActivityPubFederationControllerTest extends TestCase
     public function test_unfollow_is_a_noop_when_not_following(): void
     {
         Bus::fake();
-        Passport::actingAs(User::factory()->create());
+        Passport::actingAs(User::factory()->create(), ['*']);
 
         $this->deleteJson('/api/activitypub/follow', ['actor_id' => 'https://remote.example/users/bob'])
             ->assertStatus(204);
@@ -244,7 +244,7 @@ class ActivityPubFederationControllerTest extends TestCase
             'state' => 'accepted',
         ]);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
 
         $this->deleteJson('/api/activitypub/follow', ['actor_id' => $actorId])->assertStatus(204);
 
@@ -284,7 +284,7 @@ class ActivityPubFederationControllerTest extends TestCase
             'state' => 'accepted',
         ]);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
 
         $response = $this->getJson('/api/activitypub/following');
 
@@ -346,13 +346,13 @@ class ActivityPubFederationControllerTest extends TestCase
 
         $this->getJson("/api/users/{$user->id}/activitypub/followers")->assertForbidden();
 
-        Passport::actingAs($stranger);
+        Passport::actingAs($stranger, ['*']);
         $this->getJson("/api/users/{$user->id}/activitypub/followers")->assertForbidden();
 
-        Passport::actingAs($follower);
+        Passport::actingAs($follower, ['*']);
         $this->getJson("/api/users/{$user->id}/activitypub/followers")->assertOk();
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $this->getJson("/api/users/{$user->id}/activitypub/followers")->assertOk();
     }
 
@@ -410,13 +410,13 @@ class ActivityPubFederationControllerTest extends TestCase
 
         $this->getJson("/api/users/{$user->id}/activitypub/following")->assertForbidden();
 
-        Passport::actingAs($stranger);
+        Passport::actingAs($stranger, ['*']);
         $this->getJson("/api/users/{$user->id}/activitypub/following")->assertForbidden();
 
-        Passport::actingAs($follower);
+        Passport::actingAs($follower, ['*']);
         $this->getJson("/api/users/{$user->id}/activitypub/following")->assertOk();
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $this->getJson("/api/users/{$user->id}/activitypub/following")->assertOk();
     }
 }

@@ -16,7 +16,7 @@ class ApiExceptionRenderingTest extends TestCase
         config(['app.debug' => false]);
         $user = User::factory()->create();
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->patchJson(route('imprint.update'), ['content' => 'New imprint']);
 
         $response->assertForbidden();

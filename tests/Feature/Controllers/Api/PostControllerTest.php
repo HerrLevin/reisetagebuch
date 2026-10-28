@@ -24,7 +24,7 @@ class PostControllerTest extends TestCase
             'visibility' => Visibility::PRIVATE,
         ]);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->getJson(route('api.posts.filter'));
 
         $response->assertOk();
@@ -56,7 +56,7 @@ class PostControllerTest extends TestCase
             'published_at' => now(),
         ]);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->getJson(route('api.posts.filter', [
             'dateFrom' => now()->subDays(7)->toDateString(),
             'dateTo' => now()->toDateString(),
@@ -78,7 +78,7 @@ class PostControllerTest extends TestCase
             'visibility' => Visibility::PRIVATE,
         ]);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->getJson(route('api.posts.filter', [
             'visibility' => [Visibility::PUBLIC->value],
         ]));
@@ -91,7 +91,7 @@ class PostControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->getJson(route('api.posts.filter'));
 
         $response->assertOk();
@@ -113,7 +113,7 @@ class PostControllerTest extends TestCase
             'visibility' => Visibility::PRIVATE,
         ]);
 
-        Passport::actingAs($user);
+        Passport::actingAs($user, ['*']);
         $response = $this->postJson(route('api.posts.mass-edit'), [
             'postIds' => $posts->pluck('id')->toArray(),
             'visibility' => Visibility::PUBLIC->value,

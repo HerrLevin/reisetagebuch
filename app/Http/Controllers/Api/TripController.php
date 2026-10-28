@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Dto\TripCreationResponseDto;
+use App\Enums\Scopes\WriteScope;
 use App\Http\Controllers\Backend\TripController as BackendTripController;
 use App\Http\Requests\StoreTripRequest;
 use OpenApi\Attributes as OA;
@@ -22,11 +23,7 @@ class TripController extends Controller
         operationId: 'storeTrip',
         description: 'Create a new trip',
         summary: 'Store trip',
-        security: [
-            [
-                'passport' => [],
-            ],
-        ],
+        security: [['passport' => [WriteScope::Statuses->value]]],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(ref: StoreTripRequest::class)
