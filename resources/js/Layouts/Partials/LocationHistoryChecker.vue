@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useLocationHistoryStore } from '@/stores/locationHistory';
 import { useUserStore } from '@/stores/user';
-import { onMounted, useTemplateRef } from 'vue';
+import { onMounted, useTemplateRef, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -21,11 +21,15 @@ function dontTrack() {
     deleteModal.value?.close();
 }
 
-onMounted(() => {
+function askIfUndecided() {
     if (locationHistory.allowHistory === null && !!user.user) {
         deleteModal.value?.showModal();
     }
-});
+}
+
+onMounted(askIfUndecided);
+// The user loads asynchronously after OAuth login, so also ask once it arrives.
+watch(() => user.user, askIfUndecided);
 </script>
 
 <template>
