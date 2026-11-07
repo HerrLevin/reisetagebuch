@@ -20,7 +20,7 @@
         "cy:run": "cypress run"
     },
     "devDependencies": {
-        "@capacitor/assets": "^3.0.5",
+        "@capacitor/assets": "^4.0.0",
         "@capacitor/cli": "^8.5.1",
         "@eslint/js": "^10.0.0",
         "@rushstack/eslint-patch": "^1.12.0",
