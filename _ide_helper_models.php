@@ -238,6 +238,15 @@ namespace App\Models{
 
 namespace App\Models{
 /**
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubServer newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubServer newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubServer query()
+ */
+	class ActivityPubServer extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
  * @property int $id
  * @property string $iso_a2
  * @property string $name

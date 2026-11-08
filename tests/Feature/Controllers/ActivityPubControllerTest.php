@@ -18,6 +18,7 @@ use App\Models\Post;
 use App\Models\User;
 use App\Repositories\PostRepository;
 use App\Services\ActivityPubService;
+use App\Services\ActivityPubUrlGuard;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -658,6 +659,100 @@ class ActivityPubControllerTest extends TestCase
             ->getJson("/ap/posts/{$post->id}/object");
 
         $this->assertSame($r1->json('type'), $r2->json('type'));
+    }
+
+    private function signedGet(string $path, string $actorId, string $privateKeyPem): TestResponse
+    {
+        $host = parse_url(config('app.url'), PHP_URL_HOST) ?? 'localhost';
+        $date = now()->format('D, d M Y H:i:s \G\M\T');
+        $signingString = "(request-target): get {$path}\nhost: {$host}\ndate: {$date}";
+        openssl_sign($signingString, $signature, openssl_pkey_get_private($privateKeyPem), OPENSSL_ALGO_SHA256);
+
+        return $this->withHeaders([
+            'Accept' => 'application/activity+json',
+            'Host' => $host,
+            'Date' => $date,
+            'Signature' => 'keyId="'.$actorId.'#main-key",algorithm="rsa-sha256",headers="(request-target) host date",signature="'.base64_encode($signature).'"',
+        ])->get($path);
+    }
+
+    public function test_signed_post_object_fetch_records_remote_server(): void
+    {
+        $user = $this->createUserWithKeys(['username' => 'alice']);
+        $post = Post::factory()->create(['user_id' => $user->id]);
+        [$privKey, $pubKey] = $this->generateKeyPair();
+        $this->setupRemoteActor('https://fetcher.example/actor', $pubKey);
+
+        $this->signedGet("/ap/posts/{$post->id}", 'https://fetcher.example/actor', $privKey)->assertOk();
+
+        $this->assertDatabaseHas('activity_pub_servers', ['host' => 'fetcher.example']);
+    }
+
+    public function test_badly_signed_post_object_fetch_is_served_but_not_recorded(): void
+    {
+        $user = $this->createUserWithKeys(['username' => 'alice']);
+        $post = Post::factory()->create(['user_id' => $user->id]);
+        [, $pubKey] = $this->generateKeyPair();
+        [$wrongPrivKey] = $this->generateKeyPair();
+        $this->setupRemoteActor('https://fetcher.example/actor', $pubKey);
+
+        $this->signedGet("/ap/posts/{$post->id}", 'https://fetcher.example/actor', $wrongPrivKey)->assertOk();
+
+        $this->assertDatabaseCount('activity_pub_servers', 0);
+    }
+
+    public function test_unsigned_post_object_fetch_is_not_recorded(): void
+    {
+        $user = $this->createUserWithKeys(['username' => 'alice']);
+        $post = Post::factory()->create(['user_id' => $user->id]);
+
+        $this->withHeaders(['Accept' => 'application/activity+json'])->get("/ap/posts/{$post->id}")->assertOk();
+
+        $this->assertDatabaseCount('activity_pub_servers', 0);
+    }
+
+    public function test_announce_of_local_post_stores_booster(): void
+    {
+        $user = $this->createUserWithKeys(['username' => 'alice']);
+        $post = Post::factory()->create(['user_id' => $user->id]);
+        [, $pubKey] = $this->generateKeyPair();
+        $remoteActorId = 'https://remote.example/users/bob';
+        $this->setupRemoteActor($remoteActorId, $pubKey);
+        // remote.example doesn't resolve; skip the SSRF DNS check so Http::fake() is reached
+        $this->app->bind(ActivityPubUrlGuard::class, fn () => new class extends ActivityPubUrlGuard
+        {
+            public function assertSafe(string $url): string
+            {
+                return '203.0.113.1';
+            }
+        });
+
+        $activity = [
+            'id' => 'https://remote.example/users/bob/statuses/1/activity',
+            'type' => 'Announce',
+            'actor' => $remoteActorId,
+            'object' => route('ap.post', ['id' => $post->id]),
+        ];
+
+        $this->inboxPost('/ap/inbox', $activity)->assertStatus(202);
+
+        $this->assertDatabaseHas('activity_pub_actors', ['actor_uri' => $remoteActorId]);
+    }
+
+    public function test_announce_of_unknown_post_is_ignored(): void
+    {
+        [, $pubKey] = $this->generateKeyPair();
+        $remoteActorId = 'https://remote.example/users/bob';
+        $this->setupRemoteActor($remoteActorId, $pubKey);
+
+        $this->inboxPost('/ap/inbox', [
+            'id' => 'https://remote.example/users/bob/statuses/2/activity',
+            'type' => 'Announce',
+            'actor' => $remoteActorId,
+            'object' => 'https://elsewhere.example/notes/1',
+        ])->assertStatus(202);
+
+        $this->assertDatabaseCount('activity_pub_actors', 0);
     }
 
     // ──────────────────────────────────────────────────────────────────────────

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\ActivityPubServer;
 use App\Services\ActivityPubUrlGuard;
 use Closure;
 use DateTime;
@@ -18,7 +19,33 @@ class VerifyHttpSignature
         private readonly ActivityPubUrlGuard $urlGuard,
     ) {}
 
-    public function handle(Request $request, Closure $next): Response
+    /**
+     * With $mode "optional", unsigned or badly signed requests pass through unverified
+     * (for public GET endpoints that remote servers fetch with signatures).
+     */
+    public function handle(Request $request, Closure $next, ?string $mode = null): Response
+    {
+        $optional = $mode === 'optional';
+        if ($optional && ! $request->hasHeader('Signature')) {
+            return $next($request);
+        }
+
+        $error = $this->verify($request);
+        if ($error && ! $optional) {
+            return $error;
+        }
+
+        if (! $error) {
+            ActivityPubServer::recordSeen($request->attributes->get('ap_verified_actor'));
+        }
+
+        return $next($request);
+    }
+
+    /**
+     * Returns an error response, or null after storing the verified actor on the request.
+     */
+    private function verify(Request $request): ?Response
     {
         $signatureHeader = $request->header('Signature');
         if (! $signatureHeader) {
@@ -156,7 +183,7 @@ class VerifyHttpSignature
 
         $request->attributes->set('ap_verified_actor', $keyOwner);
 
-        return $next($request);
+        return null;
     }
 
     private function parseSignatureHeader(string $header): ?array
