@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useLocationHistoryStore } from '@/stores/locationHistory';
 import { useUserStore } from '@/stores/user';
-import { onMounted, useTemplateRef } from 'vue';
+import { useTemplateRef, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -21,11 +21,16 @@ function dontTrack() {
     deleteModal.value?.close();
 }
 
-onMounted(() => {
-    if (locationHistory.allowHistory === null && !!user.user) {
-        deleteModal.value?.showModal();
-    }
-});
+// the user is fetched async after a server-side login, so wait for it instead of checking once on mount
+watch(
+    () => user.user,
+    (current) => {
+        if (locationHistory.allowHistory === null && current) {
+            deleteModal.value?.showModal();
+        }
+    },
+    { flush: 'post', immediate: true },
+);
 </script>
 
 <template>

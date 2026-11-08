@@ -52,7 +52,9 @@ Route::prefix('ap')
     // Laravel's VerifyCsrfToken middleware for this route group.
     ->withoutMiddleware([PreventRequestForgery::class])
     ->group(function () {
-        Route::get('users/{username}', [MastodonActivityPubController::class, 'actor'])->name('actor');
+        Route::get('users/{username}', [MastodonActivityPubController::class, 'actor'])
+            ->middleware(VerifyHttpSignature::class.':optional')
+            ->name('actor');
         Route::get('users/{username}/outbox', [MastodonActivityPubController::class, 'outbox'])->name('outbox');
         Route::get('users/{username}/followers', [MastodonActivityPubController::class, 'followers'])->name('followers');
         Route::get('users/{username}/following', [MastodonActivityPubController::class, 'following'])->name('following');
@@ -62,8 +64,12 @@ Route::prefix('ap')
         Route::post('inbox', [MastodonActivityPubController::class, 'sharedInbox'])
             ->middleware([VerifyHttpSignature::class, 'throttle:60,1'])
             ->name('shared-inbox');
-        Route::get('posts/{id}', [MastodonActivityPubController::class, 'postObject'])->name('post');
-        Route::get('posts/{id}/object', [MastodonActivityPubController::class, 'postObject'])->name('post-object');
+        Route::get('posts/{id}', [MastodonActivityPubController::class, 'postObject'])
+            ->middleware(VerifyHttpSignature::class.':optional')
+            ->name('post');
+        Route::get('posts/{id}/object', [MastodonActivityPubController::class, 'postObject'])
+            ->middleware(VerifyHttpSignature::class.':optional')
+            ->name('post-object');
         Route::get('activities/{id}', function ($id) {
             return response()->json(['error' => 'Not implemented'], 404);
         })->name('activity');

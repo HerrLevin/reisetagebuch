@@ -94,8 +94,8 @@ function register(user?: Partial<TestUser>) {
 
     cy.url().should('include', '/home');
 
-    // dismiss welcome modal if it appears
-    cy.get('.btn-primary').first().click();
+    // dismiss the location history modal, which opens once the user is loaded
+    cy.get('dialog[open] .btn-primary').click();
 }
 
 Cypress.Commands.add('logout', () => {
@@ -137,12 +137,8 @@ function login(user?: Partial<TestUser>) {
             // only assert redirect to home when we performed a login
             cy.url().should('include', '/home');
 
-            // dismiss welcome modal if it appears (guard so the command doesn't fail if it doesn't exist)
-            cy.get('body').then(($body) => {
-                if ($body.find('.btn-primary').length) {
-                    cy.get('.btn-primary').first().click();
-                }
-            });
+            // dismiss the location history modal, which opens once the user is loaded
+            cy.get('dialog[open] .btn-primary').click();
         } else {
             // already signed in — skip the login flow
             Cypress.log({

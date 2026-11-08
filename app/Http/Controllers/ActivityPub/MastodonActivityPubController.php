@@ -41,6 +41,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class MastodonActivityPubController extends Controller
 {
@@ -144,7 +145,7 @@ class MastodonActivityPubController extends Controller
         $type = $activity['type'] ?? null;
 
         // Global activities: Create(Note), Update(Note/Actor) and Delete(Note) have no specific local user target
-        if ($type === 'Create' || $type === 'Update' || ($type === 'Delete' && ! $this->isActorDelete($activity))) {
+        if ($type === 'Create' || $type === 'Update' || $type === 'Announce' || ($type === 'Delete' && ! $this->isActorDelete($activity))) {
             return $this->processGlobalActivity($activity, $request);
         }
 
@@ -222,6 +223,10 @@ class MastodonActivityPubController extends Controller
 
         if ($type === 'Delete') {
             return $this->handleNoteDelete($activity);
+        }
+
+        if ($type === 'Announce') {
+            return $this->handleAnnounce($activity);
         }
 
         return response()->json('', 202);
@@ -423,6 +428,9 @@ class MastodonActivityPubController extends Controller
         }
         if ($type === 'Delete') {
             return $this->handleDelete($activity);
+        }
+        if ($type === 'Announce') {
+            return $this->handleAnnounce($activity);
         }
         if ($type === 'Accept') {
             return $this->handleAccept($activity, $user);
@@ -644,6 +652,22 @@ class MastodonActivityPubController extends Controller
         }
 
         return null;
+    }
+
+    /**
+     * A remote boost of one of our posts: store the booster so their server is known.
+     */
+    private function handleAnnounce(array $activity): JsonResponse
+    {
+        $object = $activity['object'] ?? null;
+        $objectUrl = is_array($object) ? ($object['id'] ?? null) : $object;
+        $postId = is_string($objectUrl) ? $this->parsePostIdFromUrl($objectUrl) : null;
+
+        if ($postId && Str::isUuid($postId) && $this->postRepository->internalGetById($postId)) {
+            $this->activityPubService->resolveActor($activity['actor']);
+        }
+
+        return response()->json('', 202);
     }
 
     private function handleLike(array $activity, UserDto $user): JsonResponse
