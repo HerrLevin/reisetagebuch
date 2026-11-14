@@ -29,6 +29,8 @@ class CypressController extends Controller
 
         Artisan::call('migrate:fresh', ['--seed' => false, '--force' => true]);
         Artisan::call(KeysCommand::class);
+        // resets the login/register rate limiters, which every spec would otherwise exhaust
+        Artisan::call('cache:clear');
 
         return response()->json(['message' => 'Database reset successfully.']);
     }
