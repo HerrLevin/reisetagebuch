@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { initApi } from '@/api';
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
+import ApplicationLogo from '@shared/Components/ApplicationLogo.vue';
+import InputError from '@shared/Components/InputError.vue';
+import InputLabel from '@shared/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
-import { useTitle } from '@/composables/useTitle';
+import { useTitle } from '@shared/composables/useTitle';
 import { setServerUrl } from '@/Services/ServerConfig';
 import axios from 'axios';
 import { ref } from 'vue';

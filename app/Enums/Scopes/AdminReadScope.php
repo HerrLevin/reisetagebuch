@@ -9,4 +9,5 @@ enum AdminReadScope: string
     case Accounts = 'admin:read:accounts';
     case Invites = 'admin:read:invites';
     case Settings = 'admin:read:settings';
+    case Statistics = 'admin:read:statistics';
 }

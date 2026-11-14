@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Loading from '@/Components/Loading.vue';
+import Loading from '@shared/Components/Loading.vue';
 import { CircleX } from 'lucide-vue-next';
 import { PropType } from 'vue';
 import { useI18n } from 'vue-i18n';

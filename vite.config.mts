@@ -1,6 +1,7 @@
 import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 import laravel from 'laravel-vite-plugin';
+import { fileURLToPath, URL } from 'node:url';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
@@ -11,10 +12,24 @@ export default defineConfig({
     worker: {
         format: 'es',
     },
+    resolve: {
+        alias: {
+            '@shared': fileURLToPath(
+                new URL('./resources/shared', import.meta.url),
+            ),
+            '@admin': fileURLToPath(
+                new URL('./resources/admin', import.meta.url),
+            ),
+        },
+    },
     plugins: [
         tailwindcss(),
         laravel({
-            input: ['resources/js/app.ts', 'resources/css/app.css'],
+            input: [
+                'resources/js/app.ts',
+                'resources/css/app.css',
+                'resources/admin/admin.ts',
+            ],
             refresh: true,
         }),
         vue({
@@ -27,6 +42,10 @@ export default defineConfig({
         }),
         VitePWA({
             registerType: 'autoUpdate',
+            workbox: {
+                // The admin panel is a separate, server-gated page.
+                navigateFallbackDenylist: [/^\/admin/],
+            },
             includeAssets: ['robots.txt'],
             manifest: {
                 name: 'Reisetagebuch',

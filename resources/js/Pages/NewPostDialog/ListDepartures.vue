@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { api } from '@/api';
-import Loading from '@/Components/Loading.vue';
-import { useTitle } from '@/composables/useTitle';
+import Loading from '@shared/Components/Loading.vue';
+import { useTitle } from '@shared/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import DeparturesFilter from '@/Pages/NewPostDialog/Partials/DeparturesFilter.vue';
 import DeparturesListEntry from '@/Pages/NewPostDialog/Partials/DeparturesListEntry.vue';

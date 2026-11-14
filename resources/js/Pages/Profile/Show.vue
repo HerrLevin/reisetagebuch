@@ -2,7 +2,7 @@
 import { api } from '@/api';
 import Post from '@/Components/Post/Post.vue';
 import PostSkeleton from '@/Components/Post/PostSkeleton.vue';
-import { useTitle } from '@/composables/useTitle';
+import { useTitle } from '@shared/composables/useTitle';
 import ProfileWrapper from '@/Pages/Profile/ProfileWrapper.vue';
 import { ref, watch, watchEffect } from 'vue';
 import { useI18n } from 'vue-i18n';

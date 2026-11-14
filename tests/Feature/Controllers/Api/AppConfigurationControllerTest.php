@@ -31,4 +31,11 @@ class AppConfigurationControllerTest extends TestCase
             'environment' => 'local',
         ]);
     }
+
+    public function test_index_reports_horizon_feature_flag(): void
+    {
+        $this->getJson(route('app.configuration'))
+            ->assertOk()
+            ->assertJsonFragment(['name' => 'horizon', 'enabled' => true]);
+    }
 }

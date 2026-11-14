@@ -13,8 +13,17 @@
         "skipLibCheck": true,
         "paths": {
             "@/*": ["./resources/js/*"],
+            "@shared/*": ["./resources/shared/*"],
+            "@admin/*": ["./resources/admin/*"],
             "ziggy-js": ["./vendor/tightenco/ziggy"]
         }
     },
-    "include": ["resources/js/**/*.ts", "resources/js/**/*.vue"]
+    "include": [
+        "resources/js/**/*.ts",
+        "resources/js/**/*.vue",
+        "resources/shared/**/*.ts",
+        "resources/shared/**/*.vue",
+        "resources/admin/**/*.ts",
+        "resources/admin/**/*.vue"
+    ]
 }

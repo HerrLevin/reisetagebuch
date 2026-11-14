@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { api } from '@/api';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
+import { api } from '@admin/api';
+import PageHeader from '@admin/Components/PageHeader.vue';
+import InputError from '@shared/Components/InputError.vue';
+import InputLabel from '@shared/Components/InputLabel.vue';
 import { onMounted, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { PrivacyPolicyDto } from '../../../../types/Api.gen';
+import type { PrivacyPolicyDto } from '../../types/Api.gen';
 
 const { t } = useI18n();
 
@@ -87,17 +88,14 @@ function formSubmit() {
 </script>
 
 <template>
-    <section>
+    <PageHeader
+        :title="t('settings.privacyPolicy.title')"
+        :description="t('settings.privacyPolicy.description')"
+    />
+
+    <section class="card bg-base-100 max-w-3xl p-6 shadow">
         <header>
-            <h2 class="text-lg font-medium">
-                {{ t('settings.privacyPolicy.title') }}
-            </h2>
-
-            <p class="mt-1 text-sm opacity-65">
-                {{ t('settings.privacyPolicy.description') }}
-            </p>
-
-            <p class="mt-2 text-sm opacity-65">
+            <p class="text-sm opacity-65">
                 {{
                     currentPolicy
                         ? t('settings.privacyPolicy.currentVersion', {

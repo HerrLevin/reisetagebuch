@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { api } from '@/api';
 import RemoteFollowButton from '@/Pages/Profile/Partials/RemoteFollowButton.vue';
-import { useTitle } from '@/composables/useTitle';
+import { useTitle } from '@shared/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import UserListCard from '@/Pages/Posts/Partials/UserListCard.vue';
 import { Search } from 'lucide-vue-next';

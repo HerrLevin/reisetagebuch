@@ -580,5 +580,35 @@
         "overwrite_confirm": "Für diesen oder einen späteren Halt ist bereits eine Zeit protokolliert. Überschreiben?",
         "log_stopovers": "Zwischenhalte protokollieren",
         "edit_stop_times_title": "Zeiten für {name} bearbeiten"
+    },
+    "admin": {
+        "title": "Adminbereich",
+        "dashboard": "Übersicht",
+        "back_to_app": "Zurück zur App",
+        "open_menu": "Menü öffnen",
+        "theme": {
+            "label": "Design",
+            "system": "System",
+            "light": "Hell",
+            "dark": "Dunkel"
+        },
+        "table": {
+            "empty": "Keine Einträge",
+            "sort_by": "Nach {column} sortieren"
+        },
+        "stats": {
+            "users": "Nutzer:innen",
+            "active_users_month": "im letzten Monat aktiv",
+            "posts": "Posts",
+            "posts_month": "im letzten Monat",
+            "invites": "Einladungen",
+            "federated_servers": "Server",
+            "federated_servers_month": "im letzten Monat gesehen",
+            "remote_followers": "Remote-Follower:innen",
+            "remote_posts": "Remote-Posts",
+            "remote_posts_month": "im letzten Monat empfangen",
+            "error": "Statistiken konnten nicht geladen werden"
+        },
+        "tools": "Werkzeuge"
     }
 }

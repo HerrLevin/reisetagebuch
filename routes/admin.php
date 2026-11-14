@@ -1,6 +1,8 @@
 <?php
 
+use App\Enums\Scopes\AdminReadScope;
 use App\Enums\Scopes\AdminWriteScope;
+use App\Http\Controllers\Api\AdminStatisticsController;
 use App\Http\Controllers\Api\ImprintController;
 use App\Http\Controllers\Api\PrivacyPolicyController;
 use Illuminate\Support\Facades\Route;
@@ -16,4 +18,9 @@ Route::middleware('auth:api')->prefix('app')->group(function () {
             ->middleware('admin')
             ->middleware(AdminWriteScope::Settings->middleware())->name('imprint.update');
     });
+});
+
+Route::middleware(['auth:api', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('statistics', [AdminStatisticsController::class, 'show'])
+        ->middleware(AdminReadScope::Statistics->middleware())->name('statistics');
 });

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
+import ApplicationLogo from '@shared/Components/ApplicationLogo.vue';
 import LocaleChanger from '@/Components/LocaleChanger.vue';
 import { useAppConfigurationStore } from '@/stores/appConfiguration';
 import { computed } from 'vue';

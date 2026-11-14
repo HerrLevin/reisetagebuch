@@ -75,6 +75,11 @@ Route::prefix('ap')
         })->name('activity');
     });
 
+// Admin SPA (separate Vite entry, never bundled into the native app). Session auth only.
+Route::middleware(['auth', 'admin'])->get('admin/{any?}', function () {
+    return view('admin');
+})->where('any', '.*')->name('admin');
+
 // SPA catch-all — must be last
 // Do not catch requests starting with "telescope" (Laravel Telescope routes)
 Route::get('/{any}', function () {

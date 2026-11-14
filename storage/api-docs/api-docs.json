@@ -404,6 +404,41 @@
                 ]
             }
         },
+        "/admin/statistics": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get instance statistics",
+                "description": "Global statistics of this instance. Requires admin privileges.",
+                "operationId": "getAdminStatistics",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AdminStatisticsDto"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": [
+                            "admin:read:statistics"
+                        ]
+                    }
+                ]
+            }
+        },
         "/app/configuration": {
             "get": {
                 "tags": [
@@ -3877,6 +3912,75 @@
     },
     "components": {
         "schemas": {
+            "AdminStatisticsDto": {
+                "title": "Admin Statistics DTO",
+                "description": "Global statistics of this instance",
+                "required": [
+                    "users",
+                    "activeUsersMonth",
+                    "posts",
+                    "postsMonth",
+                    "invites",
+                    "federatedServers",
+                    "federatedServersMonth",
+                    "remoteFollowers",
+                    "remotePosts",
+                    "remotePostsMonth"
+                ],
+                "properties": {
+                    "users": {
+                        "description": "Number of registered users",
+                        "type": "integer",
+                        "example": 42
+                    },
+                    "activeUsersMonth": {
+                        "description": "Users updated within the last month",
+                        "type": "integer",
+                        "example": 12
+                    },
+                    "posts": {
+                        "description": "Number of posts",
+                        "type": "integer",
+                        "example": 1337
+                    },
+                    "postsMonth": {
+                        "description": "Posts created within the last month",
+                        "type": "integer",
+                        "example": 120
+                    },
+                    "invites": {
+                        "description": "Number of invites",
+                        "type": "integer",
+                        "example": 7
+                    },
+                    "federatedServers": {
+                        "description": "Number of known ActivityPub servers",
+                        "type": "integer",
+                        "example": 23
+                    },
+                    "federatedServersMonth": {
+                        "description": "ActivityPub servers seen within the last month",
+                        "type": "integer",
+                        "example": 9
+                    },
+                    "remoteFollowers": {
+                        "description": "Number of followers from other ActivityPub servers",
+                        "type": "integer",
+                        "example": 64
+                    },
+                    "remotePosts": {
+                        "description": "Number of posts received from other ActivityPub servers",
+                        "type": "integer",
+                        "example": 512
+                    },
+                    "remotePostsMonth": {
+                        "description": "Remote posts received within the last month",
+                        "type": "integer",
+                        "example": 80
+                    }
+                },
+                "type": "object"
+            },
             "AppConfigurationDto": {
                 "required": [
                     "appName",
@@ -5461,7 +5565,9 @@
                 "type": "string",
                 "enum": [
                     "registration",
-                    "invite"
+                    "invite",
+                    "horizon",
+                    "telescope"
                 ]
             },
             "TravelReason": {
@@ -6791,6 +6897,7 @@
                             "admin:read:accounts": "See all accounts on this server",
                             "admin:read:invites": "See all invites on this server",
                             "admin:read:settings": "See the server settings",
+                            "admin:read:statistics": "See the server statistics",
                             "admin:write": "Perform all administrative actions on this server",
                             "admin:write:accounts": "Manage all accounts on this server",
                             "admin:write:invites": "Manage all invites on this server",
@@ -6817,6 +6924,10 @@
         {
             "name": "ActivityPub",
             "description": "ActivityPub"
+        },
+        {
+            "name": "Admin",
+            "description": "Admin"
         },
         {
             "name": "App Configuration",

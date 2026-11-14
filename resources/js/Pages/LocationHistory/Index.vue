@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { api } from '@/api';
-import Loading from '@/Components/Loading.vue';
+import Loading from '@shared/Components/Loading.vue';
 import LocationHistoryMap from '@/Components/Maps/LocationHistoryMap.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { ArrowLeft, ArrowRight } from 'lucide-vue-next';

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { api } from '@/api';
 import CountriesMap from '@/Components/Maps/CountriesMap.vue';
-import { useTitle } from '@/composables/useTitle';
+import { useTitle } from '@shared/composables/useTitle';
 import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { UserDto } from '../../../types/Api.gen';

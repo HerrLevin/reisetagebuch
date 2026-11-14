@@ -6,6 +6,7 @@ use App\Dto\AppConfigurationDto;
 use App\Dto\FeatureFlag;
 use App\Enums\Feature;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Route;
 
 class AppConfigurationBackend extends Controller
 {
@@ -32,6 +33,17 @@ class AppConfigurationBackend extends Controller
         $featureFlags[] = new FeatureFlag(
             name: Feature::INVITE,
             enabled: config('app.invite.enabled'),
+        );
+
+        $featureFlags[] = new FeatureFlag(
+            name: Feature::HORIZON,
+            enabled: Route::has('horizon.index'),
+        );
+
+        // Telescope's routes only exist when it is enabled, see AppServiceProvider.
+        $featureFlags[] = new FeatureFlag(
+            name: Feature::TELESCOPE,
+            enabled: Route::has('telescope'),
         );
 
         return $featureFlags;

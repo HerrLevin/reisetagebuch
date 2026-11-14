@@ -1,0 +1,11 @@
+/* source(none): only scan the admin app and shared components, not the whole repo */
+@import 'tailwindcss' source(none);
+
+@source '../admin';
+@source '../shared';
+
+@plugin 'daisyui' {
+    themes:
+        light --default,
+        dark --prefersdark;
+}

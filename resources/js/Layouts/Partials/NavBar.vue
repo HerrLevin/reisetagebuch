@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
+import ApplicationLogo from '@shared/Components/ApplicationLogo.vue';
 import SideMenu from '@/Layouts/Partials/NavMenu.vue';
 import SideNav from '@/Layouts/Partials/SideNav.vue';
 import { useUserStore } from '@/stores/user';

@@ -582,5 +582,35 @@
         "overwrite_confirm": "This stop, or a later stop, already has a logged time. Overwrite it?",
         "log_stopovers": "Log Stopovers",
         "edit_stop_times_title": "Edit times for {name}"
+    },
+    "admin": {
+        "title": "Admin panel",
+        "dashboard": "Dashboard",
+        "back_to_app": "Back to app",
+        "open_menu": "Open menu",
+        "theme": {
+            "label": "Theme",
+            "system": "System",
+            "light": "Light",
+            "dark": "Dark"
+        },
+        "table": {
+            "empty": "No entries",
+            "sort_by": "Sort by {column}"
+        },
+        "stats": {
+            "users": "Users",
+            "active_users_month": "active in the last month",
+            "posts": "Posts",
+            "posts_month": "in the last month",
+            "invites": "Invites",
+            "federated_servers": "Servers",
+            "federated_servers_month": "seen in the last month",
+            "remote_followers": "Remote followers",
+            "remote_posts": "Remote posts",
+            "remote_posts_month": "received in the last month",
+            "error": "Could not load statistics"
+        },
+        "tools": "Tools"
     }
 }
