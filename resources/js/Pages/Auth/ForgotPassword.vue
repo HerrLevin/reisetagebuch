@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { api } from '@/api';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
+import InputError from '@shared/Components/InputError.vue';
+import InputLabel from '@shared/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
-import { useTitle } from '@/composables/useTitle';
+import { useTitle } from '@shared/composables/useTitle';
 import AuthLayout from '@/Layouts/AuthLayout.vue';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';

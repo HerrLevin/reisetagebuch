@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { api } from '@/api';
-import { useTitle } from '@/composables/useTitle';
+import { useTitle } from '@shared/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { getServerOrigin } from '@/Services/ServerConfig';
 import { DateTime } from 'luxon';

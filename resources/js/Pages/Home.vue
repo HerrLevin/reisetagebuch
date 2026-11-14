@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useTitle } from '@/composables/useTitle';
+import { useTitle } from '@shared/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import GlobalTimeline from '@/Pages/Home/GlobalTimeline.vue';
 import Timeline from '@/Pages/Home/Timeline.vue';

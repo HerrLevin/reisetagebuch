@@ -53,6 +53,7 @@
     "auth.scopes.admin:read:accounts": "Alle Accounts dieses Servers sehen",
     "auth.scopes.admin:read:invites": "Alle Einladungen dieses Servers sehen",
     "auth.scopes.admin:read:settings": "Die Servereinstellungen sehen",
+    "auth.scopes.admin:read:statistics": "Die Serverstatistiken sehen",
     "auth.scopes.admin:write:accounts": "Alle Accounts dieses Servers verwalten",
     "auth.scopes.admin:write:invites": "Alle Einladungen dieses Servers verwalten",
     "auth.scopes.admin:write:settings": "Servereinstellungen, Datenschutzerklärung und Impressum ändern"

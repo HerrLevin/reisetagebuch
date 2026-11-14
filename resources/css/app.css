@@ -6,6 +6,7 @@
    a different Vite `root` (e.g. the Capacitor build, see vite.capacitor.config.mts) */
 @source '../js';
 @source '../views';
+@source '../shared';
 
 @plugin 'daisyui' {
     themes:

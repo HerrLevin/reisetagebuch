@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { api } from '@/api';
 import LocationsMap from '@/Components/Maps/LocationsMap.vue';
-import { useTitle } from '@/composables/useTitle';
+import { useTitle } from '@shared/composables/useTitle';
 import ProfileWrapper from '@/Pages/Profile/ProfileWrapper.vue';
 import { PropType, ref, watch, watchEffect } from 'vue';
 import { useI18n } from 'vue-i18n';

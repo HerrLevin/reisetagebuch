@@ -7,7 +7,7 @@ import PostMetaInfo from '@/Components/Post/PostMetaInfo.vue';
 import PostSkeleton from '@/Components/Post/PostSkeleton.vue';
 import TransportPostStats from '@/Components/Post/TransportPostStats.vue';
 import TransportPostStopovers from '@/Components/Post/TransportPostStopovers.vue';
-import { useTitle } from '@/composables/useTitle';
+import { useTitle } from '@shared/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import CardBack from '@/Pages/Posts/Partials/CardBack.vue';
 import { getColorForPost } from '@/Services/DepartureTypeService';

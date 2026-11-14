@@ -238,9 +238,15 @@ namespace App\Models{
 
 namespace App\Models{
 /**
+ * @property string $host
+ * @property \Illuminate\Support\Carbon $first_seen_at
+ * @property \Illuminate\Support\Carbon $last_seen_at
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubServer newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubServer newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubServer query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubServer whereFirstSeenAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubServer whereHost($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityPubServer whereLastSeenAt($value)
  */
 	class ActivityPubServer extends \Eloquent {}
 }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useTitle } from '@/composables/useTitle';
+import { useTitle } from '@shared/composables/useTitle';
 import AuthLayout from '@/Layouts/AuthLayout.vue';
 import { isNative } from '@/Services/ServerConfig';
 import { startNativeLogin } from '@/Services/OAuth';

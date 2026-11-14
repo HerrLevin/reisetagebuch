@@ -70,6 +70,8 @@ export enum TravelReason {
 export enum Feature {
   Registration = "registration",
   Invite = "invite",
+  Horizon = "horizon",
+  Telescope = "telescope",
 }
 
 /** Enumeration of notification types */
@@ -88,6 +90,63 @@ export enum MotisLocationType {
   ADDRESS = "ADDRESS",
   PLACE = "PLACE",
   STOP = "STOP",
+}
+
+/**
+ * Admin Statistics DTO
+ * Global statistics of this instance
+ */
+export interface AdminStatisticsDto {
+  /**
+   * Number of registered users
+   * @example 42
+   */
+  users: number;
+  /**
+   * Users updated within the last month
+   * @example 12
+   */
+  activeUsersMonth: number;
+  /**
+   * Number of posts
+   * @example 1337
+   */
+  posts: number;
+  /**
+   * Posts created within the last month
+   * @example 120
+   */
+  postsMonth: number;
+  /**
+   * Number of invites
+   * @example 7
+   */
+  invites: number;
+  /**
+   * Number of known ActivityPub servers
+   * @example 23
+   */
+  federatedServers: number;
+  /**
+   * ActivityPub servers seen within the last month
+   * @example 9
+   */
+  federatedServersMonth: number;
+  /**
+   * Number of followers from other ActivityPub servers
+   * @example 64
+   */
+  remoteFollowers: number;
+  /**
+   * Number of posts received from other ActivityPub servers
+   * @example 512
+   */
+  remotePosts: number;
+  /**
+   * Remote posts received within the last month
+   * @example 80
+   */
+  remotePostsMonth: number;
 }
 
 export interface AppConfigurationDto {
@@ -2287,6 +2346,25 @@ export class Api<
         path: `/activitypub/posts/${postId}/likes`,
         method: "DELETE",
         secure: true,
+        ...params,
+      }),
+  };
+  admin = {
+    /**
+     * @description Global statistics of this instance. Requires admin privileges.
+     *
+     * @tags Admin
+     * @name GetAdminStatistics
+     * @summary Get instance statistics
+     * @request GET:/admin/statistics
+     * @secure
+     */
+    getAdminStatistics: (params: RequestParams = {}) =>
+      this.request<AdminStatisticsDto, void>({
+        path: `/admin/statistics`,
+        method: "GET",
+        secure: true,
+        format: "json",
         ...params,
       }),
   };

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { api } from '@/api';
-import InputLabel from '@/Components/InputLabel.vue';
+import { api } from '@admin/api';
+import PageHeader from '@admin/Components/PageHeader.vue';
+import InputLabel from '@shared/Components/InputLabel.vue';
 import { onMounted, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -41,18 +42,13 @@ function formSubmit() {
 </script>
 
 <template>
-    <section>
-        <header>
-            <h2 class="text-lg font-medium">
-                {{ t('settings.imprint.title') }}
-            </h2>
+    <PageHeader
+        :title="t('settings.imprint.title')"
+        :description="t('settings.imprint.description')"
+    />
 
-            <p class="mt-1 text-sm opacity-65">
-                {{ t('settings.imprint.description') }}
-            </p>
-        </header>
-
-        <form class="mt-6 space-y-6" @submit.prevent="formSubmit()">
+    <section class="card bg-base-100 max-w-3xl p-6 shadow">
+        <form class="space-y-6" @submit.prevent="formSubmit()">
             <div>
                 <InputLabel
                     for="imprintContent"

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { api } from '@/api';
-import Loading from '@/Components/Loading.vue';
+import Loading from '@shared/Components/Loading.vue';
 import Post from '@/Components/Post/Post.vue';
 import { ChevronsUpDown } from 'lucide-vue-next';
 import { ref } from 'vue';

@@ -9,6 +9,7 @@ import {
     Route,
     Search,
     Settings,
+    Shield,
     User,
 } from 'lucide-vue-next';
 import { computed } from 'vue';
@@ -129,6 +130,12 @@ async function logout() {
                 ></component>
                 {{ t(link.label) }}
             </RouterLink>
+        </li>
+        <li v-if="user.user?.isAdmin">
+            <!-- Separate SPA, so a full page load instead of a RouterLink -->
+            <a href="/admin">
+                <Shield class="size-5" /> {{ t('admin.title') }}
+            </a>
         </li>
         <li v-if="user.user">
             <button @click="logout()">

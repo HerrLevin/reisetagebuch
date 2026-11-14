@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { api } from '@/api';
-import InputLabel from '@/Components/InputLabel.vue';
+import InputLabel from '@shared/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';

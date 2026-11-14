@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { api } from '@/api';
-import { useTitle } from '@/composables/useTitle';
+import { useTitle } from '@shared/composables/useTitle';
 import AuthLayout from '@/Layouts/AuthLayout.vue';
 import { useAuthStore } from '@/stores/auth';
 import { useUserStore } from '@/stores/user';

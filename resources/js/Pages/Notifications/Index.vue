@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useTitle } from '@/composables/useTitle';
+import { useTitle } from '@shared/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import ActivityPubMentionNotification from '@/Pages/Notifications/Partials/ActivityPubMentionNotification.vue';
 import ActivityPubPostLikedNotification from '@/Pages/Notifications/Partials/ActivityPubPostLikedNotification.vue';
