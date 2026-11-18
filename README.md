@@ -14,6 +14,11 @@ The application is designed to be self hosted, providing users with full control
 
 It's a crossover between [Träwelling](https://github.com/traewelling/traewelling) and [Swarm](https://swarmapp.com/).
 
+## Installation
+
+Reisetagebuch runs via Docker Compose. See the [installation guide](https://docs.reisetagebu.ch/installation)
+for prerequisites, the required `.env` settings and the reverse proxy setup.
+
 ## Current Features
 - User authentication, profiles and invite-only registration
 - Check-ins into [OSM](https://openstreetmap.org)-based locations & [Transitous](https://transitous.com/)/[motis](https://github.com/motis-project/motis) vehicles
