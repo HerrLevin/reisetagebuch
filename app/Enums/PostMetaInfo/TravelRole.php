@@ -16,7 +16,7 @@ enum TravelRole: string
     case OPERATOR = 'operator';
     case CATERING = 'catering';
 
-    public function getTraewellingIdentifier(): ?string
+    public function getTraewellingIdentifier(): string
     {
         return match ($this) {
             self::DEADHEAD => 'Gf',

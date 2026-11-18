@@ -57,7 +57,7 @@ class RerouteStopsController extends Controller
     public function rerouteStops(TripDto|TransportTrip $tripDto, array $stops): void
     {
         $leg = $tripDto instanceof TripDto ? $this->findLegForStops($tripDto, $stops) : null;
-        $mode = $tripDto instanceof TripDto ? ($leg?->mode ?? $tripDto->legs[0]?->mode) : $tripDto->mode;
+        $mode = $tripDto instanceof TripDto ? ($leg->mode ?? $tripDto->legs[0]?->mode) : $tripDto->mode;
         $legGeometrySegments = $leg ? $this->splitLegGeometry($leg, $stops) : [];
 
         foreach ($stops as $key => $stop) {

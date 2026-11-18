@@ -59,7 +59,7 @@ class BrouterRequestService
      * @throws BrouterProfileCreationFailed
      * @throws GuzzleException
      */
-    private function getTempProfile(): ?string
+    private function getTempProfile(): string
     {
         if (isset($this->tempProfile)) {
             return $this->tempProfile;

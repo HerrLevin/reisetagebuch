@@ -737,6 +737,7 @@ class ActivityPubControllerTest extends TestCase
         $this->inboxPost('/ap/inbox', $activity)->assertStatus(202);
 
         $this->assertDatabaseHas('activity_pub_actors', ['actor_uri' => $remoteActorId]);
+        $this->assertDatabaseHas('activity_pub_inbox_items', ['activity_id' => $activity['id'], 'actor_id' => $remoteActorId]);
     }
 
     public function test_announce_of_unknown_post_is_ignored(): void
@@ -967,6 +968,7 @@ class ActivityPubControllerTest extends TestCase
             'followed_user_id' => $user->id,
         ]);
         Http::assertSent(fn ($request) => $request->method() === 'POST' && $request['type'] === 'Accept');
+        $this->assertDatabaseHas('activity_pub_inbox_items', ['activity_id' => 'https://remote.example/activities/1', 'actor_id' => $remoteActorId]);
     }
 
     public function test_inbox_follow_is_idempotent_and_does_not_create_duplicate(): void

@@ -123,7 +123,7 @@ class CalculateTransportStatsController extends Controller
             $stops->pop();
             $distance = 0;
             foreach ($stops as $stop) {
-                $distance += $stop->routeSegment?->distance ?? 0;
+                $distance += $stop->routeSegment->distance ?? 0;
             }
             Log::debug('Calculated distance for transport post', ['post_id' => $post->id, 'distance' => $distance]);
 
@@ -151,7 +151,7 @@ class CalculateTransportStatsController extends Controller
         $arrival = $this->arrival($post);
         $departure = $this->departure($post);
 
-        return (int) abs($arrival->diffInSeconds($departure)) ?? 0;
+        return (int) abs($arrival->diffInSeconds($departure));
     }
 
     private function arrival(Post $post): Carbon
