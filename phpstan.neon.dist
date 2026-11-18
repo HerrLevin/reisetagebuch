@@ -3,7 +3,7 @@ includes:
 parameters:
     paths:
         - app
-    level: 2
+    level: 3
     parseModelCastsMethod: true
     stubFiles:
         - phpstan.stub

@@ -32,13 +32,15 @@ class FilteredPostPaginationDto extends PostPaginationDto
 {
     /**
      * @param  string[]  $availableTags
-     * @param  LocationPost[]|BasePost[]|TransportPost[]|Collection  $items
+     * @param  BasePost[]|Collection<int, BasePost>  $items
      */
     public function __construct(
-        public int $perPage,
-        public ?string $nextCursor,
-        public ?string $previousCursor,
-        public array|Collection $items,
+        int $perPage,
+        ?string $nextCursor,
+        ?string $previousCursor,
+        array|Collection $items,
         public array $availableTags,
-    ) {}
+    ) {
+        parent::__construct($perPage, $nextCursor, $previousCursor, $items);
+    }
 }

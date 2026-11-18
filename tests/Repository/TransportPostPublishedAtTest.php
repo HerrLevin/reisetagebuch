@@ -10,6 +10,8 @@ use App\Models\TransportTripStop;
 use App\Models\User;
 use App\Repositories\PostRepository;
 use Carbon\Carbon;
+use Clickbar\Magellan\Data\Geometries\LineString;
+use Clickbar\Magellan\Data\Geometries\Point;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -157,5 +159,34 @@ class TransportPostPublishedAtTest extends TestCase
 
         $updated = TransportPost::where('post_id', $post->id)->firstOrFail();
         $this->assertSame('2026-01-01T09:50:00+00:00', Carbon::parse($updated->post->published_at)->toIso8601String());
+    }
+
+    public function test_update_transport_times_keeps_user_geometry_in_result(): void
+    {
+        $trip = TransportTrip::factory()->create();
+        $originStop = TransportTripStop::factory()->create(['transport_trip_id' => $trip->id, 'stop_sequence' => 0]);
+        $destinationStop = TransportTripStop::factory()->create(['transport_trip_id' => $trip->id, 'stop_sequence' => 1]);
+
+        $repo = new PostRepository;
+        $post = $repo->storeTransport(
+            user: User::factory()->create(),
+            transportTrip: $trip,
+            originStop: $originStop,
+            destinationStop: $destinationStop,
+            visibility: Visibility::PUBLIC,
+        );
+        TransportPost::where('post_id', $post->id)->update([
+            'user_geometry' => LineString::make([Point::makeGeodetic(52.0, 13.0), Point::makeGeodetic(52.1, 13.1)]),
+        ]);
+
+        $updated = $repo->updateTransportTimes(
+            transportPost: $post,
+            manualDepartureTime: '2026-01-01T11:15:00Z',
+            updateDeparture: true,
+            manualArrivalTime: null,
+            updateArrival: false,
+        );
+
+        $this->assertNotNull($updated->userGeometry);
     }
 }

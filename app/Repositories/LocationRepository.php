@@ -216,7 +216,7 @@ class LocationRepository
 
     /**
      * @param  OverpassLocation[]  $locations
-     * @return SupportCollection<string, object{type: string, identifier: string, location_id: string}>
+     * @return SupportCollection<string, \stdClass>
      */
     private function lookupExistingOsmLocations(array $locations): SupportCollection
     {
@@ -373,6 +373,7 @@ class LocationRepository
         return $requestLocation;
     }
 
+    /** @return Builder<RequestLocation> */
     private function recentRequestLocationQuery(Point $position, int $radius): Builder
     {
         return RequestLocation::select()

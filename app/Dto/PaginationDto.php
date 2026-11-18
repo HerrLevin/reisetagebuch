@@ -7,6 +7,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use OpenApi\Attributes as OA;
 
+/** @template T */
 #[OA\Schema(
     schema: 'PaginationDto',
     description: 'A generic pagination DTO',
@@ -36,9 +37,7 @@ abstract class PaginationDto implements Arrayable
     use JsonResponseObject;
 
     /**
-     * @template T
-     *
-     * @param  T[]|Collection  $items
+     * @param  T[]|Collection<int, T>  $items
      */
     public function __construct(
         public int $perPage,

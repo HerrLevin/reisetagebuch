@@ -21,10 +21,10 @@ class GeocodeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'query' => 'required', 'string', 'max:255',
-            'provider' => 'nullable', 'string', 'in:motis,airport',
-            'latitude' => 'nullable', 'numeric',
-            'longitude' => 'nullable', 'numeric',
+            'query' => ['required', 'string', 'max:255'],
+            'provider' => ['nullable', 'string', 'in:motis,airport'],
+            'latitude' => ['nullable', 'numeric'],
+            'longitude' => ['nullable', 'numeric'],
         ];
     }
 }

@@ -184,7 +184,8 @@ class TransportPost extends BasePost
             return (string) round($delay / 60);
         }
 
-        return $delay;
+        // on time (or unknown): nothing to show
+        return null;
     }
 
     private function formatTime(?Carbon $time, ?string $delay): ?string

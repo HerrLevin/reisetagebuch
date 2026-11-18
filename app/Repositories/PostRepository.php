@@ -71,7 +71,7 @@ class PostRepository
         array $hashTagIds = [],
         TravelReason $travelReason = TravelReason::LEISURE,
         ?Carbon $visitedAt = null,
-    ): BasePost|LocationPost|TransportPost {
+    ): LocationPost {
         try {
             DB::beginTransaction();
 
@@ -105,7 +105,7 @@ class PostRepository
             throw $e;
         }
 
-        return $this->postHydrator->modelToDto($post);
+        return $this->postHydrator->toLocationPost($post);
     }
 
     public function storeText(
@@ -192,7 +192,7 @@ class PostRepository
         try {
             DB::beginTransaction();
             $post = Post::where('id', $locationPost->id)->firstOrFail();
-            $post->published_at = ($visitedAt ?? $post->created_at ?? Carbon::now())->clone()->subMinutes(10)->toIso8601ZuluString();
+            $post->published_at = ($visitedAt ?? $post->created_at ?? Carbon::now())->clone()->subMinutes(10)->utc();
             $post->locationPost()->update([
                 'visited_at' => $visitedAt?->toIso8601ZuluString(),
             ]);
@@ -204,7 +204,7 @@ class PostRepository
             throw $e;
         }
 
-        return $this->postHydrator->modelToDto($post, true);
+        return $this->postHydrator->toLocationPost($post);
     }
 
     public function updateTransportPost(TransportPost $transportPost, string $stopId, TravelReason $travelReason): TransportPost
@@ -245,7 +245,7 @@ class PostRepository
             throw $e;
         }
 
-        return $this->postHydrator->modelToDto($post, true);
+        return $this->postHydrator->toTransportPost($post, true);
     }
 
     public function storeTransport(
@@ -260,7 +260,7 @@ class PostRepository
         array $vehicleIds = [],
         ?string $metaTripId = null,
         ?TravelRole $travelRole = null
-    ): BasePost|LocationPost|TransportPost {
+    ): TransportPost {
         try {
             $publishedAt = $this->resolveTransportPublishedAt($originStop);
 
@@ -298,7 +298,7 @@ class PostRepository
             throw $e;
         }
 
-        return $this->postHydrator->modelToDto($post, true);
+        return $this->postHydrator->toTransportPost($post, true);
     }
 
     private function resolveTransportPublishedAt(TransportTripStop $originStop, ?Carbon $manualDeparture = null): Carbon
@@ -764,7 +764,7 @@ class PostRepository
             throw $e;
         }
 
-        return $this->postHydrator->modelToDto($post, true);
+        return $this->postHydrator->toTransportPost($post, true);
     }
 
     public function delete(BasePost $post): void
