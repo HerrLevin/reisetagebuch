@@ -72,10 +72,10 @@ class LocationController extends Controller
         $point = Point::makeGeodetic($request->latitude, $request->longitude);
         if ($this->canStoreHistory($request)) {
             $this->locationController->createTimestampedUserWaypoint($request->user()->id, $point);
-            abort('204');
+            abort(204);
         }
 
-        abort('406');
+        abort(406);
     }
 
     #[OA\Get(
@@ -111,7 +111,7 @@ class LocationController extends Controller
             decaySeconds: 300,
         );
 
-        abort('204');
+        abort(204);
     }
 
     #[OA\Get(

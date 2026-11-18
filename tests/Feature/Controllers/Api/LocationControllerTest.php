@@ -35,8 +35,12 @@ class LocationControllerTest extends TestCase
             return (object) ['id' => 1]; // Mock user ID
         });
 
-        $this->expectException(HttpException::class);
-        $locationController->prefetch($request);
+        try {
+            $locationController->prefetch($request);
+            $this->fail('prefetch() should abort with 204');
+        } catch (HttpException $e) {
+            $this->assertSame(204, $e->getStatusCode());
+        }
 
         Queue::assertPushed(function (PrefetchJob $job) {
             return $job->point->getLatitude() === 48.8566 && $job->point->getLongitude() === 2.3522;

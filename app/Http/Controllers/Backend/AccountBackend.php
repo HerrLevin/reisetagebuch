@@ -49,7 +49,7 @@ class AccountBackend extends Controller
 
             return true;
         } catch (Throwable $e) {
-            Log::error($e);
+            Log::error($e->getMessage(), ['exception' => $e]);
 
             return false;
         }

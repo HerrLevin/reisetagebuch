@@ -59,6 +59,12 @@ class PostVisibilityPolicy
      * Constrains $query to a followed user's posts visible in $viewer's personal
      * following-feed.
      */
+    /**
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  Builder<TModel>  $query
+     * @return Builder<TModel>
+     */
     public function scopeListableFromFollowing(Builder $query, User $viewer): Builder
     {
         return $query->whereIn('visibility', $this->listableVisibilities($viewer));

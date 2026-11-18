@@ -33,6 +33,7 @@ class LocationRepository
         $this->osmNameService = $osmNameService;
     }
 
+    /** @return Collection<int, LocationPost> */
     public function getLocationsForUser(string $userId, Carbon $fromDate, Carbon $untilDate): Collection
     {
         return LocationPost::join('posts', 'posts.id', '=', 'location_posts.post_id')
@@ -44,6 +45,7 @@ class LocationRepository
             ->get();
     }
 
+    /** @return Collection<int, TimestampedUserWaypoint> */
     public function getTimestampedUserWaypoints(string $userId, Carbon $fromDate, Carbon $untilDate): Collection
     {
         $query = TimestampedUserWaypoint::where('user_id', $userId)
@@ -344,6 +346,7 @@ class LocationRepository
             ->get();
     }
 
+    /** @return Collection<int, Location> */
     public function findAirportsByName(string $name, ?Point $locationBias = null): Collection
     {
         $locations = Location::where('type', 'airport')

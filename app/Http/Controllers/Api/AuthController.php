@@ -220,7 +220,8 @@ class AuthController extends Controller
         }
 
         if ($user->markEmailAsVerified()) {
-            event(new Verified($user));
+            // email verification is optional, so User intentionally does not implement MustVerifyEmail
+            event(new Verified($user)); // @phpstan-ignore argument.type
         }
 
         return response()->json(['status' => 'Email verified successfully.']);

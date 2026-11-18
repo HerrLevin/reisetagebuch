@@ -328,6 +328,7 @@ class PostRepository
             ->withCount('activityPubLikes');
     }
 
+    /** @return Builder<Post> */
     private function timelineQueryForUser(User $user): Builder
     {
         return $this->basePostQuery()
@@ -729,10 +730,10 @@ class PostRepository
             $post = Post::where('id', $transportPost->id)->with('transportPost.originStop')->firstOrFail();
 
             if ($updateDeparture) {
-                $post->transportPost->manual_departure = $manualDepartureTime ? Carbon::parse($manualDepartureTime)->toIso8601ZuluString() : null;
+                $post->transportPost->manual_departure = $manualDepartureTime ? Carbon::parse($manualDepartureTime)->utc() : null;
             }
             if ($updateArrival) {
-                $post->transportPost->manual_arrival = $manualArrivalTime ? Carbon::parse($manualArrivalTime)->toIso8601ZuluString() : null;
+                $post->transportPost->manual_arrival = $manualArrivalTime ? Carbon::parse($manualArrivalTime)->utc() : null;
             }
 
             // check that manual arrival is after manual departure

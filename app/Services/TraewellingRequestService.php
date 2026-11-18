@@ -145,7 +145,7 @@ class TraewellingRequestService
         }
     }
 
-    public function updateOrCreateTag(bool $tagExists, int $traewellingPostId, string $userId, string $key, string $value, int $visibility = 0): void
+    public function updateOrCreateTag(bool $tagExists, string $traewellingPostId, string $userId, string $key, string $value, int $visibility = 0): void
     {
         if ($tagExists) {
             $this->updateTag($traewellingPostId, $userId, $key, $value, $visibility);
@@ -159,7 +159,7 @@ class TraewellingRequestService
         }
     }
 
-    public function deletePostTag(int $traewellingPostId, string $userId, string $key): void
+    public function deletePostTag(string $traewellingPostId, string $userId, string $key): void
     {
         $this->getAccessToken($userId);
         $client = $this->getClient();
@@ -174,7 +174,7 @@ class TraewellingRequestService
     /**
      * @throws ConflictHttpException
      */
-    public function createTag(int $traewellingPostId, string $userId, string $key, string $value, int $visibility = 0): void
+    public function createTag(string $traewellingPostId, string $userId, string $key, string $value, int $visibility = 0): void
     {
         $this->getAccessToken($userId);
         $client = $this->getClient();
@@ -193,7 +193,7 @@ class TraewellingRequestService
         }
     }
 
-    public function updateTag(int $traewellingPostId, string $userId, string $key, string $value, int $visibility = 0): void
+    public function updateTag(string $traewellingPostId, string $userId, string $key, string $value, int $visibility = 0): void
     {
         $this->getAccessToken($userId);
         $client = $this->getClient();
@@ -212,7 +212,7 @@ class TraewellingRequestService
         }
     }
 
-    public function updatePost(int $traewellingPostId, string $userId, array $data): void
+    public function updatePost(string $traewellingPostId, string $userId, array $data): void
     {
         $this->getAccessToken($userId);
         $client = $this->getClient();

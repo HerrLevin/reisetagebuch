@@ -11,12 +11,11 @@ use App\Models\Invite;
 use App\Models\User;
 use App\Repositories\PrivacyPolicyRepository;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Laravel\Passport\Guards\TokenGuard;
 use Throwable;
 
 class AuthBackend extends Controller
@@ -26,7 +25,7 @@ class AuthBackend extends Controller
         private readonly UrlGenerator $urlGenerator
     ) {}
 
-    public function getAuthenticatedUser(StatefulGuard|TokenGuard|User $guardOrUser)
+    public function getAuthenticatedUser(Guard|User $guardOrUser)
     {
         $user = $guardOrUser instanceof User ? $guardOrUser : $guardOrUser->user();
 

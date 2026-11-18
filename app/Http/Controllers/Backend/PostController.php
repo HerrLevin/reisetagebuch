@@ -42,7 +42,6 @@ use App\Repositories\PostRepository;
 use App\Repositories\TransportTripRepository;
 use App\Repositories\UserStatisticsRepository;
 use App\Services\GpxParserService;
-use Auth;
 use Carbon\Carbon;
 use Clickbar\Magellan\Data\Geometries\LineString;
 use Clickbar\Magellan\IO\Parser\Geojson\GeojsonParser;
@@ -238,7 +237,7 @@ class PostController extends Controller
      */
     public function updatePost(string $postId, BasePostRequest $request, User $visitingUser): BasePost|LocationPost|TransportPost
     {
-        $post = $this->postRepository->getById($postId, Auth::user());
+        $post = $this->postRepository->getById($postId, $visitingUser);
         if ($visitingUser->cannot('update', $post)) {
             throw new AuthorizationException('You do not have permission to update this post.');
         }
@@ -442,7 +441,7 @@ class PostController extends Controller
      */
     private function resolveEditableTransportPost(string $postId, User $user): TransportPost
     {
-        $post = $this->postRepository->getById($postId, Auth::user());
+        $post = $this->postRepository->getById($postId, $user);
         if ($user->cannot('update', $post)) {
             throw new AuthorizationException('You do not have permission to update this post.');
         }
@@ -459,7 +458,7 @@ class PostController extends Controller
      */
     public function updateTransportPostExit(string $postId, TransportPostExitUpdateRequest $request, User $user): TransportPost
     {
-        $post = $this->postRepository->getById($postId, Auth::user());
+        $post = $this->postRepository->getById($postId, $user);
         if ($user->cannot('update', $post)) {
             throw new AuthorizationException('You do not have permission to update this post.');
         }
@@ -636,7 +635,7 @@ class PostController extends Controller
         }
 
         $traewellingId = $post->metaInfos->where('key', MetaInfoKey::TRAEWELLING_TRIP_ID)->first()?->value;
-        $postResource = $this->postRepository->getById($postId, $user);
+        $postResource = $this->getTransportPostById($postId, $user);
 
         if ($traewellingId) {
             TraewellingEditPostJob::dispatch($postResource);

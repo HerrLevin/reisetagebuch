@@ -24,6 +24,7 @@ use Clickbar\Magellan\Data\Geometries\Point;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Client\ConnectionException;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\Exception;
 use Queue;
 use Tests\TestCase;
@@ -206,10 +207,20 @@ class LocationControllerTest extends TestCase
         $this->assertNull($result);
     }
 
+    public static function stopoverDelayProvider(): array
+    {
+        return [
+            // [arrivalDelay, departureDelay] per stop; first stop has no scheduled arrival, last no scheduled departure
+            'scheduled only' => [false, [[null, null], [null, null]]],
+            'realtime' => [true, [[null, 120], [300, null]]],
+        ];
+    }
+
     /**
      * @throws Exception
      */
-    public function test_stopovers(): void
+    #[DataProvider('stopoverDelayProvider')]
+    public function test_stopovers(bool $realTime, array $expectedDelays): void
     {
         Queue::fake([
             RerouteStops::class,
@@ -222,10 +233,14 @@ class LocationControllerTest extends TestCase
             ->setMode('bus')
             ->setTripId($tripId)
             ->setRouteShortName('Route 42')
-            ->setFrom($this->createStopPlaceDto('fromStopId', 'From Stop', 48.0, 2.0, $arrivalTime, $departureTime))
+            ->setFrom($this->createStopPlaceDto('fromStopId', 'From Stop', 48.0, 2.0, $arrivalTime, $departureTime)
+                ->setScheduledArrival(null)
+                ->setScheduledDeparture($departureTime->copy()->subSeconds(120)))
             ->setIntermediateStops([])
-            ->setRealTime(false)
-            ->setTo($this->createStopPlaceDto('toStopId', 'To Stop', 49.0, 3.0, $arrivalTime, $departureTime));
+            ->setRealTime($realTime)
+            ->setTo($this->createStopPlaceDto('toStopId', 'To Stop', 49.0, 3.0, $arrivalTime, $departureTime)
+                ->setScheduledArrival($arrivalTime->copy()->subSeconds(300))
+                ->setScheduledDeparture(null));
 
         $apiTrip = new TripDto()->setLegs([$leg]);
 
@@ -296,9 +311,14 @@ class LocationControllerTest extends TestCase
             ->willReturnOnConsecutiveCalls($fromLocation, $toLocation);
 
         // Add stops to trip
+        $delays = [];
         $this->transportTripRepository->expects($this->exactly(2))
             ->method('addStopToTrip')
-            ->willReturnOnConsecutiveCalls($fromStop, $toStop);
+            ->willReturnCallback(function (...$args) use (&$delays, $fromStop, $toStop) {
+                $delays[] = [$args[5], $args[6]];
+
+                return count($delays) === 1 ? $fromStop : $toStop;
+            });
 
         // TripDtoHydrator used in createStopovers
         $this->tripDtoHydrator->expects($this->exactly(2))
@@ -318,6 +338,7 @@ class LocationControllerTest extends TestCase
         $this->assertNotNull($result->legs[0]->from);
         $this->assertNotNull($result->legs[0]->to);
 
+        $this->assertSame($expectedDelays, $delays);
         Queue::assertPushed(RerouteStops::class);
     }
 }
