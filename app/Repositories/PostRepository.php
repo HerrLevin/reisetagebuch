@@ -27,7 +27,6 @@ use Clickbar\Magellan\Data\Geometries\LineString;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use JetBrains\PhpStorm\ArrayShape;
 use Throwable;
 
 class PostRepository
@@ -912,7 +911,7 @@ class PostRepository
             ->sum();
     }
 
-    #[ArrayShape(['total' => 'int', 'transport' => 'int', 'location' => 'int', 'text' => 'int'])]
+    /** @return array{total: int, transport: int, location: int, text: int} */
     public function getPostCountsForUser(string $userId): array
     {
         $totalPosts = Post::where('user_id', $userId)->count();

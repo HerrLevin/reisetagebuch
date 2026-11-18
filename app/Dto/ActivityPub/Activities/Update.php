@@ -4,8 +4,6 @@ namespace App\Dto\ActivityPub\Activities;
 
 class Update extends BaseActivity
 {
-    public readonly string $type;
-
     public string $actor;
 
     public array $to;
@@ -14,6 +12,6 @@ class Update extends BaseActivity
 
     public function __construct()
     {
-        $this->type = 'Update';
+        parent::__construct('Update');
     }
 }

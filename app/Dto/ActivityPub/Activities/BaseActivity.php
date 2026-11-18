@@ -19,4 +19,9 @@ class BaseActivity
     public string $published;
 
     public BaseObject|array|string $object;
+
+    public function __construct(string $type)
+    {
+        $this->type = $type;
+    }
 }

@@ -7,7 +7,6 @@ namespace App\Repositories;
 use App\Http\Resources\UserDto;
 use App\Hydrators\UserHydrator;
 use App\Models\User;
-use JetBrains\PhpStorm\ArrayShape;
 
 class UserRepository
 {
@@ -99,7 +98,7 @@ class UserRepository
         return $users->map(fn (User $user) => $this->userHydrator->modelToDto($user))->all();
     }
 
-    #[ArrayShape(['followers' => 'int', 'followings' => 'int'])]
+    /** @return array{followers: int, followings: int} */
     public function getFollowCountsForUser(string $userId): array
     {
         $user = User::where('id', $userId)->first();

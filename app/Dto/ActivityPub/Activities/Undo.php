@@ -6,10 +6,8 @@ namespace App\Dto\ActivityPub\Activities;
 
 class Undo extends BaseActivity
 {
-    public readonly string $type;
-
     public function __construct()
     {
-        $this->type = 'Undo';
+        parent::__construct('Undo');
     }
 }

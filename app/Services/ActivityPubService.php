@@ -10,7 +10,6 @@ use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use JetBrains\PhpStorm\ArrayShape;
 
 class ActivityPubService
 {
@@ -18,7 +17,7 @@ class ActivityPubService
         private readonly ActivityPubUrlGuard $urlGuard,
     ) {}
 
-    #[ArrayShape(['inbox' => 'string|null', 'sharedInbox' => 'string|null'])]
+    /** @return array{inbox: ?string, sharedInbox: ?string}|null */
     public function getInbox(string $followerActorId, ?UserDto $user = null): ?array
     {
         $profile = $this->getActorProfile($followerActorId, $user);
@@ -32,15 +31,7 @@ class ActivityPubService
         ];
     }
 
-    #[ArrayShape([
-        'inbox' => 'string|null',
-        'sharedInbox' => 'string|null',
-        'preferredUsername' => 'string|null',
-        'name' => 'string|null',
-        'summary' => 'string|null',
-        'iconUrl' => 'string|null',
-        'url' => 'string|null',
-    ])]
+    /** @return array{inbox: ?string, sharedInbox: ?string, preferredUsername: ?string, name: ?string, summary: ?string, iconUrl: ?string, url: ?string}|null */
     private function getActorProfile(string $actorId, ?UserDto $user = null): ?array
     {
         $actor = null;

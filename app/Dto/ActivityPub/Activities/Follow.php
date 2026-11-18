@@ -6,10 +6,8 @@ namespace App\Dto\ActivityPub\Activities;
 
 class Follow extends BaseActivity
 {
-    public readonly string $type;
-
     public function __construct()
     {
-        $this->type = 'Follow';
+        parent::__construct('Follow');
     }
 }

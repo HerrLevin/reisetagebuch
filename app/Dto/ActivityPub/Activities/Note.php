@@ -6,8 +6,6 @@ use App\Dto\ActivityPub\Objects\BaseObject;
 
 class Note extends BaseObject
 {
-    public readonly string $type;
-
     public string $attributedTo;
 
     public string $content;
@@ -38,7 +36,7 @@ class Note extends BaseObject
 
     public function __construct()
     {
-        $this->type = 'Note';
+        parent::__construct('Note');
     }
 
     public function setContext(array|string|null $context = []): void

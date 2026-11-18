@@ -4,8 +4,6 @@ namespace App\Dto\ActivityPub\Activities;
 
 class Create extends BaseActivity
 {
-    public readonly string $type;
-
     public string $actor;
 
     public array $to;
@@ -14,6 +12,6 @@ class Create extends BaseActivity
 
     public function __construct()
     {
-        $this->type = 'Create';
+        parent::__construct('Create');
     }
 }
