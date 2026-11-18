@@ -35,6 +35,7 @@
         "barryvdh/laravel-ide-helper": "^3.5",
         "brianium/paratest": "^7.8",
         "fakerphp/faker": "^1.23",
+        "infection/infection": "^0.35.12",
         "larastan/larastan": "^3.0",
         "laravel/breeze": "^2.3",
         "laravel/pail": "^1.2.2",

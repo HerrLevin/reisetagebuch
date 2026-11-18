@@ -222,6 +222,72 @@ jobs:
         if: always()
         run: docker compose -f docker-compose.pipeline.yml down -v
 
+  infection:
+    name: Mutation Testing (changed lines)
+    runs-on: ubuntu-latest
+    # a full run takes far too long, so only mutate lines changed in the PR
+    if: github.event_name == 'pull_request'
+    needs: [install-node-dependencies, install-composer-dependencies]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.5
+          extensions: mbstring, ctype, fileinfo, json, openssl, pdo, tokenizer, xml
+          coverage: pcov
+
+      - name: Download vendor directory
+        uses: actions/download-artifact@v8
+        with:
+          name: vendor
+          path: vendor
+
+      - name: Download Vite build artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: vite-build
+          path: public/build
+
+      - name: Copy .env
+        run: cp .env.pipeline .env
+
+      - name: Directory Permissions
+        run: chmod -R 777 storage bootstrap/cache
+
+      - name: Start containers
+        run: docker compose -f docker-compose.pipeline.yml up -d
+
+      - name: Wait for database
+        run: while ! php artisan migrate --force; do sleep 5; done
+
+      - name: Generate application key
+        run: php artisan key:generate
+
+      - name: Generate passport keys
+        run: php artisan passport:keys
+
+      - name: Run Infection
+        # starting thresholds (local baseline: 85% covered MSI), raise once PRs pass reliably
+        run: php vendor/bin/infection --threads=max --git-diff-lines --git-diff-base=origin/${{ github.base_ref }} --no-progress --min-msi=70 --min-covered-msi=80
+
+      - name: Upload Infection report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: infection-report
+          path: storage/infection/infection.html
+          retention-days: 7
+
+      - name: Stop containers and remove volumes
+        if: always()
+        run: docker compose -f docker-compose.pipeline.yml down -v
+
   e2e:
     name: Cypress E2E Tests
     runs-on: ubuntu-latest
