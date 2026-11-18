@@ -38,6 +38,46 @@ class OsmNameServiceTest extends TestCase
                     'ref' => '1234',
                 ],
             ],
+            'car_sharing with ref and brand' => [
+                'expectedName' => '42 (Flinkster)',
+                'tags' => [
+                    'amenity' => 'car_sharing',
+                    'brand' => 'Flinkster',
+                    'ref' => '42',
+                ],
+            ],
+            'car_sharing prefers brand over network' => [
+                'expectedName' => '42 (Flinkster)',
+                'tags' => [
+                    'amenity' => 'car_sharing',
+                    'brand' => 'Flinkster',
+                    'network' => 'DB',
+                    'ref' => '42',
+                ],
+            ],
+            'car_sharing prefers network over operator' => [
+                'expectedName' => '42 (Flinkster)',
+                'tags' => [
+                    'amenity' => 'car_sharing',
+                    'network' => 'Flinkster',
+                    'operator' => 'DB Connect',
+                    'ref' => '42',
+                ],
+            ],
+            'car_sharing without ref' => [
+                'expectedName' => null,
+                'tags' => [
+                    'amenity' => 'car_sharing',
+                    'brand' => 'Flinkster',
+                ],
+            ],
+            'other amenity with ref' => [
+                'expectedName' => null,
+                'tags' => [
+                    'amenity' => 'stuff',
+                    'ref' => '42',
+                ],
+            ],
             'amenity without anything' => [
                 'expectedName' => null,
                 'tags' => [

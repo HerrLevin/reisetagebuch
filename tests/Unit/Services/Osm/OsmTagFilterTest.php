@@ -32,6 +32,16 @@ class OsmTagFilterTest extends TestCase
         $this->assertTrue(OsmTagFilter::matches(['amenity' => 'restaurant']));
     }
 
+    public function test_disallowed_value_does_not_stop_checking_later_filters(): void
+    {
+        $this->assertTrue(OsmTagFilter::matches(['railway' => 'rail', 'highway' => 'bus_stop']));
+    }
+
+    public function test_excluded_value_does_not_stop_checking_later_filters(): void
+    {
+        $this->assertTrue(OsmTagFilter::matches(['amenity' => 'waste_basket', 'shop' => 'bakery']));
+    }
+
     public function test_force_name_tag_requires_name(): void
     {
         $this->assertFalse(OsmTagFilter::matches(['leisure' => 'park']));
@@ -50,5 +60,12 @@ class OsmTagFilterTest extends TestCase
         $this->assertContains('shop', $keys);
         $this->assertContains('leisure', $keys);
         $this->assertContains('admin_level', $keys);
+    }
+
+    public function test_all_keys_are_unique_and_sequential(): void
+    {
+        $keys = OsmTagFilter::allKeys();
+
+        $this->assertSame(array_values(array_unique($keys)), $keys);
     }
 }
