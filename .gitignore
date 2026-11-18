@@ -28,3 +28,4 @@ docs/.vitepress/cache
 cypress/videos
 cypress/screenshots
 cypress/downloads
+/storage/infection

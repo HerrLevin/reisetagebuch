@@ -1,0 +1,17 @@
+{
+    "$schema": "vendor/infection/infection/resources/schema.json",
+    "source": {
+        "directories": ["app"]
+    },
+    "logs": {
+        "text": "storage/infection/infection.log",
+        "html": "storage/infection/infection.html"
+    },
+    "threads": "max",
+    "tmpDir": "storage/infection/tmp",
+    "mutators": {
+        "@default": true
+    },
+    "minMsi": 100,
+    "minCoveredMsi": 100
+}
