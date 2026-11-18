@@ -24,7 +24,7 @@ class MotisHydrator
             ->setName($data['name'])
             ->setLatitude((float) $data['lat'])
             ->setLongitude((float) $data['lon'])
-            ->setDistance($data['distance'] ?? $distance ?? null);
+            ->setDistance($data['distance'] ?? $distance);
     }
 
     public function hydrateStopTime(array $data): StopTimeDto
