@@ -107,6 +107,30 @@ class BasePostTest extends TestCase
         $this->assertStringContainsString('▶️ 10:00', $html);
     }
 
+    #[DataProvider('departureDelayDataProvider')]
+    public function test_transport_post_html_body_shows_departure_delay(?int $delaySeconds, string $expected): void
+    {
+        $this->mock(TimeZoneLookupService::class, function ($mock) {
+            $mock->shouldReceive('lookup')->andReturn(null);
+        });
+
+        $post = $this->makeTransportPost('');
+        $post->originStop->departureTime = '2026-01-15T10:00:00+00:00';
+        $post->originStop->departureDelay = $delaySeconds;
+
+        $this->assertStringEndsWith($expected, $post->getHtmlBody());
+    }
+
+    public static function departureDelayDataProvider(): array
+    {
+        return [
+            'unknown' => [null, '▶️ 10:00'],
+            'on time' => [0, '▶️ 10:00'],
+            'late' => [300, '▶️ 10:00 (+5 min)'],
+            'early' => [-120, '▶️ 10:00 (-2 min)'],
+        ];
+    }
+
     private function makeLocationPost(string $body): LocationPost
     {
         $post = new ReflectionClass(LocationPost::class)->newInstanceWithoutConstructor();

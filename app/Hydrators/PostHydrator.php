@@ -20,16 +20,24 @@ class PostHydrator
 
     public function modelToDto(Post $post, bool $withGeometry = false): LocationPost|TransportPost|BasePost
     {
-        $userDto = $this->userHydrator->modelToDto($post->user);
-
         if ($post->locationPost) {
-            return new LocationPost($post, $userDto);
+            return $this->toLocationPost($post);
         }
         if ($post->transportPost) {
-            return new TransportPost($post, $userDto, $withGeometry);
+            return $this->toTransportPost($post, $withGeometry);
         }
 
         // Fallback to the base post resource if no specific type is found
-        return new BasePost($post, $userDto);
+        return new BasePost($post, $this->userHydrator->modelToDto($post->user));
+    }
+
+    public function toLocationPost(Post $post): LocationPost
+    {
+        return new LocationPost($post, $this->userHydrator->modelToDto($post->user));
+    }
+
+    public function toTransportPost(Post $post, bool $withGeometry): TransportPost
+    {
+        return new TransportPost($post, $this->userHydrator->modelToDto($post->user), $withGeometry);
     }
 }

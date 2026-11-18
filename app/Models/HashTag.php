@@ -26,7 +26,7 @@ class HashTag extends Model
         return $this->belongsTo(User::class);
     }
 
-    /** @return BelongsToMany<Post, $this> */
+    /** @return BelongsToMany<Post, $this, PostsHashTagsMap> */
     public function posts(): BelongsToMany
     {
         return $this->belongsToMany(Post::class, 'posts_hash_tags_map')

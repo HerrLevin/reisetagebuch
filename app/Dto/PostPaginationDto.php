@@ -5,9 +5,9 @@ namespace App\Dto;
 use App\Http\Resources\PostTypes\BasePost;
 use App\Http\Resources\PostTypes\LocationPost;
 use App\Http\Resources\PostTypes\TransportPost;
-use Illuminate\Support\Collection;
 use OpenApi\Attributes as OA;
 
+/** @extends PaginationDto<BasePost> */
 #[OA\Schema(
     schema: 'PostPaginationDto',
     description: 'Pagination DTO specifically for posts',
@@ -27,12 +27,4 @@ use OpenApi\Attributes as OA;
         ),
     ]
 )]
-class PostPaginationDto extends PaginationDto
-{
-    /**
-     * @param  int  $perPage
-     * @param  ?string  $nextCursor
-     * @param  ?string  $previousCursor
-     * @param  LocationPost[]|BasePost[]|TransportPost[]|Collection  $items
-     */
-}
+class PostPaginationDto extends PaginationDto {}

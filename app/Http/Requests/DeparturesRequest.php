@@ -22,11 +22,11 @@ class DeparturesRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'latitude' => 'required_if:locationId,null', 'numeric',
-            'longitude' => 'required_if:locationId,null', 'numeric',
-            'identifier' => 'nullable', 'string',
-            'modes' => 'nullable', 'string',
-            'when' => 'nullable', 'date',
+            'latitude' => ['required_if:locationId,null', 'numeric'],
+            'longitude' => ['required_if:locationId,null', 'numeric'],
+            'identifier' => ['nullable', 'string'],
+            'modes' => ['nullable', 'array'],
+            'when' => ['nullable', 'date'],
         ];
     }
 }

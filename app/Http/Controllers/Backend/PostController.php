@@ -115,7 +115,7 @@ class PostController extends Controller
         $this->dispatchUpdate($post);
     }
 
-    public function storeLocation(LocationBasePostRequest $request): BasePost|LocationPost|TransportPost
+    public function storeLocation(LocationBasePostRequest $request): LocationPost
     {
         $location = $this->locationRepository->getLocationById($request->input('location'));
         $this->statisticsRepository->storeLocationPostCreation($request->user()->id);
@@ -149,7 +149,7 @@ class PostController extends Controller
         return $post;
     }
 
-    public function storeMotisTransport(TransportBasePostCreateRequest $request): BasePost|LocationPost|TransportPost
+    public function storeMotisTransport(TransportBasePostCreateRequest $request): TransportPost
     {
         $trip = $this->transportTripRepository->getTripByIdentifier(
             $request->tripId,
@@ -457,7 +457,7 @@ class PostController extends Controller
     /**
      * @throws AuthorizationException
      */
-    public function updateTransportPostExit(string $postId, TransportPostExitUpdateRequest $request, User $user): BasePost|LocationPost|TransportPost
+    public function updateTransportPostExit(string $postId, TransportPostExitUpdateRequest $request, User $user): TransportPost
     {
         $post = $this->postRepository->getById($postId, Auth::user());
         if ($user->cannot('update', $post)) {
@@ -568,7 +568,7 @@ class PostController extends Controller
         CalculateCountryStatsForPost::dispatch($post->id);
         $this->dispatchUpdate($post);
 
-        return $this->postRepository->getById($postId, $user);
+        return $this->getTransportPostById($postId, $user);
     }
 
     private function parseGeoJsonTrack(string $content): LineString
@@ -607,7 +607,17 @@ class PostController extends Controller
         CalculateCountryStatsForPost::dispatch($post->id);
         $this->dispatchUpdate($post);
 
-        return $this->postRepository->getById($postId, $user);
+        return $this->getTransportPostById($postId, $user);
+    }
+
+    private function getTransportPostById(string $postId, User $user): TransportPost
+    {
+        $post = $this->postRepository->getById($postId, $user);
+        if (! $post instanceof TransportPost) {
+            abort(422, 'Not a transport post');
+        }
+
+        return $post;
     }
 
     /**

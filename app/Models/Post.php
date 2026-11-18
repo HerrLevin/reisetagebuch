@@ -60,7 +60,7 @@ class Post extends Model
         return $this->hasMany(PostMetaInfo::class);
     }
 
-    /** @return BelongsToMany<HashTag, $this> */
+    /** @return BelongsToMany<HashTag, $this, PostsHashTagsMap> */
     public function hashTags(): BelongsToMany
     {
         return $this->belongsToMany(HashTag::class, 'posts_hash_tags_maps')

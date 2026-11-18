@@ -20,6 +20,7 @@ use Clickbar\Magellan\Data\Geometries\Point;
 use Clickbar\Magellan\Data\Geometries\PointCollection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use InvalidArgumentException;
 use Location\Coordinate;
 use Location\Distance\Vincenty;
 use Location\Polyline;
@@ -241,9 +242,12 @@ class TransportTripRepository
         return $segment;
     }
 
-    private function ensure3d(Geometry $geometry): Geometry
+    private function ensure3d(Geometry $geometry): LineString
     {
-        if (! $geometry instanceof PointCollection || $geometry->getDimension()->hasZDimension()) {
+        if (! $geometry instanceof PointCollection) {
+            throw new InvalidArgumentException('Route segment geometry must consist of points, got '.$geometry::class);
+        }
+        if ($geometry instanceof LineString && $geometry->getDimension()->hasZDimension()) {
             return $geometry;
         }
 
@@ -301,7 +305,7 @@ class TransportTripRepository
     }
 
     /**
-     * @return Collection<TransportTripStop>
+     * @return Collection<int, TransportTripStop>
      */
     public function getStopsBetween(
         string $transportTripId,
@@ -318,6 +322,7 @@ class TransportTripRepository
         return $query->get();
     }
 
+    /** @return Builder<TransportTripStop> */
     private function getStopsForTripQuery(string $tripId): Builder
     {
         return TransportTripStop::where('transport_trip_id', $tripId)
