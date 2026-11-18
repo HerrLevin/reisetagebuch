@@ -141,7 +141,7 @@ jobs:
           path: vendor
 
       - name: Run Laravel Pint
-        run: php vendor/bin/pint --test
+        run: php vendor/bin/pint --parallel --test
 
 #  phpstan:
 #    name: PHPStan Static Analysis
