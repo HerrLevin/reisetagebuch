@@ -47,7 +47,6 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
         gd \
         intl \
         pcntl \
-        pdo_mysql \
         pdo_pgsql \
         pdo_sqlite \
         zip
