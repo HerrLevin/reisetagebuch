@@ -3,6 +3,6 @@ includes:
 parameters:
     paths:
         - app
-    level: 0
+    level: 1
     bootstrapFiles:
         - bootstrap/app.php

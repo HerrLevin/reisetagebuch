@@ -116,15 +116,15 @@ class TripController extends Controller
                 $stops[] = $this->getOrCreateAndAddStopToTrip($trip, $stopover, $key);
             }
 
-            return $trip;
+            DB::commit();
         } catch (Throwable $e) {
             DB::rollBack();
             report($e);
             throw $e;
-        } finally {
-            DB::commit();
-
-            RerouteStops::dispatch($trip, $stops);
         }
+
+        RerouteStops::dispatch($trip, $stops);
+
+        return $trip;
     }
 }

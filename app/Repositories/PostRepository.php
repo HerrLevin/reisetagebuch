@@ -102,6 +102,7 @@ class PostRepository
         } catch (Throwable $e) {
             DB::rollBack();
             report($e);
+            throw $e;
         }
 
         return $this->postHydrator->modelToDto($post);
@@ -180,6 +181,7 @@ class PostRepository
         } catch (Throwable $e) {
             DB::rollBack();
             report($e);
+            throw $e;
         }
 
         return $this->postHydrator->modelToDto($post, true);
@@ -199,6 +201,7 @@ class PostRepository
         } catch (Throwable $e) {
             DB::rollBack();
             report($e);
+            throw $e;
         }
 
         return $this->postHydrator->modelToDto($post, true);
@@ -292,6 +295,7 @@ class PostRepository
         } catch (Throwable $e) {
             DB::rollBack();
             report($e);
+            throw $e;
         }
 
         return $this->postHydrator->modelToDto($post, true);
