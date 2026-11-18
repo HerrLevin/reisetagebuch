@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Notification;
 
 class NotificationRepository
 {
+    /** @return Collection<int, DatabaseNotification> */
     public function index(User $user): Collection
     {
         return $user

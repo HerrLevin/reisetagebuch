@@ -46,10 +46,7 @@ class TripController extends Controller
                 startTime: $request->departureTime,
             );
         } catch (\Throwable $e) {
-            abort(422, [
-                'success' => false,
-                'message' => 'Could not create trip: '.$e->getMessage(),
-            ]);
+            abort(422, 'Could not create trip: '.$e->getMessage());
         }
     }
 }

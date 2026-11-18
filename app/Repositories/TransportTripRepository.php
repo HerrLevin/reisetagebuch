@@ -61,7 +61,7 @@ class TransportTripRepository
             }
         }
 
-        return array_values($ids);
+        return $ids;
 
     }
 

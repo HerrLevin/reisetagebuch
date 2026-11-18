@@ -79,7 +79,7 @@ class LocationController extends Controller
         $timestampedLocations = $this->locationRepository->getTimestampedUserWaypoints($userId, $fromDate, $untilDate);
         $transportPosts = $this->locationRepository->getTransportPostLocationsForUser($userId, $fromDate, $untilDate);
 
-        $locations = $locations->merge($timestampedLocations);
+        $locations = $locations->concat($timestampedLocations);
         $routes = collect();
 
         // Sort locations by created_at in descending order
@@ -464,8 +464,8 @@ class LocationController extends Controller
                 $order,
                 $stopover->scheduledArrival,
                 $stopover->scheduledDeparture,
-                $realTime ? $stopover->scheduledArrival?->diffInSeconds($stopover->arrival) : null,
-                $realTime ? $stopover->scheduledDeparture?->diffInSeconds($stopover->departure) : null,
+                $realTime && $stopover->scheduledArrival ? (int) $stopover->scheduledArrival->diffInSeconds($stopover->arrival) : null,
+                $realTime && $stopover->scheduledDeparture ? (int) $stopover->scheduledDeparture->diffInSeconds($stopover->departure) : null,
                 $stopover->cancelled ?? false,
                 null, // todo: get route segment between stops
                 $stopover->scheduledTrack,

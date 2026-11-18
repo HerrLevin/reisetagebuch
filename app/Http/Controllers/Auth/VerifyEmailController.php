@@ -19,7 +19,8 @@ class VerifyEmailController extends Controller
         }
 
         if ($request->user()->markEmailAsVerified()) {
-            event(new Verified($request->user()));
+            // email verification is optional, so User intentionally does not implement MustVerifyEmail
+            event(new Verified($request->user())); // @phpstan-ignore argument.type
         }
 
         return redirect()->intended(route('timeline', absolute: false).'?verified=1');
