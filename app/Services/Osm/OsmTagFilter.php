@@ -115,6 +115,6 @@ class OsmTagFilter
             }
         }
 
-        return array_values(array_unique($keys));
+        return $keys;
     }
 }
