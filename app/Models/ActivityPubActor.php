@@ -34,6 +34,7 @@ class ActivityPubActor extends Model
         ];
     }
 
+    /** @return Attribute<?string, never> */
     protected function localIconUrl(): Attribute
     {
         return Attribute::get(function (): ?string {

@@ -36,16 +36,19 @@ class TransportTripStop extends Model
         'updated_at' => 'datetime',
     ];
 
+    /** @return BelongsTo<TransportTrip, $this> */
     public function transportTrip(): BelongsTo
     {
         return $this->belongsTo(TransportTrip::class, 'transport_trip_id', 'id');
     }
 
+    /** @return BelongsTo<Location, $this> */
     public function location(): BelongsTo
     {
         return $this->belongsTo(Location::class, 'location_id', 'id');
     }
 
+    /** @return BelongsTo<RouteSegment, $this> */
     public function routeSegment(): BelongsTo
     {
         return $this->belongsTo(RouteSegment::class, 'route_segment_id', 'id');

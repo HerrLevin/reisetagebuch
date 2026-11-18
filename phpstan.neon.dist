@@ -3,6 +3,9 @@ includes:
 parameters:
     paths:
         - app
-    level: 1
+    level: 2
+    parseModelCastsMethod: true
+    stubFiles:
+        - phpstan.stub
     bootstrapFiles:
         - bootstrap/app.php

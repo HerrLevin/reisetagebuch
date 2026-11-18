@@ -5,9 +5,11 @@ namespace App\Services\Socialite;
 use App\Services\VersionService;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
+use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\AbstractProvider;
 use Laravel\Socialite\Two\ProviderInterface;
 use Laravel\Socialite\Two\User;
+use LogicException;
 
 class TraewellingProvider extends AbstractProvider implements ProviderInterface
 {
@@ -16,6 +18,26 @@ class TraewellingProvider extends AbstractProvider implements ProviderInterface
     protected $scopeSeparator = ' ';
 
     private VersionService $versionService;
+
+    public static function make(): self
+    {
+        $provider = Socialite::driver('traewelling');
+        if (! $provider instanceof self) {
+            throw new LogicException('The traewelling Socialite driver must be a '.self::class);
+        }
+
+        return $provider;
+    }
+
+    public function user(): TraewellingUser
+    {
+        $user = parent::user();
+        if (! $user instanceof TraewellingUser) {
+            throw new LogicException('Traewelling users must be mapped to '.TraewellingUser::class);
+        }
+
+        return $user;
+    }
 
     public function __construct(Request $request, $clientId, $clientSecret, $redirectUrl, $guzzle = [], ?VersionService $versionService = null)
     {

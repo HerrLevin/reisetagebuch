@@ -3,11 +3,12 @@
 namespace App\Hydrators\ActivityPub;
 
 use App\Dto\ActivityPub\Activities\Create;
-use App\Dto\ActivityPub\Objects\BaseObject;
+use App\Dto\ActivityPub\Activities\Note;
+use App\Dto\ActivityPub\Objects\Person;
 
 class CreateHydrator
 {
-    public function hydrate(string $actor, BaseObject $object, bool $context = false): Create
+    public function hydrate(string $actor, Note|Person $object, bool $context = false): Create
     {
         $create = new Create;
         $create->id = $object->id.'/activity';

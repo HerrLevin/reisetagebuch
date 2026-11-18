@@ -32,16 +32,19 @@ class ActivityPubPost extends Model
         ];
     }
 
+    /** @return BelongsTo<ActivityPubActor, $this> */
     public function actor(): BelongsTo
     {
         return $this->belongsTo(ActivityPubActor::class, 'activity_pub_actor_id');
     }
 
+    /** @return HasMany<ActivityPubPostLike, $this> */
     public function likes(): HasMany
     {
         return $this->hasMany(ActivityPubPostLike::class);
     }
 
+    /** @return HasMany<ActivityPubPostLike, $this> */
     public function userLikes(): HasMany
     {
         return $this->hasMany(ActivityPubPostLike::class);

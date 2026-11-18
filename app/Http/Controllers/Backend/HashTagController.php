@@ -34,8 +34,7 @@ class HashTagController extends Controller
 
         return $this->hashTagRepository->findOrCreateHashTag(
             $request->user(),
-            $validated['value'],
-            $validated['relevance'] ?? 0
+            $validated['value']
         );
     }
 

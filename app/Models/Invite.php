@@ -27,11 +27,13 @@ class Invite extends Model
         'expires_at' => 'datetime',
     ];
 
+    /** @return BelongsTo<User, $this> */
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
+    /** @return BelongsTo<User, $this> */
     public function usedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'used_by', 'id');

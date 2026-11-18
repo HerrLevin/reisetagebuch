@@ -18,6 +18,7 @@ class UserSettings extends Model
         'hide_posts_after',
     ];
 
+    /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

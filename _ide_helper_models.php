@@ -443,6 +443,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
+ * @property-read float|null $distance only set by queries that select ST_DistanceSphere as distance
  * @property string $id
  * @property string $type
  * @property string|null $name
@@ -1057,7 +1058,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUsername($value)
  */
-	class User extends \Eloquent {}
+	class User extends \Eloquent implements \Laravel\Passport\Contracts\OAuthenticatable {}
 }
 
 namespace App\Models{

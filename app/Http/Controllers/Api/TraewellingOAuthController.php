@@ -6,10 +6,10 @@ use App\Dto\ErrorDto;
 use App\Enums\Scopes\WriteScope;
 use App\Http\Controllers\Controller;
 use App\Models\SocialAccount;
+use App\Services\Socialite\TraewellingProvider;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Laravel\Socialite\Facades\Socialite;
 use OpenApi\Attributes as OA;
 
 class TraewellingOAuthController extends Controller
@@ -43,7 +43,7 @@ class TraewellingOAuthController extends Controller
     )]
     public function redirectToProvider(): JsonResponse
     {
-        $url = Socialite::driver('traewelling')->stateless()->redirect()->getTargetUrl();
+        $url = TraewellingProvider::make()->stateless()->redirect()->getTargetUrl();
 
         return response()->json([
             'url' => $url,
@@ -86,7 +86,7 @@ class TraewellingOAuthController extends Controller
     public function handleProviderCallback()
     {
         try {
-            $user = Socialite::driver('traewelling')->stateless()->user();
+            $user = TraewellingProvider::make()->stateless()->user();
             $authUser = Auth::user();
 
             SocialAccount::updateOrCreate(

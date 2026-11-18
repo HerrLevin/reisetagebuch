@@ -13,6 +13,7 @@ use App\Models\TransportPost;
 use App\Models\TransportTrip;
 use App\Models\TransportTripStop;
 use App\Models\User;
+use App\Services\Socialite\TraewellingProvider;
 use App\Services\TraewellingRequestService;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
@@ -528,8 +529,9 @@ class CrossPostControllerTest extends TestCase
         $mockToken->token = 'new_access_token';
         $mockToken->refreshToken = 'refresh_token';
         $mockToken->expiresIn = 3600;
-        Socialite::shouldReceive('driver')->with('traewelling')->andReturnSelf();
-        Socialite::shouldReceive('refreshToken')->with('refresh_token')->andReturn($mockToken);
+        $provider = Mockery::mock(TraewellingProvider::class);
+        $provider->shouldReceive('refreshToken')->with('refresh_token')->andReturn($mockToken);
+        Socialite::shouldReceive('driver')->with('traewelling')->andReturn($provider);
 
         // Mock Guzzle Client for checkin
         $mockResponse = Mockery::mock(ResponseInterface::class);

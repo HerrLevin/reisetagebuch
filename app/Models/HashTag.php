@@ -20,11 +20,13 @@ class HashTag extends Model
         'relevance',
     ];
 
+    /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /** @return BelongsToMany<Post, $this> */
     public function posts(): BelongsToMany
     {
         return $this->belongsToMany(Post::class, 'posts_hash_tags_map')

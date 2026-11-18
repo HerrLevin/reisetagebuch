@@ -16,6 +16,7 @@ class ActivityPubLike extends Model
         'activity_id',
     ];
 
+    /** @return BelongsTo<Post, $this> */
     public function post(): BelongsTo
     {
         return $this->belongsTo(Post::class);

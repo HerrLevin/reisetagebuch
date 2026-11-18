@@ -230,7 +230,7 @@ class CrossPostController extends Controller
 
         $stationMotisIdentifier = $location->identifiers->firstWhere('origin', 'motis') ?? null;
         if ($stationMotisIdentifier !== null) {
-            $trwlStation = $this->traewellingRequestService->getTrwlStationFromIdentifier($stationMotisIdentifier, $this);
+            $trwlStation = $this->traewellingRequestService->getTrwlStationFromIdentifier($stationMotisIdentifier);
             if ($trwlStation !== null) {
                 Log::debug('Found TRWL-id from MOTIS identifier for location '.$location->name, ['identifier' => $trwlStation]);
 
@@ -241,7 +241,7 @@ class CrossPostController extends Controller
             }
         }
 
-        $trwlStation = $this->traewellingRequestService->getTrwlStationFromLocation($location->location, $this);
+        $trwlStation = $this->traewellingRequestService->getTrwlStationFromLocation($location->location);
         if ($trwlStation !== null) {
             Log::debug('Found TRWL-id from location for location '.$location->name, ['identifier' => $trwlStation]);
 

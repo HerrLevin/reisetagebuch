@@ -16,11 +16,13 @@ class ActivityPubPostLike extends Model
         'activity_id',
     ];
 
+    /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /** @return BelongsTo<ActivityPubPost, $this> */
     public function post(): BelongsTo
     {
         return $this->belongsTo(ActivityPubPost::class, 'activity_pub_post_id');

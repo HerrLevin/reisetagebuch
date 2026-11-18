@@ -23,7 +23,7 @@ class ApiExceptionRenderer
         $isHttpException = $e instanceof HttpExceptionInterface;
 
         return response()->json(
-            $this->toErrorDto($e, $isHttpException),
+            $this->toErrorDto($e),
             $isHttpException ? $e->getStatusCode() : 500,
             $isHttpException ? $e->getHeaders() : []
         );
@@ -39,9 +39,9 @@ class ApiExceptionRenderer
         return $e instanceof ValidationException || $e instanceof AuthenticationException;
     }
 
-    private function toErrorDto(Throwable $e, bool $isHttpException): ErrorDto
+    private function toErrorDto(Throwable $e): ErrorDto
     {
-        if ($isHttpException) {
+        if ($e instanceof HttpExceptionInterface) {
             $decoded = json_decode($e->getMessage(), true);
 
             $dto = is_array($decoded) && array_key_exists('message', $decoded)

@@ -16,11 +16,13 @@ class LocationPost extends Model
         'visited_at' => 'datetime',
     ];
 
+    /** @return BelongsTo<Post, $this> */
     public function post(): BelongsTo
     {
         return $this->belongsTo(Post::class);
     }
 
+    /** @return BelongsTo<Location, $this> */
     public function location(): BelongsTo
     {
         return $this->belongsTo(Location::class);
