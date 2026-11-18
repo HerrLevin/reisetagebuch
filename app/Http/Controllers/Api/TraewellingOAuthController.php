@@ -97,8 +97,8 @@ class TraewellingOAuthController extends Controller
                 [
                     'provider_user_id' => $user->getId(),
                     'access_token' => $user->token,
-                    'refresh_token' => $user->refreshToken ?? null,
-                    'token_expires_at' => isset($user->expiresIn) ? now()->addSeconds($user->expiresIn) : null,
+                    'refresh_token' => $user->refreshToken,
+                    'token_expires_at' => $user->expiresIn ? now()->addSeconds($user->expiresIn) : null,
                 ]
             );
 

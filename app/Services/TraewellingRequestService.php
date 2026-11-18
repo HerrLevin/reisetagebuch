@@ -57,7 +57,7 @@ class TraewellingRequestService
                 'token_expires_at' => now()->addSeconds($tokens->expiresIn),
             ]);
         }
-        $this->accessToken = $account?->access_token ?? '';
+        $this->accessToken = $account->access_token ?? '';
     }
 
     public function getTrwlStationFromLocation(Point $point): ?array

@@ -195,7 +195,7 @@ class TransportPost extends BasePost
         }
 
         $formattedTime = e($time->format('H:i'));
-        if ($delay !== null && $delay !== 0) {
+        if ($delay !== null) {
             $formattedTime .= " ($delay min)";
         }
 
@@ -205,7 +205,7 @@ class TransportPost extends BasePost
     public function getHtmlBody(): ?string
     {
         $parentBody = parent::getHtmlBody();
-        $emoji = $this->trip->mode?->getEmoji();
+        $emoji = $this->trip->mode->getEmoji();
         $line = e($this->trip->displayName ?? $this->trip->lineName);
         $number = $this->trip->tripShortName ? ' ('.e($this->trip->tripShortName).')' : '';
         $origin = e($this->originStop->name);

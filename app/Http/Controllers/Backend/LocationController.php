@@ -284,7 +284,7 @@ class LocationController extends Controller
         }
 
         /** @var StopPlaceDto $firstStop */
-        $firstStop = $departures->first()?->place;
+        $firstStop = $departures->first()->place;
 
         return new DeparturesDto(
             stop: $firstStop,
@@ -340,7 +340,7 @@ class LocationController extends Controller
 
         $dto = $this->transitousRequestService->getStopTimes($foreignTripId);
 
-        if (! $dto || ! $dto?->legs[0]?->realTime) {
+        if (! $dto || ! $dto->legs[0]?->realTime) {
             Log::debug('No real-time data for trip '.$foreignTripId);
 
             return;
@@ -420,7 +420,7 @@ class LocationController extends Controller
             $legDto->routeColor,
             $legDto->routeTextColor,
             null,
-            $previousTrip?->id ?? null,
+            $previousTrip->id ?? null,
             $legDto->source ?? null,
         );
 

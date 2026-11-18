@@ -54,6 +54,7 @@ class PostHydratorTest extends TestCase
                 'locationPost' => $locationPost,
                 'visibility' => Visibility::PUBLIC,
                 'user' => new User,
+                'hashTags' => new Collection,
                 'metaInfos' => new Collection([
                     $this->createMetaInfoMock(MetaInfoKey::TRAVEL_REASON, TravelReason::LEISURE->value),
                 ]),
@@ -136,6 +137,7 @@ class PostHydratorTest extends TestCase
                 'locationPost' => null,
                 'visibility' => Visibility::PUBLIC,
                 'user' => new User,
+                'hashTags' => new Collection,
                 'metaInfos' => new Collection([$vehicle2, $vehicle1]), // Wrong order to test sorting
                 default => null,
             };

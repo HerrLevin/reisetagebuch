@@ -8,7 +8,6 @@ use App\Http\Resources\UserDto;
 use App\Models\ActivityPubPost;
 use App\Models\Post;
 use App\Traits\JsonResponseObject;
-use Carbon\Carbon;
 use OpenApi\Attributes as OA;
 
 /** @phpstan-consistent-constructor */
@@ -96,20 +95,20 @@ class BasePost
         $this->body = $post->body;
         $this->user = $userDto;
         $this->visibility = $post->visibility;
-        $this->publishedAt = $post->published_at?->toIso8601String() ?? Carbon::now()->toIso8601String();
+        $this->publishedAt = $post->published_at->toIso8601String();
         $this->createdAt = $post->created_at->toIso8601String();
         $this->updatedAt = $post->updated_at->toIso8601String();
-        $this->hashTags = $post->hashTags?->map(fn ($hashTag) => $hashTag->value)->toArray() ?? [];
+        $this->hashTags = $post->hashTags->map(fn ($hashTag) => $hashTag->value)->toArray();
         $this->likesCount = $likes + $apLikes;
         $this->likedByUser = $post->liked_by_user ?? false;
-        $this->metaInfos = $post->metaInfos?->groupBy(fn ($metaInfo) => $metaInfo->key->value)
+        $this->metaInfos = $post->metaInfos->groupBy(fn ($metaInfo) => $metaInfo->key->value)
             ->map(function ($group) {
                 if ($group->first()->key->valueType() === MetaInfoValueType::STRING_LIST) {
                     return $group->sortBy('order')->pluck('value')->values()->toArray();
                 }
 
                 return $group->first()->value;
-            })->toArray() ?? [];
+            })->toArray();
     }
 
     /**

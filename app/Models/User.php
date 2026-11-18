@@ -158,21 +158,21 @@ class User extends Authenticatable implements OAuthenticatable
 
     public function getIsFollowedAttribute(): bool
     {
-        $actingUser = Auth::guard('api')?->user();
+        $actingUser = Auth::guard('api')->user();
 
         return $actingUser && $this->followers()->where('origin_user_id', $actingUser->id)->exists();
     }
 
     public function getIsFollowingAttribute(): bool
     {
-        $actingUser = Auth::guard('api')?->user();
+        $actingUser = Auth::guard('api')->user();
 
         return $actingUser && $this->followings()->where('target_user_id', $actingUser->id)->exists();
     }
 
     public function getIsFollowRequestedAttribute(): bool
     {
-        $actingUser = Auth::guard('api')?->user();
+        $actingUser = Auth::guard('api')->user();
 
         return $actingUser && $this->followerRequests()->where('origin_user_id', $actingUser->id)->exists();
     }

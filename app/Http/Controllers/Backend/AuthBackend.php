@@ -35,7 +35,7 @@ class AuthBackend extends Controller
             name: $user->name,
             username: $user->username,
             email: $user->email,
-            avatar: $user->profile?->avatar ? $this->urlGenerator->to('/files/'.$user->profile?->avatar) : null,
+            avatar: $user->profile?->avatar ? $this->urlGenerator->to('/files/'.$user->profile->avatar) : null,
             mustVerifyEmail: $user instanceof MustVerifyEmail && ! $user->hasVerifiedEmail(),
             settings: $this->getSettings($user),
             canInviteUsers: config('app.invite.enabled') && $user->can('create', Invite::class),
@@ -86,8 +86,8 @@ class AuthBackend extends Controller
     {
         return new UserSettingsDto(
             motisRadius: $user->settings?->motis_radius,
-            requiresFollowRequest: $user->settings?->requires_follow_request ?? false,
-            hidePostsAfter: ! empty($user->settings?->hide_posts_after) ? (float) $user->settings->hide_posts_after : null,
+            requiresFollowRequest: $user->settings->requires_follow_request ?? false,
+            hidePostsAfter: ! empty($user->settings->hide_posts_after) ? (float) $user->settings->hide_posts_after : null,
         );
     }
 }

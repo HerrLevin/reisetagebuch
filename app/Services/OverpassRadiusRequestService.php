@@ -36,7 +36,7 @@ class OverpassRadiusRequestService extends OverpassRequestService
         if (! isset(self::EXCLUDE[$key])) {
             return '';
         }
-        $excludes = self::EXCLUDE[$key] ?? [];
+        $excludes = self::EXCLUDE[$key];
 
         $string = '';
         foreach ($excludes as $exclude) {

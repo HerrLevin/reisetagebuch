@@ -8,7 +8,6 @@ use App\Dto\ActivityPub\Extensions\RtbExtension;
 use App\Dto\ActivityPub\Extensions\RtbExtensionFactory;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;
-use InvalidArgumentException;
 use Throwable;
 
 /**
@@ -45,10 +44,6 @@ class RtbExtensionCast implements CastsAttributes
             return json_encode($value->toArray());
         }
 
-        if (is_array($value)) {
-            return json_encode($value);
-        }
-
-        throw new InvalidArgumentException('extension_data must be an RtbExtension DTO, an array, or null.');
+        return json_encode($value);
     }
 }

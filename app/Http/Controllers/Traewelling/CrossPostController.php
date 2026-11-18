@@ -49,7 +49,7 @@ class CrossPostController extends Controller
             'transportPost.destinationStop.location.identifiers',
             'transportPost.transportTrip',
         ])->find($postId);
-        $this->traewellingId = $post?->metaInfos->where('key', MetaInfoKey::TRAEWELLING_TRIP_ID)->first()?->value ?? null;
+        $this->traewellingId = $post?->metaInfos->where('key', MetaInfoKey::TRAEWELLING_TRIP_ID)->first()->value ?? null;
         $isTrwlUser = SocialAccount::whereUserId($post?->user->id)->whereProvider('traewelling')->exists();
 
         if (! $isTrwlUser) {
@@ -308,7 +308,7 @@ class CrossPostController extends Controller
         return $stopovers->map(function (TransportTripStop $stop, int $index) use ($firstStop, $totalDuration, $numStops) {
             $interpolatedArrival = null;
             $interpolatedDeparture = null;
-            if ($totalDuration !== null && $numStops > 0) {
+            if ($totalDuration !== null) {
                 // interpolate evenly
                 $interpolatedArrival = $firstStop->departure_time?->copy()->addSeconds(intval($totalDuration * ($index + 1) / ($numStops + 1)));
                 $interpolatedDeparture = $interpolatedArrival?->copy()->addMinutes(2); // assume 2 minutes stopover

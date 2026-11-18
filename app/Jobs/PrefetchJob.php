@@ -39,7 +39,7 @@ class PrefetchJob implements ShouldQueue
         }
 
         try {
-            $attempts = method_exists($this, 'attempts') ? $this->attempts() : null;
+            $attempts = $this->attempts();
         } catch (Throwable) {
             $attempts = null;
         }

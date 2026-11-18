@@ -52,7 +52,7 @@ class RequestLocationDto
         $dto = new self;
         $dto->fetched = $model->fetched;
         $dto->toFetch = $model->to_fetch;
-        $dto->updatedAt = $model->updated_at->toIso8601String() ?? '';
+        $dto->updatedAt = $model->updated_at?->toIso8601String() ?? '';
         $dto->lastRequestedAt = $model->last_requested_at?->toIso8601String() ?? null;
 
         return $dto;

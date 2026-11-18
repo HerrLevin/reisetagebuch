@@ -42,13 +42,13 @@ class ActivityPubPostHydrator
     private function buildUserDto(ActivityPubPost $post): UserDto
     {
         $actor = $post->actor;
-        $handle = $actor?->preferred_username ?? '';
+        $handle = $actor->preferred_username ?? '';
         $instanceHost = $actor ? (parse_url($actor->actor_uri, PHP_URL_HOST) ?? '') : '';
         $fullHandle = $instanceHost ? "{$handle}@{$instanceHost}" : $handle;
 
         $userDto = new UserDto;
-        $userDto->id = $actor?->id ?? Str::uuid()->toString();
-        $userDto->name = $actor?->display_name ?? $fullHandle;
+        $userDto->id = $actor->id ?? Str::uuid()->toString();
+        $userDto->name = $actor->display_name ?? $fullHandle;
         $userDto->username = $fullHandle;
         $userDto->avatar = $actor?->local_icon_url;
         $userDto->profileUrl = $actor?->profile_url;

@@ -201,7 +201,7 @@ class MastodonActivityPubController extends Controller
             return response()->json(['error' => 'Actor does not match signature'], 403);
         }
 
-        if ($activityId && $actorId) {
+        if ($activityId) {
             $inserted = ActivityPubInboxItem::insertOrIgnore([
                 'activity_id' => $activityId,
                 'actor_id' => $actorId,
@@ -395,7 +395,7 @@ class MastodonActivityPubController extends Controller
             return response()->json(['error' => 'Actor does not match signature'], 403);
         }
 
-        if ($activityId && $actorId) {
+        if ($activityId) {
             $inserted = ActivityPubInboxItem::insertOrIgnore([
                 'activity_id' => $activityId,
                 'actor_id' => $actorId,
@@ -500,7 +500,7 @@ class MastodonActivityPubController extends Controller
                 $user,
                 new ActivityPubUserFollowedNotification(
                     followerActorId: $followerActorId,
-                    followerPreferredUsername: $actor?->preferred_username ?? $followerActorId,
+                    followerPreferredUsername: $actor->preferred_username ?? $followerActorId,
                     followerDisplayName: $actor?->display_name,
                     followerIconUrl: $actor?->local_icon_url,
                     followerProfileUrl: $actor?->profile_url,
@@ -508,7 +508,7 @@ class MastodonActivityPubController extends Controller
             );
         }
 
-        $inboxUrl = $actor?->shared_inbox_url ?? $actor?->inbox_url;
+        $inboxUrl = $actor->shared_inbox_url ?? $actor?->inbox_url;
         if ($inboxUrl) {
             try {
                 $this->sendAccept($user, $activity, $inboxUrl);
@@ -534,7 +534,7 @@ class MastodonActivityPubController extends Controller
         ])->exists();
 
         if ($alreadyFollowing) {
-            $inboxUrl = $actor?->shared_inbox_url ?? $actor?->inbox_url;
+            $inboxUrl = $actor->shared_inbox_url ?? $actor?->inbox_url;
             if ($inboxUrl) {
                 try {
                     $this->sendAccept($user, $activity, $inboxUrl);
@@ -566,7 +566,7 @@ class MastodonActivityPubController extends Controller
                 new ActivityPubUserRequestedFollowNotification(
                     followRequestId: $followRequest->id,
                     followerActorId: $followerActorId,
-                    followerPreferredUsername: $actor?->preferred_username ?? $followerActorId,
+                    followerPreferredUsername: $actor->preferred_username ?? $followerActorId,
                     followerDisplayName: $actor?->display_name,
                     followerIconUrl: $actor?->local_icon_url,
                     followerProfileUrl: $actor?->profile_url,
@@ -713,7 +713,7 @@ class MastodonActivityPubController extends Controller
                     $user,
                     new ActivityPubPostLikedNotification(
                         actorId: $actorId,
-                        preferredUsername: $actor?->preferred_username ?? $actorId,
+                        preferredUsername: $actor->preferred_username ?? $actorId,
                         displayName: $actor?->display_name,
                         iconUrl: $actor?->local_icon_url,
                         profileUrl: $actor?->profile_url,
@@ -956,7 +956,7 @@ class MastodonActivityPubController extends Controller
 
         $collection = new OrderedCollectionHydrator()->hydrate(
             id: route('ap.followers', ['username' => $user->username]),
-            totalItems: $user->statistics?->followers_count ?? 0,
+            totalItems: $user->statistics->followers_count ?? 0,
         )->toArray();
 
         return response()->json(data: $collection, options: JSON_UNESCAPED_SLASHES)
@@ -972,7 +972,7 @@ class MastodonActivityPubController extends Controller
 
         $collection = new OrderedCollectionHydrator()->hydrate(
             id: route('ap.following', ['username' => $user->username]),
-            totalItems: $user->statistics?->following_count ?? 0,
+            totalItems: $user->statistics->following_count ?? 0,
         )->toArray();
 
         return response()->json(data: $collection, options: JSON_UNESCAPED_SLASHES)
