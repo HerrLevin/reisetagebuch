@@ -4,8 +4,6 @@ namespace App\Dto\ActivityPub\Objects;
 
 class OrderedCollectionPage extends BaseObject
 {
-    public readonly string $type;
-
     public string $partOf;
 
     public array $orderedItems;
@@ -16,6 +14,6 @@ class OrderedCollectionPage extends BaseObject
 
     public function __construct()
     {
-        $this->type = 'OrderedCollectionPage';
+        parent::__construct('OrderedCollectionPage');
     }
 }

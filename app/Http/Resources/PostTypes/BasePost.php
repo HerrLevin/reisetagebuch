@@ -11,6 +11,7 @@ use App\Traits\JsonResponseObject;
 use Carbon\Carbon;
 use OpenApi\Attributes as OA;
 
+/** @phpstan-consistent-constructor */
 #[OA\Schema(
     schema: 'BasePost',
     description: 'Base Post Resource',

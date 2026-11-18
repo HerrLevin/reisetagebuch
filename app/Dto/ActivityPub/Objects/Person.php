@@ -7,8 +7,6 @@ use App\Dto\ActivityPub\PublicKey;
 
 class Person extends BaseObject
 {
-    public readonly string $type;
-
     public string $following;
 
     public string $followers;
@@ -44,6 +42,6 @@ class Person extends BaseObject
 
     public function __construct()
     {
-        $this->type = 'Person';
+        parent::__construct('Person');
     }
 }

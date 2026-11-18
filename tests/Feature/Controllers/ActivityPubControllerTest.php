@@ -942,6 +942,14 @@ class ActivityPubControllerTest extends TestCase
         $remoteActorId = 'https://remote.example/users/bob';
 
         $this->setupRemoteActor($remoteActorId, $remotePubKey);
+        // remote.example doesn't resolve; skip the SSRF DNS check so the Accept delivery reaches Http::fake()
+        $this->app->bind(ActivityPubUrlGuard::class, fn () => new class extends ActivityPubUrlGuard
+        {
+            public function assertSafe(string $url): string
+            {
+                return '203.0.113.1';
+            }
+        });
 
         $activity = [
             '@context' => 'https://www.w3.org/ns/activitystreams',
@@ -958,6 +966,7 @@ class ActivityPubControllerTest extends TestCase
             'follower_actor_id' => $remoteActorId,
             'followed_user_id' => $user->id,
         ]);
+        Http::assertSent(fn ($request) => $request->method() === 'POST' && $request['type'] === 'Accept');
     }
 
     public function test_inbox_follow_is_idempotent_and_does_not_create_duplicate(): void

@@ -6,10 +6,8 @@ namespace App\Dto\ActivityPub\Activities;
 
 class Like extends BaseActivity
 {
-    public readonly string $type;
-
     public function __construct()
     {
-        $this->type = 'Like';
+        parent::__construct('Like');
     }
 }
