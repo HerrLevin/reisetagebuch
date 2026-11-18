@@ -65,8 +65,8 @@ class BrouterRequestService
             return $this->tempProfile;
         }
 
-        // get file from storage
-        $filePath = storage_path('app/brouter/rail_improved.brf');
+        // get profile from resources
+        $filePath = resource_path('brouter/rail_improved.brf');
 
         $fileContent = file_get_contents($filePath);
 

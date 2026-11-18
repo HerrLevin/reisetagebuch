@@ -29,7 +29,12 @@ echo "Clearing caches..."
 php artisan optimize
 
 echo "Generating Passport keys (skipped if they already exist)..."
+# storage may be an empty mounted folder, and passport:keys doesn't create the directory itself
+mkdir -p /var/www/html/storage/oauth-keys
 php artisan passport:keys || true
+
+echo "Generating API docs..."
+php artisan l5-swagger:generate
 
 echo "Restart Horizon workers..."
 php artisan horizon:terminate

@@ -2,23 +2,56 @@
 
 This guide will help you set up your own instance of Reisetagebuch.
 
-## System Requirements
+## Prerequisites
 
-- Docker and Docker Compose (optional, for containerized setup)
+- Docker with Docker Compose v2
+- A domain and a reverse proxy (like traefik) that terminates HTTPS (see [Reverse Proxy](#reverse-proxy))
+- A directory for your instance containing two files:
+  - `docker-compose.yml`: copy [docker-compose.example.yml](https://github.com/HerrLevin/reisetagebuch/blob/main/docker-compose.example.yml)
+  - `.env`: copy [.env.prod.example](https://github.com/HerrLevin/reisetagebuch/blob/main/.env.prod.example)
+
+You don't need to create any other directories. Storage, database and Redis data live in Docker-managed volumes
+that are created on the first start.
+
+::: details Local data folders
+If you'd rather keep the data in folders next to your `docker-compose.yml` (e.g. for backups), use the commented-out
+`volumes` block at the end of the compose file instead of the default one. The folders must exist before the first
+start, and `storage` must be writable by the container user (uid 33):
+
+```bash
+mkdir -p ./app/storage ./pgsql ./redis
+sudo chown -R 33:33 ./app/storage
+```
+:::
+
+## Configure `.env`
+
+You **must** change these values in `.env` before the first start:
+
+| Variable                                   | What to set                                                                                                                          |
+|--------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
+| `APP_KEY`                                  | Generate with `echo "base64:$(openssl rand -base64 32)"`. Keep it, because changing it later invalidates sessions and encrypted data. |
+| `APP_URL`                                  | The public `https://` URL your reverse proxy serves, e.g. `https://your-domain.tld`                                                   |
+| `DB_PASSWORD`                              | A strong password. It is only applied when the database is first created, so set it before the first start.                           |
+| `REDIS_PASSWORD`                           | A strong password instead of `changeme`                                                                                                 |
+| `MAIL_*`                                   | Your SMTP server, so invite and notification mails can be sent                                                                          |
+
+All other options are described in [Configuration](./configuration.md).
 
 ## Docker Compose Setup
 
-Reisetagebuch is published as a [Docker image](https://hub.docker.com/r/herrlevin/reisetagebuch), making it easy to deploy using Docker Compose.
-
-The easiest way to get started is by using Docker Compose.
-
-This is the recommended way to run Reisetagebuch, as it handles all dependencies including the database.
+Reisetagebuch is published as a [Docker image](https://hub.docker.com/r/herrlevin/reisetagebuch), and Docker Compose
+is the recommended way to run it, since it handles all dependencies including the database.
 
 The `rtb.prod` service serves the web application and runs the scheduler. Queued jobs are processed separately by
 [Laravel Horizon](https://laravel.com/docs/horizon), running in its own `horizon` service so it can be scaled
-independently of the web server. 
-You can find a docker compose sample, ready to copy, here:
-[docker-compose.example.yml](https://github.com/HerrLevin/reisetagebuch/blob/main/docker-compose.example.yml)
+independently of the web server. Both wait until Postgres has finished its initial setup and Redis is ready.
+
+Start the application with:
+
+```bash
+docker compose up -d
+```
 
 ::: tip
 You can run multiple Horizon workers by scaling the `horizon` service, e.g.:
@@ -33,15 +66,17 @@ docker compose run --rm rtb.prod php artisan migrate
 ```
 :::
 
-You'll also need a `.env` file with your configuration. You can use the provided `.env.example` as a starting point.
+::: details Testing locally without a reverse proxy
+Uncomment the `ports` mapping of `rtb.prod` in `docker-compose.yml` and set these in `.env`:
 
-You can get it here: [.env.prod.example](https://github.com/HerrLevin/reisetagebuch/blob/main/.env.prod.example)
-
-You can start the application with:
-
-```bash
-docker-compose up -d
+```dotenv
+APP_ENV=local
+APP_URL=http://localhost
 ```
+
+With `APP_ENV=production` or an `https://` `APP_URL`, all links are forced to HTTPS, which breaks plain HTTP access.
+Don't use this for a public instance.
+:::
 
 ## Reverse Proxy
 

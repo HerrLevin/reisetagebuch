@@ -7,9 +7,16 @@ services:
         env_file: .env
         volumes:
             - storage:/var/www/html/storage
+        # Not published by default: put a reverse proxy with HTTPS in front of it (see installation docs).
+        # For a quick local test over plain HTTP, uncomment this and set APP_ENV=local and
+        # APP_URL=http://localhost in your .env, otherwise every link is forced to https.
+        # ports:
+        #     - '80:80'
         depends_on:
-            - pgsql
-            - redis
+            pgsql:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
         healthcheck:
             test: ['CMD', 'curl', '-fsS', '-o', '/dev/null', 'http://localhost/up']
             interval: 30s
@@ -37,9 +44,9 @@ services:
             - storage:/var/www/html/storage
         depends_on:
             pgsql:
-                condition: service_started
+                condition: service_healthy
             redis:
-                condition: service_started
+                condition: service_healthy
             rtb.prod:
                 # Only waits for rtb.prod's healthcheck (nginx responding), not for its
                 # migrations to finish. On first deploy, run migrations explicitly before
@@ -73,11 +80,15 @@ services:
                 - CMD
                 - pg_isready
                 - '-q'
+                - '-h'
+                - localhost
                 - '-d'
                 - '${DB_DATABASE}'
                 - '-U'
                 - '${DB_USERNAME}'
-            retries: 3
+            interval: 5s
+            start_period: 60s
+            retries: 10
             timeout: 5s
 
     redis:
@@ -94,27 +105,36 @@ services:
                 - '-a'
                 - '${REDIS_PASSWORD}'
                 - ping
-            retries: 3
+            interval: 5s
+            retries: 10
             timeout: 5s
 
-# The device directories must exist on the host before the first `docker compose up`
-#   mkdir -p ./app/storage ./pgsql ./redis
+# Docker-managed volumes, created automatically. `storage` is pre-filled from the image on first start.
 volumes:
     storage:
-        driver: local
-        driver_opts:
-            type: none
-            o: bind
-            device: ./app/storage
     pgsql:
-        driver: local
-        driver_opts:
-            type: none
-            o: bind
-            device: ./pgsql
     redis:
-        driver: local
-        driver_opts:
-            type: none
-            o: bind
-            device: ./redis
+
+# Alternative: keep the data in local folders next to this file. Replace the block above with this one
+# and prepare the folders first (see "Local data folders" in the installation docs):
+#   mkdir -p ./app/storage ./pgsql ./redis
+#   sudo chown -R 33:33 ./app/storage
+#volumes:
+#    storage:
+#        driver: local
+#        driver_opts:
+#            type: none
+#            o: bind
+#            device: ./app/storage
+#    pgsql:
+#        driver: local
+#        driver_opts:
+#            type: none
+#            o: bind
+#            device: ./pgsql
+#    redis:
+#        driver: local
+#        driver_opts:
+#            type: none
+#            o: bind
+#            device: ./redis
