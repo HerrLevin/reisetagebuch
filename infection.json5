@@ -8,6 +8,8 @@
         "html": "storage/infection/infection.html"
     },
     "threads": "max",
+    "staticAnalysisTool": "phpstan",
+    "staticAnalysisToolOptions": "--memory-limit=2G",
     "tmpDir": "storage/infection/tmp",
     "mutators": {
         "@default": true
