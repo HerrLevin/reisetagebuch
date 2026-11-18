@@ -17,6 +17,7 @@ use Clickbar\Magellan\Data\Geometries\Dimension;
 use Clickbar\Magellan\Data\Geometries\Geometry;
 use Clickbar\Magellan\Data\Geometries\LineString;
 use Clickbar\Magellan\Data\Geometries\Point;
+use Clickbar\Magellan\Data\Geometries\PointCollection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Location\Coordinate;
@@ -242,7 +243,7 @@ class TransportTripRepository
 
     private function ensure3d(Geometry $geometry): Geometry
     {
-        if ($geometry->getDimension()->hasZDimension()) {
+        if (! $geometry instanceof PointCollection || $geometry->getDimension()->hasZDimension()) {
             return $geometry;
         }
 

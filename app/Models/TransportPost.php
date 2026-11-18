@@ -33,31 +33,37 @@ class TransportPost extends Model
         'transited_country_codes' => 'array',
     ];
 
+    /** @return BelongsTo<Location, $this> */
     public function origin(): BelongsTo
     {
         return $this->belongsTo(Location::class, 'origin_id');
     }
 
+    /** @return BelongsTo<Location, $this> */
     public function destination(): BelongsTo
     {
         return $this->belongsTo(Location::class, 'destination_id');
     }
 
+    /** @return BelongsTo<TransportTrip, $this> */
     public function transportTrip(): BelongsTo
     {
         return $this->belongsTo(TransportTrip::class, 'transport_trip_id');
     }
 
+    /** @return BelongsTo<TransportTripStop, $this> */
     public function originStop(): BelongsTo
     {
         return $this->belongsTo(TransportTripStop::class, 'origin_stop_id');
     }
 
+    /** @return BelongsTo<TransportTripStop, $this> */
     public function destinationStop(): BelongsTo
     {
         return $this->belongsTo(TransportTripStop::class, 'destination_stop_id');
     }
 
+    /** @return BelongsTo<Post, $this> */
     public function post(): BelongsTo
     {
         return $this->belongsTo(Post::class, 'post_id');

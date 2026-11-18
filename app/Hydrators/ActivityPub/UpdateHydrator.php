@@ -2,13 +2,14 @@
 
 namespace App\Hydrators\ActivityPub;
 
+use App\Dto\ActivityPub\Activities\Note;
 use App\Dto\ActivityPub\Activities\Update;
-use App\Dto\ActivityPub\Objects\BaseObject;
+use App\Dto\ActivityPub\Objects\Person;
 use Illuminate\Support\Str;
 
 class UpdateHydrator
 {
-    public function hydrate(string $actor, BaseObject $object, bool $context = false): Update
+    public function hydrate(string $actor, Note|Person $object, bool $context): Update
     {
         $update = new Update;
         // Must differ both from the object's Create activity id and from every other

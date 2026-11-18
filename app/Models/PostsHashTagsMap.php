@@ -20,11 +20,13 @@ class PostsHashTagsMap extends Pivot
         'hash_tag_id',
     ];
 
+    /** @return BelongsTo<Post, $this> */
     public function post(): BelongsTo
     {
         return $this->belongsTo(Post::class);
     }
 
+    /** @return BelongsTo<HashTag, $this> */
     public function hashTag(): BelongsTo
     {
         return $this->belongsTo(HashTag::class);

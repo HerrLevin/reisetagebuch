@@ -10,6 +10,7 @@ class ActivityPubRemoteFollow extends Model
 {
     use HasUuids;
 
+    /** @return BelongsTo<ActivityPubActor, $this> */
     public function actor(): BelongsTo
     {
         return $this->belongsTo(ActivityPubActor::class, 'remote_actor_id', 'actor_uri');
@@ -24,6 +25,7 @@ class ActivityPubRemoteFollow extends Model
         'state',
     ];
 
+    /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'local_user_id');

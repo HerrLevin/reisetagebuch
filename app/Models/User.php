@@ -10,9 +10,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Passport\Contracts\OAuthenticatable;
 use Laravel\Passport\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Authenticatable implements OAuthenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, HasUuids, Notifiable;
@@ -59,81 +60,97 @@ class User extends Authenticatable
         return (bool) $this->is_admin;
     }
 
+    /** @return HasMany<Post, $this> */
     public function posts(): HasMany
     {
         return $this->hasMany(Post::class);
     }
 
+    /** @return HasOne<Profile, $this> */
     public function profile(): HasOne
     {
         return $this->hasOne(Profile::class);
     }
 
+    /** @return HasMany<Invite, $this> */
     public function invites(): HasMany
     {
         return $this->hasMany(Invite::class);
     }
 
+    /** @return HasOne<UserSettings, $this> */
     public function settings(): HasOne
     {
         return $this->hasOne(UserSettings::class);
     }
 
+    /** @return HasMany<TimestampedUserWaypoint, $this> */
     public function locationHistory(): HasMany
     {
         return $this->hasMany(TimestampedUserWaypoint::class);
     }
 
+    /** @return HasMany<SocialAccount, $this> */
     public function socialAccounts(): HasMany
     {
         return $this->hasMany(SocialAccount::class);
     }
 
+    /** @return HasOne<SocialAccount, $this> */
     public function traewellingAccount(): HasOne
     {
         return $this->hasOne(SocialAccount::class)->where('provider', 'traewelling');
     }
 
+    /** @return HasMany<TransportTrip, $this> */
     public function trips(): HasMany
     {
         return $this->hasMany(TransportTrip::class)->where('user_id', $this->id);
     }
 
+    /** @return HasMany<HashTag, $this> */
     public function hashTags(): HasMany
     {
         return $this->hasMany(HashTag::class);
     }
 
+    /** @return HasMany<Like, $this> */
     public function likes(): HasMany
     {
         return $this->hasMany(Like::class);
     }
 
+    /** @return HasMany<PrivacyPolicyAcceptance, $this> */
     public function privacyPolicyAcceptances(): HasMany
     {
         return $this->hasMany(PrivacyPolicyAcceptance::class);
     }
 
+    /** @return HasOne<UserStatistics, $this> */
     public function statistics(): HasOne
     {
         return $this->hasOne(UserStatistics::class);
     }
 
+    /** @return HasMany<Follow, $this> */
     public function followings(): HasMany
     {
         return $this->hasMany(Follow::class, 'origin_user_id');
     }
 
+    /** @return HasMany<Follow, $this> */
     public function followers(): HasMany
     {
         return $this->hasMany(Follow::class, 'target_user_id');
     }
 
+    /** @return HasMany<FollowRequest, $this> */
     public function followerRequests(): HasMany
     {
         return $this->hasMany(FollowRequest::class, 'target_user_id');
     }
 
+    /** @return HasMany<FollowRequest, $this> */
     public function followRequests(): HasMany
     {
         return $this->hasMany(FollowRequest::class, 'origin_user_id');
@@ -185,11 +202,13 @@ class User extends Authenticatable
         });
     }
 
+    /** @return HasMany<ActivityPubFollower, $this> */
     public function activityPubFollowers(): HasMany
     {
         return $this->hasMany(ActivityPubFollower::class, 'followed_user_id');
     }
 
+    /** @return HasMany<ActivityPubRemoteFollow, $this> */
     public function remoteFollows(): HasMany
     {
         return $this->hasMany(ActivityPubRemoteFollow::class, 'local_user_id');

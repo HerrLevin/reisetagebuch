@@ -32,11 +32,13 @@ class RouteSegment extends Model
         'updated_at' => 'datetime',
     ];
 
+    /** @return BelongsTo<Location, $this> */
     public function fromLocation(): BelongsTo
     {
         return $this->belongsTo(Location::class, 'from_location_id');
     }
 
+    /** @return BelongsTo<Location, $this> */
     public function toLocation(): BelongsTo
     {
         return $this->belongsTo(Location::class, 'to_location_id');

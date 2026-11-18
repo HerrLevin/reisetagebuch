@@ -36,26 +36,31 @@ class Post extends Model
         });
     }
 
+    /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /** @return HasOne<LocationPost, $this> */
     public function locationPost(): HasOne
     {
         return $this->hasOne(LocationPost::class);
     }
 
+    /** @return HasOne<TransportPost, $this> */
     public function transportPost(): HasOne
     {
         return $this->hasOne(TransportPost::class);
     }
 
+    /** @return HasMany<PostMetaInfo, $this> */
     public function metaInfos(): HasMany
     {
         return $this->hasMany(PostMetaInfo::class);
     }
 
+    /** @return BelongsToMany<HashTag, $this> */
     public function hashTags(): BelongsToMany
     {
         return $this->belongsToMany(HashTag::class, 'posts_hash_tags_maps')
@@ -63,11 +68,13 @@ class Post extends Model
             ->using(PostsHashTagsMap::class);
     }
 
+    /** @return HasMany<Like, $this> */
     public function likes(): HasMany
     {
         return $this->hasMany(Like::class);
     }
 
+    /** @return HasMany<ActivityPubLike, $this> */
     public function activityPubLikes(): HasMany
     {
         return $this->hasMany(ActivityPubLike::class);

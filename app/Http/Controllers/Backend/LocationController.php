@@ -13,7 +13,6 @@ use App\Dto\MotisApi\TripDto;
 use App\Dto\RequestLocationDto;
 use App\Exceptions\OverpassApiOverloaded;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\LocationDto;
 use App\Http\Resources\LocationHistoryEntryDto;
 use App\Http\Resources\TripHistoryEntryDto;
 use App\Hydrators\DbTripHydrator;
@@ -74,9 +73,6 @@ class LocationController extends Controller
         $this->overpassLocationRequestService = $overpassLocationRequestService;
     }
 
-    /**
-     * @return LocationDto[]|Collection
-     */
     public function index(string $userId, Carbon $fromDate, Carbon $untilDate): LocationHistoryDto
     {
         $locations = $this->locationRepository->getLocationsForUser($userId, $fromDate, $untilDate);
@@ -184,7 +180,7 @@ class LocationController extends Controller
 
         $locations = $this->locationRepository->getByOsmId($nodeId);
 
-        if ($locations->isEmpty() && Cache::add(sprintf('overpass:fetch_by_id:node:%s', $nodeId), true, now()->addminutes(5))) {
+        if ($locations->isEmpty() && Cache::add(sprintf('overpass:fetch_by_id:node:%s', $nodeId), true, now()->addMinutes(5))) {
             // If another process has recently fetched this node (within 1 minute), skip fetching
             try {
                 $this->fetchById($nodeId, 'node');
@@ -351,7 +347,6 @@ class LocationController extends Controller
         }
 
         $stopovers = [$dto->legs[0]->from, ...$dto->legs[0]->intermediateStops, $dto->legs[0]->to];
-        /** @var TransportTripStop[] $stopModels */
         $order = 0;
         /** @var StopPlaceDto $stopover */
         foreach ($stopovers as $stopover) {

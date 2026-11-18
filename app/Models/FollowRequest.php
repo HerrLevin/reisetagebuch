@@ -15,11 +15,13 @@ class FollowRequest extends Model
         'target_user_id',
     ];
 
+    /** @return BelongsTo<User, $this> */
     public function originUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'origin_user_id');
     }
 
+    /** @return BelongsTo<User, $this> */
     public function targetUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'target_user_id');

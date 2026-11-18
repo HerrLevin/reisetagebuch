@@ -23,11 +23,13 @@ class PrivacyPolicyAcceptance extends Model
         ];
     }
 
+    /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /** @return BelongsTo<PrivacyPolicy, $this> */
     public function privacyPolicy(): BelongsTo
     {
         return $this->belongsTo(PrivacyPolicy::class);

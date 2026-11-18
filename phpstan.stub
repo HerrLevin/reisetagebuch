@@ -1,0 +1,9 @@
+<?php
+
+namespace Laravel\Passport {
+    /**
+     * @property list<string> $redirect_uris
+     * @property list<string> $grant_types
+     */
+    class Client extends \Illuminate\Database\Eloquent\Model {}
+}

@@ -49,6 +49,7 @@ class License extends Model
         'IODL-2.0' => ['name' => 'Italian Open Data Licence', 'url' => 'https://www.dati.gov.it/iodl/2.0'],
     ];
 
+    /** @return HasMany<TransportTrip, $this> */
     public function transportTrips(): HasMany
     {
         return $this->hasMany(TransportTrip::class);

@@ -22,6 +22,7 @@ class PostMetaInfo extends Model
         'key' => MetaInfoKey::class,
     ];
 
+    /** @return BelongsTo<Post, $this> */
     public function post(): BelongsTo
     {
         return $this->belongsTo(Post::class);

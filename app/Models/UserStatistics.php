@@ -25,6 +25,7 @@ class UserStatistics extends Model
         'visited_locations_count',
     ];
 
+    /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

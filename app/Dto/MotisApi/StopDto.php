@@ -30,42 +30,42 @@ class StopDto
     #[OA\Property('distance', description: 'Distance to the stop in meters', type: 'integer', nullable: true)]
     public ?int $distance = null;
 
-    public function setStopId(string $stopId): StopDto
+    public function setStopId(string $stopId): static
     {
         $this->stopId = $stopId;
 
         return $this;
     }
 
-    public function setTripStopId(?string $tripStopId): StopDto
+    public function setTripStopId(?string $tripStopId): static
     {
         $this->tripStopId = $tripStopId;
 
         return $this;
     }
 
-    public function setName(string $name): StopDto
+    public function setName(string $name): static
     {
         $this->name = $name;
 
         return $this;
     }
 
-    public function setLatitude(float $latitude): StopDto
+    public function setLatitude(float $latitude): static
     {
         $this->latitude = $latitude;
 
         return $this;
     }
 
-    public function setLongitude(float $longitude): StopDto
+    public function setLongitude(float $longitude): static
     {
         $this->longitude = $longitude;
 
         return $this;
     }
 
-    public function setDistance(?int $distance): StopDto
+    public function setDistance(?int $distance): static
     {
         $this->distance = $distance;
 

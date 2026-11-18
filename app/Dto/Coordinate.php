@@ -16,6 +16,11 @@ readonly class Coordinate
         $this->longitude = $longitude;
     }
 
+    public function toArray(): array
+    {
+        return ['latitude' => $this->latitude, 'longitude' => $this->longitude];
+    }
+
     public function __toString(): string
     {
         return $this->latitude.','.$this->longitude;

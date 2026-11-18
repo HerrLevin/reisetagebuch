@@ -20,6 +20,7 @@ class TimestampedUserWaypoint extends Model
         'location' => Point::class,
     ];
 
+    /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

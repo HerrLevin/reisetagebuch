@@ -316,6 +316,7 @@ class PostRepository
         return $time?->clone()->addSeconds($delaySeconds ?? 0);
     }
 
+    /** @return Builder<Post> */
     private function basePostQuery(): Builder
     {
         return Post::with([

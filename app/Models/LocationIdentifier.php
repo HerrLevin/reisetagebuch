@@ -13,6 +13,7 @@ class LocationIdentifier extends Model
 
     protected $fillable = ['location_id', 'identifier', 'type', 'origin', 'name'];
 
+    /** @return BelongsTo<Location, $this> */
     public function location(): BelongsTo
     {
         return $this->belongsTo(Location::class);

@@ -22,6 +22,7 @@ class PrivacyPolicy extends Model
         ];
     }
 
+    /** @return HasMany<PrivacyPolicyAcceptance, $this> */
     public function acceptances(): HasMany
     {
         return $this->hasMany(PrivacyPolicyAcceptance::class);

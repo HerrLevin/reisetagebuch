@@ -43,26 +43,31 @@ class TransportTrip extends Model
         });
     }
 
+    /** @return HasMany<TransportTripStop, $this> */
     public function stops(): HasMany
     {
         return $this->hasMany(TransportTripStop::class, 'transport_trip_id', 'id')->orderBy('stop_sequence');
     }
 
+    /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /** @return HasMany<TransportPost, $this> */
     public function transportPosts(): HasMany
     {
         return $this->hasMany(TransportPost::class, 'transport_trip_id', 'id');
     }
 
+    /** @return HasOne<TransportTrip, $this> */
     public function continuesAs(): HasOne
     {
         return $this->hasOne(TransportTrip::class, 'id', 'continues_as_trip_id');
     }
 
+    /** @return BelongsTo<License, $this> */
     public function license(): BelongsTo
     {
         return $this->belongsTo(License::class);

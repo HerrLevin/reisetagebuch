@@ -23,11 +23,13 @@ class TransportPostStopoverLog extends Model
         'manual_departure' => 'datetime',
     ];
 
+    /** @return BelongsTo<TransportPost, $this> */
     public function transportPost(): BelongsTo
     {
         return $this->belongsTo(TransportPost::class);
     }
 
+    /** @return BelongsTo<TransportTripStop, $this> */
     public function transportTripStop(): BelongsTo
     {
         return $this->belongsTo(TransportTripStop::class);

@@ -4,11 +4,11 @@ namespace App\Services;
 
 use App\Models\LocationIdentifier;
 use App\Models\SocialAccount;
+use App\Services\Socialite\TraewellingProvider;
 use Clickbar\Magellan\Data\Geometries\Point;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Log;
-use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\Token;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
@@ -50,7 +50,7 @@ class TraewellingRequestService
         // if traewelling token is expired, refresh it
         if ($account && $account->token_expires_at && $account->token_expires_at->isPast()) {
             /** @var Token $tokens */
-            $tokens = Socialite::driver('traewelling')->refreshToken($account->refresh_token);
+            $tokens = TraewellingProvider::make()->refreshToken($account->refresh_token);
             $account->update([
                 'access_token' => $tokens->token,
                 'refresh_token' => $tokens->refreshToken,
