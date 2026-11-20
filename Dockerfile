@@ -5,7 +5,7 @@ COPY . .
 RUN composer install --no-dev --optimize-autoloader --ignore-platform-req=ext-gd --ignore-platform-req=ext-pcntl
 
 # Stage 2: Build PHP application
-FROM php:8.6-fpm
+FROM php:8.5-fpm
 
 # Set environment variables for runtime user and group IDs
 ARG RUNTIME_UID=33
