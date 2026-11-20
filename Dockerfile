@@ -1,11 +1,12 @@
 # Stage 1: Build dependencies
-FROM composer:latest AS builder
+FROM php:8.5-cli AS builder
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /app
 COPY . .
 RUN composer install --no-dev --optimize-autoloader --ignore-platform-req=ext-gd --ignore-platform-req=ext-pcntl
 
 # Stage 2: Build PHP application
-FROM php:8.6-fpm
+FROM php:8.5-fpm
 
 # Set environment variables for runtime user and group IDs
 ARG RUNTIME_UID=33
