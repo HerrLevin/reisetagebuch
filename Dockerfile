@@ -1,6 +1,8 @@
 # Stage 1: Build dependencies
 FROM php:8.5-cli AS builder
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# composer needs unzip to extract dist packages; php:*-cli doesn't ship it
+RUN apt-get update && apt-get install -y --no-install-recommends unzip && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY . .
 RUN composer install --no-dev --optimize-autoloader --ignore-platform-req=ext-gd --ignore-platform-req=ext-pcntl
