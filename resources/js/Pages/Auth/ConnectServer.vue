@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LoadingButton from '@shared/Components/LoadingButton.vue';
 import { initApi } from '@/api';
 import ApplicationLogo from '@shared/Components/ApplicationLogo.vue';
 import InputError from '@shared/Components/InputError.vue';
@@ -78,14 +79,13 @@ const submit = async () => {
                     <InputError class="mt-2" :message="error" />
                 </div>
 
-                <button
+                <LoadingButton
                     type="submit"
                     class="btn btn-primary mt-6 w-full"
-                    :class="{ 'opacity-25': processing }"
-                    :disabled="processing"
+                    :loading="processing"
                 >
                     {{ t('connect_server.submit') }}
-                </button>
+                </LoadingButton>
             </form>
         </div>
     </div>

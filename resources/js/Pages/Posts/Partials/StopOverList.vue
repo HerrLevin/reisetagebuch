@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import EditTimesDialog from '@/Components/Post/Partials/EditTimesDialog.vue';
+import LoadingButton from '@shared/Components/LoadingButton.vue';
 import { DateTime } from 'luxon';
 import { CircleX, Pencil, PlaneLanding, PlaneTakeoff } from 'lucide-vue-next';
 import {
@@ -63,7 +64,7 @@ function logArrival(stop: TransportPostStopoverDto, index: number) {
         return;
     }
 
-    api.posts
+    return api.posts
         .logStopoverArrival(props.activeTransportPost.id, stop.id, {
             timestamp,
         })
@@ -85,7 +86,7 @@ function logDeparture(stop: TransportPostStopoverDto, index: number) {
         return;
     }
 
-    api.posts
+    return api.posts
         .logStopoverDeparture(props.activeTransportPost.id, stop.id, {
             timestamp,
         })
@@ -157,7 +158,7 @@ function saveStopoverTimes() {
         );
     }
 
-    Promise.all(requests).then((responses) => {
+    return Promise.all(requests).then((responses) => {
         const last = responses[responses.length - 1];
         if (last) {
             emit('update:stopovers', last.data);
@@ -180,7 +181,7 @@ function clearArrival() {
     if (!props.activeTransportPost || !editingStop.value) {
         return;
     }
-    api.posts
+    return api.posts
         .clearStopoverArrival(
             props.activeTransportPost.id,
             editingStop.value.id,
@@ -192,7 +193,7 @@ function clearDeparture() {
     if (!props.activeTransportPost || !editingStop.value) {
         return;
     }
-    api.posts
+    return api.posts
         .clearStopoverDeparture(
             props.activeTransportPost.id,
             editingStop.value.id,
@@ -262,7 +263,7 @@ function clearDeparture() {
                     </div>
                 </div>
                 <div v-if="props.editable" class="flex gap-2">
-                    <button
+                    <LoadingButton
                         v-if="index > 0"
                         class="btn btn-xs md:btn-sm btn-outline"
                         :class="{
@@ -271,14 +272,14 @@ function clearDeparture() {
                                 props.stopovers[index].manualDepartureTime ||
                                 props.stopovers[index].manualArrivalTime,
                         }"
-                        @click="logArrival(stop, index)"
+                        :action="() => logArrival(stop, index)"
+                        :icon="PlaneLanding"
                     >
-                        <PlaneLanding class="size-4" />
                         <span class="hidden md:inline">
                             {{ t('edit_transport_times.arrive_now') }}
                         </span>
-                    </button>
-                    <button
+                    </LoadingButton>
+                    <LoadingButton
                         v-if="index < props.stopovers.length - 1"
                         class="btn btn-xs md:btn-sm btn-primary"
                         :class="{
@@ -286,13 +287,13 @@ function clearDeparture() {
                                 laterStopAlreadyLogged(index) ||
                                 props.stopovers[index].manualDepartureTime,
                         }"
-                        @click="logDeparture(stop, index)"
+                        :action="() => logDeparture(stop, index)"
+                        :icon="PlaneTakeoff"
                     >
-                        <PlaneTakeoff class="size-4" />
                         <span class="hidden md:inline">
                             {{ t('edit_transport_times.depart_now') }}
                         </span>
-                    </button>
+                    </LoadingButton>
                     <button
                         class="btn btn-xs md:btn-sm btn-ghost"
                         @click="openEditDialog(stop, index)"
@@ -317,27 +318,27 @@ function clearDeparture() {
         :show-departure="editShowDeparture"
         :show-arrival="editShowArrival"
         arrival-first
-        @save="saveStopoverTimes"
+        :save="saveStopoverTimes"
     >
         <template v-if="editingStop?.manualArrivalTime" #arrival-extra>
-            <button
-                type="button"
+            <LoadingButton
                 class="btn btn-sm btn-outline"
-                @click="clearArrival"
+                :action="clearArrival"
+                :icon="CircleX"
+                icon-class="size-5"
             >
-                <CircleX class="size-5" />
                 {{ t('edit_transport_times.clear_arrival') }}
-            </button>
+            </LoadingButton>
         </template>
         <template v-if="editingStop?.manualDepartureTime" #departure-extra>
-            <button
-                type="button"
+            <LoadingButton
                 class="btn btn-sm btn-outline"
-                @click="clearDeparture"
+                :action="clearDeparture"
+                :icon="CircleX"
+                icon-class="size-5"
             >
-                <CircleX class="size-5" />
                 {{ t('edit_transport_times.clear_departure') }}
-            </button>
+            </LoadingButton>
         </template>
     </EditTimesDialog>
 </template>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LoadingButton from '@shared/Components/LoadingButton.vue';
 import { api } from '@/api';
 import InputError from '@shared/Components/InputError.vue';
 import InputLabel from '@shared/Components/InputLabel.vue';
@@ -107,13 +108,13 @@ const submit = async () => {
             </div>
 
             <div class="mt-4 flex items-center justify-end">
-                <button
+                <LoadingButton
+                    type="submit"
                     class="btn btn-primary"
-                    :class="{ 'opacity-25': processing }"
-                    :disabled="processing"
+                    :loading="processing"
                 >
                     {{ t('auth.reset_password.title') }}
-                </button>
+                </LoadingButton>
             </div>
         </form>
     </AuthLayout>

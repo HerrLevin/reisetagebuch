@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LoadingButton from '@shared/Components/LoadingButton.vue';
 import { api } from '@/api';
 import InputLabel from '@shared/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
@@ -86,14 +87,13 @@ const deleteUser = () => {
                         </button>
                     </form>
 
-                    <button
+                    <LoadingButton
                         class="btn btn-error"
-                        :class="{ 'opacity-25': processing }"
-                        :disabled="processing"
+                        :loading="processing"
                         @click="deleteUser"
                     >
                         {{ t('settings.delete_account.confirm') }}
-                    </button>
+                    </LoadingButton>
                 </div>
             </div>
             <form method="dialog" class="modal-backdrop">

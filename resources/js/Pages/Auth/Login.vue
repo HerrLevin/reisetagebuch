@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LoadingButton from '@shared/Components/LoadingButton.vue';
 import { useTitle } from '@shared/composables/useTitle';
 import AuthLayout from '@/Layouts/AuthLayout.vue';
 import { isNative } from '@/Services/ServerConfig';
@@ -46,12 +47,8 @@ if (isNative() && route.query.start === 'true') {
             <Info class="size-4" />
             {{ t('auth.logged_out') }}
         </div>
-        <button
-            type="button"
-            class="btn btn-primary mt-12 w-full"
-            @click="login()"
-        >
+        <LoadingButton class="btn btn-primary mt-12 w-full" :action="login">
             {{ t('auth.login.title') }}
-        </button>
+        </LoadingButton>
     </AuthLayout>
 </template>

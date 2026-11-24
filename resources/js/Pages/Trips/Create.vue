@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import LoadingButton from '@shared/Components/LoadingButton.vue';
 import { api } from '@/api';
-import Loading from '@shared/Components/Loading.vue';
 import Map from '@/Components/Map.vue';
 import { useTitle } from '@shared/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
@@ -343,14 +343,13 @@ const stopOvers = computed<MultiPoint | null>(() => {
                 </div>
             </div>
             <div class="mt-4 flex justify-end">
-                <Loading v-if="loading" class="me-2" />
-                <button
+                <LoadingButton
                     class="btn btn-primary"
-                    :disabled="loading"
+                    :loading="loading"
                     @click="submit"
                 >
                     {{ t('new_route.create_route') }}
-                </button>
+                </LoadingButton>
             </div>
         </div>
         <template v-if="showMap">

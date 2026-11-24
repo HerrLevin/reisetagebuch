@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LoadingButton from '@shared/Components/LoadingButton.vue';
 import { api } from '@/api';
 import { useI18n } from 'vue-i18n';
 
@@ -36,14 +37,14 @@ async function unfollow() {
 </script>
 
 <template>
-    <button
+    <LoadingButton
         v-if="!followState"
         class="btn btn-primary btn-sm shrink-0"
-        :disabled="following"
-        @click="follow"
+        :loading="following"
+        :action="follow"
     >
         {{ t('fediverse.follow') }}
-    </button>
+    </LoadingButton>
     <button
         v-else-if="followState === 'pending'"
         class="btn btn-sm shrink-0"
@@ -51,13 +52,13 @@ async function unfollow() {
     >
         {{ t('fediverse.pending') }}
     </button>
-    <button
+    <LoadingButton
         v-else-if="followState === 'accepted'"
         class="btn btn-sm shrink-0"
-        @click="unfollow"
+        :action="unfollow"
     >
         {{ t('fediverse.unfollow') }}
-    </button>
+    </LoadingButton>
     <span
         v-else-if="followState === 'rejected'"
         class="badge badge-error badge-sm shrink-0"

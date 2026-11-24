@@ -2,6 +2,7 @@
 import { api } from '@/api';
 import router from '@/router';
 import EditTimesDialog from '@/Components/Post/Partials/EditTimesDialog.vue';
+import LoadingButton from '@shared/Components/LoadingButton.vue';
 import { getOwnShareText, getShareText } from '@/Services/PostTextService';
 import { getServerOrigin } from '@/Services/ServerConfig';
 import { calculateDelay, getDepartureTime } from '@/Services/TripTimeService';
@@ -50,7 +51,6 @@ const emit = defineEmits<{
 }>();
 
 const deleteModal = useTemplateRef('deleteModal');
-const deleteProcessing = ref(false);
 
 function showTimeButtons(): boolean {
     const post = props.post;
@@ -91,29 +91,28 @@ function showTimeButtons(): boolean {
     return false;
 }
 
-function departNow(): void {
+// The dropdown stays open until the request is done, so the loading state stays visible.
+async function departNow(): Promise<void> {
     const post = props.post;
     if (!isTransportPost(post)) {
         return;
     }
 
-    const now = DateTime.now();
+    await updateDepartureTime(post, DateTime.now().toISO());
     blur();
-    updateDepartureTime(post, now.toISO());
 }
 
-function arriveNow(): void {
+async function arriveNow(): Promise<void> {
     const post = props.post;
     if (!isTransportPost(post)) {
         return;
     }
-    const now = DateTime.now();
+    await updateArrivalTime(post, DateTime.now().toISO());
     blur();
-    updateArrivalTime(post, now.toISO());
 }
 
-function updateDepartureTime(post: TransportPost, departure: string): void {
-    api.posts
+function updateDepartureTime(post: TransportPost, departure: string) {
+    return api.posts
         .logStopoverDeparture(post.id, post.originStop.id, {
             timestamp: departure,
         })
@@ -125,8 +124,8 @@ function updateDepartureTime(post: TransportPost, departure: string): void {
         });
 }
 
-function updateArrivalTime(post: TransportPost, arrival: string): void {
-    api.posts
+function updateArrivalTime(post: TransportPost, arrival: string) {
+    return api.posts
         .logStopoverArrival(post.id, post.destinationStop.id, {
             timestamp: arrival,
         })
@@ -138,34 +137,33 @@ function updateArrivalTime(post: TransportPost, arrival: string): void {
         });
 }
 
-function submit(
+// Sequential, so a clear can't land after the new time was set.
+async function submit(
     departure: string | null | undefined,
     arrival: string | null | undefined,
-): void {
+): Promise<void> {
     blur();
     const post = props.post;
     if (!isTransportPost(post)) {
         return;
     }
 
-    api.posts
-        .clearStopoverDeparture(post.id, post.originStop.id)
-        .then((data) => {
-            updateTimes(data.data);
-        });
+    updateTimes(
+        (await api.posts.clearStopoverDeparture(post.id, post.originStop.id))
+            .data,
+    );
 
     if (departure) {
-        updateDepartureTime(post, departure);
+        await updateDepartureTime(post, departure);
     }
 
-    api.posts
-        .clearStopoverArrival(post.id, post.destinationStop.id)
-        .then((data) => {
-            updateTimes(data.data);
-        });
+    updateTimes(
+        (await api.posts.clearStopoverArrival(post.id, post.destinationStop.id))
+            .data,
+    );
 
     if (arrival) {
-        updateArrivalTime(post, arrival);
+        await updateArrivalTime(post, arrival);
     }
 }
 
@@ -209,8 +207,8 @@ function openEditTimesDialog(): void {
     editTimesDialog.value?.show();
 }
 
-function saveManualTimes(): void {
-    submit(
+function saveManualTimes() {
+    return submit(
         editManualDeparture.value ? editManualDeparture.value.toISO() : null,
         editManualArrival.value ? editManualArrival.value.toISO() : null,
     );
@@ -245,8 +243,7 @@ function arriveNowInDialog(): void {
 }
 
 function deletePost() {
-    deleteProcessing.value = true;
-    api.posts
+    return api.posts
         .deletePost(props.post.id)
         .then(() => {
             deleteModal.value?.close();
@@ -256,7 +253,6 @@ function deletePost() {
             // handle error
         })
         .finally(() => {
-            deleteProcessing.value = false;
             activePostStore.fetchPost(true);
         });
 }
@@ -392,16 +388,22 @@ function blur() {
                     </li>
                     <template v-if="showTimeButtons()">
                         <li>
-                            <a href="#" @click="departNow()">
-                                <PlaneTakeoff class="size-5" />
+                            <LoadingButton
+                                :action="departNow"
+                                :icon="PlaneTakeoff"
+                                icon-class="size-5"
+                            >
                                 {{ t('edit_transport_times.depart_now') }}
-                            </a>
+                            </LoadingButton>
                         </li>
                         <li>
-                            <a href="#" @click="arriveNow()">
-                                <PlaneLanding class="size-5" />
+                            <LoadingButton
+                                :action="arriveNow"
+                                :icon="PlaneLanding"
+                                icon-class="size-5"
+                            >
                                 {{ t('edit_transport_times.arrive_now') }}
-                            </a>
+                            </LoadingButton>
                         </li>
                     </template>
                 </template>
@@ -435,13 +437,13 @@ function blur() {
                     </button>
                 </form>
 
-                <button
+                <LoadingButton
                     class="btn btn-error"
-                    :disabled="deleteProcessing"
-                    @click.stop="deletePost()"
+                    :action="deletePost"
+                    @click.stop
                 >
                     {{ t('verbs.delete') }}
-                </button>
+                </LoadingButton>
             </div>
         </div>
         <form method="dialog" class="modal-backdrop">
@@ -456,7 +458,7 @@ function blur() {
         :title="t('edit_transport_times.title')"
         :departure-label="t('edit_transport_times.departure')"
         :arrival-label="t('edit_transport_times.arrival')"
-        @save="saveManualTimes"
+        :save="saveManualTimes"
     >
         <template #departure-extra>
             <div class="flex w-full justify-between gap-2">

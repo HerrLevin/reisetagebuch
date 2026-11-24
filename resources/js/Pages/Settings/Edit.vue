@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LoadingButton from '@shared/Components/LoadingButton.vue';
 import { api } from '@/api';
 import { useTitle } from '@shared/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
@@ -33,13 +34,13 @@ onMounted(async () => {
 });
 
 function changeServer() {
-    authStore.logout().finally(() => {
+    return authStore.logout().finally(() => {
         router.push({ name: 'connect-server' });
     });
 }
 
 function connectTraewelling() {
-    api.socialite.connectTraewelling().then((response) => {
+    return api.socialite.connectTraewelling().then((response) => {
         const url = response.data.url;
         console.log('Redirecting to Traewelling for authentication:', url);
         window.location.href = url;
@@ -125,13 +126,12 @@ if (route.name === 'socialite.traewelling.callback') {
                             })
                         }}
                     </p>
-                    <button
+                    <LoadingButton
                         class="btn btn-outline btn-sm"
-                        type="button"
-                        @click="changeServer()"
+                        :action="changeServer"
                     >
                         {{ t('connect_server.change_button') }}
-                    </button>
+                    </LoadingButton>
                 </div>
             </div>
             <div class="card bg-base-100 min-w-full p-8 shadow-md">
@@ -159,22 +159,22 @@ if (route.name === 'socialite.traewelling.callback') {
                     <span class="text-success">
                         {{ t('settings.connected_to_traewelling') }}
                     </span>
-                    <a
+                    <LoadingButton
                         class="btn btn-error btn-sm ml-4"
-                        type="button"
+                        :loading="processingTraewelling"
                         @click="disconnectTraewelling()"
                     >
                         {{ t('settings.disconnect_traewelling') }}
-                    </a>
+                    </LoadingButton>
                 </div>
-                <button
+                <LoadingButton
                     v-else
                     class="btn btn-primary"
-                    type="button"
-                    @click="connectTraewelling()"
+                    :loading="processingTraewelling"
+                    :action="connectTraewelling"
                 >
                     {{ t('settings.connect_traewelling') }}
-                </button>
+                </LoadingButton>
             </div>
             <div class="card bg-base-100 min-w-full p-8 shadow-md">
                 <DeleteUserForm class="max-w-xl" />

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LoadingButton from '@shared/Components/LoadingButton.vue';
 import { api } from '@/api';
 import InputLabel from '@shared/Components/InputLabel.vue';
 import TextArea from '@/Components/TextArea.vue';
@@ -207,14 +208,13 @@ const headerUpload = (event: Event) => {
                     </button>
                 </form>
 
-                <button
+                <LoadingButton
                     class="btn btn-primary"
-                    :class="{ 'opacity-25': processing }"
-                    :disabled="processing"
+                    :loading="processing"
                     @click.prevent="submit"
                 >
                     {{ t('verbs.save') }}
-                </button>
+                </LoadingButton>
             </div>
         </div>
         <form method="dialog" class="modal-backdrop">

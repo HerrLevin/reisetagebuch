@@ -155,6 +155,7 @@ fetchPost();
                     :travel-role="form.travelRole"
                     :meta-trip-id="form.metaTripId"
                     :post-time="form.visitedAt"
+                    :loading="loading"
                     @select-travel-reason="
                         (reason) => (form.travelReason = reason)
                     "

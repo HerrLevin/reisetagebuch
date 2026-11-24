@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LoadingButton from '@shared/Components/LoadingButton.vue';
 import { api } from '@/api';
 import { useTitle } from '@shared/composables/useTitle';
 import AuthLayout from '@/Layouts/AuthLayout.vue';
@@ -57,13 +58,13 @@ const logout = async () => {
 
         <form @submit.prevent="submit">
             <div class="mt-4 flex items-center justify-between">
-                <button
+                <LoadingButton
+                    type="submit"
                     class="btn btn-primary"
-                    :class="{ 'opacity-25': processing }"
-                    :disabled="processing"
+                    :loading="processing"
                 >
                     {{ t('auth.verify_email.resend') }}
-                </button>
+                </LoadingButton>
 
                 <button type="button" class="btn btn-link" @click="logout">
                     {{ t('auth.verify_email.logout') }}

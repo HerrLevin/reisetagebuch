@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LoadingButton from '@shared/Components/LoadingButton.vue';
 import { api } from '@/api';
 import NotificationLayout from '@/Pages/Notifications/Partials/NotificationLayout.vue';
 import { useUserStore } from '@/stores/user';
@@ -24,7 +25,7 @@ const hide = ref(false);
 
 function approve() {
     if (!authUser.user) return;
-    api.users
+    return api.users
         .approveFollowRequest(data.followerUserId, authUser.user.id)
         .then(() => {
             hide.value = true;
@@ -33,7 +34,7 @@ function approve() {
 
 function decline() {
     if (!authUser.user) return;
-    api.users
+    return api.users
         .deleteFollowRequest(data.followerUserId, authUser.user.id)
         .then(() => {
             hide.value = true;
@@ -65,18 +66,20 @@ const data = props.notification.data as UserRequestedFollowData;
                 }}
 
                 <div class="join my-1 ms-5 sm:my-0">
-                    <button
+                    <LoadingButton
                         class="btn btn-outline btn-error btn-xs join-item"
-                        @click="decline()"
+                        :action="decline"
+                        icon-class="size-3"
                     >
                         {{ t('notifications.follow_request.decline') }}
-                    </button>
-                    <button
+                    </LoadingButton>
+                    <LoadingButton
                         class="btn btn-success btn-xs join-item"
-                        @click="approve()"
+                        :action="approve"
+                        icon-class="size-3"
                     >
                         {{ t('notifications.follow_request.accept') }}
-                    </button>
+                    </LoadingButton>
                 </div>
             </div>
             <div class="mt-1 text-xs opacity-40">

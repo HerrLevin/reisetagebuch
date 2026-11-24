@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LoadingButton from '@shared/Components/LoadingButton.vue';
 import { api } from '@/api';
 import { useTitle } from '@shared/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
@@ -134,14 +135,14 @@ function accept(policy: PrivacyPolicyDto, target: 'current' | 'upcoming') {
                     v-if="authStore.isAuthenticated() && currentPolicy"
                     class="mt-6"
                 >
-                    <button
+                    <LoadingButton
                         v-if="!currentPolicy.acceptedAt"
                         class="btn btn-primary"
-                        :disabled="acceptingCurrent"
+                        :loading="acceptingCurrent"
                         @click="accept(currentPolicy, 'current')"
                     >
                         {{ t('pages.privacyPolicy.accept') }}
-                    </button>
+                    </LoadingButton>
                     <span v-else class="text-success">
                         {{ t('pages.privacyPolicy.accepted') }}
                     </span>
@@ -167,14 +168,14 @@ function accept(policy: PrivacyPolicyDto, target: 'current' | 'upcoming') {
                 <pre class="prose" v-html="upcomingContent"></pre>
 
                 <div v-if="authStore.isAuthenticated()" class="mt-6">
-                    <button
+                    <LoadingButton
                         v-if="!upcomingPolicy.acceptedAt"
                         class="btn btn-primary"
-                        :disabled="acceptingUpcoming"
+                        :loading="acceptingUpcoming"
                         @click="accept(upcomingPolicy, 'upcoming')"
                     >
                         {{ t('pages.privacyPolicy.accept') }}
-                    </button>
+                    </LoadingButton>
                     <span v-else class="text-success">
                         {{ t('pages.privacyPolicy.accepted') }}
                     </span>

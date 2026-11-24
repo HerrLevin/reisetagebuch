@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LoadingButton from '@shared/Components/LoadingButton.vue';
 import { api } from '@/api';
 import InputError from '@shared/Components/InputError.vue';
 import InputLabel from '@shared/Components/InputLabel.vue';
@@ -63,13 +64,13 @@ const submit = async () => {
             </div>
 
             <div class="mt-4 flex justify-end">
-                <button
+                <LoadingButton
+                    type="submit"
                     class="btn btn-primary ms-4"
-                    :class="{ 'opacity-25': processing }"
-                    :disabled="processing"
+                    :loading="processing"
                 >
                     {{ t('verbs.confirm') }}
-                </button>
+                </LoadingButton>
             </div>
         </form>
     </AuthLayout>

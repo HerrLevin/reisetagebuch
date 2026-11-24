@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import LoadingButton from '@shared/Components/LoadingButton.vue';
 import { DateTime } from 'luxon';
-import { useTemplateRef } from 'vue';
+import { ref, useTemplateRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -14,6 +15,8 @@ const props = withDefaults(
         showDeparture?: boolean;
         showArrival?: boolean;
         arrivalFirst?: boolean;
+        // Awaited before the dialog closes, so the save button can show its loading state.
+        save: () => unknown;
     }>(),
     {
         subtitle: '',
@@ -27,12 +30,12 @@ const departure = defineModel<DateTime | null>('departure', { default: null });
 const arrival = defineModel<DateTime | null>('arrival', { default: null });
 
 const emit = defineEmits<{
-    save: [];
     cancel: [];
 }>();
 
 const dialog = useTemplateRef('dialog');
 let saved = false;
+const saving = ref(false);
 
 function show() {
     saved = false;
@@ -50,7 +53,10 @@ function onClose() {
     saved = false;
 }
 
-function submit() {
+async function submit() {
+    if (saving.value) {
+        return;
+    }
     if (departure.value && arrival.value) {
         // arrivalFirst: arrival happens first, departure follows (e.g. a stopover).
         // Otherwise: departure happens first, arrival follows (e.g. a whole journey).
@@ -63,9 +69,14 @@ function submit() {
             return;
         }
     }
-    saved = true;
-    emit('save');
-    close();
+    saving.value = true;
+    try {
+        await props.save();
+        saved = true;
+        close();
+    } finally {
+        saving.value = false;
+    }
 }
 
 function selectDepartureDate(event: Event) {
@@ -260,9 +271,13 @@ defineExpose({ show, close });
                     >
                         {{ t('verbs.cancel') }}
                     </button>
-                    <button type="submit" class="btn btn-primary">
+                    <LoadingButton
+                        type="submit"
+                        class="btn btn-primary"
+                        :loading="saving"
+                    >
                         {{ t('edit_transport_times.save_times') }}
-                    </button>
+                    </LoadingButton>
                 </div>
             </form>
         </div>
