@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
+use App\Exceptions\TraewellingTokenExpired;
 use App\Models\LocationIdentifier;
 use App\Models\SocialAccount;
 use App\Services\Socialite\TraewellingProvider;
 use Clickbar\Magellan\Data\Geometries\Point;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Two\Token;
@@ -43,21 +45,40 @@ class TraewellingRequestService
         ]);
     }
 
+    /**
+     * @throws TraewellingTokenExpired
+     */
     public function getAccessToken(string $userId): void
     {
         $account = SocialAccount::whereUserId($userId)->whereProvider('traewelling')->first();
 
         // if traewelling token is expired, refresh it
         if ($account && $account->token_expires_at && $account->token_expires_at->isPast()) {
-            /** @var Token $tokens */
-            $tokens = TraewellingProvider::make()->refreshToken($account->refresh_token);
-            $account->update([
-                'access_token' => $tokens->token,
-                'refresh_token' => $tokens->refreshToken,
-                'token_expires_at' => now()->addSeconds($tokens->expiresIn),
-            ]);
+            $this->refreshToken($account);
         }
         $this->accessToken = $account->access_token ?? '';
+    }
+
+    /**
+     * @throws TraewellingTokenExpired
+     */
+    public function refreshToken(SocialAccount $account): void
+    {
+        try {
+            /** @var Token $tokens */
+            $tokens = TraewellingProvider::make()->refreshToken($account->refresh_token);
+        } catch (ClientException $e) {
+            // refresh token expired or revoked: the link is dead, drop it so the user can reconnect
+            Log::warning('Traewelling refresh token rejected, removing linked account', ['userId' => $account->user_id, 'exception' => $e->getMessage()]);
+            $account->delete();
+
+            throw new TraewellingTokenExpired('Your Träwelling connection has expired. Please reconnect your Träwelling account in the settings.');
+        }
+        $account->update([
+            'access_token' => $tokens->token,
+            'refresh_token' => $tokens->refreshToken,
+            'token_expires_at' => now()->addSeconds($tokens->expiresIn),
+        ]);
     }
 
     public function getTrwlStationFromLocation(Point $point): ?array
