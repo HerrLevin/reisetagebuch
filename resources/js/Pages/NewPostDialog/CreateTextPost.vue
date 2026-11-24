@@ -49,6 +49,7 @@ function submitForm() {
                     v-model="form.body"
                     :name="t('new_post.title')"
                     emoji="✍"
+                    :loading="loading"
                     @cancel="vueRouter.back()"
                     @select-visibility="
                         (visibility) => (form.visibility = visibility)

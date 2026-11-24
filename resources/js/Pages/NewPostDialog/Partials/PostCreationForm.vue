@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LoadingButton from '@shared/Components/LoadingButton.vue';
 import TimeSelect from '@/Components/TimeSelect.vue';
 import TagsInput from '@/Pages/NewPostDialog/Partials/TagsInput.vue';
 import VehicleIdInput from '@/Pages/NewPostDialog/Partials/VehicleIdInput.vue';
@@ -399,8 +400,8 @@ watch(
         <button class="btn btn-secondary" @click.prevent="$emit('cancel')">
             {{ t('verbs.cancel') }}
         </button>
-        <button class="btn btn-primary" type="submit" :disabled="loading">
+        <LoadingButton class="btn btn-primary" type="submit" :loading="loading">
             {{ confirmButtonText || t('verbs.confirm') }}
-        </button>
+        </LoadingButton>
     </div>
 </template>

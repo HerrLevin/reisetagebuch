@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LoadingButton from '@shared/Components/LoadingButton.vue';
 import { api } from '@/api';
 import SelectInput from '@/Components/SelectInput.vue';
 import TagsInput from '@/Pages/NewPostDialog/Partials/TagsInput.vue';
@@ -233,17 +234,17 @@ watch(
                     <button type="button" class="btn btn-ghost" @click="cancel">
                         {{ t('common.cancel') }}
                     </button>
-                    <button
+                    <LoadingButton
                         type="submit"
                         class="btn btn-primary"
-                        :disabled="processing"
+                        :loading="processing"
                     >
                         {{
                             processing
                                 ? t('common.saving')
                                 : t('posts.mass_edit.apply')
                         }}
-                    </button>
+                    </LoadingButton>
                 </div>
             </form>
         </div>

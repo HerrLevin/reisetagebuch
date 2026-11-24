@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LoadingButton from '@shared/Components/LoadingButton.vue';
 import { api } from '@/api';
 import { useUserStore } from '@/stores/user';
 import { Plus } from 'lucide-vue-next';
@@ -20,46 +21,42 @@ const props = defineProps({
 });
 
 function toggleFollow() {
-    if (followed.value) {
-        unfollow();
-    } else {
-        follow();
-    }
+    return followed.value ? unfollow() : follow();
 }
 
 function toggleFollowRequest() {
-    if (followRequested.value) {
-        destroyFollowRequest();
-    } else {
-        requestFollow();
-    }
+    return followRequested.value ? destroyFollowRequest() : requestFollow();
 }
 
 function requestFollow() {
     if (!authUser.user) {
         return;
     }
-    api.users.createFollowRequest(authUser.user.id, props.user.id).then(() => {
-        emits('follow-updated', true);
-        followRequested.value = true;
-    });
+    return api.users
+        .createFollowRequest(authUser.user.id, props.user.id)
+        .then(() => {
+            emits('follow-updated', true);
+            followRequested.value = true;
+        });
 }
 
 function destroyFollowRequest() {
     if (!authUser.user) {
         return;
     }
-    api.users.deleteFollowRequest(authUser.user.id, props.user.id).then(() => {
-        emits('follow-updated', false);
-        followRequested.value = false;
-    });
+    return api.users
+        .deleteFollowRequest(authUser.user.id, props.user.id)
+        .then(() => {
+            emits('follow-updated', false);
+            followRequested.value = false;
+        });
 }
 
 function follow() {
     if (!authUser.user) {
         return;
     }
-    api.users.createFollow(authUser.user.id, props.user.id).then(() => {
+    return api.users.createFollow(authUser.user.id, props.user.id).then(() => {
         emits('follow-updated', true);
         followed.value = true;
     });
@@ -69,7 +66,7 @@ function unfollow() {
     if (!authUser.user) {
         return;
     }
-    api.users.deleteFollow(authUser.user.id, props.user.id).then(() => {
+    return api.users.deleteFollow(authUser.user.id, props.user.id).then(() => {
         emits('follow-updated', false);
         followed.value = false;
     });
@@ -93,30 +90,30 @@ watch(
 
 <template>
     <template v-if="authUser.user && authUser.user.id !== user.id">
-        <button
+        <LoadingButton
             v-if="
                 !user.requiresFollowRequest ||
                 (user.requiresFollowRequest && followed)
             "
             class="btn rounded-full"
             :class="{ 'btn-primary': !followed }"
-            @click="toggleFollow"
+            :action="toggleFollow"
+            :icon="followed ? undefined : Plus"
         >
-            <Plus v-if="!followed" class="size-4" />
             {{ followed ? t('profile.unfollow') : t('profile.follow') }}
-        </button>
-        <button
+        </LoadingButton>
+        <LoadingButton
             v-else
             class="btn rounded-full"
             :class="{ 'btn-gray': followRequested }"
-            @click="toggleFollowRequest"
+            :action="toggleFollowRequest"
+            :icon="followRequested ? undefined : Plus"
         >
-            <Plus v-if="!followRequested" class="size-4" />
             {{
                 followRequested
                     ? t('profile.withdraw_follow_request')
                     : t('profile.request_follow')
             }}
-        </button>
+        </LoadingButton>
     </template>
 </template>

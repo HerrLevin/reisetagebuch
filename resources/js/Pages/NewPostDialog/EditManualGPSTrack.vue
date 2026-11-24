@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LoadingButton from '@shared/Components/LoadingButton.vue';
 import { api } from '@/api';
 import Loading from '@shared/Components/Loading.vue';
 import { useTitle } from '@shared/composables/useTitle';
@@ -87,7 +88,7 @@ function deleteGeometry() {
         return;
     }
 
-    api.posts
+    return api.posts
         .deleteTransportTrack(props.postId)
         .then(() => {
             vueRouter.push({
@@ -133,14 +134,13 @@ watch(() => props.postId, fetchPost, { immediate: true });
                     </div>
                     <div class="flex w-full justify-between pt-8">
                         <div>
-                            <button
+                            <LoadingButton
                                 v-show="post?.userGeometry"
-                                type="button"
                                 class="btn btn-outline btn-error"
-                                @click.prevent="deleteGeometry()"
+                                :action="deleteGeometry"
                             >
                                 {{ t('edit_manual_tracking.delete_track') }}
-                            </button>
+                            </LoadingButton>
                             <Loading v-if="loading" />
                         </div>
                         <div class="flex gap-4">
@@ -151,14 +151,15 @@ watch(() => props.postId, fetchPost, { immediate: true });
                             >
                                 {{ t('verbs.cancel') }}
                             </button>
-                            <button
+                            <LoadingButton
                                 class="btn btn-primary"
                                 type="submit"
-                                :disabled="uploading || !gpsInput"
+                                :loading="uploading"
+                                :disabled="!gpsInput"
                                 @click.prevent="submit()"
                             >
                                 {{ t('edit_manual_tracking.save_track') }}
-                            </button>
+                            </LoadingButton>
                         </div>
                     </div>
                 </form>

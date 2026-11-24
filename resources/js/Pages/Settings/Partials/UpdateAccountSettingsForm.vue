@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LoadingButton from '@shared/Components/LoadingButton.vue';
 import { api } from '@/api';
 import InputLabel from '@shared/Components/InputLabel.vue';
 import SelectInput from '@/Components/SelectInput.vue';
@@ -226,9 +227,13 @@ function formSubmit() {
             </div>
 
             <div class="flex items-center gap-4">
-                <button class="btn btn-primary" :disabled="processing">
+                <LoadingButton
+                    type="submit"
+                    class="btn btn-primary"
+                    :loading="processing"
+                >
                     {{ t('verbs.save') }}
-                </button>
+                </LoadingButton>
 
                 <Transition
                     enter-active-class="transition ease-in-out"

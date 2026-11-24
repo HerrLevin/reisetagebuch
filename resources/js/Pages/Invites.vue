@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LoadingButton from '@shared/Components/LoadingButton.vue';
 import { api } from '@/api';
 import { useTitle } from '@shared/composables/useTitle';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
@@ -26,25 +27,13 @@ async function fetchInvites(): Promise<void> {
 }
 
 async function createInvite(): Promise<void> {
-    loading.value = true;
-    try {
-        api.invites.createInvite({}).then(() => {
-            fetchInvites();
-        });
-    } finally {
-        loading.value = false;
-    }
+    await api.invites.createInvite({});
+    await fetchInvites();
 }
 
 async function deleteInvite(inviteCode: string): Promise<void> {
-    loading.value = true;
-    try {
-        api.invites.deleteInvite(inviteCode).then(() => {
-            fetchInvites();
-        });
-    } finally {
-        loading.value = false;
-    }
+    await api.invites.deleteInvite(inviteCode);
+    await fetchInvites();
 }
 
 function humanTimestamp(timestamp: string | null): string {
@@ -80,14 +69,13 @@ onMounted(() => {
 
         <div class="card bg-base-100 flex min-w-full shadow-md">
             <div class="flex min-w-full justify-center py-5">
-                <button
-                    type="button"
+                <LoadingButton
                     class="btn btn-primary"
                     :disabled="loading"
-                    @click="createInvite"
+                    :action="createInvite"
                 >
                     {{ t('invites.create_invite') }}
-                </button>
+                </LoadingButton>
             </div>
             <div class="divider"></div>
             <div class="overflow-x-auto">
@@ -118,13 +106,13 @@ onMounted(() => {
                                 </button>
                             </td>
                             <td>
-                                <button
+                                <LoadingButton
                                     class="btn btn-error"
                                     :disabled="loading"
-                                    @click="deleteInvite(invite.id)"
+                                    :action="() => deleteInvite(invite.id)"
                                 >
                                     {{ t('verbs.delete') }}
-                                </button>
+                                </LoadingButton>
                             </td>
                         </tr>
                     </tbody>

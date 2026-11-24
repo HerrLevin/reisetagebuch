@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LoadingButton from '@shared/Components/LoadingButton.vue';
 import { api } from '@/api';
 import Loading from '@shared/Components/Loading.vue';
 import MassEdit from '@/Components/Post/MassEdit.vue';
@@ -372,12 +373,13 @@ function deletePost(postId: string): void {
                             </div>
                         </div>
 
-                        <button
+                        <LoadingButton
                             class="btn btn-primary btn-block"
+                            :loading="loading"
                             @click="applyFilters"
                         >
                             {{ t('posts.filter.apply_filters') }}
-                        </button>
+                        </LoadingButton>
                     </div>
                 </div>
             </div>
