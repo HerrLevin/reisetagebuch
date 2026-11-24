@@ -18,3 +18,4 @@ Schedule::command('app:fetch-transitous-licenses')->daily()->after(function () {
     Artisan::call('app:fetch-transitous-license-overrides');
 });
 Schedule::command('app:fetch-transitous-license-overrides')->everySixHours();
+Schedule::command('app:refresh-traewelling-tokens')->daily();

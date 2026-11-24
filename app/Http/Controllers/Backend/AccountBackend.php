@@ -75,13 +75,13 @@ class AccountBackend extends Controller
                  */
                 $user = TraewellingProvider::make()->userFromToken($accessToken);
                 $user->logout();
-                $account->delete();
-
-                return true;
             } catch (Exception $e) {
-                // Log the error and continue with account deletion
+                // e.g. refresh token expired: remote logout is impossible, still remove the local link
                 Log::error('Traewelling logout error: '.$e->getMessage());
             }
+            $account->delete();
+
+            return true;
         }
 
         return false;
