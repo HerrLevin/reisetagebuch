@@ -67,7 +67,7 @@ services:
     pgsql:
         restart: always
         platform: 'linux/amd64' # Force x86_64 architecture for Postgres, because they don't support arm64 yet
-        image: 'postgis/postgis:18-master'
+        image: 'postgis/postgis:19-master'
         environment:
             PGPASSWORD: '${DB_PASSWORD:-secret}'
             POSTGRES_DB: '${DB_DATABASE}'
