@@ -1,0 +1,16 @@
+{
+	# TLS is terminated by the reverse proxy in front of the container
+	auto_https off
+}
+
+:80 {
+	root /var/www/html/public
+	encode zstd br gzip
+	header -Server
+
+	request_body {
+		max_size 11MB
+	}
+
+	php_server
+}

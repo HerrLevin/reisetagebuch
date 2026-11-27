@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - develop
+      - main
+    tags:
+      - "v*"
   pull_request:
 
 jobs:
@@ -388,3 +391,11 @@ jobs:
       - name: Stop containers and remove volumes
         if: always()
         run: docker compose -f docker-compose.pipeline.yml down -v
+
+  docker:
+    name: Docker Build & Push
+    # PRs only build the image; develop doesn't publish one
+    if: github.ref != 'refs/heads/develop'
+    needs: [lint, pint, phpstan, test, e2e]
+    uses: ./.github/workflows/docker-build.yml
+    secrets: inherit
