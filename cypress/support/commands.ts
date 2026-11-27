@@ -57,7 +57,7 @@ Cypress.Commands.add('apiRegister', (user?: Partial<TestUser>) => {
             method: 'POST',
             url: '/api/cypress/register',
             headers: {
-                'X-Cypress-Token': Cypress.env('CYPRESS_TOKEN') || 'testing',
+                'X-Cypress-Token': Cypress.expose('CYPRESS_TOKEN') || 'testing',
             },
             body: userData,
         })
@@ -177,7 +177,7 @@ Cypress.Commands.add('resetDatabase', () => {
         method: 'POST',
         url: '/api/cypress/reset',
         headers: {
-            'X-Cypress-Token': Cypress.env('CYPRESS_TOKEN') || 'testing',
+            'X-Cypress-Token': Cypress.expose('CYPRESS_TOKEN') || 'testing',
         },
     });
 });
@@ -187,7 +187,7 @@ Cypress.Commands.add('seedDatabase', () => {
         method: 'POST',
         url: '/api/cypress/seed',
         headers: {
-            'X-Cypress-Token': Cypress.env('CYPRESS_TOKEN') || 'testing',
+            'X-Cypress-Token': Cypress.expose('CYPRESS_TOKEN') || 'testing',
         },
     });
 });
