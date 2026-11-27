@@ -1,0 +1,35 @@
+# VCS, IDE and OS junk
+.git
+.idea
+.vscode
+.fleet
+.zed
+**/.DS_Store
+
+# Installed inside the image (composer in the builder stage, npm in the runtime stage)
+vendor
+node_modules
+public/build
+public/hot
+public/storage
+
+# Secrets and local caches must never end up in the image
+.env
+.env.*
+!.env.example
+auth.json
+bootstrap/cache/*
+!bootstrap/cache/.gitignore
+
+# Keep the storage folder structure, but none of its local contents (logs, keys, uploads)
+storage/**
+!storage/**/.gitignore
+
+# Native apps and test artefacts aren't part of the server image
+android
+ios
+dist-capacitor
+cypress/videos
+cypress/screenshots
+cypress/downloads
+.phpunit.cache

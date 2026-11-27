@@ -1,5 +1,5 @@
 services:
-    # Serves the web application (nginx + php-fpm) and runs the scheduler.
+    # Serves the web application (FrankenPHP) and runs the scheduler.
     # Does NOT process queued jobs — that's handled by the `horizon` service below.
     rtb.prod:
         restart: always
@@ -25,8 +25,8 @@ services:
             retries: 3
 
     # Processes queued jobs via Laravel Horizon. Uses the same image as `rtb.prod`, but
-    # overrides the container command to run only `artisan horizon`, skipping migrations,
-    # nginx and php-fpm.
+    # overrides the container command to run only `artisan horizon`, skipping migrations
+    # and the web server.
     #
     # Scale to multiple Horizon workers with:
     #   docker compose -f docker-compose.example.yml up -d --scale horizon=3
@@ -48,7 +48,7 @@ services:
             redis:
                 condition: service_healthy
             rtb.prod:
-                # Only waits for rtb.prod's healthcheck (nginx responding), not for its
+                # Only waits for rtb.prod's healthcheck (web server responding), not for its
                 # migrations to finish. On first deploy, run migrations explicitly before
                 # starting workers, e.g.: docker compose run --rm rtb.prod php artisan migrate
                 condition: service_healthy
